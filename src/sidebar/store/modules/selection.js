@@ -193,7 +193,7 @@ const reducers = {
    */
   ADD_ANNOTATIONS(state, action) {
     const topLevelAnnotations = action.annotations.filter(
-      annotation => !metadata.isReply(annotation)
+      annotation => !metadata.isReply(annotation),
     );
     const noteCount = countIf(action.annotations, metadata.isPageNote);
 
@@ -275,7 +275,7 @@ function selectAnnotations(ids) {
   return dispatch => {
     dispatch(clearSelection());
     dispatch(
-      makeAction(reducers, 'SELECT_ANNOTATIONS', { selection: toTrueMap(ids) })
+      makeAction(reducers, 'SELECT_ANNOTATIONS', { selection: toTrueMap(ids) }),
     );
   };
 }
@@ -367,7 +367,7 @@ function annotationFocusRequest(state) {
 const forcedVisibleThreads = createSelector(
   /** @param {State} state */
   state => state.forcedVisible,
-  forcedVisible => trueKeys(forcedVisible)
+  forcedVisible => trueKeys(forcedVisible),
 );
 
 /**
@@ -376,13 +376,13 @@ const forcedVisibleThreads = createSelector(
 const hasSelectedAnnotations = createSelector(
   /** @param {State} state */
   state => state.selected,
-  selection => trueKeys(selection).length > 0
+  selection => trueKeys(selection).length > 0,
 );
 
 const selectedAnnotations = createSelector(
   /** @param {State} state */
   state => state.selected,
-  selection => trueKeys(selection)
+  selection => trueKeys(selection),
 );
 
 /**
@@ -405,7 +405,7 @@ const selectionState = createSelector(
       sortKey: sortKey(selection),
       selectedTab: selectedTab(selection),
     };
-  }
+  },
 );
 
 /**
@@ -431,7 +431,7 @@ const sortKeys = createSelector(
       sortKeysForTab.push('Location');
     }
     return sortKeysForTab;
-  }
+  },
 );
 
 export const selectionModule = createStoreModule(initialState, {

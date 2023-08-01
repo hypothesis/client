@@ -15,7 +15,7 @@ describe('TagListItem', () => {
       <TagList>
         <TagListItem tag="my tag" href="http://www.example.com/my-tag" />
         <TagListItem tag="purple" />
-      </TagList>
+      </TagList>,
     );
 
   it('renders the tag text', () => {
@@ -48,6 +48,6 @@ describe('TagListItem', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponentInList(),
-    })
+    }),
   );
 });

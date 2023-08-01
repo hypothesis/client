@@ -15,7 +15,7 @@ describe('NotebookResultCount', () => {
         isLoading={false}
         resultCount={0}
         {...props}
-      />
+      />,
     );
   };
 
@@ -162,6 +162,6 @@ describe('NotebookResultCount', () => {
           return createComponent({ isLoading: true });
         },
       },
-    ])
+    ]),
   );
 });

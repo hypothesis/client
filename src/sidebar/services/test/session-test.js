@@ -71,7 +71,7 @@ describe('SessionService', () => {
       fakeApi,
       fakeAuth,
       fakeSettings,
-      fakeToastMessenger
+      fakeToastMessenger,
     );
   }
 
@@ -85,7 +85,7 @@ describe('SessionService', () => {
         fakeApi.profile.read.returns(
           Promise.resolve({
             userid: 'acct:user@publisher.org',
-          })
+          }),
         );
       });
 
@@ -113,7 +113,7 @@ describe('SessionService', () => {
         fakeApi.profile.read.returns(
           Promise.resolve({
             userid: 'acct:user@hypothes.is',
-          })
+          }),
         );
       });
 
@@ -205,7 +205,7 @@ describe('SessionService', () => {
       fakeApi.profile.update.returns(
         Promise.resolve({
           preferences: {},
-        })
+        }),
       );
     });
 
@@ -215,7 +215,7 @@ describe('SessionService', () => {
       assert.calledWith(
         fakeApi.profile.update,
         {},
-        { preferences: { show_sidebar_tutorial: false } }
+        { preferences: { show_sidebar_tutorial: false } },
       );
     });
 
@@ -236,7 +236,7 @@ describe('SessionService', () => {
       fakeApi.profile.read.returns(
         Promise.resolve({
           userid: 'acct:user_a@hypothes.is',
-        })
+        }),
       );
       const session = createService();
       return session.load();
@@ -246,7 +246,7 @@ describe('SessionService', () => {
       fakeApi.profile.read.returns(
         Promise.resolve({
           userid: 'acct:user_b@hypothes.is',
-        })
+        }),
       );
 
       fakeStore.updateProfile.resetHistory();
@@ -306,7 +306,7 @@ describe('SessionService', () => {
       fakeApi.profile.read.returns(
         Promise.resolve({
           userid: 'acct:initial_user@hypothes.is',
-        })
+        }),
       );
 
       const session = createService();
@@ -317,7 +317,7 @@ describe('SessionService', () => {
           fakeApi.profile.read.returns(
             Promise.resolve({
               userid: 'acct:different_user@hypothes.is',
-            })
+            }),
           );
           fakeAuth.emit('oauthTokensChanged');
 

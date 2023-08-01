@@ -46,7 +46,7 @@ export class Emitter implements Destroyable {
     this._emitter.off(event, callback);
     this._subscriptions = this._subscriptions.filter(
       ([subEvent, subCallback]) =>
-        subEvent !== event || subCallback !== callback
+        subEvent !== event || subCallback !== callback,
     );
   }
 

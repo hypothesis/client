@@ -21,7 +21,7 @@ describe('SidebarView', () => {
         loadAnnotationsService={fakeLoadAnnotationsService}
         streamer={fakeStreamer}
         {...props}
-      />
+      />,
     );
 
   beforeEach(() => {
@@ -193,7 +193,7 @@ describe('SidebarView', () => {
           wrapper
             .find('SidebarContentError')
             .filter({ errorType: 'annotation' })
-            .exists()
+            .exists(),
         );
       });
 
@@ -222,7 +222,7 @@ describe('SidebarView', () => {
         wrapper
           .find('SidebarContentError')
           .filter({ errorType: 'group' })
-          .exists()
+          .exists(),
       );
     });
 
@@ -295,6 +295,6 @@ describe('SidebarView', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
-    })
+    }),
   );
 });

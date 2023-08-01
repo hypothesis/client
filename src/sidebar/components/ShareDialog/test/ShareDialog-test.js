@@ -44,7 +44,7 @@ describe('ShareDialog', () => {
 
       assert.equal(
         wrapper.find('SidebarPanel').prop('title'),
-        'Share Annotations in Test Private Group'
+        'Share Annotations in Test Private Group',
       );
     });
 
@@ -54,7 +54,7 @@ describe('ShareDialog', () => {
       const wrapper = createComponent();
       assert.equal(
         wrapper.find('SidebarPanel').prop('title'),
-        'Share Annotations in ...'
+        'Share Annotations in ...',
       );
     });
   });
@@ -76,10 +76,10 @@ describe('ShareDialog', () => {
 
         assert.isTrue(wrapper.find('TabHeader').exists());
         assert.isTrue(
-          wrapper.find('Tab[aria-controls="share-panel"]').props().selected
+          wrapper.find('Tab[aria-controls="share-panel"]').props().selected,
         );
         assert.isTrue(
-          wrapper.find('TabPanel[id="share-panel"]').props().active
+          wrapper.find('TabPanel[id="share-panel"]').props().active,
         );
       });
 
@@ -135,7 +135,7 @@ describe('ShareDialog', () => {
       'should pass a11y checks',
       checkAccessibility({
         content: () => createComponent(),
-      })
+      }),
     );
   });
 });

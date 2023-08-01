@@ -34,8 +34,8 @@ describe('annotator.config.configFuncSettingsFrom', () => {
       assert.calledOnce(console.warn);
       assert.isTrue(
         console.warn.firstCall.args[0].startsWith(
-          'hypothesisConfig must be a function'
-        )
+          'hypothesisConfig must be a function',
+        ),
       );
     });
   });

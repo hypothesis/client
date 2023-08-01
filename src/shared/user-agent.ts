@@ -17,7 +17,7 @@ export const isMacOS = (_userAgent: string = window.navigator.userAgent) => {
  */
 export const isIOS = (
   _navigator: { platform: string; userAgent: string } = window.navigator,
-  _ontouchend: boolean = 'ontouchend' in document
+  _ontouchend: boolean = 'ontouchend' in document,
 ): boolean => {
   return (
     [

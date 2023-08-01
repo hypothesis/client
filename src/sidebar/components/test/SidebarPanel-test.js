@@ -118,6 +118,6 @@ describe('SidebarPanel', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createSidebarPanel(),
-    })
+    }),
   );
 });

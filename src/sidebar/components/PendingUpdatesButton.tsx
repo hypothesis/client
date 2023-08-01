@@ -22,7 +22,7 @@ function PendingUpdatesButton({
   const hasPendingUpdates = store.hasPendingUpdates();
   const applyPendingUpdates = useCallback(
     () => streamer.applyPendingUpdates(),
-    [streamer]
+    [streamer],
   );
 
   useShortcut('l', () => hasPendingUpdates && applyPendingUpdates());

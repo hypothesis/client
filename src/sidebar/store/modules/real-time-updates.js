@@ -164,7 +164,7 @@ function receiveRealTimeUpdates({
       makeAction(reducers, 'RECEIVE_REAL_TIME_UPDATES', {
         pendingUpdates,
         pendingDeletions,
-      })
+      }),
     );
   };
 }
@@ -203,7 +203,7 @@ const pendingUpdateCount = createSelector(
   /** @param {State} state */
   state => [state.pendingUpdates, state.pendingDeletions],
   ([pendingUpdates, pendingDeletions]) =>
-    Object.keys(pendingUpdates).length + Object.keys(pendingDeletions).length
+    Object.keys(pendingUpdates).length + Object.keys(pendingDeletions).length,
 );
 
 /**

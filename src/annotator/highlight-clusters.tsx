@@ -78,7 +78,7 @@ export class HighlightClusterController implements Destroyable {
     this._features = options.features;
 
     this._outerContainer = document.createElement(
-      'hypothesis-highlight-cluster-toolbar'
+      'hypothesis-highlight-cluster-toolbar',
     );
     this._element.appendChild(this._outerContainer);
     this._shadowRoot = createShadowRoot(this._outerContainer);
@@ -165,7 +165,7 @@ export class HighlightClusterController implements Destroyable {
    */
   _setClusterStyles(
     cluster: HighlightCluster,
-    styleName: keyof typeof highlightStyles
+    styleName: keyof typeof highlightStyles,
   ) {
     const styleRules = highlightStyles[styleName];
 
@@ -174,7 +174,7 @@ export class HighlightClusterController implements Destroyable {
     >) {
       this._setClusterStyle(
         `--hypothesis-${cluster}-${ruleName}`,
-        styleRules[ruleName] as string
+        styleRules[ruleName] as string,
       );
     }
   }
@@ -184,7 +184,7 @@ export class HighlightClusterController implements Destroyable {
    */
   _onChangeClusterStyle(
     cluster: HighlightCluster,
-    styleName: keyof typeof highlightStyles
+    styleName: keyof typeof highlightStyles,
   ) {
     this.appliedStyles[cluster] = styleName;
     this._setClusterStyles(cluster, styleName);
@@ -201,7 +201,7 @@ export class HighlightClusterController implements Destroyable {
           this._onChangeClusterStyle(cluster, styleName)
         }
       />,
-      this._shadowRoot
+      this._shadowRoot,
     );
   }
 }

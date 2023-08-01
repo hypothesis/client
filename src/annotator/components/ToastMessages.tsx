@@ -17,12 +17,12 @@ export default function ToastMessages({ emitter }: ToastMessagesProps) {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
   const addMessage = useCallback(
     (newMessage: ToastMessage) => setMessages(prev => [...prev, newMessage]),
-    []
+    [],
   );
   const dismissMessage = useCallback(
     (messageId: string) =>
       setMessages(prev => prev.filter(message => message.id !== messageId)),
-    []
+    [],
   );
 
   useEffect(() => {

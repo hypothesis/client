@@ -49,7 +49,7 @@ describe('MarkdownEditor', () => {
   function createComponent(props = {}, mountProps = {}) {
     return mount(
       <MarkdownEditor label="Test editor" text="test" {...props} />,
-      mountProps
+      mountProps,
     );
   }
 
@@ -110,7 +110,7 @@ describe('MarkdownEditor', () => {
         const text = 'toolbar command test';
         const wrapper = createComponent({ text, onEditText });
         const button = wrapper.find(
-          `ToolbarButton[title="${command}"] > IconButton button`
+          `ToolbarButton[title="${command}"] > IconButton button`,
         );
         const input = wrapper.find('textarea').getDOMNode();
         input.selectionStart = 0;
@@ -123,7 +123,7 @@ describe('MarkdownEditor', () => {
         assert.calledWith(
           formatFunction,
           sinon.match({ text, selectionStart: 0, selectionEnd: text.length }),
-          ...args
+          ...args,
         );
       });
 
@@ -149,11 +149,11 @@ describe('MarkdownEditor', () => {
               test.setOs();
               const wrapper = createComponent();
               const button = wrapper.find(
-                `ToolbarButton[title="${command}"] > IconButton`
+                `ToolbarButton[title="${command}"] > IconButton`,
               );
 
               const buttonTitlePattern = new RegExp(
-                `${test.expectedModifier}-${key.toUpperCase()}`
+                `${test.expectedModifier}-${key.toUpperCase()}`,
               );
               assert.match(button.props().title, buttonTitlePattern);
             });
@@ -190,7 +190,7 @@ describe('MarkdownEditor', () => {
                 selectionStart: 0,
                 selectionEnd: text.length,
               }),
-              ...args
+              ...args,
             );
           });
         });
@@ -397,6 +397,6 @@ describe('MarkdownEditor', () => {
           return wrapper;
         },
       },
-    ])
+    ]),
   );
 });

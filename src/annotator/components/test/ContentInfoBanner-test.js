@@ -67,11 +67,11 @@ describe('ContentInfoBanner', () => {
     // title attributes provide access to the full titles
     assert.equal(
       wrapper.find('div[data-testid="content-container-info"]').prop('title'),
-      'Expansive Book'
+      'Expansive Book',
     );
     assert.equal(
       wrapper.find('Link[data-testid="content-item-link"]').prop('title'),
-      'Chapter 2: Some book chapter'
+      'Chapter 2: Some book chapter',
     );
   });
 
@@ -80,18 +80,18 @@ describe('ContentInfoBanner', () => {
       const wrapper = createComponent();
 
       const prevLink = wrapper.find(
-        'Link[data-testid="content-previous-link"]'
+        'Link[data-testid="content-previous-link"]',
       );
       const nextLink = wrapper.find('Link[data-testid="content-next-link"]');
 
       assert.equal(
         prevLink.prop('href'),
-        'https://www.jstor.org/stable/book.123.1'
+        'https://www.jstor.org/stable/book.123.1',
       );
       assert.equal(prevLink.prop('target'), '_blank');
       assert.equal(
         nextLink.prop('href'),
-        'https://www.jstor.org/stable/book.123.3'
+        'https://www.jstor.org/stable/book.123.3',
       );
       assert.equal(nextLink.prop('target'), '_blank');
     });
@@ -103,7 +103,7 @@ describe('ContentInfoBanner', () => {
       const wrapper = createComponent({ contentInfo: noLinks });
 
       const prevLink = wrapper.find(
-        'Link[data-testid="content-previous-link"]'
+        'Link[data-testid="content-previous-link"]',
       );
       const nextLink = wrapper.find('Link[data-testid="content-next-link"]');
 
@@ -118,7 +118,7 @@ describe('ContentInfoBanner', () => {
       const wrapper = createComponent({ contentInfo: noLinks });
 
       const prevLink = wrapper.find(
-        'Link[data-testid="content-previous-link"]'
+        'Link[data-testid="content-previous-link"]',
       );
       const nextLink = wrapper.find('Link[data-testid="content-next-link"]');
 

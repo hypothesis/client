@@ -94,7 +94,7 @@ export class Injector {
 
     if (this._constructing.has(name)) {
       throw new Error(
-        `Encountered a circular dependency when constructing "${name}"`
+        `Encountered a circular dependency when constructing "${name}"`,
       );
     }
 
@@ -111,7 +111,7 @@ export class Injector {
           resolvedDependencies.push(this.get(dependency));
         } catch (e) {
           const resolveErr = new Error(
-            `Failed to construct dependency "${dependency}" of "${name}": ${e.message}`
+            `Failed to construct dependency "${dependency}" of "${name}": ${e.message}`,
           );
           // @ts-ignore - `cause` is a custom property
           resolveErr.cause = e;

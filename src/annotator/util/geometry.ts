@@ -109,6 +109,6 @@ export function unionRects(a: DOMRect, b: DOMRect) {
 export function rectCenter(rect: DOMRect) {
   return new DOMPoint(
     (rect.left + rect.right) / 2,
-    (rect.top + rect.bottom) / 2
+    (rect.top + rect.bottom) / 2,
   );
 }

@@ -94,7 +94,7 @@ describe('APIRoutesService', () => {
         ([routesA, routesB]) => {
           assert.equal(routesA, routesB);
           assert.equal(fakeFetchJSON.callCount, 1);
-        }
+        },
       );
     });
 
@@ -125,7 +125,7 @@ describe('APIRoutesService', () => {
         ([linksA, linksB]) => {
           assert.equal(linksA, linksB);
           assert.deepEqual(fakeFetchJSON.callCount, 2);
-        }
+        },
       );
     });
 

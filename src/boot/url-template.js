@@ -51,7 +51,7 @@ export function processUrlTemplate(url, document_ = document) {
     url = url.replace('{current_scheme}', origin.protocol);
   } else {
     throw new Error(
-      'Could not process URL template because script origin is unknown'
+      'Could not process URL template because script origin is unknown',
     );
   }
 

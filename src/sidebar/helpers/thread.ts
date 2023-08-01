@@ -12,7 +12,7 @@ function countByVisibility(thread: Thread, visibility: boolean): number {
   const matchesVisibility = thread.visible === visibility;
   return thread.children.reduce(
     (count, reply) => count + countByVisibility(reply, visibility),
-    matchesVisibility ? 1 : 0
+    matchesVisibility ? 1 : 0,
   );
 }
 

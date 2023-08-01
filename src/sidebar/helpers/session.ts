@@ -22,7 +22,7 @@ import { serviceConfig } from '../config/service-config';
 export function shouldAutoDisplayTutorial(
   isSidebar: boolean,
   profile: Profile,
-  settings: SidebarSettings
+  settings: SidebarSettings,
 ): boolean {
   const shouldShowBasedOnProfile =
     typeof profile.preferences === 'object' &&

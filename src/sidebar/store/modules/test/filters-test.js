@@ -89,7 +89,7 @@ describe('sidebar/store/modules/filters', () => {
       it('disables focus mode if there is a conflicting filter key', () => {
         store = createStore(
           [filtersModule],
-          [{ focus: { user: { username: 'somebody' } } }]
+          [{ focus: { user: { username: 'somebody' } } }],
         );
 
         assert.isTrue(store.focusState().active);
@@ -293,7 +293,7 @@ describe('sidebar/store/modules/filters', () => {
                 user: { username: 'somebody', displayName: 'Ding Bat' },
               },
             },
-          ]
+          ],
         );
         const focusFilters = store.getFocusFilters();
         assert.exists(focusFilters.user);
@@ -314,7 +314,7 @@ describe('sidebar/store/modules/filters', () => {
       it('returns true if user-focused mode is active', () => {
         store = createStore(
           [filtersModule],
-          [{ focus: { user: { username: 'somebody' } } }]
+          [{ focus: { user: { username: 'somebody' } } }],
         );
 
         assert.isTrue(store.hasAppliedFilter());
@@ -339,7 +339,7 @@ describe('sidebar/store/modules/filters', () => {
       it('returns false if user-focused mode is configured but inactive', () => {
         store = createStore(
           [filtersModule],
-          [{ focus: { user: { username: 'somebody' } } }]
+          [{ focus: { user: { username: 'somebody' } } }],
         );
         store.toggleFocusMode(false);
 

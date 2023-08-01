@@ -72,7 +72,7 @@ describe('Thread', () => {
         thread={createThread()}
         threadsService={fakeThreadsService}
         {...props}
-      />
+      />,
     );
   };
 
@@ -309,7 +309,7 @@ describe('Thread', () => {
 
       assert.equal(
         wrapper.find(childListSelector).find('Thread').length,
-        threadWithChildren.replyCount
+        threadWithChildren.replyCount,
       );
     });
 
@@ -324,7 +324,7 @@ describe('Thread', () => {
       // all of the second child's replies plus the second child itself.
       assert.equal(
         wrapper.find(childListSelector).find('Thread').length,
-        threadWithChildren.children[1].replyCount + 1
+        threadWithChildren.children[1].replyCount + 1,
       );
     });
   });
@@ -340,7 +340,7 @@ describe('Thread', () => {
       'should pass a11y checks',
       checkAccessibility({
         content: () => createComponent({ thread: threadWithChildren }),
-      })
+      }),
     );
   });
 });

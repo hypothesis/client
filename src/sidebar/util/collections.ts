@@ -36,7 +36,7 @@ export function trueKeys(obj: Record<string, boolean>): string[] {
  * Unlike `Object.entries`, this preserves the type of the key.
  */
 export function entries<Key extends string | number | symbol, Value>(
-  object: Record<Key, Value>
+  object: Record<Key, Value>,
 ): [Key, Value][] {
   return Object.entries(object) as [Key, Value][];
 }

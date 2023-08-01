@@ -11,7 +11,7 @@ import { hasOwn } from '../../shared/has-own';
  */
 export function replaceURLParams<Param>(
   url: string,
-  params: Record<string, Param>
+  params: Record<string, Param>,
 ): { url: string; unusedParams: Record<string, Param> } {
   const unusedParams: Record<string, Param> = {};
   for (const param in params) {

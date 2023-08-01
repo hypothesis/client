@@ -66,7 +66,7 @@ export class GroupsService {
     api: APIService,
     auth: AuthService,
     settings: SidebarSettings,
-    toastMessenger: ToastMessengerService
+    toastMessenger: ToastMessengerService,
   ) {
     this._store = store;
     this._api = api;
@@ -96,7 +96,7 @@ export class GroupsService {
     groups: Group[],
     isLoggedIn: boolean,
     directLinkedAnnotationGroupId: string | null,
-    directLinkedGroupId: string | null
+    directLinkedGroupId: string | null,
   ): Promise<Group[]> {
     // Filter the directLinkedGroup out if it is out of scope and scope is enforced.
     if (directLinkedGroupId) {
@@ -121,7 +121,7 @@ export class GroupsService {
     // If the main document URL has no groups associated with it, always show
     // the "Public" group.
     const pageHasAssociatedGroups = groups.some(
-      g => g.id !== '__world__' && g.isScopedToUri
+      g => g.id !== '__world__' && g.isScopedToUri,
     );
     if (!pageHasAssociatedGroups) {
       return groups;
@@ -154,7 +154,7 @@ export class GroupsService {
     watch(
       this._store.subscribe,
       () => this._mainURI(),
-      () => this.load()
+      () => this.load(),
     );
 
     // Reload groups when user ID changes. This is a bit inefficient since it
@@ -174,7 +174,7 @@ export class GroupsService {
         }
         this.load();
       },
-      shallowEqual
+      shallowEqual,
     );
   }
 
@@ -322,12 +322,12 @@ export class GroupsService {
       if (!directLinkedAnnGroup) {
         try {
           const directLinkedAnnGroup = await this._fetchGroup(
-            directLinkedAnn.group
+            directLinkedAnn.group,
           );
           featuredGroups.push(directLinkedAnnGroup);
         } catch (e) {
           this._toastMessenger.error(
-            'Unable to fetch group for linked annotation'
+            'Unable to fetch group for linked annotation',
           );
         }
       }
@@ -340,7 +340,7 @@ export class GroupsService {
       combineGroups(myGroups, featuredGroups, documentUri, this._settings),
       isLoggedIn,
       directLinkedAnnotationGroupId,
-      directLinkedGroupId
+      directLinkedGroupId,
     );
 
     const groupToFocus =
@@ -356,7 +356,7 @@ export class GroupsService {
    * @param groupIds - `id` or `groupid`s of groups to fetch
    */
   private async _loadServiceSpecifiedGroups(
-    groupIds: string[]
+    groupIds: string[],
   ): Promise<Group[]> {
     // Fetch the groups that the user is a member of in one request and then
     // fetch any other groups not returned in that request directly.
@@ -427,7 +427,7 @@ export class GroupsService {
         groupIds = await groupIdsOrPromise;
       } catch (e) {
         this._toastMessenger.error(
-          `Unable to fetch group configuration: ${e.message}`
+          `Unable to fetch group configuration: ${e.message}`,
         );
       }
       return this._loadServiceSpecifiedGroups(groupIds);

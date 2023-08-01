@@ -107,7 +107,7 @@ describe('annotator/integrations/vitalsource', () => {
     it('returns "content" if the book container element is found in the parent document', () => {
       assert.equal(
         vitalSourceFrameRole(fakeViewer.contentFrame.contentWindow),
-        'content'
+        'content',
       );
     });
 
@@ -145,7 +145,7 @@ describe('annotator/integrations/vitalsource', () => {
         fakeInjectClient,
         fakeViewer.contentFrame,
         fakeConfig,
-        'vitalsource-content'
+        'vitalsource-content',
       );
     });
 
@@ -172,7 +172,7 @@ describe('annotator/integrations/vitalsource', () => {
         assert.calledWith(
           fakeInjectClient,
           fakeViewer.contentFrame,
-          fakeConfig
+          fakeConfig,
         );
       });
     });
@@ -197,7 +197,7 @@ describe('annotator/integrations/vitalsource', () => {
       // nothing as we've already handled the current frame.
       fakeViewer.contentFrame.insertAdjacentElement(
         'afterend',
-        document.createElement('div')
+        document.createElement('div'),
       );
       await delay(0);
 
@@ -445,7 +445,7 @@ describe('annotator/integrations/vitalsource', () => {
         assert.instanceOf(error, Error);
         assert.equal(
           error.message,
-          `Page metadata field "${field}" is missing`
+          `Page metadata field "${field}" is missing`,
         );
       });
     });
@@ -552,7 +552,7 @@ describe('annotator/integrations/vitalsource', () => {
         const uri = await integration.uri();
         assert.equal(
           uri,
-          'https://bookshelf.vitalsource.com/reader/books/TEST-BOOK-ID'
+          'https://bookshelf.vitalsource.com/reader/books/TEST-BOOK-ID',
         );
       });
 
@@ -646,7 +646,7 @@ describe('annotator/integrations/vitalsource', () => {
           assert.isFalse(frame.hasAttribute('scrolling'));
           assert.equal(
             getComputedStyle(frame).height,
-            `${window.innerHeight}px` // "100%" in pixels
+            `${window.innerHeight}px`, // "100%" in pixels
           );
 
           // Try re-adding the scrolling attribute. It should get re-removed.
@@ -668,7 +668,7 @@ describe('annotator/integrations/vitalsource', () => {
           FakeImageTextLayer,
           fakePageImage,
           sinon.match.array,
-          pageText
+          pageText,
         );
 
         const glyphs = FakeImageTextLayer.getCall(0).args[1].map(domRect => ({

@@ -31,7 +31,7 @@ export function pageNumberOptions(
   currentPage: number,
   totalPages: number,
   /* istanbul ignore next */
-  maxPages = 5
+  maxPages = 5,
 ): PageNumber[] {
   if (totalPages <= 1) {
     return [];

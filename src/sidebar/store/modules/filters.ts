@@ -100,7 +100,7 @@ const reducers = {
 
   SET_FILTER(
     state: State,
-    action: { filterName: FilterKey; filterOption: FilterOption }
+    action: { filterName: FilterKey; filterOption: FilterOption },
   ) {
     const updatedFilters: Filters = {
       ...state.filters,
@@ -193,7 +193,7 @@ const focusState = createSelector(
       configured: !!focusFilters?.user,
       displayName: focusFilters?.user?.display || '',
     };
-  }
+  },
 );
 
 /**
@@ -210,7 +210,7 @@ const getFilters = createSelector(
       return { ...focusFilters, ...filters };
     }
     return { ...filters };
-  }
+  },
 );
 
 /**
@@ -234,7 +234,7 @@ const getFilterValues = createSelector(
       }
     }
     return filterValues;
-  }
+  },
 );
 
 function getFocusFilters(state: State) {

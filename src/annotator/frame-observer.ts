@@ -31,7 +31,7 @@ export class FrameObserver {
   constructor(
     element: Element,
     onFrameAdded: FrameCallback,
-    onFrameRemoved: FrameCallback
+    onFrameRemoved: FrameCallback,
   ) {
     this._element = element;
     this._onFrameAdded = onFrameAdded;
@@ -42,7 +42,7 @@ export class FrameObserver {
     this._mutationObserver = new MutationObserver(
       debounce(() => {
         this._discoverFrames();
-      }, DEBOUNCE_WAIT)
+      }, DEBOUNCE_WAIT),
     );
     this._discoverFrames();
     this._mutationObserver.observe(this._element, {
@@ -72,7 +72,7 @@ export class FrameObserver {
       this._onFrameAdded(frame);
     } catch (e) {
       console.warn(
-        `Unable to inject the Hypothesis client (from '${document.location.href}' into a cross-origin frame '${frame.src}')`
+        `Unable to inject the Hypothesis client (from '${document.location.href}' into a cross-origin frame '${frame.src}')`,
       );
     }
   }
@@ -84,7 +84,7 @@ export class FrameObserver {
 
   private _discoverFrames() {
     const frames = new Set<HTMLIFrameElement>(
-      this._element.querySelectorAll('iframe[enable-annotation]')
+      this._element.querySelectorAll('iframe[enable-annotation]'),
     );
 
     for (const frame of frames) {
@@ -121,7 +121,7 @@ function hasBlankDocumentThatWillNavigate(frame: HTMLIFrameElement): boolean {
  * See {@link onDocumentReady} for the definition of _ready_.
  */
 export function onNextDocumentReady(
-  frame: HTMLIFrameElement
+  frame: HTMLIFrameElement,
 ): Promise<Document> {
   return new Promise((resolve, reject) => {
     const unsubscribe = onDocumentReady(frame, (err, doc) => {
@@ -158,7 +158,7 @@ export function onNextDocumentReady(
 export function onDocumentReady(
   frame: HTMLIFrameElement,
   callback: (err: Error | null, document?: Document) => void,
-  { pollInterval = 10 }: { pollInterval?: number } = {}
+  { pollInterval = 10 }: { pollInterval?: number } = {},
 ): () => void {
   let pollTimer: number | undefined;
   // Two linting rules are conflicting here, so muting one of them.
@@ -214,7 +214,7 @@ export function onDocumentReady(
         callback(null, currentDocument);
       } else {
         currentDocument.addEventListener('DOMContentLoaded', () =>
-          callback(null, currentDocument)
+          callback(null, currentDocument),
         );
       }
     }

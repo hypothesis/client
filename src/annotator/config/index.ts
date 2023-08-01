@@ -236,7 +236,7 @@ export function getConfig(context: Context, window_: Window = window) {
     const configDef = configDefinitions[key];
     const hasDefault = configDef.defaultValue !== undefined; // A default could be null
     const isURLFromBrowserExtension = isBrowserExtension(
-      urlFromLinkTag(window_, 'sidebar', 'html')
+      urlFromLinkTag(window_, 'sidebar', 'html'),
     );
 
     // Only allow certain values in the browser extension context

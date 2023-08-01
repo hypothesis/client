@@ -68,7 +68,7 @@ export class AuthService extends TinyEmitter {
     apiRoutes: APIRoutesService,
     localStorage: LocalStorageService,
     settings: SidebarSettings,
-    toastMessenger: ToastMessengerService
+    toastMessenger: ToastMessengerService,
   ) {
     super();
 
@@ -161,7 +161,7 @@ export class AuthService extends TinyEmitter {
         `Hypothesis login lost: You must reload the page to annotate.`,
         {
           autoDismiss: false,
-        }
+        },
       );
       throw err;
     }
@@ -203,7 +203,7 @@ export class AuthService extends TinyEmitter {
    */
   private async _refreshAccessToken(
     refreshToken: string,
-    options: RefreshOptions
+    options: RefreshOptions,
   ): Promise<TokenInfo | null> {
     const client = await this._oauthClient();
 

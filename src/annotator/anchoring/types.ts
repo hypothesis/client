@@ -59,11 +59,11 @@ export class RangeAnchor {
 
     const startPos = TextPosition.fromCharOffset(
       startContainer,
-      selector.startOffset
+      selector.startOffset,
     );
     const endPos = TextPosition.fromCharOffset(
       endContainer,
-      selector.endOffset
+      selector.endOffset,
     );
 
     const range = new TextRange(startPos, endPos).toRange();
@@ -112,13 +112,13 @@ export class TextPositionAnchor {
     return new TextPositionAnchor(
       root,
       textRange.start.offset,
-      textRange.end.offset
+      textRange.end.offset,
     );
   }
 
   static fromSelector(
     root: Element,
-    selector: TextPositionSelector
+    selector: TextPositionSelector,
   ): TextPositionAnchor {
     return new TextPositionAnchor(root, selector.start, selector.end);
   }
@@ -160,7 +160,7 @@ export class TextQuoteAnchor {
   constructor(
     root: Element,
     exact: string,
-    context: TextQuoteAnchorContext = {}
+    context: TextQuoteAnchorContext = {},
   ) {
     this.root = root;
     this.exact = exact;
@@ -198,7 +198,7 @@ export class TextQuoteAnchor {
 
   static fromSelector(
     root: Element,
-    selector: TextQuoteSelector
+    selector: TextQuoteSelector,
   ): TextQuoteAnchor {
     const { prefix, suffix } = selector;
     return new TextQuoteAnchor(root, selector.exact, { prefix, suffix });
@@ -262,10 +262,10 @@ function closestElement(node: Node) {
  */
 function getMediaTimeRange(
   start: Element | undefined | null,
-  end: Element | undefined | null = start
+  end: Element | undefined | null = start,
 ): [number, number] | null {
   const startTime = parseMediaTime(
-    start?.getAttribute('data-time-start') ?? ''
+    start?.getAttribute('data-time-start') ?? '',
   );
   const endTime = parseMediaTime(end?.getAttribute('data-time-end') ?? '');
   if (
@@ -298,7 +298,7 @@ export class MediaTimeAnchor {
    */
   static fromRange(root: Element, range: Range): MediaTimeAnchor | null {
     const start = closestElement(range.startContainer)?.closest(
-      '[data-time-start]'
+      '[data-time-start]',
     );
     const end = closestElement(range.endContainer)?.closest('[data-time-end]');
     const timeRange = getMediaTimeRange(start, end);
@@ -336,7 +336,7 @@ export class MediaTimeAnchor {
 
     const startIdx = findLastIndex(
       segments,
-      s => s.start <= this.start && s.end >= this.start
+      s => s.start <= this.start && s.end >= this.start,
     );
     if (startIdx === -1) {
       throw new Error('Start segment not found');
@@ -361,7 +361,7 @@ export class MediaTimeAnchor {
 
   static fromSelector(
     root: Element,
-    selector: MediaTimeSelector
+    selector: MediaTimeSelector,
   ): MediaTimeAnchor {
     const { start, end } = selector;
     return new MediaTimeAnchor(root, start, end);

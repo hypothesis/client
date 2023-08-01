@@ -19,7 +19,7 @@ export class SelectionObserver {
    */
   constructor(
     callback: (range: Range | null) => void,
-    document_: Document = document
+    document_: Document = document,
   ) {
     let isMouseDown = false;
 

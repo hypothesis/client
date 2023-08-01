@@ -17,7 +17,7 @@ describe('ClusterToolbar', () => {
         currentStyles={defaultClusterStyles}
         onStyleChange={noop}
         {...props}
-      />
+      />,
     );
 
   const toggleOpen = wrapper => {
@@ -37,14 +37,14 @@ describe('ClusterToolbar', () => {
 
     assert.equal(
       wrapper.find('div[data-testid="cluster-style-controls"]').length,
-      0
+      0,
     );
 
     toggleOpen(wrapper);
 
     assert.equal(
       wrapper.find('div[data-testid="cluster-style-controls"]').length,
-      1
+      1,
     );
   });
 
@@ -54,7 +54,7 @@ describe('ClusterToolbar', () => {
 
     assert.equal(
       wrapper.find('ClusterStyleControl').length,
-      Object.keys(defaultClusterStyles).length
+      Object.keys(defaultClusterStyles).length,
     );
   });
 

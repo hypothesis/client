@@ -36,7 +36,7 @@ describe('sidebar/helpers/visible-threads', () => {
         fakeThreadHeights,
         0, // scrollpos
         fakeWindowHeight,
-        fakeDefaultDimensions
+        fakeDefaultDimensions,
       );
 
       assert.equal(calculated.offscreenUpperHeight, 0);
@@ -49,7 +49,7 @@ describe('sidebar/helpers/visible-threads', () => {
         fakeThreadHeights,
         0,
         200,
-        fakeDefaultDimensions
+        fakeDefaultDimensions,
       );
 
       const visibleIds = calculated.visibleThreads.map(thread => thread.id);
@@ -72,7 +72,7 @@ describe('sidebar/helpers/visible-threads', () => {
         fakeThreadHeights,
         1200, // scrollPos
         100,
-        fakeDefaultDimensions
+        fakeDefaultDimensions,
       );
 
       const visibleIds = calculated.visibleThreads.map(thread => thread.id);
@@ -143,18 +143,18 @@ describe('sidebar/helpers/visible-threads', () => {
             fakeThreadHeights,
             testCase.scrollPos,
             testCase.windowHeight,
-            fakeDefaultDimensions
+            fakeDefaultDimensions,
           );
 
           const visibleIds = calculated.visibleThreads.map(thread => thread.id);
           assert.deepEqual(visibleIds, testCase.expectedVisibleThreadIds);
           assert.equal(
             calculated.offscreenUpperHeight,
-            testCase.offscreenUpperHeight
+            testCase.offscreenUpperHeight,
           );
           assert.equal(
             calculated.offscreenLowerHeight,
-            testCase.offscreenLowerHeight
+            testCase.offscreenLowerHeight,
           );
         });
       });

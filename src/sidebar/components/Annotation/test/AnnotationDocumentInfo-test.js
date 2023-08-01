@@ -11,7 +11,7 @@ describe('AnnotationDocumentInfo', () => {
         link="http://www.baz"
         title="Turtles"
         {...props}
-      />
+      />,
     );
   };
 
@@ -45,6 +45,6 @@ describe('AnnotationDocumentInfo', () => {
       content: () => {
         return createAnnotationDocumentInfo();
       },
-    })
+    }),
   );
 });

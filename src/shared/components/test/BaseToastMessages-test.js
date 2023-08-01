@@ -40,7 +40,7 @@ describe('BaseToastMessages', () => {
       <BaseToastMessages
         messages={messages}
         onMessageDismiss={fakeOnMessageDismiss}
-      />
+      />,
     );
   }
 
@@ -103,7 +103,7 @@ describe('BaseToastMessages', () => {
 
         assert.include(
           wrapper.text(),
-          `${testCase.prefix}${testCase.message.message}`
+          `${testCase.prefix}${testCase.message.message}`,
         );
       });
     });
@@ -147,7 +147,7 @@ describe('BaseToastMessages', () => {
               fakeNoticeMessage(),
             ]),
         },
-      ])
+      ]),
     );
   });
 });

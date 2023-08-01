@@ -34,7 +34,7 @@ const reducers = {
    */
   REMOVE_MESSAGE(state, action) {
     const updatedMessages = state.messages.filter(
-      message => message.id !== action.id
+      message => message.id !== action.id,
     );
     return { messages: updatedMessages };
   },

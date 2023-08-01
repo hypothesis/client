@@ -30,7 +30,7 @@ describe('sidebar/helpers/annotation-sharing', () => {
       it('returns `incontext` link if set on annotation', () => {
         assert.equal(
           sharingUtil.annotationSharingLink(fakeAnnotation),
-          'https://www.example.com'
+          'https://www.example.com',
         );
       });
 
@@ -39,7 +39,7 @@ describe('sidebar/helpers/annotation-sharing', () => {
 
         assert.equal(
           sharingUtil.annotationSharingLink(fakeAnnotation),
-          'https://www.example2.com'
+          'https://www.example2.com',
         );
       });
 
@@ -65,7 +65,7 @@ describe('sidebar/helpers/annotation-sharing', () => {
       it('returns `html` link if set on annotation', () => {
         assert.equal(
           sharingUtil.annotationSharingLink(fakeAnnotation),
-          'https://www.example2.com'
+          'https://www.example2.com',
         );
       });
 
@@ -87,13 +87,13 @@ describe('sidebar/helpers/annotation-sharing', () => {
     it('generates a bouncer link based on the document URI and group id', () => {
       assert.equal(
         sharingUtil.pageSharingLink('https://www.example.com', 'testprivate'),
-        'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
+        'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate',
       );
     });
 
     it('returns null if the `documentURI` is not a shareable URI', () => {
       assert.isNull(
-        sharingUtil.pageSharingLink('file://on-my-computer.pdf', 'testprivate')
+        sharingUtil.pageSharingLink('file://on-my-computer.pdf', 'testprivate'),
       );
     });
   });

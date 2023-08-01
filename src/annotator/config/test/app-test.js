@@ -10,8 +10,8 @@ describe('createAppConfig', () => {
   function filterConfig(config) {
     return Object.fromEntries(
       Object.entries(config).filter(
-        ([key]) => key !== 'hostURL' && key !== 'origin' && key !== 'version'
-      )
+        ([key]) => key !== 'hostURL' && key !== 'origin' && key !== 'version',
+      ),
     );
   }
 

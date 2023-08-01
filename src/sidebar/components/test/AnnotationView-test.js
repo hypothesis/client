@@ -46,7 +46,7 @@ describe('AnnotationView', () => {
         loadAnnotationsService={fakeLoadAnnotationsService}
         onLogin={fakeOnLogin}
         {...props}
-      />
+      />,
     );
   }
 
@@ -126,7 +126,7 @@ describe('AnnotationView', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
       assert.calledWith(
         fakeStore.highlightAnnotations,
-        sinon.match(['test_annotation_id'])
+        sinon.match(['test_annotation_id']),
       );
     });
   });

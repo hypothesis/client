@@ -23,7 +23,7 @@ describe('Menu', () => {
       <Menu {...props} label={<TestLabel />} title="Test menu">
         <TestMenuItem />
       </Menu>,
-      { attachTo: container }
+      { attachTo: container },
     );
   };
 
@@ -260,6 +260,6 @@ describe('Menu', () => {
           </Menu>
         ),
       },
-    ])
+    ]),
   );
 });

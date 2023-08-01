@@ -83,7 +83,7 @@ describe('GroupListItem', () => {
         group={fakeGroup}
         groups={fakeGroupsService}
         {...props}
-      />
+      />,
     );
   };
 
@@ -152,7 +152,7 @@ describe('GroupListItem', () => {
 
         assert.equal(
           wrapper.find('MenuItem').prop('isSelected'),
-          expectedIsSelected
+          expectedIsSelected,
         );
       });
     });
@@ -199,7 +199,7 @@ describe('GroupListItem', () => {
       const wrapper = createGroupListItem(fakeGroup, { isExpanded });
       assert.equal(
         wrapper.find('MenuItem').prop('isSubmenuVisible'),
-        undefined
+        undefined,
       );
     });
   });
@@ -297,13 +297,13 @@ describe('GroupListItem', () => {
       });
       assert.equal(
         wrapper.find('MenuItem').first().prop('isDisabled'),
-        expectDisabled
+        expectDisabled,
       );
 
       const submenu = getSubmenu(wrapper);
       assert.equal(
         submenu.exists('[data-testid="unselectable-group-note"]'),
-        expectDisabled
+        expectDisabled,
       );
     });
   });

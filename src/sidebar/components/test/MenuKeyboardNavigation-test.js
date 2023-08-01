@@ -26,7 +26,7 @@ describe('MenuKeyboardNavigation', () => {
       </MenuKeyboardNavigation>,
       {
         attachTo: newContainer,
-      }
+      },
     );
   };
 
@@ -129,6 +129,6 @@ describe('MenuKeyboardNavigation', () => {
           </MenuKeyboardNavigation>
         </div>
       ),
-    })
+    }),
   );
 });

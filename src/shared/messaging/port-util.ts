@@ -70,7 +70,7 @@ export function isMessageEqual(data: any, message: Partial<Message>) {
  * Check that source is of type Window.
  */
 export function isSourceWindow(
-  source: MessageEventSource | null
+  source: MessageEventSource | null,
 ): source is Window {
   if (
     // `source` can be of type Window, MessagePort, ServiceWorker, or null.

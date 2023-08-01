@@ -62,7 +62,7 @@ describe('sidebar/helpers/session', () => {
         const shouldDisplay = sessionUtil.shouldAutoDisplayTutorial(
           fixture.isSidebar,
           fixture.sessionState,
-          fixture.settings
+          fixture.settings,
         );
         assert.equal(shouldDisplay, fixture.expected);
       });

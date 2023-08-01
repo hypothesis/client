@@ -116,7 +116,7 @@ describe('annotator/integrations/pdf', () => {
 
     function pdfViewerHasClass(className) {
       return fakePDFViewerApplication.pdfViewer.viewer.classList.contains(
-        className
+        className,
       );
     }
 
@@ -205,7 +205,7 @@ describe('annotator/integrations/pdf', () => {
 
       it('returns null if range-trimming encounters a RangeError', () => {
         fakeTrimmedRange.throws(
-          new RangeError('Range contains no non-whitespace text')
+          new RangeError('Range contains no non-whitespace text'),
         );
         const range = new Range();
         assert.isNull(pdfIntegration.getAnnotatableRange(range));
@@ -240,8 +240,8 @@ describe('annotator/integrations/pdf', () => {
 
         assert.isFalse(
           fakePDFViewerApplication.pdfViewer.viewer.classList.contains(
-            'has-transparent-text-layer'
-          )
+            'has-transparent-text-layer',
+          ),
         );
       });
 
@@ -329,7 +329,7 @@ describe('annotator/integrations/pdf', () => {
       assert.isNotNull(banner);
       assert.include(
         banner.shadowRoot.textContent,
-        'This PDF does not contain selectable text'
+        'This PDF does not contain selectable text',
       );
     });
 
@@ -501,7 +501,7 @@ describe('annotator/integrations/pdf', () => {
         assert.calledWith(
           fakeScrollUtils.scrollElement,
           integration.contentContainer(),
-          offset
+          offset,
         );
       });
 
@@ -541,7 +541,7 @@ describe('annotator/integrations/pdf', () => {
         assert.calledWith(
           fakeScrollUtils.scrollElement,
           integration.contentContainer(),
-          50
+          50,
         );
 
         // Simulate a delay while rendering of the text layer for the page happens
@@ -565,7 +565,7 @@ describe('annotator/integrations/pdf', () => {
         assert.calledWith(
           fakeScrollUtils.scrollElement,
           integration.contentContainer(),
-          150
+          150,
         );
       });
 

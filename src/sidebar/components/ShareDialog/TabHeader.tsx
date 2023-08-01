@@ -22,7 +22,7 @@ export default function TabHeader({
           // Always render this button at 16px square regardless of parent
           // font size
           'text-[16px]',
-          'text-grey-6 hover:text-grey-7 hover:bg-grey-3/50'
+          'text-grey-6 hover:text-grey-7 hover:bg-grey-3/50',
         )}
         title="Close"
         variant="custom"

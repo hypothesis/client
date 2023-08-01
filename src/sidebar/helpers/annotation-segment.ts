@@ -10,10 +10,10 @@ import type { Annotation, EPUBContentSelector } from '../../types/api';
  */
 export function annotationMatchesSegment(
   ann: Annotation,
-  segment: SegmentInfo
+  segment: SegmentInfo,
 ) {
   const selector = ann.target[0].selector?.find(
-    s => s.type === 'EPUBContentSelector'
+    s => s.type === 'EPUBContentSelector',
   ) as EPUBContentSelector;
 
   if (!selector) {
@@ -26,6 +26,6 @@ export function annotationMatchesSegment(
     (segment.url && selector.url === segment.url) ||
       (segment.cfi &&
         selector.cfi &&
-        stripCFIAssertions(selector.cfi) === stripCFIAssertions(segment.cfi))
+        stripCFIAssertions(selector.cfi) === stripCFIAssertions(segment.cfi)),
   );
 }

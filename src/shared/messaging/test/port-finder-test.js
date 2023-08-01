@@ -81,7 +81,7 @@ describe('PortFinder', () => {
 
       assert.equal(
         error.message,
-        'Unable to establish guest-host communication channel'
+        'Unable to establish guest-host communication channel',
       );
     });
   });
@@ -96,7 +96,7 @@ describe('PortFinder', () => {
           error = e;
         }
         assert.equal(error.message, 'Invalid request of channel/port');
-      })
+      }),
     );
 
     it('sends port request to host frame', async () => {
@@ -115,7 +115,7 @@ describe('PortFinder', () => {
             requestId,
             sourceId: 'guest-id',
           },
-          '*'
+          '*',
         );
       } finally {
         clock.restore();
@@ -146,7 +146,7 @@ describe('PortFinder', () => {
         await delay(0);
 
         assert.instanceOf(resolvedPort, MessagePort);
-      })
+      }),
     );
 
     it("times out if host doesn't respond", async () => {
@@ -174,14 +174,14 @@ describe('PortFinder', () => {
           requestId,
           sourceId: undefined,
         },
-        '*'
+        '*',
       );
 
       await delay(0);
 
       assert.equal(
         error.message,
-        'Unable to establish guest-host communication channel'
+        'Unable to establish guest-host communication channel',
       );
     });
   });

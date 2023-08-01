@@ -17,7 +17,7 @@ describe('processUrlTemplate', () => {
     it('replaces {current_host} in template', () => {
       const url = processUrlTemplate(
         'https://{current_host}:3000/script.js',
-        fakeDocument
+        fakeDocument,
       );
       assert.equal(url, 'https://john-smith-mbp.local:3000/script.js');
     });
@@ -25,7 +25,7 @@ describe('processUrlTemplate', () => {
     it('replaces {current_scheme} in template', () => {
       const url = processUrlTemplate(
         '{current_scheme}://localhost/script.js',
-        fakeDocument
+        fakeDocument,
       );
       assert.equal(url, 'https://localhost/script.js');
     });
@@ -48,7 +48,7 @@ describe('processUrlTemplate', () => {
     it('does not try to determine the origin if there are no URL template params', () => {
       const url = processUrlTemplate(
         'https://hypothes.is/embed.js',
-        fakeDocument
+        fakeDocument,
       );
       assert.equal(url, 'https://hypothes.is/embed.js');
       assert.notCalled(fakeDocument.querySelectorAll);

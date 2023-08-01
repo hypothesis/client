@@ -7,7 +7,7 @@ describe('shared/config-fragment', () => {
       const url = addConfigFragment('https://example.com/app.html', config);
       assert.equal(
         url,
-        'https://example.com/app.html#config=%7B%22appType%22%3A%22bar%22%7D'
+        'https://example.com/app.html#config=%7B%22appType%22%3A%22bar%22%7D',
       );
     });
 
@@ -16,7 +16,7 @@ describe('shared/config-fragment', () => {
       const url = addConfigFragment('https://example.com/app.html#foo', config);
       assert.equal(
         url,
-        'https://example.com/app.html#config=%7B%22appType%22%3A%22bar%22%7D'
+        'https://example.com/app.html#config=%7B%22appType%22%3A%22bar%22%7D',
       );
     });
   });
@@ -27,7 +27,7 @@ describe('shared/config-fragment', () => {
 
       const urlWithConfig = addConfigFragment(
         'https://example.com/app.html',
-        config
+        config,
       );
       const parsedConfig = parseConfigFragment(urlWithConfig);
 

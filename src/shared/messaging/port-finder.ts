@@ -75,7 +75,7 @@ export class PortFinder implements Destroyable {
             requestId,
             sourceId: this._sourceId,
           },
-          '*'
+          '*',
         );
       };
 
@@ -93,8 +93,8 @@ export class PortFinder implements Destroyable {
         clearInterval(intervalId);
         reject(
           new Error(
-            `Unable to establish ${this._source}-${target} communication channel`
-          )
+            `Unable to establish ${this._source}-${target} communication channel`,
+          ),
         );
       }, MAX_WAIT_FOR_PORT);
 

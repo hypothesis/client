@@ -136,7 +136,7 @@ describe('SearchInput', () => {
           bubbles: true,
           cancelable: true,
           key: '/',
-        })
+        }),
       );
 
       assert.equal(document.activeElement, searchInputEl);
@@ -153,7 +153,7 @@ describe('SearchInput', () => {
           cancelable: true,
           key: 'K',
           ctrlKey: true,
-        })
+        }),
       );
 
       assert.equal(document.activeElement, searchInputEl);
@@ -170,7 +170,7 @@ describe('SearchInput', () => {
           cancelable: true,
           key: 'K',
           metaKey: true,
-        })
+        }),
       );
 
       assert.equal(document.activeElement, searchInputEl);
@@ -192,13 +192,13 @@ describe('SearchInput', () => {
           bubbles: true,
           cancelable: true,
           key: '/',
-        })
+        }),
       );
 
       assert.equal(
         document.activeElement,
         inputEl,
-        'focus is moved from button to input'
+        'focus is moved from button to input',
       );
 
       inputEl.dispatchEvent(
@@ -206,13 +206,13 @@ describe('SearchInput', () => {
           bubbles: true,
           cancelable: true,
           key: 'Escape',
-        })
+        }),
       );
 
       assert.equal(
         document.activeElement,
         buttonEl,
-        'focus has been restored to the button'
+        'focus has been restored to the button',
       );
     });
 
@@ -235,13 +235,13 @@ describe('SearchInput', () => {
             bubbles: true,
             cancelable: true,
             key: '/',
-          })
+          }),
         );
 
         assert.equal(
           document.activeElement,
           inputEl,
-          'focus has not been moved to search input'
+          'focus has not been moved to search input',
         );
       });
     });
@@ -270,13 +270,13 @@ describe('SearchInput', () => {
           cancelable: true,
           key: 'k',
           ctrlKey: true,
-        })
+        }),
       );
 
       assert.equal(
         document.activeElement,
         searchInputEl,
-        'focus has been moved to search input'
+        'focus has been moved to search input',
       );
     });
   });
@@ -294,6 +294,6 @@ describe('SearchInput', () => {
           return createSearchInput();
         },
       },
-    ])
+    ]),
   );
 });

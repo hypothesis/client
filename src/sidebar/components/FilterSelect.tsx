@@ -34,7 +34,7 @@ function FilterSelect({
       className={classnames(
         // Don't allow the label text to wrap
         'shrink-0 flex items-center gap-x-2',
-        'text-color-text font-bold text-md'
+        'text-color-text font-bold text-md',
       )}
     >
       {Icon && <Icon className="w-4 h-4" />}
@@ -51,7 +51,7 @@ function FilterSelect({
         // use `504px` (this odd number is to maximize the likelihood that the
         // overflow cutoff is in the middle of an option, making it more obvious
         // that the list is scrollable), but don't exceed 60vh.
-        'max-h-[min(60vh,504px)] overflow-y-auto'
+        'max-h-[min(60vh,504px)] overflow-y-auto',
       )}
     >
       {filterOptions.map(filterOption => (

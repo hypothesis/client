@@ -122,7 +122,7 @@ function SelectionTabs({
     <div
       className={classnames(
         // 9px balances out the space above the tabs
-        'space-y-3 pb-[9px]'
+        'space-y-3 pb-[9px]',
       )}
     >
       <div className="flex gap-x-6 theme-clean:ml-[15px]" role="tablist">

@@ -18,7 +18,7 @@ export function parseJsonConfig(document) {
   /** @type {Record<string, unknown>} */
   const config = {};
   const settingsElements = document.querySelectorAll(
-    'script.js-hypothesis-config'
+    'script.js-hypothesis-config',
   );
 
   for (let i = 0; i < settingsElements.length; i++) {
@@ -28,7 +28,7 @@ export function parseJsonConfig(document) {
     } catch (err) {
       console.warn(
         'Could not parse settings from js-hypothesis-config tags',
-        err
+        err,
       );
       settings = {};
     }

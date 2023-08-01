@@ -125,12 +125,12 @@ describe('Injector', () => {
       assert.instanceOf(err, Error);
       assert.equal(
         err.toString(),
-        'Error: Failed to construct dependency "foo" of "foo": Encountered a circular dependency when constructing "foo"'
+        'Error: Failed to construct dependency "foo" of "foo": Encountered a circular dependency when constructing "foo"',
       );
       assert.instanceOf(err.cause, Error);
       assert.equal(
         err.cause.toString(),
-        'Error: Encountered a circular dependency when constructing "foo"'
+        'Error: Encountered a circular dependency when constructing "foo"',
       );
     });
   });
@@ -140,7 +140,7 @@ describe('Injector', () => {
       const container = new Injector();
       assert.equal(
         container.register('foo', () => 42),
-        container
+        container,
       );
     });
 

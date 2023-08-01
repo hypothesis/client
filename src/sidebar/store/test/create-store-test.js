@@ -101,7 +101,7 @@ const groupsModule = createStoreModule(
         return state.groups.find(g => g.id === state.currentGroup);
       },
     },
-  }
+  },
 );
 
 function counterStore(initArgs = [], middleware = []) {
@@ -247,7 +247,7 @@ describe('createStore', () => {
         reducers: {},
         actionCreators: {},
         selectors: { testSelector() {} },
-      }
+      },
     );
     const moduleB = createStoreModule(
       {},
@@ -256,11 +256,11 @@ describe('createStore', () => {
         reducers: {},
         actionCreators: {},
         selectors: { testSelector() {} },
-      }
+      },
     );
     assert.throws(
       () => createStore([moduleA, moduleB]),
-      "Cannot add duplicate 'testSelector' property to object"
+      "Cannot add duplicate 'testSelector' property to object",
     );
   });
 
@@ -272,7 +272,7 @@ describe('createStore', () => {
         reducers: {},
         actionCreators: { testAction() {} },
         selectors: {},
-      }
+      },
     );
     const moduleB = createStoreModule(
       {},
@@ -281,11 +281,11 @@ describe('createStore', () => {
         reducers: {},
         actionCreators: { testAction() {} },
         selectors: {},
-      }
+      },
     );
     assert.throws(
       () => createStore([moduleA, moduleB]),
-      "Cannot add duplicate 'testAction' property to object"
+      "Cannot add duplicate 'testAction' property to object",
     );
   });
 

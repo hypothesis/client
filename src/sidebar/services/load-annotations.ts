@@ -58,7 +58,7 @@ export class LoadAnnotationsService {
     api: APIService,
     store: SidebarStore,
     streamer: StreamerService,
-    streamFilter: StreamFilter
+    streamFilter: StreamFilter,
   ) {
     this._api = api;
     this._store = store;

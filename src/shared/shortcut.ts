@@ -83,7 +83,7 @@ export function installShortcut(
     // element is not keyboard-focusable in XHTML documents in Safari/Chrome.
     // See https://github.com/hypothesis/client/issues/4364.
     rootElement = document.documentElement,
-  }: ShortcutOptions = {}
+  }: ShortcutOptions = {},
 ) {
   const onKeydown = (event: KeyboardEvent) => {
     if (matchShortcut(event, shortcut)) {
@@ -111,7 +111,7 @@ export function installShortcut(
 export function useShortcut(
   shortcut: string | null,
   onPress: (e: KeyboardEvent) => void,
-  { rootElement }: ShortcutOptions = {}
+  { rootElement }: ShortcutOptions = {},
 ) {
   useEffect(() => {
     if (!shortcut) {

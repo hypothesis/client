@@ -4,7 +4,7 @@ setupControls();
 
 // Set up links whose URLs should have a randomly generated suffix.
 const randomizedLinks = Array.from(
-  document.querySelectorAll('.js-randomize-url')
+  document.querySelectorAll('.js-randomize-url'),
 );
 for (let link of randomizedLinks) {
   const randomizeUrl = () => {

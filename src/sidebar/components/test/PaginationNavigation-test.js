@@ -18,7 +18,7 @@ describe('PaginationNavigation', () => {
         onChangePage={fakeOnChangePage}
         totalPages={10}
         {...props}
-      />
+      />,
     );
   };
 
@@ -154,6 +154,6 @@ describe('PaginationNavigation', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent({ currentPage: 2 }),
-    })
+    }),
   );
 });

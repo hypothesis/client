@@ -32,6 +32,6 @@ describe('AnnotationUser', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createAnnotationUser(),
-    })
+    }),
   );
 });

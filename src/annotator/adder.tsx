@@ -154,7 +154,7 @@ export class Adder implements Destroyable {
   show(selectionRect: DOMRect, isRTLselection: boolean) {
     const { left, top, arrowDirection } = this._calculateTarget(
       selectionRect,
-      isRTLselection
+      isRTLselection,
     );
     this._showAt(left, top);
 
@@ -189,7 +189,7 @@ export class Adder implements Destroyable {
    */
   private _calculateTarget(
     selectionRect: DOMRect,
-    isRTLselection: boolean
+    isRTLselection: boolean,
   ): Target {
     // Set the initial arrow direction based on whether the selection was made
     // forwards/upwards or downwards/backwards.
@@ -279,7 +279,7 @@ export class Adder implements Destroyable {
       ...document.elementsFromPoint(left, top + adderHeight),
       ...document.elementsFromPoint(
         left + adderWidth / 2,
-        top + adderHeight / 2
+        top + adderHeight / 2,
       ),
       ...document.elementsFromPoint(left + adderWidth, top),
       ...document.elementsFromPoint(left + adderWidth, top + adderHeight),
@@ -349,7 +349,7 @@ export class Adder implements Destroyable {
         onCommand={handleCommand}
         annotationCount={this.annotationsForSelection.length}
       />,
-      this._shadowRoot
+      this._shadowRoot,
     );
   }
 }

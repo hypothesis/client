@@ -42,7 +42,7 @@ function buildRootThread(threadState: ThreadState): Thread {
   if (annotationsFiltered) {
     const filters = generateFacetedFilter(
       selection.filterQuery || '',
-      selection.filters
+      selection.filters,
     );
     options.filterFn = ann => filterAnnotations([ann], filters).length > 0;
   }

@@ -6,7 +6,7 @@
  */
 export function createAppConfig(
   appURL: string,
-  config: Record<string, unknown>
+  config: Record<string, unknown>,
 ): Record<string, unknown> {
   const appConfig: Record<string, unknown> = {};
 

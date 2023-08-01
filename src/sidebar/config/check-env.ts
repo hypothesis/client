@@ -20,7 +20,7 @@ export function checkEnvironment(window: Window): boolean {
   // situations beyond our control where it can happen.
   if (version !== '__VERSION__') {
     console.warn(
-      `The Hypothesis sidebar is using a different version (__VERSION__) than the host page (${version}). It may not work.`
+      `The Hypothesis sidebar is using a different version (__VERSION__) than the host page (${version}). It may not work.`,
     );
     return false;
   }
@@ -31,12 +31,12 @@ export function checkEnvironment(window: Window): boolean {
   // security.
   if (window.origin === 'null') {
     console.warn(
-      `Hypothesis has been loaded in a sandboxed frame. This is not supported.`
+      `Hypothesis has been loaded in a sandboxed frame. This is not supported.`,
     );
     return false;
   } else if (window.origin !== origin) {
     console.warn(
-      `The Hypothesis sidebar is running in a different origin (${window.origin}) than expected (${origin}). It may not work.`
+      `The Hypothesis sidebar is running in a different origin (${window.origin}) than expected (${origin}). It may not work.`,
     );
     return false;
   }

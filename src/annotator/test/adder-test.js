@@ -76,7 +76,7 @@ describe('Adder', () => {
 
     const triggerShortcut = key =>
       document.body.dispatchEvent(
-        new KeyboardEvent('keydown', { key, bubbles: true })
+        new KeyboardEvent('keydown', { key, bubbles: true }),
       );
 
     const showAdder = () => {
@@ -143,7 +143,7 @@ describe('Adder', () => {
 
     it("calls onAnnotate callback when Annotate button's label is clicked", () => {
       const annotateLabel = getContent(adder).querySelector(
-        'button[title^="Annotate"] [data-testid="adder-button-label"]'
+        'button[title^="Annotate"] [data-testid="adder-button-label"]',
       );
       annotateLabel.dispatchEvent(new Event('click', { bubbles: true }));
       assert.called(adderCallbacks.onAnnotate);
@@ -219,7 +219,7 @@ describe('Adder', () => {
       const viewSize = windowSize();
       const target = adder._calculateTarget(
         rect(0, viewSize.height + 100, 10, 20),
-        false
+        false,
       );
       assert.isAtMost(target.top, viewSize.height - adderRect().height);
     });
@@ -228,7 +228,7 @@ describe('Adder', () => {
       const viewSize = windowSize();
       const target = adder._calculateTarget(
         rect(viewSize.width + 100, 100, 10, 20),
-        false
+        false,
       );
       assert.isAtMost(target.left, viewSize.width);
     });
@@ -283,7 +283,7 @@ describe('Adder', () => {
               zIndex,
             }}
           />,
-          { attachTo }
+          { attachTo },
         );
 
       const wrapper = createComponent(0, 0, 2, container);
@@ -308,7 +308,7 @@ describe('Adder', () => {
         initLeft + adderWidth / 2,
         initTop + adderHeight / 2,
         6,
-        wrapperDOMNode
+        wrapperDOMNode,
       );
       assert.strictEqual(getAdderZIndex(initLeft, initTop), 7);
 
@@ -321,7 +321,7 @@ describe('Adder', () => {
         initLeft + adderWidth,
         initTop + adderHeight,
         8,
-        wrapperDOMNode
+        wrapperDOMNode,
       );
       assert.strictEqual(getAdderZIndex(initLeft, initTop), 9);
 
@@ -387,7 +387,7 @@ describe('Adder', () => {
       adder.show(rect(200, 100, 100, 20), false);
       assert.strictEqual(
         document.elementFromPoint(250, 150).tagName,
-        'HYPOTHESIS-ADDER'
+        'HYPOTHESIS-ADDER',
       );
     });
   });

@@ -64,7 +64,7 @@ function createThread(fixture, options, keys) {
 
   const rootThread = filter(
     buildThread(fixture, opts),
-    keys.concat(['annotation', 'children'])
+    keys.concat(['annotation', 'children']),
   );
   return rootThread.children;
 }
@@ -361,7 +361,7 @@ describe('sidebar/helpers/build-thread', () => {
           {
             filterFn: annot => annot.text.match(/first/),
           },
-          ['visible']
+          ['visible'],
         );
         assert.deepEqual(threads, [
           {
@@ -393,7 +393,7 @@ describe('sidebar/helpers/build-thread', () => {
           {
             filterFn: annot => annot.text.match(/third/),
           },
-          ['visible']
+          ['visible'],
         );
         assert.deepEqual(threads, [
           {

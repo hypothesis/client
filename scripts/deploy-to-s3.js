@@ -118,7 +118,7 @@ async function uploadPackageToS3(bucket, options) {
   const uploads = files.map(file =>
     uploader.upload(`${packageName}/${version}/${file}`, file, {
       cacheControl: cacheForever,
-    })
+    }),
   );
   await Promise.all(uploads);
 

@@ -126,7 +126,7 @@ describe('FilterStatus', () => {
     it('should show a separate count for results versus forced visible', () => {
       assertFilterText(
         createComponent(),
-        "Showing 2 results for 'foobar' (and 3 more)"
+        "Showing 2 results for 'foobar' (and 3 more)",
       );
     });
 
@@ -209,7 +209,7 @@ describe('FilterStatus', () => {
     it('should show a count of annotations by the focused user', () => {
       assertFilterText(
         createComponent(),
-        'Showing 1 annotation by Ebenezer Studentolog'
+        'Showing 1 annotation by Ebenezer Studentolog',
       );
     });
 
@@ -217,7 +217,7 @@ describe('FilterStatus', () => {
       fakeThreadUtil.countVisible.returns(3);
       assertFilterText(
         createComponent(),
-        'Showing 3 annotations by Ebenezer Studentolog'
+        'Showing 3 annotations by Ebenezer Studentolog',
       );
     });
 
@@ -225,7 +225,7 @@ describe('FilterStatus', () => {
       fakeThreadUtil.countVisible.returns(0);
       assertFilterText(
         createComponent(),
-        'No annotations by Ebenezer Studentolog'
+        'No annotations by Ebenezer Studentolog',
       );
     });
 
@@ -252,7 +252,7 @@ describe('FilterStatus', () => {
     it('should show a count of annotations by the focused user', () => {
       assertFilterText(
         createComponent(),
-        "Showing 1 result for 'biscuits' by Ebenezer Studentolog"
+        "Showing 1 result for 'biscuits' by Ebenezer Studentolog",
       );
     });
 
@@ -260,7 +260,7 @@ describe('FilterStatus', () => {
       fakeThreadUtil.countVisible.returns(3);
       assertFilterText(
         createComponent(),
-        "Showing 3 results for 'biscuits' by Ebenezer Studentolog"
+        "Showing 3 results for 'biscuits' by Ebenezer Studentolog",
       );
     });
 
@@ -268,7 +268,7 @@ describe('FilterStatus', () => {
       fakeThreadUtil.countVisible.returns(0);
       assertFilterText(
         createComponent(),
-        "No results for 'biscuits' by Ebenezer Studentolog"
+        "No results for 'biscuits' by Ebenezer Studentolog",
       );
     });
 
@@ -294,14 +294,14 @@ describe('FilterStatus', () => {
       it('should show a count of annotations by the focused user', () => {
         assertFilterText(
           createComponent(),
-          "Showing 1 result for 'biscuits' by Ebenezer Studentolog (and 2 more)"
+          "Showing 1 result for 'biscuits' by Ebenezer Studentolog (and 2 more)",
         );
       });
 
       it('should provide a "Clear search" button', () => {
         assertClearButton(createComponent());
       });
-    }
+    },
   );
 
   context('(State 8): user-focus mode active, selected annotations', () => {
@@ -341,7 +341,7 @@ describe('FilterStatus', () => {
     it('should show count of user results separately from forced-visible threads', () => {
       assertFilterText(
         createComponent(),
-        'Showing 4 annotations by Ebenezer Studentolog (and 3 more)'
+        'Showing 4 annotations by Ebenezer Studentolog (and 3 more)',
       );
     });
 
@@ -349,7 +349,7 @@ describe('FilterStatus', () => {
       fakeStore.forcedVisibleThreads.returns([1, 2, 3, 4, 5, 6, 7]);
       assertFilterText(
         createComponent(),
-        'No annotations by Ebenezer Studentolog (and 7 more)'
+        'No annotations by Ebenezer Studentolog (and 7 more)',
       );
     });
 

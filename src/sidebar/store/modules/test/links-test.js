@@ -33,7 +33,7 @@ describe('sidebar/store/modules/links', () => {
       addLinks();
       assert.equal(
         store.getLink('account.settings'),
-        'https://hypothes.is/account/settings'
+        'https://hypothes.is/account/settings',
       );
     });
 
@@ -41,7 +41,7 @@ describe('sidebar/store/modules/links', () => {
       addLinks();
       assert.equal(
         store.getLink('user', { user: 'foobar' }),
-        'https://hypothes.is/u/foobar'
+        'https://hypothes.is/u/foobar',
       );
     });
 

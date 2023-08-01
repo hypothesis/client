@@ -30,7 +30,7 @@ export class SessionService {
     api: APIService,
     auth: AuthService,
     settings: SidebarSettings,
-    toastMessenger: ToastMessengerService
+    toastMessenger: ToastMessengerService,
   ) {
     this._api = api;
     this._auth = auth;
@@ -89,7 +89,7 @@ export class SessionService {
   async dismissSidebarTutorial() {
     const updatedProfile = await this._api.profile.update(
       {},
-      { preferences: { show_sidebar_tutorial: false } }
+      { preferences: { show_sidebar_tutorial: false } },
     );
     this.update(updatedProfile);
   }

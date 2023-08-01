@@ -142,7 +142,7 @@ function GroupListItem({
               className={classnames(
                 // Left padding to match submenu items above. Turn off hyphenation
                 // as it causes this content to hyphenate awkwardly.
-                'p-2 pl-9 bg-grey-1 hyphens-none'
+                'p-2 pl-9 bg-grey-1 hyphens-none',
               )}
               data-testid="unselectable-group-note"
             >

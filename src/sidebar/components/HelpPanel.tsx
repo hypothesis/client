@@ -107,7 +107,7 @@ function HelpPanel({ session }: HelpPanelProps) {
 
     return new VersionData(
       { userid: profile.userid, displayName },
-      documentFrames
+      documentFrames,
     );
   }, [profile, displayName, frames, mainFrame]);
 
@@ -129,7 +129,7 @@ function HelpPanel({ session }: HelpPanelProps) {
         session.dismissSidebarTutorial();
       }
     },
-    [session, hasAutoDisplayPreference]
+    [session, hasAutoDisplayPreference],
   );
 
   return (

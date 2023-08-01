@@ -66,11 +66,11 @@ describe('sidebar/helpers/tabs', () => {
 
         assert.equal(
           tabs.shouldShowInTab(ann, 'annotation'),
-          testCase.expectedTab === 'annotation'
+          testCase.expectedTab === 'annotation',
         );
         assert.equal(
           tabs.shouldShowInTab(ann, 'orphan'),
-          testCase.expectedTab === 'orphan'
+          testCase.expectedTab === 'orphan',
         );
       });
     });

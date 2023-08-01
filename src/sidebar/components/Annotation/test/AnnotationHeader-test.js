@@ -26,7 +26,7 @@ describe('AnnotationHeader', () => {
         threadIsCollapsed={false}
         settings={fakeSettings}
         {...props}
-      />
+      />,
     );
   };
 
@@ -120,7 +120,7 @@ describe('AnnotationHeader', () => {
 
       assert.equal(
         wrapper.find('AnnotationUser').props().authorLink,
-        'http://www.example.com/user/'
+        'http://www.example.com/user/',
       );
     });
 
@@ -136,7 +136,7 @@ describe('AnnotationHeader', () => {
       const wrapper = createAnnotationHeader();
       assert.equal(
         wrapper.find('AnnotationUser').props().displayName,
-        'Wackford Squeers'
+        'Wackford Squeers',
       );
     });
   });
@@ -284,7 +284,7 @@ describe('AnnotationHeader', () => {
 
       assert.equal(
         wrapper.find('[data-testid="extended-header-info"]').length,
-        1
+        1,
       );
     });
 
@@ -296,7 +296,7 @@ describe('AnnotationHeader', () => {
 
       assert.equal(
         wrapper.find('[data-testid="extended-header-info"]').length,
-        0
+        0,
       );
     });
 
@@ -460,6 +460,6 @@ describe('AnnotationHeader', () => {
             isEditing: true,
           }),
       },
-    ])
+    ]),
   );
 });

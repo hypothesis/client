@@ -15,7 +15,7 @@ function getTagDate(tag) {
     `git tag --list "${tag}" "--format=%(committerdate) -- %(taggerdate)"`,
     {
       encoding: 'utf-8',
-    }
+    },
   );
   const [commitDate, tagDate] = result.trim().split('--');
   const date = new Date(tagDate || commitDate);

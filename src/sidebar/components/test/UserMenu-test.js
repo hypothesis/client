@@ -20,7 +20,7 @@ describe('UserMenu', () => {
         frameSync={fakeFrameSync}
         onLogout={fakeOnLogout}
         settings={fakeSettings}
-      />
+      />,
     );
   };
 
@@ -77,7 +77,7 @@ describe('UserMenu', () => {
 
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         assert.notOk(profileMenuItem.prop('isDisabled'));
       });
@@ -87,7 +87,7 @@ describe('UserMenu', () => {
 
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         assert.equal(profileMenuItem.prop('href'), 'profile-link');
       });
@@ -97,7 +97,7 @@ describe('UserMenu', () => {
 
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         assert.isFunction(profileMenuItem.prop('onClick'));
       });
@@ -115,7 +115,7 @@ describe('UserMenu', () => {
 
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         assert.isTrue(profileMenuItem.prop('isDisabled'));
       });
@@ -127,7 +127,7 @@ describe('UserMenu', () => {
 
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         assert.isTrue(profileMenuItem.prop('isDisabled'));
       });
@@ -139,7 +139,7 @@ describe('UserMenu', () => {
 
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         assert.notOk(profileMenuItem.prop('isDisabled'));
       });
@@ -151,7 +151,7 @@ describe('UserMenu', () => {
 
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         assert.isFunction(profileMenuItem.prop('onClick'));
       });
@@ -164,7 +164,7 @@ describe('UserMenu', () => {
         const wrapper = createUserMenu();
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         const onProfileSelected = profileMenuItem.prop('onClick');
 
@@ -179,7 +179,7 @@ describe('UserMenu', () => {
         const wrapper = createUserMenu();
         const profileMenuItem = findMenuItem(
           wrapper,
-          fakeProfile.user_info.display_name
+          fakeProfile.user_info.display_name,
         );
         const onProfileSelected = profileMenuItem.prop('onClick');
 
@@ -222,7 +222,7 @@ describe('UserMenu', () => {
 
           assert.equal(isFeatureEnabled, openProfileItem.exists());
         });
-      }
+      },
     );
 
     it('opens the profile when clicked', () => {
@@ -255,7 +255,7 @@ describe('UserMenu', () => {
           assert.equal(featureIsEnabled, fakeFrameSync.notifyHost.called);
           assert.equal(!featureIsEnabled, wrapper.find('Menu').props().open);
         });
-      }
+      },
     );
   });
 

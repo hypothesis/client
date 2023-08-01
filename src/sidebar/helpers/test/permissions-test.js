@@ -28,14 +28,14 @@ describe('sidebar/helpers/permissions', () => {
       assert.deepEqual(
         permissions.defaultPermissions(userid, 'gid'),
         permissions.sharedPermissions(userid, 'gid'),
-        null
+        null,
       );
     });
 
     it('returns private permissions if the saved level is "private"', () => {
       assert.deepEqual(
         permissions.defaultPermissions(userid, 'gid', 'private'),
-        permissions.privatePermissions(userid)
+        permissions.privatePermissions(userid),
       );
     });
 
@@ -45,14 +45,14 @@ describe('sidebar/helpers/permissions', () => {
       // code is refactored.
       assert.deepEqual(
         permissions.defaultPermissions(undefined, 'gid', 'private'),
-        permissions.sharedPermissions(undefined, 'gid')
+        permissions.sharedPermissions(undefined, 'gid'),
       );
     });
 
     it('returns shared permissions if the saved level is "shared"', () => {
       assert.deepEqual(
         permissions.defaultPermissions(userid, 'gid', 'shared'),
-        permissions.sharedPermissions(userid, 'gid')
+        permissions.sharedPermissions(userid, 'gid'),
       );
     });
   });

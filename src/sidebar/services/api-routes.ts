@@ -18,7 +18,7 @@ function getJSON<T>(url: string): Promise<T> {
       // any additional headers/config so that we can use `<link rel="preload">` in
       // the `/app.html` response to fetch them early, while the client JS app
       // is loading.
-      fetchJSON(url) as Promise<T>
+      fetchJSON(url) as Promise<T>,
   );
 }
 
@@ -48,7 +48,7 @@ export class APIRoutesService {
   routes(): Promise<RouteMap> {
     if (!this._routeCache) {
       this._routeCache = getJSON<IndexResponse>(this._apiURL).then(
-        result => result.links
+        result => result.links,
       );
     }
     return this._routeCache;

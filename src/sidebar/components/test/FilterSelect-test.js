@@ -15,7 +15,7 @@ describe('FilterSelect', () => {
         options={someOptions}
         title="Select one"
         {...props}
-      />
+      />,
     );
   };
 
@@ -55,7 +55,7 @@ describe('FilterSelect', () => {
     assert.calledOnce(fakeOnSelect);
     assert.calledWith(
       fakeOnSelect,
-      sinon.match({ value: 'onevalue', display: 'One Value' })
+      sinon.match({ value: 'onevalue', display: 'One Value' }),
     );
   });
 
@@ -108,6 +108,6 @@ describe('FilterSelect', () => {
           });
         },
       },
-    ])
+    ]),
   );
 });

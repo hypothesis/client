@@ -174,7 +174,7 @@ export default function FilterStatus() {
       // Compare visible top-level annotations against the count of selected
       // (top-level) annotatinos.
       const visibleAnnotationCount = (rootThread.children || []).filter(
-        thread => thread.annotation && thread.visible
+        thread => thread.annotation && thread.visible,
       ).length;
       return visibleAnnotationCount - selectedCount;
     } else {
@@ -225,7 +225,7 @@ export default function FilterStatus() {
                   // Setting `min-width: 0` here allows wrapping to work as
                   // expected for long `filterQuery` strings. See
                   // https://css-tricks.com/flexbox-truncated-text/
-                  'grow min-w-[0]'
+                  'grow min-w-[0]',
                 )}
                 role="status"
               >

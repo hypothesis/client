@@ -32,7 +32,7 @@ describe('sidebar/store/modules/real-time-updates', () => {
 
     store = createStore(
       [realTimeUpdatesModule, annotationsModule, selectionModule],
-      [fakeSettings]
+      [fakeSettings],
     );
 
     $imports.$mock({
@@ -139,7 +139,7 @@ describe('sidebar/store/modules/real-time-updates', () => {
       const deletes = addPendingDeletions(store);
       assert.deepEqual(
         store.pendingUpdateCount(),
-        updates.length + deletes.length
+        updates.length + deletes.length,
       );
     });
   });

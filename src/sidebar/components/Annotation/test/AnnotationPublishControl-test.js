@@ -27,7 +27,7 @@ describe('AnnotationPublishControl', () => {
         onSetPrivate={fakeOnSetPrivate}
         settings={fakeSettings}
         {...props}
-      />
+      />,
     );
   };
 
@@ -74,7 +74,7 @@ describe('AnnotationPublishControl', () => {
       assert.calledWith(
         fakeApplyTheme,
         ['ctaTextColor', 'ctaBackgroundColor'],
-        fakeSettings
+        fakeSettings,
       );
       assert.include(btnPrimary.prop('style'), fakeStyle);
     });
@@ -200,6 +200,6 @@ describe('AnnotationPublishControl', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createAnnotationPublishControl(),
-    })
+    }),
   );
 });

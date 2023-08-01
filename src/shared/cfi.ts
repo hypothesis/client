@@ -15,7 +15,7 @@
  */
 function compareArrays(
   a: Array<number | string>,
-  b: Array<number | string>
+  b: Array<number | string>,
 ): number {
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     if (a[i] === b[i]) {

@@ -21,7 +21,7 @@ describe('GroupListSection', () => {
     ...props
   } = {}) => {
     return mount(
-      <GroupListSection groups={groups} heading={heading} {...props} />
+      <GroupListSection groups={groups} heading={heading} {...props} />,
     );
   };
 

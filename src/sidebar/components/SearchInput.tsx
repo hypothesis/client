@@ -23,7 +23,7 @@ import { useSidebarStore } from '../store';
  *   input is focused.
  */
 function useSearchKeyboardShortcuts(
-  searchInputRef: RefObject<HTMLInputElement>
+  searchInputRef: RefObject<HTMLInputElement>,
 ) {
   const prevFocusRef = useRef<HTMLOrSVGElement | null>(null);
 
@@ -46,7 +46,7 @@ function useSearchKeyboardShortcuts(
         event.stopPropagation();
       }
     },
-    [searchInputRef]
+    [searchInputRef],
   );
 
   const restoreFocus = useCallback(() => {
@@ -135,7 +135,7 @@ export default function SearchInput({
         // Having a nearly opaque white background makes the collision with
         // group names to the left a little less jarring. Full white on hover
         // to fully remove the distraction.
-        'bg-white/90 hover:bg-white transition-colors'
+        'bg-white/90 hover:bg-white transition-colors',
       )}
       name="searchForm"
       onSubmit={onSubmit}
@@ -174,7 +174,7 @@ export default function SearchInput({
             'focus:max-w-[150px] focus:ml-[2px]': true,
             'max-w-[150px] p-1.5 ml-[2px]': isExpanded,
           },
-          'transition-[max-width] duration-300 ease-out'
+          'transition-[max-width] duration-300 ease-out',
         )}
         data-testid="search-input"
         dir="auto"

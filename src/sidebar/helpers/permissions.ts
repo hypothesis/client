@@ -51,7 +51,7 @@ export function privatePermissions(userid: string): Permissions {
  */
 export function sharedPermissions(
   userid: string,
-  groupid: string
+  groupid: string,
 ): Permissions {
   return Object.assign(privatePermissions(userid), {
     read: ['group:' + groupid],
@@ -67,7 +67,7 @@ export function sharedPermissions(
 export function defaultPermissions(
   userid: string,
   groupid: string,
-  savedLevel: string | null
+  savedLevel: string | null,
 ): Permissions {
   if (defaultLevel(savedLevel) === 'private' && userid) {
     return privatePermissions(userid);
@@ -99,7 +99,7 @@ export function isPrivate(perms: Permissions): boolean {
 export function permits(
   perms: Permissions,
   action: 'update' | 'delete',
-  userid: string | null
+  userid: string | null,
 ): boolean {
   return perms[action].indexOf(userid || '') !== -1;
 }

@@ -35,11 +35,11 @@ export default function AnnotationTimestamps({
   const [now, setNow] = useState(() => new Date());
   const createdDate = useMemo(
     () => new Date(annotationCreated),
-    [annotationCreated]
+    [annotationCreated],
   );
   const updatedDate = useMemo(
     () => withEditedTimestamp && new Date(annotationUpdated),
-    [annotationUpdated, withEditedTimestamp]
+    [annotationUpdated, withEditedTimestamp],
   );
 
   const created = useMemo(() => {

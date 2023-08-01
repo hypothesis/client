@@ -107,7 +107,10 @@
     "importOrder": [
       "^[./]"
     ],
-    "importOrderSeparation": true
+    "importOrderSeparation": true,
+    "plugins": [
+      "@trivago/prettier-plugin-sort-imports"
+    ]
   },
   "main": "./build/boot.js",
   "scripts": {

@@ -17,7 +17,7 @@ export default function LaunchErrorPanel({ error }: LaunchErrorPanelProps) {
       className={classnames(
         // The large top-margin is to ensure the panel clears the close button
         // in the Notebook
-        'm-2 mt-12'
+        'm-2 mt-12',
       )}
     >
       <Panel title="Unable to start Hypothesis">{error.message}</Panel>

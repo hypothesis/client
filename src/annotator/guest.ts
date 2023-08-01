@@ -54,7 +54,7 @@ type AnnotationHighlight = HTMLElement & { _annotation?: AnnotationData };
 function annotationsForSelection(): string[] {
   const tags = itemsForRange(
     selectedRange() ?? new Range(),
-    node => (node as AnnotationHighlight)._annotation?.$tag
+    node => (node as AnnotationHighlight)._annotation?.$tag,
   );
   return tags;
 }
@@ -259,7 +259,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   constructor(
     element: HTMLElement,
     config: GuestConfig = {},
-    hostFrame: Window = window
+    hostFrame: Window = window,
   ) {
     super();
 
@@ -323,7 +323,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
         this._integration.contentContainer(),
         {
           features: this.features,
-        }
+        },
       );
     }
 
@@ -475,7 +475,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._hostRPC.on('createAnnotation', () => this.createAnnotation());
 
     this._hostRPC.on('hoverAnnotations', (tags: string[]) =>
-      this._hoverAnnotations(tags)
+      this._hoverAnnotations(tags),
     );
 
     this._hostRPC.on('scrollToAnnotation', (tag: string) => {
@@ -483,7 +483,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     });
 
     this._hostRPC.on('selectAnnotations', (tags: string[], toggle: boolean) =>
-      this.selectAnnotations(tags, { toggle })
+      this.selectAnnotations(tags, { toggle }),
     );
 
     this._hostRPC.on('sidebarLayoutChanged', (sidebarLayout: SidebarLayout) => {
@@ -498,7 +498,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
         new LayoutChangeEvent({
           sidebarLayout,
           sideBySideActive: this._sideBySideActive(),
-        })
+        }),
       );
     });
 
@@ -546,13 +546,13 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   async _connectSidebar() {
     this._sidebarRPC.on(
       'featureFlagsUpdated',
-      (flags: Record<string, boolean>) => this.features.update(flags)
+      (flags: Record<string, boolean>) => this.features.update(flags),
     );
 
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
     this._sidebarRPC.on('hoverAnnotations', (tags: string[]) =>
-      this._hoverAnnotations(tags)
+      this._hoverAnnotations(tags),
     );
 
     this._sidebarRPC.on('scrollToAnnotation', (tag: string) => {
@@ -575,15 +575,18 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
           /* istanbul ignore next */
           console.warn('Failed to anchor annotations:', e);
         }
-      }
+      },
     );
 
-    this._sidebarRPC.on('showContentInfo', (info: ContentInfoConfig) =>
-      this._integration.showContentInfo?.(info)
+    this._sidebarRPC.on(
+      'showContentInfo',
+      (info: ContentInfoConfig) => this._integration.showContentInfo?.(info),
     );
 
-    this._sidebarRPC.on('navigateToSegment', (annotation: AnnotationData) =>
-      this._integration.navigateToSegment?.(annotation)
+    this._sidebarRPC.on(
+      'navigateToSegment',
+      (annotation: AnnotationData) =>
+        this._integration.navigateToSegment?.(annotation),
     );
 
     // Connect to sidebar and send document info/URIs to it.
@@ -647,7 +650,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       try {
         const range = await this._integration.anchor(
           this.element,
-          target.selector
+          target.selector,
         );
         // Convert the `Range` to a `TextRange` which can be converted back to
         // a `Range` later. The `TextRange` representation allows for highlights
@@ -672,7 +675,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
 
       const highlights = highlightRange(
         range,
-        anchor.annotation?.$cluster /* cssClass */
+        anchor.annotation?.$cluster /* cssClass */,
       ) as AnnotationHighlight[];
       highlights.forEach(h => {
         h._annotation = anchor.annotation;
@@ -764,7 +767,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     const info = await this.getDocumentInfo();
     const root = this.element;
     const rangeSelectors = await Promise.all(
-      ranges.map(range => this._integration.describe(root, range))
+      ranges.map(range => this._integration.describe(root, range)),
     );
     const target = rangeSelectors.map(selectors => ({
       source: info.uri,
@@ -865,7 +868,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    */
   selectAnnotations(
     tags: string[],
-    { toggle = false, focusInSidebar = false } = {}
+    { toggle = false, focusInSidebar = false } = {},
   ) {
     if (toggle) {
       this._sidebarRPC.call('toggleAnnotationSelection', tags);

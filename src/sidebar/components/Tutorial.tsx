@@ -24,7 +24,7 @@ function LabeledIcon({ commandName, icon: Icon }: LabeledIconProps) {
         className={classnames(
           'w-em h-em',
           'mx-1 -mt-1', // Give horizontal space; pull up top margin a little
-          'text-color-text-light inline'
+          'text-color-text-light inline',
         )}
       />
       <em data-testid="command-name">{commandName}</em>

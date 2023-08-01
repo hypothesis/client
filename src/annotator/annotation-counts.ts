@@ -17,7 +17,7 @@ const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
  */
 export function annotationCounts(
   rootEl: Element,
-  rpc: PortRPC<'publicAnnotationCountChanged', string>
+  rpc: PortRPC<'publicAnnotationCountChanged', string>,
 ) {
   rpc.on('publicAnnotationCountChanged', updateAnnotationCountElems);
 

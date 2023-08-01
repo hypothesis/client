@@ -133,7 +133,7 @@ describe('AnnotationsService', () => {
           fakeDefaultPermissions,
           'acct:foo@bar.com',
           'mygroup',
-          'private'
+          'private',
         );
         assert.equal(annotation.permissions, 'private-permissions');
       });
@@ -150,7 +150,7 @@ describe('AnnotationsService', () => {
           fakeDefaultPermissions,
           'acct:foo@bar.com',
           'mygroup',
-          'shared'
+          'shared',
         );
         assert.equal(annotation.permissions, 'default permissions');
       });
@@ -367,7 +367,7 @@ describe('AnnotationsService', () => {
 
       assert.equal(
         reply.references[reply.references.length - 1],
-        annotation.id
+        annotation.id,
       );
       assert.equal(reply.group, annotation.group);
       assert.equal(reply.target[0].source, annotation.target[0].source);
@@ -423,7 +423,7 @@ describe('AnnotationsService', () => {
       assert.calledWith(
         fakeAnnotationActivity.reportActivity,
         'create',
-        savedAnnotation
+        savedAnnotation,
       );
     });
 
@@ -448,7 +448,7 @@ describe('AnnotationsService', () => {
       assert.calledWith(
         fakeAnnotationActivity.reportActivity,
         'update',
-        savedAnnotation
+        savedAnnotation,
       );
     });
 

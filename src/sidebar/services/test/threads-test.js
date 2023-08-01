@@ -94,7 +94,7 @@ describe('ThreadsService', () => {
         assert.calledWith(fakeStore.setForcedVisible, threadId);
         assert.callCount(
           fakeStore.setForcedVisible,
-          nonVisibleThreadIds.length
+          nonVisibleThreadIds.length,
         );
       });
     });

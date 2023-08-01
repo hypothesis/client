@@ -13,7 +13,7 @@ class FakeSearchClient extends EventEmitter {
       sortBy = 'created',
       sortOrder = 'asc',
       maxResults = null,
-    }
+    },
   ) {
     super();
 
@@ -110,13 +110,13 @@ describe('LoadAnnotationsService', () => {
     fakeStore.frames.returns(
       fakeUris.map(uri => {
         return { uri };
-      })
+      }),
     );
     return new LoadAnnotationsService(
       fakeApi,
       fakeStore,
       fakeStreamer,
-      fakeStreamFilter
+      fakeStreamFilter,
     );
   }
 
@@ -231,12 +231,12 @@ describe('LoadAnnotationsService', () => {
       assert.calledWith(
         fakeStore.updateFrameAnnotationFetchStatus,
         fakeUris[0],
-        true
+        true,
       );
       assert.calledWith(
         fakeStore.updateFrameAnnotationFetchStatus,
         fakeUris[1],
-        true
+        true,
       );
     });
 
@@ -417,7 +417,7 @@ describe('LoadAnnotationsService', () => {
 
         assert.calledWith(
           fakeApi.annotation.get,
-          sinon.match({ id: 'target_annotation' })
+          sinon.match({ id: 'target_annotation' }),
         );
       });
 
@@ -460,7 +460,7 @@ describe('LoadAnnotationsService', () => {
 
         assert.calledWith(
           fakeApi.annotation.get,
-          sinon.match({ id: 'parent_annotation_1' })
+          sinon.match({ id: 'parent_annotation_1' }),
         );
       });
     });
@@ -486,7 +486,7 @@ describe('LoadAnnotationsService', () => {
 
         assert.calledWith(
           fakeApi.search,
-          sinon.match({ references: 'parent_annotation_1' })
+          sinon.match({ references: 'parent_annotation_1' }),
         );
       });
 
@@ -552,19 +552,19 @@ describe('LoadAnnotationsService', () => {
           '/references',
           'one_of',
           'parent_annotation_1',
-          true
+          true,
         );
         assert.calledWith(
           fakeAddClause,
           '/id',
           'equals',
           'parent_annotation_1',
-          true
+          true,
         );
         assert.calledWith(
           fakeStreamer.setConfig,
           'filter',
-          sinon.match({ filter: 'filter' })
+          sinon.match({ filter: 'filter' }),
         );
         assert.calledOnce(fakeStreamer.connect);
       });

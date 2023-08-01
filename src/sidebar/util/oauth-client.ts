@@ -209,7 +209,7 @@ export class OAuthClient {
           $window.removeEventListener('message', authRespListener);
         }
         $window.addEventListener('message', authRespListener);
-      }
+      },
     );
 
     // Authorize user and retrieve grant token
@@ -237,7 +237,7 @@ export class OAuthClient {
     const authWindow = $window.open(
       authURL.toString(),
       'Log in to Hypothesis',
-      authWindowSettings
+      authWindowSettings,
     );
 
     if (!authWindow) {
@@ -279,13 +279,13 @@ export class OAuthClient {
    * @param data - Fields for form POST request
    */
   private async _getAccessToken(
-    data: Record<string, string>
+    data: Record<string, string>,
   ): Promise<TokenInfo> {
     let response;
     try {
       response = (await this._formPost(
         this.tokenEndpoint,
-        data
+        data,
       )) as AccessTokenResponse;
     } catch (err) {
       throw new TokenError('Failed to fetch access token', err);

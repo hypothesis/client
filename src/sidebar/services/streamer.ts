@@ -60,7 +60,7 @@ export class StreamerService {
     apiRoutes: APIRoutesService,
     auth: AuthService,
     groups: GroupsService,
-    session: SessionService
+    session: SessionService,
   ) {
     this._auth = auth;
     this._groups = groups;
@@ -111,7 +111,7 @@ export class StreamerService {
       warnOnce(
         'Check that your H service is configured to allow ' +
           'WebSocket connections from ' +
-          window.location.origin
+          window.location.origin,
       );
     }
   }
@@ -151,7 +151,7 @@ export class StreamerService {
         console.warn(
           'WebSocket user ID "%s" does not match logged-in ID "%s"',
           message.userid,
-          userid
+          userid,
         );
       }
     } else {
@@ -222,15 +222,15 @@ export class StreamerService {
         setTimeout(() => this._reconnect(), delay);
       } else {
         console.error(
-          'Gave up trying to reconnect to Hypothesis real time update service'
+          'Gave up trying to reconnect to Hypothesis real time update service',
         );
       }
     });
     newSocket.on('error', (event: ErrorEvent) =>
-      this._handleSocketError(websocketURL, event)
+      this._handleSocketError(websocketURL, event),
     );
     newSocket.on('message', (event: MessageEvent) =>
-      this._handleSocketMessage(event)
+      this._handleSocketMessage(event),
     );
     this._socket = newSocket;
 
@@ -258,7 +258,7 @@ export class StreamerService {
    * @return Promise which resolves once the WebSocket connection process has started.
    */
   async connect(
-    options: { applyUpdatesImmediately?: boolean } = {}
+    options: { applyUpdatesImmediately?: boolean } = {},
   ): Promise<void> {
     this._updateImmediately = options.applyUpdatesImmediately ?? true;
 
@@ -268,7 +268,7 @@ export class StreamerService {
       watch(
         this._store.subscribe,
         () => this._store.profile().userid,
-        () => this._reconnect()
+        () => this._reconnect(),
       );
     }
 

@@ -97,7 +97,7 @@ describe('HTMLIntegration', () => {
       0,
       0,
       window.innerWidth - sidebarWidth - sideBySidePadding,
-      window.innerHeight
+      window.innerHeight,
     );
   }
 
@@ -133,7 +133,7 @@ describe('HTMLIntegration', () => {
 
     it('returns null if range-trimming encounters a RangeError', () => {
       fakeTrimmedRange.throws(
-        new RangeError('Range contains no non-whitespace text')
+        new RangeError('Range contains no non-whitespace text'),
       );
       const integration = createIntegration();
       const range = new Range();
@@ -285,10 +285,10 @@ describe('HTMLIntegration', () => {
 
         function getComputedMargins(element) {
           const leftMargin = Math.floor(
-            parseInt(window.getComputedStyle(element).marginLeft, 10)
+            parseInt(window.getComputedStyle(element).marginLeft, 10),
           );
           const rightMargin = Math.floor(
-            parseInt(window.getComputedStyle(element).marginRight, 10)
+            parseInt(window.getComputedStyle(element).marginRight, 10),
           );
           return [leftMargin, rightMargin];
         }
@@ -362,7 +362,7 @@ describe('HTMLIntegration', () => {
           // margin re-adjust to the available amount of space (move to the left):
           const updatedMargins = getComputedMargins(document.body);
           const expectedLeftMargin = Math.floor(
-            window.innerWidth - bodyWidth - 262
+            window.innerWidth - bodyWidth - 262,
           );
           assert.equal(updatedMargins[0], expectedLeftMargin);
           assert.isBelow(updatedMargins[0], autoMargin);
@@ -376,16 +376,16 @@ describe('HTMLIntegration', () => {
 
         assert.isTrue(
           integration.container.classList.contains(
-            'hypothesis-sidebyside-active'
-          )
+            'hypothesis-sidebyside-active',
+          ),
         );
 
         integration.fitSideBySide({ expanded: false, width: 100 });
 
         assert.isFalse(
           integration.container.classList.contains(
-            'hypothesis-sidebyside-active'
-          )
+            'hypothesis-sidebyside-active',
+          ),
         );
       });
     });

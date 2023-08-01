@@ -47,7 +47,7 @@ describe('annotator/anchoring/trim-range', () => {
     return TextRange.fromOffsets(
       container,
       startOffset ?? 0,
-      endOffset ?? container.textContent.length
+      endOffset ?? container.textContent.length,
     ).toRange();
   };
 
@@ -144,7 +144,7 @@ describe('annotator/anchoring/trim-range', () => {
 
         const textRange = textRangeBetween(
           document.querySelector(range.from),
-          document.querySelector(range.to ?? range.from)
+          document.querySelector(range.to ?? range.from),
         );
 
         const trimmedRange = trimRange(textRange);
@@ -152,16 +152,16 @@ describe('annotator/anchoring/trim-range', () => {
         assert.equal(
           trimmedRange.startContainer,
           textNodes(document.querySelector(expected.start))[0],
-          `Trimmed startContainer is first text node inside of ${expected.start}`
+          `Trimmed startContainer is first text node inside of ${expected.start}`,
         );
 
         assert.equal(trimmedRange.startOffset, expected.offset);
         assert.equal(
           trimmedRange.startContainer.textContent.charAt(
-            trimmedRange.startOffset
+            trimmedRange.startOffset,
           ),
           expected.char,
-          `First character at trimmed start position is ${expected.char}`
+          `First character at trimmed start position is ${expected.char}`,
         );
       });
     });
@@ -209,7 +209,7 @@ describe('annotator/anchoring/trim-range', () => {
 
         const textRange = textRangeBetween(
           document.querySelector(range.from),
-          document.querySelector(range.to ?? range.from)
+          document.querySelector(range.to ?? range.from),
         );
 
         const trimmedRange = trimRange(textRange);
@@ -219,16 +219,16 @@ describe('annotator/anchoring/trim-range', () => {
         assert.equal(
           trimmedRange.endContainer,
           endTextNodes[endTextNodes.length - 1],
-          `Trimmed endContainer is last text node inside of ${expected.end}`
+          `Trimmed endContainer is last text node inside of ${expected.end}`,
         );
 
         assert.equal(trimmedRange.endOffset, expected.offset);
         assert.equal(
           trimmedRange.endContainer.textContent.charAt(
-            trimmedRange.endOffset - 1
+            trimmedRange.endOffset - 1,
           ),
           expected.char,
-          `Character before trimmed end position is ${expected.char}`
+          `Character before trimmed end position is ${expected.char}`,
         );
       });
     });
@@ -239,13 +239,13 @@ describe('annotator/anchoring/trim-range', () => {
 
     const textRange = textRangeBetween(
       document.querySelector('#empty'),
-      document.querySelector('#empty')
+      document.querySelector('#empty'),
     );
 
     assert.throws(
       () => trimRange(textRange),
       RangeError,
-      'Range contains no non-whitespace text'
+      'Range contains no non-whitespace text',
     );
   });
 
@@ -259,7 +259,7 @@ describe('annotator/anchoring/trim-range', () => {
     assert.throws(
       () => trimRange(range),
       RangeError,
-      'Range startContainer is not a text node'
+      'Range startContainer is not a text node',
     );
 
     const pTextNode = textNodes(pElement)[0];
@@ -267,7 +267,7 @@ describe('annotator/anchoring/trim-range', () => {
     assert.throws(
       () => trimRange(range),
       RangeError,
-      'Range endContainer is not a text node'
+      'Range endContainer is not a text node',
     );
   });
 });

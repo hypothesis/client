@@ -25,7 +25,7 @@ type RangePosition = {
 function closestNonSpaceInString(
   text: string,
   baseOffset: number,
-  direction: TrimDirection
+  direction: TrimDirection,
 ): number {
   const nextChar =
     direction === TrimDirection.Forwards ? baseOffset : baseOffset - 1;
@@ -67,12 +67,12 @@ function closestNonSpaceInString(
  */
 function closestNonSpaceInRange(
   range: Range,
-  direction: TrimDirection
+  direction: TrimDirection,
 ): RangePosition {
   const nodeIter =
     range.commonAncestorContainer.ownerDocument!.createNodeIterator(
       range.commonAncestorContainer,
-      NodeFilter.SHOW_TEXT
+      NodeFilter.SHOW_TEXT,
     );
 
   const initialBoundaryNode =
@@ -165,12 +165,12 @@ export function trimRange(range: Range): Range {
     start: closestNonSpaceInString(
       range.startContainer.textContent!,
       range.startOffset,
-      TrimDirection.Forwards
+      TrimDirection.Forwards,
     ),
     end: closestNonSpaceInString(
       range.endContainer.textContent!,
       range.endOffset,
-      TrimDirection.Backwards
+      TrimDirection.Backwards,
     ),
   };
 
@@ -195,7 +195,7 @@ export function trimRange(range: Range): Range {
     // end of the `startContainer` node.
     const { node, offset } = closestNonSpaceInRange(
       trimmedRange,
-      TrimDirection.Forwards
+      TrimDirection.Forwards,
     );
 
     if (node && offset >= 0) {
@@ -208,7 +208,7 @@ export function trimRange(range: Range): Range {
     // `endContainer` text content and the `endOffset`.
     const { node, offset } = closestNonSpaceInRange(
       trimmedRange,
-      TrimDirection.Backwards
+      TrimDirection.Backwards,
     );
 
     if (node && offset > 0) {

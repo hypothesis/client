@@ -20,7 +20,7 @@ async function createGitHubRelease({ previousVersion }) {
 
   if (!pkg.repository || !pkg.repository.match(GITHUB_ORG_REPO_PAT)) {
     throw new Error(
-      'package.json is missing a "repository" field of the form :owner/:repo'
+      'package.json is missing a "repository" field of the form :owner/:repo',
     );
   }
 
@@ -41,7 +41,7 @@ async function createGitHubRelease({ previousVersion }) {
 Changes since previous release ${previousVersion}:
 
 ${changes}
-`
+`,
   );
 
   await octokit.repos.createRelease({

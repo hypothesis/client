@@ -45,7 +45,7 @@ export function watch<T>(
   subscribe: (callback: VoidFunction) => VoidFunction,
   getValue: () => T,
   callback: (current: T, previous: T) => void,
-  compare?: (current: T, previous: T) => boolean
+  compare?: (current: T, previous: T) => boolean,
 ): VoidFunction {
   let prevValue = getValue();
   const unsubscribe = subscribe(() => {

@@ -12,7 +12,7 @@ describe('AdderToolbar', () => {
         onCommand={() => {}}
         isVisible={true}
         {...props}
-      />
+      />,
     );
 
   describe('keyboard shortcut content for screen readers', () => {
@@ -50,7 +50,7 @@ describe('AdderToolbar', () => {
     it('renders status information about annotation count when there are annotations to show', () => {
       const wrapper = createComponent({ annotationCount: 2 });
       const annotationCountStatus = wrapper.find(
-        '[data-testid="annotation-count-announce"]'
+        '[data-testid="annotation-count-announce"]',
       );
       assert.include(annotationCountStatus.text(), '2 annotations');
     });
@@ -58,7 +58,7 @@ describe('AdderToolbar', () => {
     it('does not render status information about annotation count when there are no annotations', () => {
       const wrapper = createComponent({ annotationCount: 0 });
       const annotationCountStatus = wrapper.find(
-        '[data-testid="annotation-count-announce"]'
+        '[data-testid="annotation-count-announce"]',
       );
 
       assert.isEmpty(annotationCountStatus.text());

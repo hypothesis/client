@@ -27,7 +27,7 @@ function loadClient(clientUrl) {
  */
 function unloadClient() {
   let annotatorLink = document.querySelector(
-    'link[type="application/annotator+html"]'
+    'link[type="application/annotator+html"]',
   );
 
   if (annotatorLink) {

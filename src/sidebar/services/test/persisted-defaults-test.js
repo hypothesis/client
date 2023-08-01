@@ -24,7 +24,7 @@ describe('PersistedDefaultsService', () => {
         setDefault: sinon.stub(),
         getDefault: sinon.stub(),
         getDefaults: sinon.stub().returns({ annotationPrivacy: 'earmuffs' }),
-      }
+      },
     );
 
     fakeGetItem = sinon.stub();
@@ -49,7 +49,7 @@ describe('PersistedDefaultsService', () => {
       // Retrieving each known default from localStorage...
       assert.equal(
         fakeLocalStorage.getItem.callCount,
-        Object.keys(DEFAULT_KEYS).length
+        Object.keys(DEFAULT_KEYS).length,
       );
 
       Object.keys(DEFAULT_KEYS).forEach(defaultKey => {
@@ -93,7 +93,7 @@ describe('PersistedDefaultsService', () => {
         assert.calledWith(
           fakeLocalStorage.setItem,
           DEFAULT_KEYS.annotationPrivacy,
-          'carrots'
+          'carrots',
         );
       });
 
@@ -113,12 +113,12 @@ describe('PersistedDefaultsService', () => {
         assert.calledWith(
           fakeLocalStorage.setItem,
           DEFAULT_KEYS.annotationPrivacy,
-          'carrots'
+          'carrots',
         );
         assert.calledWith(
           fakeLocalStorage.setItem,
           DEFAULT_KEYS.annotationPrivacy,
-          'potatoes'
+          'potatoes',
         );
       });
 

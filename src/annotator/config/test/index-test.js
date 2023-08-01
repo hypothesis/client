@@ -51,7 +51,7 @@ describe('annotator/config/index', () => {
 
         assert.equal(config[settingName], 'SETTING_VALUE');
       });
-    }
+    },
   );
 
   context("when there's no application/annotator+html <link>", () => {
@@ -100,7 +100,7 @@ describe('annotator/config/index', () => {
             usernameUrl: null,
             sideBySide: { mode: 'auto' },
           },
-          config
+          config,
         );
       });
     });
@@ -136,7 +136,7 @@ describe('annotator/config/index', () => {
             usernameUrl: 'fakeValue',
             sideBySide: { mode: 'auto' },
           },
-          config
+          config,
         );
       });
     });
@@ -215,7 +215,7 @@ describe('annotator/config/index', () => {
 
         assert.equal(settingValue, settings[settingName]);
       });
-    }
+    },
   );
 
   describe('coerces values', () => {

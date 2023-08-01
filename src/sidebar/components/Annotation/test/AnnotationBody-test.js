@@ -34,7 +34,7 @@ describe('AnnotationBody', () => {
         annotation={fakeAnnotation}
         settings={fakeSettings}
         {...props}
-      />
+      />,
     );
   }
 
@@ -127,7 +127,7 @@ describe('AnnotationBody', () => {
     assert.isOk(button.exists());
     assert.equal(
       button.props().title,
-      'Toggle visibility of full annotation text: Show More'
+      'Toggle visibility of full annotation text: Show More',
     );
     assert.isFalse(button.props().expanded);
   });
@@ -152,7 +152,7 @@ describe('AnnotationBody', () => {
 
     assert.equal(
       buttonProps.title,
-      'Toggle visibility of full annotation text: Show Less'
+      'Toggle visibility of full annotation text: Show Less',
     );
     assert.isTrue(buttonProps.expanded);
   });
@@ -207,6 +207,6 @@ describe('AnnotationBody', () => {
           return wrapper;
         },
       },
-    ])
+    ]),
   );
 });

@@ -30,13 +30,13 @@ export function annotationSharingLink(annotation: Annotation): string | null {
  */
 export function pageSharingLink(
   documentURI: string,
-  groupId: string
+  groupId: string,
 ): string | null {
   if (!isShareableURI(documentURI)) {
     return null;
   }
   return `https://hyp.is/go?url=${encodeURIComponent(
-    documentURI
+    documentURI,
   )}&group=${groupId}`;
 }
 

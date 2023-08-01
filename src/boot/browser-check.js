@@ -33,7 +33,7 @@ export function isBrowserSupported() {
         // These arguments are optional in the spec but required in Edge Legacy.
         null /* namespaceResolver */,
         XPathResult.ANY_TYPE,
-        null /* result */
+        null /* result */,
       );
       return true;
     },

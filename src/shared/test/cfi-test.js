@@ -10,7 +10,7 @@ describe('sidebar/util/cfi', () => {
       assert.equal(stripCFIAssertions('/1/2[chap4ref]'), '/1/2');
       assert.equal(
         stripCFIAssertions('/1[part1ref]/2[chapter2ref]/3[subsectionref]'),
-        '/1/2/3'
+        '/1/2/3',
       );
     });
 
@@ -97,7 +97,7 @@ describe('sidebar/util/cfi', () => {
         assert.equal(
           compareCFIs(a, b),
           expected,
-          `comparing CFIs "${a}" and "${b}" failed`
+          `comparing CFIs "${a}" and "${b}" failed`,
         );
       });
     });
@@ -115,7 +115,7 @@ describe('sidebar/util/cfi', () => {
     it('strips assertions', () => {
       assert.equal(
         documentCFI('/6/152[;vnd.vst.idref=ch13_01]!/4/2[ch13_sec_1]'),
-        '/6/152'
+        '/6/152',
       );
     });
   });

@@ -12,7 +12,7 @@ describe('sidebar/store/util', () => {
         {
           SOME_ACTION: 'SOME_ACTION',
           ANOTHER_ACTION: 'ANOTHER_ACTION',
-        }
+        },
       );
     });
   });

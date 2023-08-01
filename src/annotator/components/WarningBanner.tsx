@@ -11,7 +11,7 @@ export default function WarningBanner() {
       <div
         className={classnames(
           'flex items-center gap-x-2',
-          'border border-yellow-notice bg-yellow-notice/10 text-annotator-base'
+          'border border-yellow-notice bg-yellow-notice/10 text-annotator-base',
         )}
       >
         <div className="bg-yellow-notice text-white p-2">

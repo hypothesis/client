@@ -143,7 +143,7 @@ function assetURL(config, path) {
 export function bootHypothesisClient(doc, config) {
   // Detect presence of Hypothesis in the page
   const appLinkEl = doc.querySelector(
-    'link[type="application/annotator+html"]'
+    'link[type="application/annotator+html"]',
   );
   if (appLinkEl) {
     return;
@@ -169,7 +169,7 @@ export function bootHypothesisClient(doc, config) {
     doc,
     'hypothesis-client',
     'javascript',
-    config.assetRoot + 'build/boot.js'
+    config.assetRoot + 'build/boot.js',
   );
 
   const scripts = ['scripts/annotator.bundle.js'];

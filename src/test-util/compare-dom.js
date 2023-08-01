@@ -42,7 +42,7 @@ export function nodeToString(node) {
 export function assertNodesEqual(actual, expected) {
   if (actual !== expected) {
     throw new Error(
-      `Expected ${nodeToString(actual)} to equal ${nodeToString(expected)}`
+      `Expected ${nodeToString(actual)} to equal ${nodeToString(expected)}`,
     );
   }
 }

@@ -100,12 +100,12 @@ describe('ShareAnnotations', () => {
 
       assert.match(
         wrapper.find('[data-testid="sharing-intro"]').text(),
-        testCase.introPattern
+        testCase.introPattern,
       );
 
       assert.match(
         wrapper.find('[data-testid="sharing-details"]').text(),
-        testCase.visibilityPattern
+        testCase.visibilityPattern,
       );
     });
 
@@ -156,7 +156,7 @@ describe('ShareAnnotations', () => {
 
         assert.calledWith(
           fakeToastMessenger.success,
-          'Copied share link to clipboard'
+          'Copied share link to clipboard',
         );
       });
 
@@ -176,6 +176,6 @@ describe('ShareAnnotations', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
-    })
+    }),
   );
 });

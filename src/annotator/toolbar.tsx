@@ -130,7 +130,7 @@ export class ToolbarController {
         toggleSidebarRef={this._sidebarToggleButton}
         useMinimalControls={this.useMinimalControls}
       />,
-      this._container
+      this._container,
     );
   }
 }

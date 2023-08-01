@@ -275,7 +275,7 @@ describe('Guest', () => {
             detail: sinon.match({
               sidebarLayout: dummyLayout,
             }),
-          })
+          }),
         );
       });
     });
@@ -376,7 +376,7 @@ describe('Guest', () => {
           event.waitUntil(
             new Promise(resolve => {
               contentReady = resolve;
-            })
+            }),
           );
         };
         guest.element.addEventListener('scrolltorange', listener);
@@ -396,7 +396,7 @@ describe('Guest', () => {
       it('allows the default scroll behaviour to be prevented', async () => {
         const guest = setupGuest();
         guest.element.addEventListener('scrolltorange', event =>
-          event.preventDefault()
+          event.preventDefault(),
         );
 
         await triggerScroll();
@@ -452,7 +452,7 @@ describe('Guest', () => {
         assert.calledWith(
           highlighter.setHighlightsFocused,
           guest.anchors[0].highlights,
-          true
+          true,
         );
       });
 
@@ -470,7 +470,7 @@ describe('Guest', () => {
         assert.calledWith(
           highlighter.setHighlightsFocused,
           guest.anchors[1].highlights,
-          false
+          false,
         );
       });
 
@@ -501,14 +501,14 @@ describe('Guest', () => {
         assert.calledWith(
           highlighter.setHighlightsVisible,
           guest.element,
-          true
+          true,
         );
 
         emitSidebarEvent('setHighlightsVisible', false);
         assert.calledWith(
           highlighter.setHighlightsVisible,
           guest.element,
-          false
+          false,
         );
       });
     });
@@ -525,12 +525,12 @@ describe('Guest', () => {
         assert.calledWith(
           sidebarRPC().call,
           'syncAnchoringStatus',
-          sinon.match({ target: [], uri: 'uri', $tag: 'tag1' })
+          sinon.match({ target: [], uri: 'uri', $tag: 'tag1' }),
         );
         assert.calledWith(
           sidebarRPC().call,
           'syncAnchoringStatus',
-          sinon.match({ target: [], uri: 'uri', $tag: 'tag2' })
+          sinon.match({ target: [], uri: 'uri', $tag: 'tag2' }),
         );
       });
     });
@@ -635,7 +635,7 @@ describe('Guest', () => {
     context('clicks/taps on the document', () => {
       const simulateClick = (element = rootElement, clientX = 0) =>
         element.dispatchEvent(
-          new PointerEvent('pointerdown', { bubbles: true, clientX })
+          new PointerEvent('pointerdown', { bubbles: true, clientX }),
         );
 
       it('hides sidebar', () => {
@@ -755,7 +755,7 @@ describe('Guest', () => {
     it('toggles selected annotations in the sidebar when Ctrl/Cmd-clicking a highlight', () => {
       createGuest();
       fakeHighlight.dispatchEvent(
-        new MouseEvent('mouseup', { bubbles: true, ctrlKey: true })
+        new MouseEvent('mouseup', { bubbles: true, ctrlKey: true }),
       );
 
       assert.calledWith(sidebarRPC().call, 'toggleAnnotationSelection', [
@@ -891,7 +891,7 @@ describe('Guest', () => {
       assert.calledWith(
         sidebarRPC().call,
         'createAnnotation',
-        sinon.match({ $highlight: true })
+        sinon.match({ $highlight: true }),
       );
     });
 
@@ -906,7 +906,7 @@ describe('Guest', () => {
         sidebarRPC().call,
         'showAnnotations',
         tags,
-        true // Focus annotation in sidebar
+        true, // Focus annotation in sidebar
       );
     });
   });
@@ -922,7 +922,7 @@ describe('Guest', () => {
         sidebarRPC().call,
         'showAnnotations',
         tags,
-        false // Don't focus annotation in sidebar
+        false, // Don't focus annotation in sidebar
       );
     });
 
@@ -953,7 +953,7 @@ describe('Guest', () => {
         sidebarRPC().call,
         'showAnnotations',
         tags,
-        true // Focus in sidebar
+        true, // Focus in sidebar
       );
     });
   });
@@ -1001,7 +1001,7 @@ describe('Guest', () => {
       assert.equal(annotation.uri, await fakeIntegration.uri());
       assert.deepEqual(
         annotation.document,
-        await fakeIntegration.getMetadata()
+        await fakeIntegration.getMetadata(),
       );
     });
 
@@ -1160,7 +1160,7 @@ describe('Guest', () => {
         ],
       };
       fakeIntegration.anchor.returns(
-        Promise.reject(new Error('Failed to anchor'))
+        Promise.reject(new Error('Failed to anchor')),
       );
 
       return guest
@@ -1177,7 +1177,7 @@ describe('Guest', () => {
         ],
       };
       fakeIntegration.anchor.returns(
-        Promise.reject(new Error('Failed to anchor'))
+        Promise.reject(new Error('Failed to anchor')),
       );
 
       return guest
@@ -1246,7 +1246,7 @@ describe('Guest', () => {
 
       assert.equal(
         highlighter.highlightRange.lastCall.args[1],
-        'user-annotations'
+        'user-annotations',
       );
     });
 
@@ -1308,7 +1308,7 @@ describe('Guest', () => {
 
       // Hover the annotation (in the sidebar) before it is anchored in the page.
       const [, hoverAnnotationsCallback] = sidebarRPC().on.args.find(
-        args => args[0] === 'hoverAnnotations'
+        args => args[0] === 'hoverAnnotations',
       );
       hoverAnnotationsCallback([annotation.$tag]);
       const anchors = await guest.anchor(annotation);
@@ -1318,7 +1318,7 @@ describe('Guest', () => {
       assert.calledWith(
         highlighter.setHighlightsFocused,
         anchors[0].highlights,
-        true
+        true,
       );
     });
 
@@ -1400,7 +1400,7 @@ describe('Guest', () => {
 
       assert.include(guest.anchors, anchorB);
       assert.isFalse(
-        highlighter.removeHighlights.calledWith(anchorB.highlights)
+        highlighter.removeHighlights.calledWith(anchorB.highlights),
       );
     });
 
@@ -1493,7 +1493,7 @@ describe('Guest', () => {
     assert.calledOnce(fakeIntegration.showContentInfo);
     assert.calledWith(
       fakeIntegration.showContentInfo,
-      config.contentInfoBanner
+      config.contentInfoBanner,
     );
   });
 
@@ -1636,7 +1636,7 @@ describe('Guest', () => {
           ctrlKey: true,
           shiftKey: true,
           key: 'h',
-        })
+        }),
       );
       assert.equal(guest.highlightsVisible, false);
       assert.calledWith(hostRPC().call, 'highlightsVisibleChanged', false);
@@ -1646,7 +1646,7 @@ describe('Guest', () => {
           ctrlKey: true,
           shiftKey: true,
           key: 'h',
-        })
+        }),
       );
       assert.equal(guest.highlightsVisible, true);
       assert.calledWith(hostRPC().call, 'highlightsVisibleChanged', true);

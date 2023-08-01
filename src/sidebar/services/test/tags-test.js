@@ -119,7 +119,7 @@ describe('TagsService', () => {
           count: 1,
           text: 'new',
           updated: sinon.match.number,
-        })
+        }),
       );
     });
 

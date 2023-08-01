@@ -20,7 +20,7 @@ describe('sidebar.util.disable-opener-for-external-links', () => {
       new Event('click', {
         bubbles: true,
         cancelable: true,
-      })
+      }),
     );
   }
 

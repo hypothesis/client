@@ -24,7 +24,7 @@ describe('HypothesisApp', () => {
         session={fakeSession}
         toastMessenger={fakeToastMessenger}
         {...props}
-      />
+      />,
     );
   };
 
@@ -240,7 +240,7 @@ describe('HypothesisApp', () => {
 
       assert.equal(fakeFrameSync.notifyHost.callCount, 1);
       assert.isTrue(
-        fakeFrameSync.notifyHost.calledWithExactly('loginRequested')
+        fakeFrameSync.notifyHost.calledWithExactly('loginRequested'),
       );
     });
   });

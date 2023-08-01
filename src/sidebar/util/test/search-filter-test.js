@@ -21,7 +21,7 @@ describe('sidebar/util/search-filter', () => {
         const result = searchFilter.toObject(emptyQuery);
         assert.isTrue(
           isEmptyFilter(result),
-          `expected "${emptyQuery}" to produce empty filter`
+          `expected "${emptyQuery}" to produce empty filter`,
         );
       }
     });

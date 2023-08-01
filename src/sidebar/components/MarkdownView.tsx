@@ -22,7 +22,7 @@ export default function MarkdownView({
 }: MarkdownViewProps) {
   const html = useMemo(
     () => (markdown ? renderMathAndMarkdown(markdown) : ''),
-    [markdown]
+    [markdown],
   );
   const content = useRef<HTMLDivElement | null>(null);
 

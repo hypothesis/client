@@ -35,7 +35,7 @@ function InlineControls({
         // with transparents in gradients:
         // https://bugs.webkit.org/show_bug.cgi?id=150940
         // https://tailwindcss.com/docs/gradient-color-stops#fading-to-transparent
-        'w-20 bg-gradient-to-l from-white'
+        'w-20 bg-gradient-to-l from-white',
       )}
     >
       <div className="flex justify-end">
@@ -137,7 +137,7 @@ function Excerpt({
   useLayoutEffect(() => {
     const cleanup = observeElementSize(
       contentElement.current!,
-      updateContentHeight
+      updateContentHeight,
     );
     updateContentHeight();
     return cleanup;
@@ -165,7 +165,7 @@ function Excerpt({
       data-testid="excerpt-container"
       className={classnames(
         'relative overflow-hidden',
-        'transition-[max-height] ease-in duration-150'
+        'transition-[max-height] ease-in duration-150',
       )}
       style={contentStyle}
     >
@@ -176,7 +176,7 @@ function Excerpt({
           // this element down from the top of the container.
           // See https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
           // See https://github.com/hypothesis/client/issues/1518
-          'inline-block w-full'
+          'inline-block w-full',
         )}
         data-testid="excerpt-content"
         ref={contentElement}
@@ -201,7 +201,7 @@ function Excerpt({
             // Don't make this shadow visible OR clickable if there's nothing
             // to do here (the excerpt isn't expandable)
             'opacity-0 pointer-events-none': !isExpandable,
-          }
+          },
         )}
         title="Show the full excerpt"
       />

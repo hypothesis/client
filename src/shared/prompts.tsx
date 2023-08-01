@@ -71,7 +71,7 @@ export async function confirm({
       >
         {message}
       </ModalDialog>,
-      container
+      container,
     );
   });
 }

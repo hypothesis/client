@@ -44,7 +44,7 @@ function StreamView({ api, toastMessenger }: StreamViewProps) {
         store.annotationFetchFinished();
       }
     },
-    [api, store]
+    [api, store],
   );
 
   // Update the stream when this route is initially displayed and whenever

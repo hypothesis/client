@@ -64,7 +64,7 @@ describe('TopBar', () => {
         settings={fakeSettings}
         streamer={fakeStreamer}
         {...props}
-      />
+      />,
     );
   }
 
@@ -171,7 +171,7 @@ describe('TopBar', () => {
     it("doesn't show the share annotations button", () => {
       const wrapper = createTopBar();
       assert.isFalse(
-        wrapper.exists('[title="Share annotations on this page"]')
+        wrapper.exists('[title="Share annotations on this page"]'),
       );
     });
   });
@@ -233,6 +233,6 @@ describe('TopBar', () => {
         name: 'in stream / single annotation view',
         content: () => createTopBar({ isSidebar: false }),
       },
-    ])
+    ]),
   );
 });

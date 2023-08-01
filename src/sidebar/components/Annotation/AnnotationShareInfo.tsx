@@ -27,7 +27,7 @@ function AnnotationShareInfo({ group, isPrivate }: AnnotationShareInfoProps) {
           // The light-text hover color is not a standard color for a Link, so
           // a custom variant is used
           classes={classnames(
-            'text-color-text-light hover:text-color-text-light'
+            'text-color-text-light hover:text-color-text-light',
           )}
           href={group.links.html}
           target="_blank"

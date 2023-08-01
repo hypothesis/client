@@ -14,7 +14,7 @@ describe('SidebarContentError', () => {
         errorType="annotation"
         onLoginRequest={sinon.stub()}
         {...props}
-      />
+      />,
     );
   };
 
@@ -63,7 +63,7 @@ describe('SidebarContentError', () => {
 
       assert.include(
         wrapper.text(),
-        'The annotation associated with the current URL is unavailable'
+        'The annotation associated with the current URL is unavailable',
       );
       assert.include(wrapper.text(), 'You may need to log in');
     });
@@ -88,7 +88,7 @@ describe('SidebarContentError', () => {
 
       assert.include(
         wrapper.text(),
-        'The current URL links to an annotation, but that annotation'
+        'The current URL links to an annotation, but that annotation',
       );
       assert.notInclude(wrapper.text(), 'You may need to log in');
     });
@@ -111,7 +111,7 @@ describe('SidebarContentError', () => {
 
       assert.include(
         wrapper.text(),
-        'The group associated with the current URL is unavailable'
+        'The group associated with the current URL is unavailable',
       );
       assert.include(wrapper.text(), 'You may need to log in');
     });
@@ -134,7 +134,7 @@ describe('SidebarContentError', () => {
 
       assert.include(
         wrapper.text(),
-        'The current URL links to a group, but that group'
+        'The current URL links to a group, but that group',
       );
       assert.notInclude(wrapper.text(), 'You may need to log in');
     });
@@ -165,6 +165,6 @@ describe('SidebarContentError', () => {
           return createComponent();
         },
       },
-    ])
+    ]),
   );
 });

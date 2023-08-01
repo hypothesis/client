@@ -38,7 +38,7 @@ function replaceText(
   state: EditorState,
   pos: number,
   length: number,
-  text: string
+  text: string,
 ): EditorState {
   let newSelectionStart = state.selectionStart;
   let newSelectionEnd = state.selectionEnd;
@@ -91,7 +91,7 @@ function replaceText(
  */
 export function convertSelectionToLink(
   state: EditorState,
-  linkType: LinkType = LinkType.ANCHOR_LINK
+  linkType: LinkType = LinkType.ANCHOR_LINK,
 ): EditorState {
   const selection = state.text.slice(state.selectionStart, state.selectionEnd);
 
@@ -109,7 +109,7 @@ export function convertSelectionToLink(
       state,
       state.selectionStart,
       selection.length,
-      linkPrefix + '[' + dummyLabel + '](' + selection + ')'
+      linkPrefix + '[' + dummyLabel + '](' + selection + ')',
     );
     newState.selectionStart = state.selectionStart + linkPrefix.length + 1;
     newState.selectionEnd = newState.selectionStart + dummyLabel.length;
@@ -123,7 +123,7 @@ export function convertSelectionToLink(
       state,
       state.selectionStart,
       selection.length,
-      beforeURL + dummyLink + ')'
+      beforeURL + dummyLink + ')',
     );
     newState.selectionStart = state.selectionStart + beforeURL.length;
     newState.selectionEnd = newState.selectionStart + dummyLink.length;
@@ -146,7 +146,7 @@ export function toggleSpanStyle(
   state: EditorState,
   prefix: string,
   suffix: string | undefined,
-  placeholder: string
+  placeholder: string,
 ): EditorState {
   if (typeof suffix === 'undefined') {
     suffix = prefix;
@@ -154,11 +154,11 @@ export function toggleSpanStyle(
 
   const selectionPrefix = state.text.slice(
     state.selectionStart - prefix.length,
-    state.selectionStart
+    state.selectionStart,
   );
   const selectionSuffix = state.text.slice(
     state.selectionEnd,
-    state.selectionEnd + prefix.length
+    state.selectionEnd + prefix.length,
   );
   let newState = state;
 
@@ -172,7 +172,7 @@ export function toggleSpanStyle(
       newState,
       newState.selectionStart - prefix.length,
       prefix.length,
-      ''
+      '',
     );
     newState = replaceText(newState, newState.selectionEnd, suffix.length, '');
   } else {
@@ -211,7 +211,7 @@ type TransformLinesCallback = (
   state: EditorState,
   start: number,
   end: number,
-  lineIndex: number
+  lineIndex: number,
 ) => EditorState;
 
 /**
@@ -228,7 +228,7 @@ function transformLines(
   state: EditorState,
   start: number,
   end: number,
-  callback: TransformLinesCallback
+  callback: TransformLinesCallback,
 ) {
   let lineStart = startOfLine(state.text, start);
   let lineEnd = endOfLine(state.text, start);
@@ -265,7 +265,7 @@ function transformLines(
  */
 export function toggleBlockStyle(
   state: EditorState,
-  prefix: string | ((lineIndex: number) => string)
+  prefix: string | ((lineIndex: number) => string),
 ): EditorState {
   const start = state.selectionStart;
   const end = state.selectionEnd;
@@ -292,7 +292,7 @@ export function toggleBlockStyle(
       (state, lineStart, _lineEnd, lineIndex) => {
         const prefix = prefixToString(lineIndex);
         return replaceText(state, lineStart, prefix.length, '');
-      }
+      },
     );
   } else {
     // Add the block style to any lines which do not already have it applied
@@ -307,7 +307,7 @@ export function toggleBlockStyle(
         } else {
           return replaceText(state, lineStart, 0, prefix);
         }
-      }
+      },
     );
   }
 }

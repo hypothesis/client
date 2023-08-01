@@ -176,7 +176,7 @@ describe('PortRPC', () => {
 
       await waitForMessageDelivery();
       assert.notCalled(plusOne);
-    })
+    }),
   );
 
   it('throws an error if `on` is called after `connect`', () => {
@@ -316,7 +316,7 @@ describe('PortRPC', () => {
       const { port1, port2 } = new MessageChannel();
       const transferredPort = await transferPort(
         port1,
-        childFrame.contentWindow
+        childFrame.contentWindow,
       );
 
       const sender = new PortRPC({

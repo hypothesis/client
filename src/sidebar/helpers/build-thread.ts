@@ -72,7 +72,7 @@ function annotationId(annotation: Annotation): string {
 function hasPathToRoot(
   threads: Record<string, Thread>,
   id: string,
-  ancestorId: string
+  ancestorId: string,
 ): boolean {
   const ancestor = threads[ancestorId];
   if (!ancestor || ancestor.parent === id) {
@@ -93,7 +93,7 @@ function hasPathToRoot(
 function setParent(
   threads: Record<string, Thread>,
   id: string,
-  parents: string[]
+  parents: string[],
 ) {
   if (threads[id].parent || !parents.length) {
     // Parent already assigned, do not try to change it.
@@ -151,7 +151,7 @@ function threadAnnotations(annotations: Annotation[]): Thread {
   annotations.forEach(annotation => {
     // Remove references to self from `references` to avoid circular references
     const parents = (annotation.references || []).filter(
-      id => id !== annotation.id
+      id => id !== annotation.id,
     );
     return setParent(threads, annotationId(annotation), parents);
   });
@@ -199,10 +199,10 @@ function mapThread(thread: Thread, mapFn: (t: Thread) => Thread): Thread {
 function sortThread(
   thread: Thread,
   compareFn: (a: Thread, b: Thread) => number,
-  replyCompareFn: (a: Thread, b: Thread) => number
+  replyCompareFn: (a: Thread, b: Thread) => number,
 ): Thread {
   const children = thread.children.map(child =>
-    sortThread(child, replyCompareFn, replyCompareFn)
+    sortThread(child, replyCompareFn, replyCompareFn),
   );
 
   const sortedChildren = children.slice().sort(compareFn);
@@ -218,7 +218,7 @@ function countRepliesAndDepth(thread: Thread, depth: number): Thread {
   const children = thread.children.map(c => countRepliesAndDepth(c, depth + 1));
   const replyCount = children.reduce(
     (total, child) => total + 1 + child.replyCount,
-    0
+    0,
   );
   return {
     ...thread,
@@ -300,7 +300,7 @@ const replySortCompareFn = (a: Thread, b: Thread): number => {
  */
 export function buildThread(
   annotations: Annotation[],
-  options: BuildThreadOptions
+  options: BuildThreadOptions,
 ): Thread {
   const hasSelection = options.selected.length > 0;
   const hasForcedVisible = options.forcedVisible.length > 0;
@@ -348,7 +348,7 @@ export function buildThread(
 
   // Remove top-level threads which contain no visible annotations
   thread.children = thread.children.filter(
-    child => child.visible || hasVisibleChildren(child)
+    child => child.visible || hasVisibleChildren(child),
   );
 
   // Determine collapsed state for UI

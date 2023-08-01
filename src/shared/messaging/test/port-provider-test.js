@@ -169,7 +169,7 @@ describe('PortProvider', () => {
         window.postMessage,
         { ...data, type: 'offer' },
         window.location.origin,
-        [sinon.match.instanceOf(MessagePort)]
+        [sinon.match.instanceOf(MessagePort)],
       );
     });
 
@@ -208,7 +208,7 @@ describe('PortProvider', () => {
         window.postMessage,
         { ...data, type: 'offer' },
         window.location.origin,
-        [sinon.match.instanceOf(MessagePort)]
+        [sinon.match.instanceOf(MessagePort)],
       );
     });
 
@@ -241,7 +241,7 @@ describe('PortProvider', () => {
         handler,
         sinon.match({
           data: { ...data, type: 'offer' },
-        })
+        }),
       );
     });
 
@@ -260,7 +260,7 @@ describe('PortProvider', () => {
       assert.calledWith(
         handler,
         'sidebar',
-        sinon.match.instanceOf(MessagePort)
+        sinon.match.instanceOf(MessagePort),
       );
 
       handler.resetHistory();

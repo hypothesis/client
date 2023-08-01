@@ -54,7 +54,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://www.youtube.com/embed/QCkm0lL-6lc'
+        'https://www.youtube.com/embed/QCkm0lL-6lc',
       );
     });
   });
@@ -72,7 +72,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5',
       );
     });
   });
@@ -90,7 +90,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5',
       );
     });
   });
@@ -159,7 +159,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5',
       );
     });
   });
@@ -176,7 +176,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://www.youtube.com/embed/QCkm0lL-6lc'
+        'https://www.youtube.com/embed/QCkm0lL-6lc',
       );
     });
   });
@@ -193,7 +193,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5',
       );
     });
   });
@@ -210,7 +210,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5',
       );
     });
   });
@@ -227,7 +227,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
+        'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5',
       );
     });
   });
@@ -248,7 +248,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://player.vimeo.com/video/149000090'
+        'https://player.vimeo.com/video/149000090',
       );
     });
   });
@@ -270,7 +270,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://player.vimeo.com/video/148845534'
+        'https://player.vimeo.com/video/148845534',
       );
     });
   });
@@ -286,7 +286,7 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        'https://flipgrid.com/s/' + id + '?embed=true'
+        'https://flipgrid.com/s/' + id + '?embed=true',
       );
     });
   });
@@ -404,7 +404,7 @@ describe('sidebar/media-embedder', () => {
         '">' +
         url +
         '</a>\n\n' +
-        "<p>Isn't it cool!</p>\n\n"
+        "<p>Isn't it cool!</p>\n\n",
     );
 
     mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -427,7 +427,7 @@ describe('sidebar/media-embedder', () => {
         url2 +
         '">' +
         url2 +
-        '</a>'
+        '</a>',
     );
 
     mediaEmbedder.replaceLinksWithEmbeds(element);

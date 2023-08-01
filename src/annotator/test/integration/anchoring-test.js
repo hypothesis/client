@@ -30,7 +30,7 @@ function highlightedPhrases(container) {
   return Array.from(container.querySelectorAll('.hypothesis-highlight')).map(
     el => {
       return el.textContent;
-    }
+    },
   );
 }
 
@@ -105,7 +105,7 @@ describe('anchoring', () => {
           : assert.deepEqual;
         assertFn(
           normalize(highlightedPhrases(container)),
-          normalize(testCase.quotes)
+          normalize(testCase.quotes),
         );
       });
     });

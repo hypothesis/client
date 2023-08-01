@@ -31,7 +31,7 @@ export class HypothesisInjector implements Destroyable {
     this._frameObserver = new FrameObserver(
       element,
       frame => injectClient(frame, config), // Frame added callback
-      () => {} // Frame removed callback
+      () => {}, // Frame removed callback
     );
   }
 
@@ -58,8 +58,8 @@ function hasHypothesis(iframe: HTMLIFrameElement) {
 export function removeTemporaryClientConfig(document_: Document = document) {
   const tempConfigEls = Array.from(
     document_.querySelectorAll(
-      'script.js-hypothesis-config[data-remove-on-unload]'
-    )
+      'script.js-hypothesis-config[data-remove-on-unload]',
+    ),
   );
   tempConfigEls.forEach(el => el.remove());
 }
@@ -83,7 +83,7 @@ export function removeTemporaryClientConfig(document_: Document = document) {
 export async function injectClient(
   frame: HTMLIFrameElement,
   config: InjectConfig,
-  frameId?: string
+  frameId?: string,
 ) {
   if (hasHypothesis(frame)) {
     return;

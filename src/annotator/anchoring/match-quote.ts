@@ -81,7 +81,7 @@ type Context = {
 export function matchQuote(
   text: string,
   quote: string,
-  context: Context = {}
+  context: Context = {},
 ): Match | null {
   if (quote.length === 0) {
     return null;
@@ -120,15 +120,15 @@ export function matchQuote(
       ? textMatchScore(
           text.slice(
             Math.max(0, match.start - context.prefix.length),
-            match.start
+            match.start,
           ),
-          context.prefix
+          context.prefix,
         )
       : 1.0;
     const suffixScore = context.suffix
       ? textMatchScore(
           text.slice(match.end, match.end + context.suffix.length),
-          context.suffix
+          context.suffix,
         )
       : 1.0;
 

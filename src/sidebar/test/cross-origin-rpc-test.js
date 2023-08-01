@@ -66,8 +66,8 @@ describe('sidebar/cross-origin-rpc', () => {
             id: 42,
             result: 'ok',
           },
-          'https://allowed1.com'
-        )
+          'https://allowed1.com',
+        ),
       );
     });
 
@@ -104,7 +104,7 @@ describe('sidebar/cross-origin-rpc', () => {
 
           assert.calledWith(
             fakeStore.changeFocusModeUser,
-            sinon.match({ username: 'foobar', displayName: 'Simon Says' })
+            sinon.match({ username: 'foobar', displayName: 'Simon Says' }),
           );
         });
 
@@ -119,7 +119,7 @@ describe('sidebar/cross-origin-rpc', () => {
             assert.calledWith(
               fakeNormalizeGroupIds,
               ['1', '2', '3', '4'],
-              ['1', '2', '3']
+              ['1', '2', '3'],
             );
             assert.calledWith(fakeStore.filterGroups, ['1', '2']);
             assert.notCalled(console.error);
@@ -133,7 +133,7 @@ describe('sidebar/cross-origin-rpc', () => {
 
             assert.calledWith(
               console.error,
-              'No matching groups found in list of filtered group IDs'
+              'No matching groups found in list of filtered group IDs',
             );
             assert.calledWith(fakeStore.filterGroups, []);
           });
@@ -242,7 +242,7 @@ describe('sidebar/cross-origin-rpc', () => {
 
         assert.calledWith(
           fakeWarnOnce,
-          sinon.match(/Ignoring JSON-RPC request from non-whitelisted origin/)
+          sinon.match(/Ignoring JSON-RPC request from non-whitelisted origin/),
         );
         assert.isTrue(frame.postMessage.notCalled);
       });
@@ -269,8 +269,8 @@ describe('sidebar/cross-origin-rpc', () => {
               message: 'Method not found',
             },
           },
-          'https://allowed1.com'
-        )
+          'https://allowed1.com',
+        ),
       );
     });
 
@@ -295,8 +295,8 @@ describe('sidebar/cross-origin-rpc', () => {
                 message: 'Method not found',
               },
             },
-            'https://allowed1.com'
-          )
+            'https://allowed1.com',
+          ),
         );
       });
     });
@@ -321,8 +321,8 @@ describe('sidebar/cross-origin-rpc', () => {
             id: 42,
             result: 'ok',
           },
-          'https://allowed1.com'
-        )
+          'https://allowed1.com',
+        ),
       );
     });
 
@@ -363,7 +363,7 @@ describe('sidebar/cross-origin-rpc', () => {
 
       assert.calledWith(
         fakeWarnOnce,
-        sinon.match(/Ignoring JSON-RPC request from non-whitelisted origin/)
+        sinon.match(/Ignoring JSON-RPC request from non-whitelisted origin/),
       );
     });
   });

@@ -65,7 +65,7 @@ export class ToastMessengerService extends TinyEmitter {
 
     this._window.addEventListener('focus', () => {
       this._delayedMessageQueue.forEach(({ type, messageText, options }) =>
-        this._addMessage(type, messageText, options)
+        this._addMessage(type, messageText, options),
       );
       this._delayedMessageQueue = [];
     });
@@ -104,7 +104,7 @@ export class ToastMessengerService extends TinyEmitter {
       moreInfoURL = '',
       visuallyHidden = false,
       delayed = false,
-    }: MessageOptions = {}
+    }: MessageOptions = {},
   ) {
     // Do not add duplicate messages (messages with the same type and text)
     if (this._store.hasToastMessage(type, messageText)) {

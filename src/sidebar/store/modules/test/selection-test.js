@@ -16,7 +16,7 @@ describe('sidebar/store/modules/selection', () => {
   beforeEach(() => {
     store = createStore(
       [annotationsModule, filtersModule, selectionModule, routeModule],
-      fakeSettings
+      fakeSettings,
     );
   });
 

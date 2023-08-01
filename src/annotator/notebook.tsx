@@ -17,7 +17,7 @@ export class Notebook implements Destroyable {
   constructor(
     element: HTMLElement,
     eventBus: EventBus,
-    config: NotebookConfig
+    config: NotebookConfig,
   ) {
     /**
      * Un-styled shadow host for the notebook content.
@@ -29,7 +29,7 @@ export class Notebook implements Destroyable {
 
     render(
       <NotebookModal eventBus={eventBus} config={config} />,
-      this._shadowRoot
+      this._shadowRoot,
     );
   }
 

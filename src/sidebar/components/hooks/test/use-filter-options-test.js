@@ -123,7 +123,7 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
     it('should add focused-user filter information', () => {
       fakeStore.allAnnotations.returns(annotationFixtures());
       fakeAnnotationUser.annotationDisplayName.callsFake(
-        fakeAnnotationUserDisplay
+        fakeAnnotationUserDisplay,
       );
 
       mount(<DummyComponent />);
@@ -154,7 +154,7 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
 
     it('sorts the current user to the front with " (Me)" suffix', () => {
       fakeAnnotationUser.annotationDisplayName.callsFake(
-        fakeAnnotationUserDisplay
+        fakeAnnotationUserDisplay,
       );
       fakeStore.allAnnotations.returns(annotationFixtures());
       fakeStore.profile.returns({
@@ -174,7 +174,7 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
     it('does not add (Me)" suffix if user has no annotations', () => {
       fakeStore.allAnnotations.returns(annotationFixtures());
       fakeAnnotationUser.annotationDisplayName.callsFake(
-        fakeAnnotationUserDisplay
+        fakeAnnotationUserDisplay,
       );
       fakeStore.profile.returns({
         userid: 'fakeid',

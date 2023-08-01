@@ -43,7 +43,7 @@ function findBookElement(document_ = document): MosaicBookElement | null {
  *   not part of the Bookshelf reader.
  */
 export function vitalSourceFrameRole(
-  window_ = window
+  window_ = window,
 ): 'container' | 'content' | null {
   if (findBookElement(window_.document)) {
     return 'container';
@@ -221,7 +221,7 @@ export class VitalSourceContentIntegration
     options: {
       // Test seam
       bookElement?: MosaicBookElement;
-    } = {}
+    } = {},
   ) {
     super();
 
@@ -230,7 +230,7 @@ export class VitalSourceContentIntegration
     if (!bookElement) {
       /* istanbul ignore next */
       throw new Error(
-        'Failed to find <mosaic-book> element in container frame'
+        'Failed to find <mosaic-book> element in container frame',
       );
     }
     this._bookElement = bookElement;
@@ -289,7 +289,7 @@ export class VitalSourceContentIntegration
       this._textLayer = new ImageTextLayer(
         bookImage,
         charRects,
-        pageData.words
+        pageData.words,
       );
 
       // VitalSource has several DOM elements in the page which are raised
@@ -431,7 +431,7 @@ export class VitalSourceContentIntegration
 
   navigateToSegment(ann: AnnotationData) {
     const selector = ann.target[0].selector?.find(
-      s => s.type === 'EPUBContentSelector'
+      s => s.type === 'EPUBContentSelector',
     ) as EPUBContentSelector | undefined;
     if (selector?.cfi) {
       this._bookElement.goToCfi(selector.cfi);
@@ -483,7 +483,7 @@ export class VitalSourceContentIntegration
       // https://github.com/hypothesis/client/issues/4986.
       const pageCFI = documentCFI(pageInfo.cfi);
       const tocEntry = toc.data?.find(
-        entry => documentCFI(entry.cfi) === pageCFI
+        entry => documentCFI(entry.cfi) === pageCFI,
       );
       if (tocEntry) {
         title = tocEntry.title;

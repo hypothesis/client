@@ -61,7 +61,7 @@ describe('annotator/range-util', () => {
       testNode.innerHTML = 'one <b>two</b> three';
       const range = createRange(testNode, 1, 2);
       assert.isFalse(
-        rangeUtil.isNodeInRange(range, testNode.childNodes.item(2))
+        rangeUtil.isNodeInRange(range, testNode.childNodes.item(2)),
       );
     });
 
@@ -114,7 +114,7 @@ describe('annotator/range-util', () => {
 
       assert.deepEqual(
         roundCoords(rect),
-        roundCoords(testNode.getBoundingClientRect())
+        roundCoords(testNode.getBoundingClientRect()),
       );
     });
   });
@@ -145,7 +145,7 @@ describe('annotator/range-util', () => {
       assert.approximately(
         rect.top + rect.height,
         testNode.offsetTop + testNode.offsetHeight,
-        1
+        1,
       );
     });
   });
@@ -234,7 +234,7 @@ describe('annotator/range-util', () => {
           container.childNodes[nodeA],
           offsetA,
           container.childNodes[nodeB],
-          offsetB
+          offsetB,
         );
         assert.equal(isSelectionBackwards(getSelection()), backwards);
       });

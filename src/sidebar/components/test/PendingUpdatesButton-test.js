@@ -36,7 +36,7 @@ describe('PendingUpdatesButton', () => {
       <PendingUpdatesButton
         streamer={fakeStreamer}
         toastMessenger={fakeToastMessenger}
-      />
+      />,
     );
   };
 
@@ -57,7 +57,7 @@ describe('PendingUpdatesButton', () => {
         'New annotations are available.',
         {
           visuallyHidden: true,
-        }
+        },
       );
       assert.calledWith(
         fakeToastMessenger.notice,
@@ -65,7 +65,7 @@ describe('PendingUpdatesButton', () => {
         {
           visuallyHidden: true,
           delayed: true,
-        }
+        },
       );
     });
   });
@@ -90,7 +90,7 @@ describe('PendingUpdatesButton', () => {
       new KeyboardEvent('keydown', {
         key: 'l',
         bubbles: true,
-      })
+      }),
     );
 
     assert.called(fakeStreamer.applyPendingUpdates);

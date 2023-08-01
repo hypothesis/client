@@ -66,7 +66,7 @@ describe('shared/shortcut', () => {
         it('should not match if non-modifier key does not match', () => {
           assert.isFalse(matchShortcut(event, shortcut));
         });
-      }
+      },
     );
 
     ['ctrl', 'META'].forEach(shortcut => {

@@ -23,7 +23,7 @@ type HypothesisWindowProps = {
  * @return Any config settings returned by hypothesisConfig()
  */
 export function configFuncSettingsFrom(
-  window_: Window & HypothesisWindowProps
+  window_: Window & HypothesisWindowProps,
 ): Record<string, unknown> {
   if (!hasOwn(window_, 'hypothesisConfig')) {
     return {};

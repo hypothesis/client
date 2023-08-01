@@ -31,7 +31,7 @@ describe('HypothesisInjector integration test', () => {
 
   function getHypothesisScript(iframe) {
     return iframe.contentDocument.querySelector(
-      'script[src="data:,Hypothesis"]'
+      'script[src="data:,Hypothesis"]',
     );
   }
 
@@ -71,7 +71,7 @@ describe('HypothesisInjector integration test', () => {
 
   function extractClientConfig(frame) {
     const configElement = frame.contentDocument.querySelector(
-      '.js-hypothesis-config'
+      '.js-hypothesis-config',
     );
     if (!configElement) {
       return null;
@@ -102,7 +102,7 @@ describe('HypothesisInjector integration test', () => {
       await injectClient(
         frame,
         { clientUrl: 'https://hyp.is' },
-        'some-frame-id'
+        'some-frame-id',
       );
 
       const config = extractClientConfig(frame);
@@ -124,22 +124,22 @@ describe('HypothesisInjector integration test', () => {
       await injectClient(frame, hostJSONConfig);
 
       const configElement = frame.contentDocument.querySelector(
-        '.js-hypothesis-config'
+        '.js-hypothesis-config',
       );
       const config = JSON.parse(configElement.textContent);
 
       assert.equal(config.assetRoot, 'chrome-extension://abc/client');
       assert.equal(
         config.profileAppUrl,
-        'chrome-extension://abc/client/profile.html'
+        'chrome-extension://abc/client/profile.html',
       );
       assert.equal(
         config.notebookAppUrl,
-        'chrome-extension://abc/client/notebook.html'
+        'chrome-extension://abc/client/notebook.html',
       );
       assert.equal(
         config.sidebarAppUrl,
-        'chrome-extension://abc/client/sidebar.html'
+        'chrome-extension://abc/client/sidebar.html',
       );
     });
   });
@@ -157,12 +157,12 @@ describe('HypothesisInjector integration test', () => {
 
     assert.isNotNull(
       getHypothesisScript(validFrame),
-      'expected valid iframe to include the Hypothesis script'
+      'expected valid iframe to include the Hypothesis script',
     );
 
     assert.isNull(
       getHypothesisScript(invalidFrame),
-      'expected invalid iframe to not include the Hypothesis script'
+      'expected invalid iframe to not include the Hypothesis script',
     );
   });
 
@@ -175,12 +175,12 @@ describe('HypothesisInjector integration test', () => {
     const scriptElement = getHypothesisScript(iframe);
     assert.isNotNull(
       scriptElement,
-      'expected the iframe to include the Hypothesis script'
+      'expected the iframe to include the Hypothesis script',
     );
     assert.equal(
       scriptElement.src,
       config.clientUrl,
-      'unexpected embed script source'
+      'unexpected embed script source',
     );
   });
 
@@ -197,7 +197,7 @@ describe('HypothesisInjector integration test', () => {
 
     assert.isNull(
       getHypothesisScript(iframe),
-      'expected iframe to not include the Hypothesis script'
+      'expected iframe to not include the Hypothesis script',
     );
   });
 
@@ -212,7 +212,7 @@ describe('HypothesisInjector integration test', () => {
     await waitForInjectClient(iframe);
     assert.isNotNull(
       getHypothesisScript(iframe),
-      'expected dynamically added iframe to include the Hypothesis script'
+      'expected dynamically added iframe to include the Hypothesis script',
     );
   });
 
@@ -225,7 +225,7 @@ describe('HypothesisInjector integration test', () => {
 
     assert.isNotNull(
       getHypothesisScript(iframe),
-      'expected initial iframe to include the Hypothesis script'
+      'expected initial iframe to include the Hypothesis script',
     );
 
     iframe.remove();
@@ -239,7 +239,7 @@ describe('HypothesisInjector integration test', () => {
 
     assert.isNotNull(
       getHypothesisScript(iframe),
-      'expected dynamically added iframe to include the Hypothesis script'
+      'expected dynamically added iframe to include the Hypothesis script',
     );
   });
 
@@ -255,7 +255,7 @@ describe('HypothesisInjector integration test', () => {
 
     assert.isNotNull(
       getHypothesisScript(iframe),
-      'expected dynamically added iframe to include the Hypothesis script'
+      'expected dynamically added iframe to include the Hypothesis script',
     );
 
     iframe.remove();
@@ -269,7 +269,7 @@ describe('HypothesisInjector integration test', () => {
 
     assert.isNotNull(
       getHypothesisScript(iframe),
-      'expected dynamically added iframe to include the Hypothesis script'
+      'expected dynamically added iframe to include the Hypothesis script',
     );
   });
 

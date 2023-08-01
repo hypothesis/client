@@ -127,7 +127,7 @@ describe('sidebar/util/thread-sorters', () => {
           // to match their displayed sort option values
           /* eslint-disable-next-line new-cap */
           sorters.Location(testCase.a, testCase.b),
-          testCase.expected
+          testCase.expected,
         );
       });
     });
@@ -168,7 +168,7 @@ describe('sidebar/util/thread-sorters', () => {
           // to match their displayed sort option values
           /* eslint-disable-next-line new-cap */
           sorters.Location(testCase.a, testCase.b),
-          testCase.expected
+          testCase.expected,
         );
       });
     });

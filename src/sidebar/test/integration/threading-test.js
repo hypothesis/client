@@ -71,7 +71,7 @@ describe('integration: annotation threading', () => {
     mount(
       <ServiceContext.Provider value={container}>
         <DummyComponent />
-      </ServiceContext.Provider>
+      </ServiceContext.Provider>,
     );
   });
 
@@ -136,7 +136,7 @@ describe('integration: annotation threading', () => {
       });
 
       const actualOrder = lastRootThread.children.map(
-        thread => thread.annotation.id
+        thread => thread.annotation.id,
       );
       assert.deepEqual(actualOrder, testCase.expectedOrder);
     });

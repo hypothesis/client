@@ -33,7 +33,7 @@ function ToolbarButton({ icon: Icon, ...buttonProps }: ToolbarButtonProps) {
       classes={classnames(
         'justify-center rounded-[4px]',
         'w-[30px] h-[30px]',
-        'shadow border bg-white text-grey-6 hover:text-grey-9'
+        'shadow border bg-white text-grey-6 hover:text-grey-9',
       )}
       {...buttonProps}
       size="custom"
@@ -128,7 +128,7 @@ export default function Toolbar({
     <div
       className={classnames(
         'absolute left-[-33px] w-[33px] z-2',
-        'text-px-base leading-none' // non-scaling sizing
+        'text-px-base leading-none', // non-scaling sizing
       )}
     >
       {/* In the clean theme (`useMinimalControls` is `true`),
@@ -147,7 +147,7 @@ export default function Toolbar({
             'border-r-0',
             // A more intense shadow than other ToolbarButtons, to match that
             // of the edge of the sidebar in clean theme
-            'shadow-sidebar'
+            'shadow-sidebar',
           )}
           title="Close annotation sidebar"
           onClick={closeSidebar}
@@ -166,7 +166,7 @@ export default function Toolbar({
               'bg-white text-grey-5 hover:text-grey-9',
               // Turn on left and bottom borders to continue the
               // border of the sidebar's top bar
-              'border-l border-b'
+              'border-l border-b',
             )}
             elementRef={toggleSidebarRef}
             title="Annotation sidebar"
