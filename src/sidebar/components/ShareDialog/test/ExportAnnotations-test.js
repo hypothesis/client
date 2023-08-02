@@ -103,7 +103,7 @@ describe('ExportAnnotations', () => {
     const input = wrapper.find('Input');
 
     assert.isTrue(input.exists());
-    assert.equal(input.prop('defaultValue'), 'suggested-filename');
+    assert.equal(input.prop('value'), 'suggested-filename');
   });
 
   describe('export button clicked', () => {
@@ -126,9 +126,10 @@ describe('ExportAnnotations', () => {
 
     it('downloads a file using user-entered filename appended with `.json`', () => {
       const wrapper = createComponent();
+      const input = wrapper.find('input[data-testid="export-filename"]');
 
-      wrapper.find('input[data-testid="export-filename"]').getDOMNode().value =
-        'my-filename';
+      input.getDOMNode().value = 'my-filename';
+      input.simulate('input');
 
       wrapper.find('button[data-testid="export-button"]').simulate('click');
 
@@ -186,6 +187,32 @@ describe('ExportAnnotations', () => {
       assert.include(
         wrapperPlural.find('[data-testid="drafts-message"]').text(),
         'You have 2 unsaved annotations that',
+      );
+    });
+  });
+
+  context('when filename is invalid', () => {
+    const createComponentWithInvalidFilename = () => {
+      const wrapper = createComponent();
+      const input = wrapper.find('input[data-testid="export-filename"]');
+
+      input.getDOMNode().value = 'invalid*';
+      input.simulate('input');
+
+      return wrapper;
+    };
+
+    it('disables export button', () => {
+      const wrapper = createComponentWithInvalidFilename();
+      assert.isTrue(
+        wrapper.find('Button[data-testid="export-button"]').prop('disabled'),
+      );
+    });
+
+    it('sets filename input with error', () => {
+      const wrapper = createComponentWithInvalidFilename();
+      assert.isTrue(
+        wrapper.find('Input[data-testid="export-filename"]').prop('hasError'),
       );
     });
   });
