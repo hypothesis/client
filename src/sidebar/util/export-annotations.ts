@@ -23,3 +23,9 @@ export const suggestedFilename = ({
 
   return filenameSegments.join('-');
 };
+
+export const validateFilename = (filename: string): boolean => {
+  // Allow filenames between 1 and 255 characters.
+  // Characters \n, :, \, /, *, ?, ", ', < and > are not allowed.
+  return /^[^\n:\\/*?"'<>]{1,255}$/.test(filename);
+};
