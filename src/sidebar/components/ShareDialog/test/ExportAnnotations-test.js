@@ -217,6 +217,12 @@ describe('ExportAnnotations', () => {
     });
   });
 
+  // context('when selected group changes', () => {
+  //   it('updates filename input value if it still had previous suggested name', () => {})
+  //
+  //   it('keeps current filename input value if it was manually edited', () => {})
+  // });
+
   it(
     'should pass a11y checks',
     checkAccessibility({

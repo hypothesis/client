@@ -1,5 +1,5 @@
 import { Button, CardActions, Input } from '@hypothesis/frontend-shared';
-import { useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { downloadJSONFile } from '../../../shared/download-json-file';
 import { withServices } from '../../service-context';
@@ -30,13 +30,29 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
   const exportCount = exportableAnnotations.length;
   const draftCount = store.countDrafts();
 
-  const [inputValue, setInputValue] = useState<string>(
+  const suggestedFilenameRef = useRef(
     suggestedFilename({ groupName: group?.name }),
   );
+  const [inputValue, setInputValue] = useState<string>(
+    suggestedFilenameRef.current,
+  );
+  const inputHasSuggestedName = useRef(true);
   const isValidFilename = useMemo(
     () => validateFilename(inputValue),
     [inputValue],
   );
+
+  useEffect(() => {
+    const newSuggestedFilename = suggestedFilename({ groupName: group?.name });
+
+    // Only if the input is still displaying previous suggested name, update it
+    // for the new group. If the user edited the value, we keep it.
+    if (inputHasSuggestedName.current) {
+      setInputValue(newSuggestedFilename);
+    }
+
+    suggestedFilenameRef.current = newSuggestedFilename;
+  }, [group]);
 
   if (!exportReady) {
     return <LoadingSpinner />;
@@ -48,6 +64,12 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
       exportableAnnotations,
     );
     downloadJSONFile(exportData, filename);
+  };
+  const onFilenameEdited = (input: HTMLInputElement) => {
+    setInputValue(input.value);
+    // Track if the input value is currently the same as the suggested filename
+    inputHasSuggestedName.current =
+      input.value === suggestedFilenameRef.current;
   };
 
   // Naive simple English pluralization
@@ -70,7 +92,7 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
             data-testid="export-filename"
             id="export-filename"
             value={inputValue}
-            onInput={e => setInputValue((e.target as HTMLInputElement).value)}
+            onInput={e => onFilenameEdited(e.target as HTMLInputElement)}
             hasError={!isValidFilename}
           />
         </>
