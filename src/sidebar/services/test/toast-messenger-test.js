@@ -1,7 +1,6 @@
 import { ToastMessengerService } from '../toast-messenger';
 
 describe('ToastMessengerService', () => {
-  let clock;
   let fakeStore;
   let fakeWindow;
   let service;
@@ -12,19 +11,13 @@ describe('ToastMessengerService', () => {
       getToastMessage: sinon.stub(),
       hasToastMessage: sinon.stub(),
       removeToastMessage: sinon.stub(),
-      updateToastMessage: sinon.stub(),
     };
     fakeWindow = new EventTarget();
     fakeWindow.document = {
       hasFocus: sinon.stub().returns(true),
     };
 
-    clock = sinon.useFakeTimers();
     service = new ToastMessengerService(fakeStore, fakeWindow);
-  });
-
-  afterEach(() => {
-    clock.restore();
   });
 
   describe('#success', () => {
@@ -54,35 +47,6 @@ describe('ToastMessengerService', () => {
           visuallyHidden: true,
         }),
       );
-    });
-
-    it('passes along `moreInfoURL` when present', () => {
-      fakeStore.hasToastMessage.returns(false);
-
-      service.success('hooray', { moreInfoURL: 'http://www.example.com' });
-
-      assert.calledWith(
-        fakeStore.addToastMessage,
-        sinon.match({
-          type: 'success',
-          message: 'hooray',
-          moreInfoURL: 'http://www.example.com',
-        }),
-      );
-    });
-
-    it('dismisses the message after timeout fires', () => {
-      fakeStore.hasToastMessage.returns(false);
-      fakeStore.getToastMessage.returns(undefined);
-
-      service.success('hooray');
-
-      // Move to the first scheduled timeout, which should invoke the
-      // `dismiss` method
-      clock.next();
-
-      assert.calledOnce(fakeStore.getToastMessage);
-      assert.notCalled(fakeStore.updateToastMessage);
     });
 
     it('emits "toastMessageAdded" event', () => {
@@ -138,31 +102,14 @@ describe('ToastMessengerService', () => {
       );
     });
 
-    it('dismisses the message after timeout fires', () => {
-      fakeStore.hasToastMessage.returns(false);
-      fakeStore.getToastMessage.returns(undefined);
-
-      service.error('boo');
-
-      // Move to the first scheduled timeout, which should invoke the
-      // `dismiss` method
-      clock.next();
-
-      assert.calledOnce(fakeStore.getToastMessage);
-      assert.notCalled(fakeStore.updateToastMessage);
-    });
-
     it('does not dismiss the message if `autoDismiss` is false', () => {
       fakeStore.hasToastMessage.returns(false);
       fakeStore.getToastMessage.returns(undefined);
 
       service.error('boo', { autoDismiss: false });
 
-      // Move to the first scheduled timeout.
-      clock.next();
-
       assert.notCalled(fakeStore.getToastMessage);
-      assert.notCalled(fakeStore.updateToastMessage);
+      assert.notCalled(fakeStore.removeToastMessage);
     });
   });
 
@@ -172,22 +119,10 @@ describe('ToastMessengerService', () => {
 
       service.dismiss('someid');
 
-      assert.notCalled(fakeStore.updateToastMessage);
+      assert.notCalled(fakeStore.removeToastMessage);
     });
 
-    it('does not dismiss a message if it is already dismissed', () => {
-      fakeStore.getToastMessage.returns({
-        type: 'success',
-        message: 'yay',
-        isDismissed: true,
-      });
-
-      service.dismiss('someid');
-
-      assert.notCalled(fakeStore.updateToastMessage);
-    });
-
-    it('updates the message object to set `isDimissed` to `true`', () => {
+    it('removes the message from the store', () => {
       fakeStore.getToastMessage.returns({
         type: 'success',
         message: 'yay',
@@ -195,24 +130,6 @@ describe('ToastMessengerService', () => {
       });
 
       service.dismiss('someid');
-
-      assert.calledWith(
-        fakeStore.updateToastMessage,
-        sinon.match({ isDismissed: true }),
-      );
-    });
-
-    it('removes the message from the store after timeout fires', () => {
-      fakeStore.getToastMessage.returns({
-        type: 'success',
-        message: 'yay',
-        isDismissed: false,
-      });
-
-      service.dismiss('someid');
-
-      // Advance the clock to fire the timeout that will remove the message
-      clock.next();
 
       assert.calledOnce(fakeStore.removeToastMessage);
       assert.calledWith(fakeStore.removeToastMessage, 'someid');

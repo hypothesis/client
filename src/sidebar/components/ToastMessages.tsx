@@ -1,4 +1,6 @@
-import BaseToastMessages from '../../shared/components/BaseToastMessages';
+import classnames from 'classnames';
+
+import BaseToastMessages from '../../shared/components/ToastMessages';
 import { withServices } from '../service-context';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
@@ -16,10 +18,22 @@ function ToastMessages({ toastMessenger }: ToastMessageProps) {
   const messages = store.getToastMessages();
 
   return (
-    <BaseToastMessages
-      messages={messages}
-      onMessageDismiss={(id: string) => toastMessenger.dismiss(id)}
-    />
+    <div
+      className={classnames(
+        // Ensure toast messages are rendered above other content
+        'z-10',
+        'absolute left-0 w-full',
+      )}
+    >
+      <BaseToastMessages
+        messages={messages}
+        onMessageDismiss={(id: string) => toastMessenger.dismiss(id)}
+        transitionClasses={{
+          transitionIn:
+            'motion-safe:animate-slide-in-from-right lg:animate-fade-in motion-reduce:animate-fade-in',
+        }}
+      />
+    </div>
   );
 }
 

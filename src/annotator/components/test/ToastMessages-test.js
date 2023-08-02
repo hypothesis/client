@@ -17,6 +17,9 @@ describe('ToastMessages', () => {
 
   const createComponent = () => mount(<ToastMessages emitter={emitter} />);
 
+  const toastMessagesList = wrapper =>
+    wrapper.find('[messages]').prop('messages');
+
   beforeEach(() => {
     emitter = new Emitter(new EventEmitter());
   });
@@ -25,14 +28,14 @@ describe('ToastMessages', () => {
     const wrapper = createComponent();
 
     // Initially messages is empty
-    assert.lengthOf(wrapper.find('BaseToastMessages').prop('messages'), 0);
+    assert.lengthOf(toastMessagesList(wrapper), 0);
 
     emitter.publish('toastMessageAdded', fakeMessage('someId1'));
     emitter.publish('toastMessageAdded', fakeMessage('someId2'));
     emitter.publish('toastMessageAdded', fakeMessage('someId3'));
     wrapper.update();
 
-    assert.lengthOf(wrapper.find('BaseToastMessages').prop('messages'), 3);
+    assert.lengthOf(toastMessagesList(wrapper), 3);
   });
 
   it('removes toast existing messages on toastMessageDismissed', () => {
@@ -49,6 +52,6 @@ describe('ToastMessages', () => {
     emitter.publish('toastMessageDismissed', 'someId4');
     wrapper.update();
 
-    assert.lengthOf(wrapper.find('BaseToastMessages').prop('messages'), 2);
+    assert.lengthOf(toastMessagesList(wrapper), 2);
   });
 });

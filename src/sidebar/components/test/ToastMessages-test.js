@@ -49,14 +49,14 @@ describe('ToastMessages', () => {
 
     const wrapper = createComponent();
 
-    assert.lengthOf(wrapper.find('BaseToastMessages').prop('messages'), 3);
+    assert.lengthOf(wrapper.find('[messages]').prop('messages'), 3);
   });
 
   it('should dismiss the message when clicked', () => {
     fakeStore.getToastMessages.returns([fakeMessage()]);
 
     const wrapper = createComponent();
-    const messageContainer = wrapper.find('BaseToastMessages');
+    const messageContainer = wrapper.find('[onMessageDismiss]');
 
     messageContainer.prop('onMessageDismiss')();
 
