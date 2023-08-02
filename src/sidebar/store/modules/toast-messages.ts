@@ -1,4 +1,4 @@
-import type { ToastMessage } from '../../../shared/components/BaseToastMessages';
+import type { ToastMessage } from '../../../shared/components/ToastMessages';
 import { createStoreModule, makeAction } from '../create-store';
 
 /**
@@ -28,16 +28,6 @@ const reducers = {
     );
     return { messages: updatedMessages };
   },
-
-  UPDATE_MESSAGE(state: State, action: { message: ToastMessage }) {
-    const updatedMessages = state.messages.map(message => {
-      if (message.id && message.id === action.message.id) {
-        return { ...action.message };
-      }
-      return message;
-    });
-    return { messages: updatedMessages };
-  },
 };
 
 /** Actions */
@@ -51,13 +41,6 @@ function addMessage(message: ToastMessage) {
  */
 function removeMessage(id: string) {
   return makeAction(reducers, 'REMOVE_MESSAGE', { id });
-}
-
-/**
- * Update the `message` object (lookup is by `id`).
- */
-function updateMessage(message: ToastMessage) {
-  return makeAction(reducers, 'UPDATE_MESSAGE', { message });
 }
 
 /** Selectors */
@@ -93,7 +76,6 @@ export const toastMessagesModule = createStoreModule(initialState, {
   actionCreators: {
     addToastMessage: addMessage,
     removeToastMessage: removeMessage,
-    updateToastMessage: updateMessage,
   },
   selectors: {
     getToastMessage: getMessage,
