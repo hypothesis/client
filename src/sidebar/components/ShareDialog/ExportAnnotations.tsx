@@ -31,9 +31,16 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
   const draftCount = store.countDrafts();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [currentFilenameIsDefault, setCurrentFilenameIsDefault] =
+    useState(true);
   const defaultFilename = useMemo(
-    () => suggestedFilename({ groupName: group?.name }),
-    [group],
+    () =>
+      // When the group changes, we want to keep the input value if it was
+      // changed by the user
+      currentFilenameIsDefault
+        ? suggestedFilename({ groupName: group?.name })
+        : inputRef.current?.value,
+    [group, currentFilenameIsDefault],
   );
   const [filenameIsValid, setFilenameIsValid] = useState(true);
 
@@ -54,6 +61,13 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
     return count === 1 ? str : `${str}s`;
   };
 
+  const onInput = () => {
+    const currentFilename = inputRef.current!.value;
+
+    setFilenameIsValid(validateFilename(currentFilename));
+    setCurrentFilenameIsDefault(currentFilename === defaultFilename);
+  };
+
   return (
     <>
       {exportCount > 0 ? (
@@ -70,9 +84,7 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
             id="export-filename"
             defaultValue={defaultFilename}
             elementRef={inputRef}
-            onInput={() =>
-              setFilenameIsValid(validateFilename(inputRef.current!.value))
-            }
+            onInput={onInput}
             hasError={!filenameIsValid}
           />
         </>
