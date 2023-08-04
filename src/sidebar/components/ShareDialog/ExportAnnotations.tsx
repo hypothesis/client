@@ -4,6 +4,7 @@ import { useRef } from 'preact/hooks';
 import { downloadJSONFile } from '../../../shared/download-json-file';
 import { withServices } from '../../service-context';
 import type { AnnotationsExporter } from '../../services/annotations-exporter';
+import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import { suggestedFilename } from '../../util/export-annotations';
 import LoadingSpinner from './LoadingSpinner';
@@ -11,6 +12,7 @@ import LoadingSpinner from './LoadingSpinner';
 export type ExportAnnotationsProps = {
   // injected
   annotationsExporter: AnnotationsExporter;
+  toastMessenger: ToastMessengerService;
 };
 
 // TODO: Validate user-entered filename
@@ -20,7 +22,10 @@ export type ExportAnnotationsProps = {
  * Render content for "export" tab panel: allow user to export annotations
  * with a specified filename.
  */
-function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
+function ExportAnnotations({
+  annotationsExporter,
+  toastMessenger,
+}: ExportAnnotationsProps) {
   const store = useSidebarStore();
   const group = store.focusedGroup();
   const exportReady = group && !store.isLoading();
@@ -35,11 +40,15 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
   }
 
   const exportAnnotations = () => {
-    const filename = `${inputRef.current!.value}.json`;
-    const exportData = annotationsExporter.buildExportContent(
-      exportableAnnotations,
-    );
-    downloadJSONFile(exportData, filename);
+    try {
+      const filename = `${inputRef.current!.value}.json`;
+      const exportData = annotationsExporter.buildExportContent(
+        exportableAnnotations,
+      );
+      downloadJSONFile(exportData, filename);
+    } catch (e) {
+      toastMessenger.error('Exporting annotations failed');
+    }
   };
 
   // Naive simple English pluralization
@@ -90,4 +99,7 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
   );
 }
 
-export default withServices(ExportAnnotations, ['annotationsExporter']);
+export default withServices(ExportAnnotations, [
+  'annotationsExporter',
+  'toastMessenger',
+]);
