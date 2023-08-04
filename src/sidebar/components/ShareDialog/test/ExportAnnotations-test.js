@@ -8,6 +8,7 @@ import ExportAnnotations, { $imports } from '../ExportAnnotations';
 describe('ExportAnnotations', () => {
   let fakeStore;
   let fakeAnnotationsExporter;
+  let fakeToastMessenger;
   let fakeDownloadJSONFile;
 
   const fakePrivateGroup = {
@@ -20,6 +21,7 @@ describe('ExportAnnotations', () => {
     mount(
       <ExportAnnotations
         annotationsExporter={fakeAnnotationsExporter}
+        toastMessenger={fakeToastMessenger}
         {...props}
       />,
     );
@@ -27,6 +29,9 @@ describe('ExportAnnotations', () => {
   beforeEach(() => {
     fakeAnnotationsExporter = {
       buildExportContent: sinon.stub().returns({}),
+    };
+    fakeToastMessenger = {
+      error: sinon.stub(),
     };
     fakeDownloadJSONFile = sinon.stub();
     fakeStore = {
@@ -107,6 +112,9 @@ describe('ExportAnnotations', () => {
   });
 
   describe('export button clicked', () => {
+    const clickExportButton = wrapper =>
+      wrapper.find('button[data-testid="export-button"]').simulate('click');
+
     it('builds an export file from the non-draft annotations', () => {
       const wrapper = createComponent();
       const annotationsToExport = [
@@ -115,13 +123,14 @@ describe('ExportAnnotations', () => {
       ];
       fakeStore.savedAnnotations.returns(annotationsToExport);
 
-      wrapper.find('button[data-testid="export-button"]').simulate('click');
+      clickExportButton(wrapper);
 
       assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
       assert.calledWith(
         fakeAnnotationsExporter.buildExportContent,
         annotationsToExport,
       );
+      assert.notCalled(fakeToastMessenger.error);
     });
 
     it('downloads a file using user-entered filename appended with `.json`', () => {
@@ -130,7 +139,7 @@ describe('ExportAnnotations', () => {
       wrapper.find('input[data-testid="export-filename"]').getDOMNode().value =
         'my-filename';
 
-      wrapper.find('button[data-testid="export-button"]').simulate('click');
+      clickExportButton(wrapper);
 
       assert.calledOnce(fakeDownloadJSONFile);
       assert.calledWith(
@@ -138,6 +147,25 @@ describe('ExportAnnotations', () => {
         sinon.match.object,
         'my-filename.json',
       );
+    });
+
+    context('when exporting annotations fails', () => {
+      it('displays error toast message', () => {
+        fakeAnnotationsExporter.buildExportContent.throws(
+          new Error('Error exporting'),
+        );
+
+        const wrapper = createComponent();
+
+        clickExportButton(wrapper);
+
+        assert.notCalled(fakeDownloadJSONFile);
+        assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
+        assert.calledWith(
+          fakeToastMessenger.error,
+          'Exporting annotations failed',
+        );
+      });
     });
   });
 
