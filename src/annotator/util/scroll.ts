@@ -90,6 +90,14 @@ export async function scrollElementIntoView(
     });
   }
 
+  // Ensure that the details are open before scrolling, in case the annotation
+  // is within the details tag.This guarantees that the user can promptly view
+  // the content on the screen.
+  const details = element.closest('details');
+  if (details && !details.hasAttribute('open')) {
+    details.setAttribute('open', '');
+  }
+
   await new Promise(resolve =>
     scrollIntoView(element, { time: maxDuration }, resolve),
   );
