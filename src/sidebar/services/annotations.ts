@@ -1,6 +1,10 @@
 import { generateHexString } from '../../shared/random';
 import type { AnnotationData } from '../../types/annotator';
-import type { Annotation, SavedAnnotation } from '../../types/api';
+import type {
+  APIAnnotationData,
+  Annotation,
+  SavedAnnotation,
+} from '../../types/api';
 import type { AnnotationEventType } from '../../types/config';
 import * as metadata from '../helpers/annotation-metadata';
 import {
@@ -53,11 +57,16 @@ export class AnnotationsService {
   }
 
   /**
-   * Extend new annotation objects with defaults and permissions.
+   * Create a new {@link Annotation} object from a set of field values.
+   *
+   * All fields not set in `annotationData` will be populated with default
+   * values.
    */
-  private _initialize(
-    annotationData: Omit<AnnotationData, '$tag'>,
-    now: Date,
+  annotationFromData(
+    annotationData: Partial<APIAnnotationData> &
+      Pick<AnnotationData, 'uri' | 'target'>,
+    /* istanbul ignore next */
+    now: Date = new Date(),
   ): Annotation {
     const defaultPrivacy = this._store.getDefault('annotationPrivacy');
     const groupid = this._store.focusedGroupId();
@@ -109,7 +118,7 @@ export class AnnotationsService {
    * drafts out of the way.
    */
   create(annotationData: Omit<AnnotationData, '$tag'>, now = new Date()) {
-    const annotation = this._initialize(annotationData, now);
+    const annotation = this.annotationFromData(annotationData, now);
 
     this._store.addAnnotations([annotation]);
 

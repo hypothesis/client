@@ -23,6 +23,11 @@ export type State = {
    * matching the most recent load/search request
    */
   annotationResultCount: number | null;
+
+  /**
+   * Count of annotations waiting to be imported.
+   */
+  importsPending: number;
 };
 
 const initialState: State = {
@@ -31,6 +36,7 @@ const initialState: State = {
   activeAnnotationFetches: 0,
   hasFetchedAnnotations: false,
   annotationResultCount: null,
+  importsPending: 0,
 };
 
 const reducers = {
@@ -106,6 +112,21 @@ const reducers = {
       annotationResultCount: action.resultCount,
     };
   },
+
+  BEGIN_IMPORT(state: State, action: { count: number }) {
+    return {
+      importsPending: state.importsPending + action.count,
+    };
+  },
+
+  COMPLETE_IMPORT(state: State, action: { count: number }) {
+    if (!state.importsPending) {
+      return state;
+    }
+    return {
+      importsPending: Math.max(state.importsPending - action.count, 0),
+    };
+  },
 };
 
 function annotationFetchStarted() {
@@ -136,6 +157,14 @@ function setAnnotationResultCount(resultCount: number) {
   return makeAction(reducers, 'SET_ANNOTATION_RESULT_COUNT', { resultCount });
 }
 
+function beginImport(count: number) {
+  return makeAction(reducers, 'BEGIN_IMPORT', { count });
+}
+
+function completeImport(count: number) {
+  return makeAction(reducers, 'COMPLETE_IMPORT', { count });
+}
+
 /** Selectors */
 
 function annotationResultCount(state: State) {
@@ -144,6 +173,10 @@ function annotationResultCount(state: State) {
 
 function hasFetchedAnnotations(state: State) {
   return state.hasFetchedAnnotations;
+}
+
+function importsPending(state: State) {
+  return state.importsPending;
 }
 
 /**
@@ -184,11 +217,14 @@ export const activityModule = createStoreModule(initialState, {
     annotationSaveFinished,
     apiRequestStarted,
     apiRequestFinished,
+    beginImport,
+    completeImport,
     setAnnotationResultCount,
   },
 
   selectors: {
     hasFetchedAnnotations,
+    importsPending,
     isLoading,
     isFetchingAnnotations,
     isSavingAnnotation,

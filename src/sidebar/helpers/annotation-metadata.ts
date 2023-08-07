@@ -1,4 +1,5 @@
 import type {
+  APIAnnotationData,
   Annotation,
   SavedAnnotation,
   TextQuoteSelector,
@@ -326,7 +327,7 @@ export function flagCount(annotation: Annotation): number | null {
 /**
  * Return the text quote that an annotation refers to.
  */
-export function quote(annotation: Annotation): string | null {
+export function quote(annotation: APIAnnotationData): string | null {
   if (annotation.target.length === 0) {
     return null;
   }

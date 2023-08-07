@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { act } from 'preact/test-utils';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
@@ -59,70 +58,71 @@ describe('ShareDialog', () => {
     });
   });
 
-  describe('tabbed dialog panel', () => {
-    it('does not render a tabbed dialog if export feature flag is not enabled', () => {
+  function enableFeature(feature) {
+    fakeStore.isFeatureEnabled.withArgs(feature).returns(true);
+  }
+
+  function selectTab(wrapper, name) {
+    wrapper
+      .find(`Tab[aria-controls="${name}-panel"]`)
+      .find('button')
+      .simulate('click');
+  }
+
+  function getActiveTab(wrapper) {
+    return wrapper.find('Tab').filter({ selected: true });
+  }
+
+  function activeTabPanel(wrapper) {
+    return wrapper.find('TabPanel').filter({ active: true });
+  }
+
+  it('does not render a tabbed dialog if import/export feature flags are not enabled', () => {
+    const wrapper = createComponent();
+
+    assert.isFalse(wrapper.find('TabHeader').exists());
+  });
+
+  ['export_annotations', 'import_annotations'].forEach(feature => {
+    it(`renders a tabbed dialog when ${feature} feature is enabled`, () => {
+      enableFeature('export_annotations');
+
       const wrapper = createComponent();
 
-      assert.isFalse(wrapper.find('TabHeader').exists());
+      assert.isTrue(wrapper.find('TabHeader').exists());
+      assert.isTrue(
+        wrapper.find('Tab[aria-controls="share-panel"]').props().selected,
+      );
+      assert.isTrue(wrapper.find('TabPanel[id="share-panel"]').props().active);
     });
+  });
 
-    context('export feature enabled', () => {
-      beforeEach(() => {
-        fakeStore.isFeatureEnabled.withArgs('export_annotations').returns(true);
-      });
+  it('shows correct tab panel when each tab is clicked', () => {
+    enableFeature('export_annotations');
+    enableFeature('import_annotations');
 
-      it('renders a tabbed dialog with share panel active', () => {
-        const wrapper = createComponent();
+    const wrapper = createComponent();
 
-        assert.isTrue(wrapper.find('TabHeader').exists());
-        assert.isTrue(
-          wrapper.find('Tab[aria-controls="share-panel"]').props().selected,
-        );
-        assert.isTrue(
-          wrapper.find('TabPanel[id="share-panel"]').props().active,
-        );
-      });
+    selectTab(wrapper, 'export');
+    let selectedTab = getActiveTab(wrapper);
+    assert.equal(selectedTab.text(), 'Export');
+    assert.equal(selectedTab.props()['aria-controls'], 'export-panel');
+    assert.equal(activeTabPanel(wrapper).props().id, 'export-panel');
 
-      it('shows the export tab panel when export tab clicked', () => {
-        const wrapper = createComponent();
-        const shareTabSelector = 'Tab[aria-controls="share-panel"]';
-        const exportTabSelector = 'Tab[aria-controls="export-panel"]';
+    selectTab(wrapper, 'import');
+    selectedTab = getActiveTab(wrapper);
+    assert.equal(selectedTab.text(), 'Import');
+    assert.equal(selectedTab.props()['aria-controls'], 'import-panel');
+    assert.equal(activeTabPanel(wrapper).props().id, 'import-panel');
 
-        act(() => {
-          wrapper
-            .find(exportTabSelector)
-            .getDOMNode()
-            .dispatchEvent(new Event('click'));
-        });
-        wrapper.update();
-
-        const selectedTab = wrapper.find('Tab').filter({ selected: true });
-        assert.equal(selectedTab.text(), 'Export');
-        assert.equal(selectedTab.props()['aria-controls'], 'export-panel');
-
-        const activeTabPanel = wrapper
-          .find('TabPanel')
-          .filter({ active: true });
-        assert.equal(activeTabPanel.props().id, 'export-panel');
-
-        // Now, reselect share tab
-        act(() => {
-          wrapper
-            .find(shareTabSelector)
-            .getDOMNode()
-            .dispatchEvent(new Event('click'));
-        });
-        wrapper.update();
-
-        const shareTabPanel = wrapper.find('TabPanel').filter({ active: true });
-        assert.equal(shareTabPanel.props().id, 'share-panel');
-      });
-    });
+    selectTab(wrapper, 'share');
+    assert.equal(activeTabPanel(wrapper).props().id, 'share-panel');
   });
 
   describe('a11y', () => {
     beforeEach(() => {
-      fakeStore.isFeatureEnabled.withArgs('export_annotations').returns(true);
+      enableFeature('export_annotations');
+      enableFeature('import_annotations');
     });
 
     it(
