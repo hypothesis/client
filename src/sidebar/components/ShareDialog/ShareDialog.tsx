@@ -4,6 +4,7 @@ import { useState } from 'preact/hooks';
 import { useSidebarStore } from '../../store';
 import SidebarPanel from '../SidebarPanel';
 import ExportAnnotations from './ExportAnnotations';
+import ImportAnnotations from './ImportAnnotations';
 import ShareAnnotations from './ShareAnnotations';
 import TabHeader from './TabHeader';
 import TabPanel from './TabPanel';
@@ -20,8 +21,12 @@ export default function ShareDialog() {
   const groupName = (focusedGroup && focusedGroup.name) || '...';
   const panelTitle = `Share Annotations in ${groupName}`;
 
-  const tabbedDialog = store.isFeatureEnabled('export_annotations');
-  const [selectedTab, setSelectedTab] = useState<'share' | 'export'>('share');
+  const showExportTab = store.isFeatureEnabled('export_annotations');
+  const showImportTab = store.isFeatureEnabled('import_annotations');
+  const tabbedDialog = showExportTab || showImportTab;
+  const [selectedTab, setSelectedTab] = useState<'share' | 'export' | 'import'>(
+    'share',
+  );
 
   return (
     <SidebarPanel
@@ -42,16 +47,30 @@ export default function ShareDialog() {
             >
               Share
             </Tab>
-            <Tab
-              id="export-panel-tab"
-              aria-controls="export-panel"
-              variant="tab"
-              selected={selectedTab === 'export'}
-              onClick={() => setSelectedTab('export')}
-              textContent="Export"
-            >
-              Export
-            </Tab>
+            {showExportTab && (
+              <Tab
+                id="export-panel-tab"
+                aria-controls="export-panel"
+                variant="tab"
+                selected={selectedTab === 'export'}
+                onClick={() => setSelectedTab('export')}
+                textContent="Export"
+              >
+                Export
+              </Tab>
+            )}
+            {showImportTab && (
+              <Tab
+                id="import-panel-tab"
+                aria-controls="import-panel"
+                variant="tab"
+                selected={selectedTab === 'import'}
+                onClick={() => setSelectedTab('import')}
+                textContent="Import"
+              >
+                Import
+              </Tab>
+            )}
           </TabHeader>
           <Card>
             <TabPanel
@@ -69,6 +88,14 @@ export default function ShareDialog() {
               title={`Export from ${focusedGroup?.name ?? '...'}`}
             >
               <ExportAnnotations />
+            </TabPanel>
+            <TabPanel
+              id="import-panel"
+              active={selectedTab === 'import'}
+              aria-labelledby="import-panel-tab"
+              title={`Import into ${focusedGroup?.name ?? '...'}`}
+            >
+              <ImportAnnotations />
             </TabPanel>
           </Card>
         </>

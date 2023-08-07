@@ -223,4 +223,30 @@ describe('sidebar/store/modules/activity', () => {
       assert.equal(store.annotationResultCount(), 5);
     });
   });
+
+  describe('#beginImport', () => {
+    it('increments count of pending imports', () => {
+      assert.equal(store.importsPending(), 0);
+      store.beginImport(2);
+      assert.equal(store.importsPending(), 2);
+      store.beginImport(2);
+      assert.equal(store.importsPending(), 4);
+    });
+  });
+
+  describe('#completeImport', () => {
+    it('decrements count of pending imports', () => {
+      store.beginImport(5);
+      store.completeImport(2);
+      assert.equal(store.importsPending(), 3);
+      store.completeImport(1);
+      assert.equal(store.importsPending(), 2);
+      store.completeImport(2);
+      assert.equal(store.importsPending(), 0);
+
+      // Value can't go below 0. We could choose to throw an error here instead.
+      store.completeImport(1);
+      assert.equal(store.importsPending(), 0);
+    });
+  });
 });

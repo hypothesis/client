@@ -26,6 +26,7 @@ import { AuthService } from './services/auth';
 import { AutosaveService } from './services/autosave';
 import { FrameSyncService } from './services/frame-sync';
 import { GroupsService } from './services/groups';
+import { ImportAnnotationsService } from './services/import-annotations';
 import { LoadAnnotationsService } from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
 import { PersistedDefaultsService } from './services/persisted-defaults';
@@ -129,6 +130,7 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
     .register('autosaveService', AutosaveService)
     .register('frameSync', FrameSyncService)
     .register('groups', GroupsService)
+    .register('importAnnotationsService', ImportAnnotationsService)
     .register('loadAnnotationsService', LoadAnnotationsService)
     .register('localStorage', LocalStorageService)
     .register('persistedDefaults', PersistedDefaultsService)
