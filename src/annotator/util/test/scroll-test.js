@@ -129,14 +129,12 @@ describe('annotator/util/scroll', () => {
       }
     });
 
-
     // A test for scrolling when there is a target within the 'details' tag.
-    it('scrolls element into view when the target is within the details tag',async () => {
-      const container = document.createElement('div');
+    it('scrolls element into view when the target is within the details tag', async () => {
+      const container = createContainer();
       container.style.height = '500px';
       container.style.overflow = 'auto';
       container.style.position = 'relative';
-      document.body.append(container);
 
       const details = document.createElement('details');
       details.style.position = 'absolute';
@@ -157,6 +155,7 @@ describe('annotator/util/scroll', () => {
       const containerRect = container.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
 
+      assert.isTrue(details.open);
       assert.isTrue(containerRect.top <= targetRect.top);
       assert.isTrue(containerRect.bottom >= targetRect.bottom);
     });
