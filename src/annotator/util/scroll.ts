@@ -95,7 +95,7 @@ export async function scrollElementIntoView(
   // the content on the screen.
   const details = element.closest('details');
   if (details && !details.hasAttribute('open')) {
-    details.setAttribute('open', '');
+    details.open = true;
   }
 
   await new Promise(resolve =>
