@@ -15,7 +15,6 @@ export type ExportAnnotationsProps = {
   toastMessenger: ToastMessengerService;
 };
 
-// TODO: Validate user-entered filename
 // TODO: does the Input need a label?
 
 /**
@@ -39,7 +38,9 @@ function ExportAnnotations({
     return <LoadingSpinner />;
   }
 
-  const exportAnnotations = () => {
+  const exportAnnotations = (e: Event) => {
+    e.preventDefault();
+
     try {
       const filename = `${inputRef.current!.value}.json`;
       const exportData = annotationsExporter.buildExportContent(
@@ -57,21 +58,27 @@ function ExportAnnotations({
   };
 
   return (
-    <>
+    <form
+      className="space-y-3"
+      onSubmit={exportAnnotations}
+      data-testid="export-form"
+    >
       {exportCount > 0 ? (
         <>
-          <p data-testid="export-count">
+          <label data-testid="export-count" htmlFor="export-filename">
             Export{' '}
             <strong>
               {exportCount} {pluralize('annotation', exportCount)}
             </strong>{' '}
             in a file named:
-          </p>
+          </label>
           <Input
             data-testid="export-filename"
             id="export-filename"
             defaultValue={suggestedFilename({ groupName: group?.name })}
             elementRef={inputRef}
+            required
+            maxLength={250}
           />
         </>
       ) : (
@@ -90,12 +97,12 @@ function ExportAnnotations({
           data-testid="export-button"
           variant="primary"
           disabled={!exportCount}
-          onClick={exportAnnotations}
+          type="submit"
         >
           Export
         </Button>
       </CardActions>
-    </>
+    </form>
   );
 }
 

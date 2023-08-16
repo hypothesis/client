@@ -111,9 +111,9 @@ describe('ExportAnnotations', () => {
     assert.equal(input.prop('defaultValue'), 'suggested-filename');
   });
 
-  describe('export button clicked', () => {
-    const clickExportButton = wrapper =>
-      wrapper.find('button[data-testid="export-button"]').simulate('click');
+  describe('export form submitted', () => {
+    const submitExportForm = wrapper =>
+      wrapper.find('[data-testid="export-form"]').simulate('submit');
 
     it('builds an export file from the non-draft annotations', () => {
       const wrapper = createComponent();
@@ -123,7 +123,7 @@ describe('ExportAnnotations', () => {
       ];
       fakeStore.savedAnnotations.returns(annotationsToExport);
 
-      clickExportButton(wrapper);
+      submitExportForm(wrapper);
 
       assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
       assert.calledWith(
@@ -139,7 +139,7 @@ describe('ExportAnnotations', () => {
       wrapper.find('input[data-testid="export-filename"]').getDOMNode().value =
         'my-filename';
 
-      clickExportButton(wrapper);
+      submitExportForm(wrapper);
 
       assert.calledOnce(fakeDownloadJSONFile);
       assert.calledWith(
@@ -157,7 +157,7 @@ describe('ExportAnnotations', () => {
 
         const wrapper = createComponent();
 
-        clickExportButton(wrapper);
+        submitExportForm(wrapper);
 
         assert.notCalled(fakeDownloadJSONFile);
         assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
