@@ -129,7 +129,6 @@ describe('annotator/util/scroll', () => {
       }
     });
 
-    // A test for scrolling when there is a target within the 'details' tag.
     it('scrolls element into view when the target is within the details tag', async () => {
       const container = createContainer();
       container.style.height = '500px';
