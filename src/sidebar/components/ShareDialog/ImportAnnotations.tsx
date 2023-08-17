@@ -9,6 +9,7 @@ import { withServices } from '../../service-context';
 import type { ExportContent } from '../../services/annotations-exporter';
 import type { ImportAnnotationsService } from '../../services/import-annotations';
 import { useSidebarStore } from '../../store';
+import FileInput from './FileInput';
 import LoadingSpinner from './LoadingSpinner';
 
 /**
@@ -136,7 +137,6 @@ function ImportAnnotations({
     };
   }
 
-  const fileInputId = useId();
   const userSelectId = useId();
 
   if (!currentUser) {
@@ -154,25 +154,13 @@ function ImportAnnotations({
 
   return (
     <>
-      <label htmlFor={fileInputId}>
-        <p>Select Hypothesis export file:</p>
-      </label>
-      <input
-        id={fileInputId}
-        accept=".json"
-        type="file"
-        disabled={busy}
-        onChange={e => {
-          const files = (e.target as HTMLInputElement)!.files;
-          if (files !== null && files.length > 0) {
-            setFile(files[0]);
-          }
-        }}
-      />
+      <FileInput onFileSelected={setFile} disabled={busy} />
       {userList && (
         <>
           <label htmlFor={userSelectId}>
-            <p>Select which user&apos;s annotations to import:</p>
+            <p className="mt-3">
+              Select which user&apos;s annotations to import:
+            </p>
           </label>
           <Select
             id={userSelectId}
