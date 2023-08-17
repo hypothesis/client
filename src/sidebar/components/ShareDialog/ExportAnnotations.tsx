@@ -1,5 +1,5 @@
 import { Button, CardActions, Input } from '@hypothesis/frontend-shared';
-import { useRef } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 
 import { downloadJSONFile } from '../../../shared/download-json-file';
 import { withServices } from '../../service-context';
@@ -14,8 +14,6 @@ export type ExportAnnotationsProps = {
   annotationsExporter: AnnotationsExporter;
   toastMessenger: ToastMessengerService;
 };
-
-// TODO: does the Input need a label?
 
 /**
  * Render content for "export" tab panel: allow user to export annotations
@@ -32,7 +30,11 @@ function ExportAnnotations({
   const exportCount = exportableAnnotations.length;
   const draftCount = store.countDrafts();
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const defaultFilename = useMemo(
+    () => suggestedFilename({ groupName: group?.name }),
+    [group],
+  );
+  const [customFilename, setCustomFilename] = useState<string>();
 
   if (!exportReady) {
     return <LoadingSpinner />;
@@ -42,7 +44,7 @@ function ExportAnnotations({
     e.preventDefault();
 
     try {
-      const filename = `${inputRef.current!.value}.json`;
+      const filename = `${customFilename ?? defaultFilename}.json`;
       const exportData = annotationsExporter.buildExportContent(
         exportableAnnotations,
       );
@@ -75,8 +77,11 @@ function ExportAnnotations({
           <Input
             data-testid="export-filename"
             id="export-filename"
-            defaultValue={suggestedFilename({ groupName: group?.name })}
-            elementRef={inputRef}
+            defaultValue={defaultFilename}
+            value={customFilename}
+            onChange={e =>
+              setCustomFilename((e.target as HTMLInputElement).value)
+            }
             required
             maxLength={250}
           />

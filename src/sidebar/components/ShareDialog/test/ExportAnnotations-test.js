@@ -135,9 +135,12 @@ describe('ExportAnnotations', () => {
 
     it('downloads a file using user-entered filename appended with `.json`', () => {
       const wrapper = createComponent();
+      const filenameInput = wrapper.find(
+        'input[data-testid="export-filename"]',
+      );
 
-      wrapper.find('input[data-testid="export-filename"]').getDOMNode().value =
-        'my-filename';
+      filenameInput.getDOMNode().value = 'my-filename';
+      filenameInput.simulate('change');
 
       submitExportForm(wrapper);
 
