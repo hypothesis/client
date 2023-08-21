@@ -121,7 +121,7 @@ function titleTextFromAnnotation(annotation: Annotation): string {
 /**
  * Return `true` if the given annotation is a reply, `false` otherwise.
  */
-export function isReply(annotation: Annotation): boolean {
+export function isReply(annotation: APIAnnotationData): boolean {
   return (annotation.references || []).length > 0;
 }
 
