@@ -74,35 +74,78 @@ describe('ImportAnnotations', () => {
     assert.isTrue(getImportButton(wrapper).prop('disabled'));
   });
 
-  it('displays user list when a valid file is selected', async () => {
-    const wrapper = createImportAnnotations();
-
-    selectFile(wrapper, [
-      {
-        user: 'acct:john@example.com',
-        user_info: {
-          display_name: 'John Smith',
+  [
+    // File with a mix of annotations and replies.
+    {
+      annotations: [
+        {
+          id: 'abc',
+          user: 'acct:john@example.com',
+          user_info: {
+            display_name: 'John Smith',
+          },
+          text: 'Test annotation',
         },
-        text: 'Test annotation',
-      },
-      {
-        user: 'acct:brian@example.com',
-        user_info: {
-          display_name: 'Brian Smith',
-        },
-        text: 'Test annotation',
-      },
-    ]);
 
-    const userList = await waitForElement(wrapper, 'Select');
-    const users = userList.find('option');
-    assert.equal(users.length, 3);
-    assert.equal(users.at(0).prop('value'), '');
-    assert.equal(users.at(0).text(), '');
-    assert.equal(users.at(1).prop('value'), 'acct:brian@example.com');
-    assert.equal(users.at(1).text(), 'Brian Smith (1)');
-    assert.equal(users.at(2).prop('value'), 'acct:john@example.com');
-    assert.equal(users.at(2).text(), 'John Smith (1)');
+        {
+          id: 'def',
+          user: 'acct:brian@example.com',
+          user_info: {
+            display_name: 'Brian Smith',
+          },
+          text: 'Test annotation',
+        },
+
+        // A reply, this shouldn't be counted in the list.
+        {
+          id: 'xyz',
+          user: 'acct:brian@example.com',
+          user_info: {
+            display_name: 'Brian Smith',
+          },
+          text: 'Test annotation',
+          references: ['abc'],
+        },
+      ],
+      userEntries: [
+        { value: '', text: '' }, // "No user selected" entry
+        { value: 'acct:brian@example.com', text: 'Brian Smith (1)' },
+        { value: 'acct:john@example.com', text: 'John Smith (1)' },
+      ],
+    },
+
+    // File with a single reply.
+    {
+      annotations: [
+        {
+          id: 'xyz',
+          user: 'acct:brian@example.com',
+          user_info: {
+            display_name: 'Brian Smith',
+          },
+          text: 'Test annotation',
+          references: ['abc'],
+        },
+      ],
+      userEntries: [
+        { value: '', text: '' }, // "No user selected" entry
+      ],
+    },
+  ].forEach(({ annotations, userEntries }) => {
+    it('displays user list when a valid file is selected', async () => {
+      const wrapper = createImportAnnotations();
+
+      selectFile(wrapper, annotations);
+
+      const userList = await waitForElement(wrapper, 'Select');
+      const users = userList.find('option');
+      assert.equal(users.length, userEntries.length);
+
+      for (const [i, entry] of userEntries.entries()) {
+        assert.equal(users.at(i).prop('value'), entry.value);
+        assert.equal(users.at(i).text(), entry.text);
+      }
+    });
   });
 
   it('displays error if file is invalid', async () => {
@@ -156,7 +199,9 @@ describe('ImportAnnotations', () => {
   it('imports annotations when "Import" button is clicked', async () => {
     const wrapper = createImportAnnotations();
     const annotations = [
+      // Annotation by a different user. This should be ignored.
       {
+        id: 'abc',
         user: 'acct:john@example.com',
         user_info: {
           display_name: 'John Smith',
@@ -164,6 +209,17 @@ describe('ImportAnnotations', () => {
         text: 'Test annotation',
       },
       {
+        id: 'def',
+        user: 'acct:brian@example.com',
+        user_info: {
+          display_name: 'Brian Smith',
+        },
+        text: 'Test annotation',
+      },
+      // Reply by selected user. This should be ignored.
+      {
+        id: 'xyz',
+        references: ['abc'],
         user: 'acct:brian@example.com',
         user_info: {
           display_name: 'Brian Smith',
@@ -184,7 +240,9 @@ describe('ImportAnnotations', () => {
 
     assert.calledWith(
       fakeImportAnnotationsService.import,
-      annotations.filter(ann => ann.user === 'acct:brian@example.com'),
+      annotations.filter(
+        ann => ann.user === 'acct:brian@example.com' && !ann.references,
+      ),
     );
   });
 

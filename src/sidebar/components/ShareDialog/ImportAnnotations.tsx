@@ -2,6 +2,7 @@ import { Button, CardActions, Select } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useId, useMemo, useState } from 'preact/hooks';
 
 import type { APIAnnotationData } from '../../../types/api';
+import { isReply } from '../../helpers/annotation-metadata';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import { readExportFile } from '../../helpers/import';
 import { withServices } from '../../service-context';
@@ -10,29 +11,37 @@ import { useSidebarStore } from '../../store';
 import FileInput from './FileInput';
 import LoadingSpinner from './LoadingSpinner';
 
-type UserAnnotationCount = {
+/** Details of a user and their annotations that are available to import. */
+type UserAnnotations = {
   userid: string;
   displayName: string;
-
-  /** Number of annotations made by this user. */
-  count: number;
+  annotations: APIAnnotationData[];
 };
 
 /**
- * Generate an alphabetized list of authors and their annotation counts.
+ * Generate an alphabetized list of authors and their importable annotations.
  */
-function annotationCountsByUser(
+function annotationsByUser(
   anns: APIAnnotationData[],
   getDisplayName: (ann: APIAnnotationData) => string,
-): UserAnnotationCount[] {
-  const userInfo = new Map<string, UserAnnotationCount>();
+): UserAnnotations[] {
+  const userInfo = new Map<string, UserAnnotations>();
   for (const ann of anns) {
+    if (isReply(ann)) {
+      // We decided to exclude replies from the initial implementation of
+      // annotation import, to simplify the feature.
+      continue;
+    }
     let info = userInfo.get(ann.user);
     if (!info) {
-      info = { userid: ann.user, displayName: getDisplayName(ann), count: 0 };
+      info = {
+        userid: ann.user,
+        displayName: getDisplayName(ann),
+        annotations: [],
+      };
       userInfo.set(ann.user, info);
     }
-    info.count += 1;
+    info.annotations.push(ann);
   }
   const userInfos = [...userInfo.values()];
   userInfos.sort((a, b) => a.displayName.localeCompare(b.displayName));
@@ -74,8 +83,7 @@ function ImportAnnotations({
     [defaultAuthority, displayNamesEnabled],
   );
   const userList = useMemo(
-    () =>
-      annotations ? annotationCountsByUser(annotations, getDisplayName) : null,
+    () => (annotations ? annotationsByUser(annotations, getDisplayName) : null),
     [annotations, getDisplayName],
   );
 
@@ -104,13 +112,17 @@ function ImportAnnotations({
   }, [currentUser, file]);
 
   let importAnnotations;
-  if (annotations && selectedUser) {
+  if (annotations && selectedUser && userList) {
     importAnnotations = async () => {
-      const annsToImport = annotations.filter(ann => ann.user === selectedUser);
+      const userEntry = userList.find(item => item.userid === selectedUser);
+      /* istanbul ignore next - This should never be triggered */
+      if (!userEntry) {
+        return;
+      }
 
       // nb. In the event of an error, `import` will report that directly via
       // a toast message, so we don't do that ourselves.
-      importAnnotationsService.import(annsToImport);
+      importAnnotationsService.import(userEntry.annotations);
     };
   }
 
@@ -154,7 +166,7 @@ function ImportAnnotations({
                 value={userInfo.userid}
                 selected={userInfo.userid === selectedUser}
               >
-                {userInfo.displayName} ({userInfo.count})
+                {userInfo.displayName} ({userInfo.annotations.length})
               </option>
             ))}
           </Select>
