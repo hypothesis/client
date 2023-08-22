@@ -2,6 +2,7 @@ import { Button, CardActions, Input } from '@hypothesis/frontend-shared';
 import { useMemo, useState } from 'preact/hooks';
 
 import { downloadJSONFile } from '../../../shared/download-json-file';
+import { isReply } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 import type { AnnotationsExporter } from '../../services/annotations-exporter';
 import type { ToastMessengerService } from '../../services/toast-messenger';
@@ -26,8 +27,14 @@ function ExportAnnotations({
   const store = useSidebarStore();
   const group = store.focusedGroup();
   const exportReady = group && !store.isLoading();
+
   const exportableAnnotations = store.savedAnnotations();
-  const exportCount = exportableAnnotations.length;
+  const replyCount = useMemo(
+    () => exportableAnnotations.filter(ann => isReply(ann)).length,
+    [exportableAnnotations],
+  );
+  const nonReplyCount = exportableAnnotations.length - replyCount;
+
   const draftCount = store.countDrafts();
 
   const defaultFilename = useMemo(
@@ -55,8 +62,8 @@ function ExportAnnotations({
   };
 
   // Naive simple English pluralization
-  const pluralize = (str: string, count: number) => {
-    return count === 1 ? str : `${str}s`;
+  const pluralize = (count: number, singular: string, plural: string) => {
+    return count === 1 ? singular : plural;
   };
 
   return (
@@ -65,13 +72,21 @@ function ExportAnnotations({
       onSubmit={exportAnnotations}
       data-testid="export-form"
     >
-      {exportCount > 0 ? (
+      {exportableAnnotations.length > 0 ? (
         <>
           <label data-testid="export-count" htmlFor="export-filename">
             Export{' '}
             <strong>
-              {exportCount} {pluralize('annotation', exportCount)}
+              {nonReplyCount}{' '}
+              {pluralize(nonReplyCount, 'annotation', 'annotations')}
             </strong>{' '}
+            {replyCount > 0
+              ? `(and ${replyCount} ${pluralize(
+                  replyCount,
+                  'reply',
+                  'replies',
+                )}) `
+              : ''}
             in a file named:
           </label>
           <Input
@@ -93,15 +108,16 @@ function ExportAnnotations({
       )}
       {draftCount > 0 && (
         <p data-testid="drafts-message">
-          You have {draftCount} unsaved {pluralize('annotation', draftCount)}
-          {exportCount > 0 && <> that will not be included</>}.
+          You have {draftCount} unsaved{' '}
+          {pluralize(draftCount, 'draft', 'drafts')}
+          {exportableAnnotations.length > 0 && <> that will not be included</>}.
         </p>
       )}
       <CardActions>
         <Button
           data-testid="export-button"
           variant="primary"
-          disabled={!exportCount}
+          disabled={exportableAnnotations.length === 0}
           type="submit"
         >
           Export

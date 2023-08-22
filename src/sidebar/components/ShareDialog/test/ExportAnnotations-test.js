@@ -83,24 +83,41 @@ describe('ExportAnnotations', () => {
     });
   });
 
-  it('shows a count of annotations for export', () => {
-    fakeStore.savedAnnotations.returns([fixtures.oldAnnotation()]);
-    const wrapperSingular = createComponent();
-    fakeStore.savedAnnotations.returns([
-      fixtures.oldAnnotation(),
-      fixtures.oldAnnotation(),
-    ]);
-    const wrapperPlural = createComponent();
-
-    assert.include(
-      wrapperSingular.find('[data-testid="export-count"]').text(),
-      'Export 1 annotation in a file',
-    );
-
-    assert.include(
-      wrapperPlural.find('[data-testid="export-count"]').text(),
-      'Export 2 annotations in a file',
-    );
+  [
+    {
+      annotations: [fixtures.oldAnnotation()],
+      message: 'Export 1 annotation in a file',
+    },
+    {
+      annotations: [fixtures.oldAnnotation(), fixtures.oldAnnotation()],
+      message: 'Export 2 annotations in a file',
+    },
+    {
+      annotations: [
+        fixtures.oldAnnotation(),
+        fixtures.oldAnnotation(),
+        fixtures.oldReply(),
+      ],
+      message: 'Export 2 annotations (and 1 reply) in a file',
+    },
+    {
+      annotations: [
+        fixtures.oldAnnotation(),
+        fixtures.oldAnnotation(),
+        fixtures.oldReply(),
+        fixtures.oldReply(),
+      ],
+      message: 'Export 2 annotations (and 2 replies) in a file',
+    },
+  ].forEach(({ annotations, message }) => {
+    it('shows a count of annotations for export', () => {
+      fakeStore.savedAnnotations.returns(annotations);
+      const wrapper = createComponent();
+      assert.include(
+        wrapper.find('[data-testid="export-count"]').text(),
+        message,
+      );
+    });
   });
 
   it('provides a filename field with a default suggested name', () => {
@@ -211,12 +228,12 @@ describe('ExportAnnotations', () => {
 
       assert.include(
         wrapperSingular.find('[data-testid="drafts-message"]').text(),
-        'You have 1 unsaved annotation that',
+        'You have 1 unsaved draft that',
       );
 
       assert.include(
         wrapperPlural.find('[data-testid="drafts-message"]').text(),
-        'You have 2 unsaved annotations that',
+        'You have 2 unsaved drafts that',
       );
     });
   });
