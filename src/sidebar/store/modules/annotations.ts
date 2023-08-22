@@ -554,9 +554,10 @@ const orphanCount = createSelector(
 /**
  * Return all loaded annotations which have been saved to the server
  */
-function savedAnnotations(state: State): SavedAnnotation[] {
-  return state.annotations.filter(ann => isSaved(ann)) as SavedAnnotation[];
-}
+const savedAnnotations = createSelector(
+  (state: State) => state.annotations,
+  annotations => annotations.filter(ann => isSaved(ann)) as SavedAnnotation[],
+);
 
 export const annotationsModule = createStoreModule(initialState, {
   namespace: 'annotations',
