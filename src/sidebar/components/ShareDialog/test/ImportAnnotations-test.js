@@ -6,9 +6,12 @@ import ImportAnnotations, { $imports } from '../ImportAnnotations';
 
 describe('ImportAnnotations', () => {
   let fakeImportAnnotationsService;
+  let fakeReadExportFile;
   let fakeStore;
 
   beforeEach(() => {
+    fakeReadExportFile = sinon.stub().rejects(new Error('Failed to read file'));
+
     fakeImportAnnotationsService = {
       import: sinon.stub().resolves([]),
     };
@@ -21,6 +24,7 @@ describe('ImportAnnotations', () => {
     };
 
     $imports.$mock({
+      '../../helpers/import': { readExportFile: fakeReadExportFile },
       '../../store': { useSidebarStore: () => fakeStore },
     });
   });
@@ -49,16 +53,18 @@ describe('ImportAnnotations', () => {
     return wrapper.find('button[data-testid="import-button"]');
   }
 
-  function selectFile(wrapper, data) {
+  function selectFile(wrapper, readResult) {
     const fileInput = wrapper.find('input[type="file"]');
-    const fileContent = typeof data === 'string' ? data : JSON.stringify(data);
-    const file = new File([fileContent], 'export.json');
+    const file = new File(['dummy content'], 'export.json');
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    fileInput.getDOMNode().files = transfer.files;
 
-    // `HTMLInputElement.files` can be assigned, but is a `FileList`, which
-    // can't be constructed, so we just stub the property instead.
-    Object.defineProperty(fileInput.getDOMNode(), 'files', {
-      get: () => [file],
-    });
+    if (readResult instanceof Error) {
+      fakeReadExportFile.withArgs(file).rejects(readResult);
+    } else {
+      fakeReadExportFile.withArgs(file).resolves(readResult);
+    }
 
     fileInput.simulate('change');
   }
@@ -71,24 +77,22 @@ describe('ImportAnnotations', () => {
   it('displays user list when a valid file is selected', async () => {
     const wrapper = createImportAnnotations();
 
-    selectFile(wrapper, {
-      annotations: [
-        {
-          user: 'acct:john@example.com',
-          user_info: {
-            display_name: 'John Smith',
-          },
-          text: 'Test annotation',
+    selectFile(wrapper, [
+      {
+        user: 'acct:john@example.com',
+        user_info: {
+          display_name: 'John Smith',
         },
-        {
-          user: 'acct:brian@example.com',
-          user_info: {
-            display_name: 'Brian Smith',
-          },
-          text: 'Test annotation',
+        text: 'Test annotation',
+      },
+      {
+        user: 'acct:brian@example.com',
+        user_info: {
+          display_name: 'Brian Smith',
         },
-      ],
-    });
+        text: 'Test annotation',
+      },
+    ]);
 
     const userList = await waitForElement(wrapper, 'Select');
     const users = userList.find('option');
@@ -101,29 +105,17 @@ describe('ImportAnnotations', () => {
     assert.equal(users.at(2).text(), 'John Smith (1)');
   });
 
-  // TODO - Check handling of errors when reading file fails
+  it('displays error if file is invalid', async () => {
+    const wrapper = createImportAnnotations();
+    const reason = 'Not a valid Hypothesis JSON file';
 
-  [
-    {
-      content: 'foobar',
-      reason: 'Not a valid JSON file',
-    },
-    {
-      content: {},
-      reason: 'Not a valid Hypothesis JSON file',
-    },
-  ].forEach(({ content, reason }) => {
-    it('displays error if file is invalid', async () => {
-      const wrapper = createImportAnnotations();
+    selectFile(wrapper, new Error(reason));
 
-      selectFile(wrapper, content);
-
-      const error = await waitForElement(wrapper, '[data-testid="error-info"]');
-      assert.equal(
-        error.text(),
-        `Unable to find annotations to import: ${reason}`,
-      );
-    });
+    const error = await waitForElement(wrapper, '[data-testid="error-info"]');
+    assert.equal(
+      error.text(),
+      `Unable to find annotations to import: ${reason}`,
+    );
   });
 
   it('selects user matching logged in user if found', async () => {
@@ -137,7 +129,7 @@ describe('ImportAnnotations', () => {
         text: 'Test annotation',
       },
     ];
-    selectFile(wrapper, { annotations });
+    selectFile(wrapper, annotations);
 
     const userList = await waitForElement(wrapper, 'Select');
     assert.equal(userList.getDOMNode().value, 'acct:john@example.com');
@@ -155,7 +147,7 @@ describe('ImportAnnotations', () => {
         text: 'Test annotation',
       },
     ];
-    selectFile(wrapper, { annotations });
+    selectFile(wrapper, annotations);
 
     const userList = await waitForElement(wrapper, 'Select');
     assert.equal(userList.getDOMNode().value, '');
@@ -180,7 +172,7 @@ describe('ImportAnnotations', () => {
       },
     ];
 
-    selectFile(wrapper, { annotations });
+    selectFile(wrapper, annotations);
 
     const userList = await waitForElement(wrapper, 'select');
     userList.getDOMNode().value = 'acct:brian@example.com';
