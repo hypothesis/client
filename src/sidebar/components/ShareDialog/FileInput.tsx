@@ -27,7 +27,6 @@ export default function FileInput({
         disabled={disabled}
         className="invisible absolute w-0 h-0"
         aria-hidden
-        tabIndex={-1}
         data-testid="file-input"
         onChange={e => {
           const files = (e.target as HTMLInputElement)!.files;
