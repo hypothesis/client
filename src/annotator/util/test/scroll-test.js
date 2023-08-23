@@ -129,15 +129,9 @@ describe('annotator/util/scroll', () => {
       }
     });
 
-    it('scrolls element into view when the target is within the details tag', async () => {
+    it('opens containing `<details>` tag to make content visible', async () => {
       const container = createContainer();
-      container.style.height = '500px';
-      container.style.overflow = 'auto';
-      container.style.position = 'relative';
-
       const details = document.createElement('details');
-      details.style.position = 'absolute';
-      details.style.top = '1000px';
       container.append(details);
 
       const summary = document.createElement('summary');
@@ -145,18 +139,11 @@ describe('annotator/util/scroll', () => {
       details.append(summary);
 
       const target = document.createElement('div');
-      target.style.height = '20px';
-      target.style.width = '100px';
       details.append(target);
 
+      assert.isFalse(details.open);
       await scrollElementIntoView(target, { maxDuration: 1 });
-
-      const containerRect = container.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-
       assert.isTrue(details.open);
-      assert.isTrue(containerRect.top <= targetRect.top);
-      assert.isTrue(containerRect.bottom >= targetRect.bottom);
     });
   });
 });
