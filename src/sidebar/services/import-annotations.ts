@@ -4,6 +4,9 @@ import type { SidebarStore } from '../store';
 import type { AnnotationsService } from './annotations';
 import type { ToastMessengerService } from './toast-messenger';
 
+/** Number of annotations to import concurrently. */
+export const MAX_CONCURRENT_IMPORTS = 5;
+
 /**
  * The subset of annotation fields which are preserved during an import.
  */
@@ -116,19 +119,20 @@ export class ImportAnnotationsService {
 
   /**
    * Import annotations.
+   *
+   * Returns an array of the results of each import. The results are in the
+   * same order as the input annotation list. Each result can either be a
+   * successful import, a skipped import, or an error.
    */
   async import(anns: APIAnnotationData[]): Promise<ImportResult[]> {
     this._store.beginImport(anns.length);
 
     const existingAnns = this._store.allAnnotations();
-    const results: ImportResult[] = [];
 
-    for (const ann of anns) {
+    const importAnn = async (ann: APIAnnotationData): Promise<ImportResult> => {
       const existingAnn = existingAnns.find(ex => duplicateMatch(ann, ex));
       if (existingAnn) {
-        results.push({ type: 'duplicate', annotation: existingAnn });
-        this._store.completeImport(1);
-        continue;
+        return { type: 'duplicate', annotation: existingAnn };
       }
 
       try {
@@ -143,13 +147,41 @@ export class ImportAnnotationsService {
         // Persist the annotation.
         const saved = await this._annotationsService.save(saveData);
 
-        results.push({ type: 'import', annotation: saved });
+        return { type: 'import', annotation: saved };
       } catch (error) {
-        results.push({ type: 'error', error });
-      } finally {
-        this._store.completeImport(1);
+        return { type: 'error', error };
+      }
+    };
+
+    // Save annotations to the server, allowing a maximum of
+    // `MAX_CONCURRENT_IMPORTS` in-flight requests at a time.
+    const results: ImportResult[] = [];
+    const queue = anns.map((ann, index) => ({ ann, index }));
+    const active: Array<Promise<void>> = [];
+    while (queue.length > 0) {
+      const task = queue.shift()!;
+      const done = importAnn(task.ann)
+        .then(result => {
+          this._store.completeImport(1);
+          results[task.index] = result;
+        })
+        .then(() => {
+          const idx = active.indexOf(done);
+          // nb. `idx` should always be >= 0 here.
+          if (idx !== -1) {
+            active.splice(idx, 1);
+          }
+        });
+      active.push(done);
+
+      // When we reach max concurrency, wait for at least one import to complete.
+      if (active.length >= MAX_CONCURRENT_IMPORTS) {
+        await Promise.race(active);
       }
     }
+
+    // Wait for all remaining imports to complete.
+    await Promise.all(active);
 
     const { messageType, message } = importStatus(results);
     if (messageType === 'success') {

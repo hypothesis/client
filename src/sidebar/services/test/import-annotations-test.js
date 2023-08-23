@@ -84,6 +84,25 @@ describe('ImportAnnotationsService', () => {
       });
     });
 
+    it('can save many annotations', async () => {
+      const svc = createService();
+      const anns = [];
+      const totalAnns = 23; // A total that exceeds the max number of concurrent imports.
+      while (anns.length < totalAnns) {
+        anns.push(generateAnnotation());
+      }
+
+      await svc.import(anns);
+
+      assert.equal(fakeAnnotationsService.save.callCount, anns.length);
+      for (const ann of anns) {
+        assert.calledWith(fakeAnnotationsService.save, {
+          $tag: 'dummy',
+          ...ann,
+        });
+      }
+    });
+
     it('does not skip annotation if existing annotations in store differ', async () => {
       const svc = createService();
       const ann = generateAnnotation();
