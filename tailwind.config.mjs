@@ -216,7 +216,9 @@ export default {
       // element had the `.theme-clean` class.
       addVariant('theme-clean', '.theme-clean &');
     }),
-    plugin(({ addComponents, addUtilities }) => {
+    plugin(({ addComponents, addUtilities, theme }) => {
+      const ringWidth = theme('ringWidth.DEFAULT');
+
       addUtilities({
         // Tailwind does not provide hyphens-related utility classes.
         '.hyphens-none': {
@@ -229,6 +231,20 @@ export default {
         '.break-anywhere': {
           'overflow-wrap': 'anywhere',
         },
+
+        // This acts like focus-visible-ring utility, but designed to mimic focus
+        // on elements which are not focusable and need to be to highlighted when
+        // children elements are focused.
+        '.focus-within-ring': {
+          '&:focus-within': {
+            boxShadow: `var(--tw-ring-inset) 0 0 0 calc(${ringWidth} + var(--tw-ring-offset-width)) var(--tw-ring-color)`,
+            outline: 'none',
+          },
+          // Disable focus ring on children elements
+          '.focus-visible-ring': {
+            boxShadow: 'none !important'
+          }
+        }
       });
       addComponents({
         // Add a custom class to set all properties to initial values. Used

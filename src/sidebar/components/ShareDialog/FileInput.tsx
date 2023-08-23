@@ -36,7 +36,7 @@ export default function FileInput({
         }}
       />
       <label htmlFor={inputId}>Select Hypothesis export file:</label>
-      <InputGroup>
+      <InputGroup classes="focus-within-ring rounded">
         <Input
           id={inputId}
           onClick={() => fileInputRef.current?.click()}
@@ -45,6 +45,7 @@ export default function FileInput({
           value={fileInputRef.current?.files![0]?.name ?? 'Select a file'}
           data-testid="file-input-proxy-input"
           classes="cursor-pointer"
+          tabIndex={-1}
         />
         <IconButton
           title="Select a file"
