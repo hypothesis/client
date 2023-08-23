@@ -1,5 +1,6 @@
 import { mount } from 'enzyme';
 
+import { checkAccessibility } from '../../../../test-util/accessibility';
 import FileInput from '../FileInput';
 
 describe('FileInput', () => {
@@ -96,4 +97,18 @@ describe('FileInput', () => {
       assert.equal(proxyButton.prop('disabled'), disabled);
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        content: () =>
+          mount(
+            <div>
+              <FileInput onFileSelected={fakeOnFileSelected} />
+            </div>,
+          ),
+      },
+    ]),
+  );
 });
