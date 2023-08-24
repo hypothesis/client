@@ -143,6 +143,7 @@ function ImportAnnotations({
 
   return (
     <>
+      <p>Select Hypothesis export file:</p>
       <FileInput onFileSelected={setFile} disabled={busy} />
       {userList && (
         <>

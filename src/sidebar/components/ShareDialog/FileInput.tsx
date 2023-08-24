@@ -1,10 +1,6 @@
-import {
-  FileGenericIcon,
-  IconButton,
-  Input,
-  InputGroup,
-} from '@hypothesis/frontend-shared';
-import { useId, useRef } from 'preact/hooks';
+import { Button, FileGenericIcon } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
+import { useRef, useState } from 'preact/hooks';
 
 export type FileInputProps = {
   onFileSelected: (file: File) => void;
@@ -16,10 +12,20 @@ export default function FileInput({
   disabled,
 }: FileInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputId = useId();
+  const [filename, setFilename] = useState<string | null>(null);
 
   return (
-    <>
+    <Button
+      variant="custom"
+      classes={classnames(
+        'w-full relative overflow-hidden border rounded',
+        'bg-grey-0 hover:bg-grey-0',
+      )}
+      title={filename ? `${filename}, Select a file` : 'Select a file'}
+      onClick={() => fileInputRef.current?.click()}
+      disabled={disabled}
+      data-testid="file-input-proxy-button"
+    >
       <input
         ref={fileInputRef}
         accept=".json"
@@ -30,31 +36,22 @@ export default function FileInput({
         data-testid="file-input"
         onChange={e => {
           const files = (e.target as HTMLInputElement)!.files;
+          setFilename(files?.[0]?.name ?? null);
+
           if (files !== null && files.length > 0) {
             onFileSelected(files[0]);
           }
         }}
       />
-      <label htmlFor={inputId}>Select Hypothesis export file:</label>
-      <InputGroup>
-        <Input
-          id={inputId}
-          onClick={() => fileInputRef.current?.click()}
-          readonly
-          disabled={disabled}
-          value={fileInputRef.current?.files![0]?.name ?? 'Select a file'}
-          data-testid="file-input-proxy-input"
-          classes="cursor-pointer"
-        />
-        <IconButton
-          title="Select a file"
-          onClick={() => fileInputRef.current?.click()}
-          icon={FileGenericIcon}
-          variant="dark"
-          disabled={disabled}
-          data-testid="file-input-proxy-button"
-        />
-      </InputGroup>
-    </>
+      <div
+        className="max-w-full pr-10 truncate"
+        data-testid="filename-container"
+      >
+        {filename ?? 'Select a file'}
+      </div>
+      <div className="absolute right-0 h-full p-2 border-l bg-grey-2">
+        <FileGenericIcon />
+      </div>
+    </Button>
   );
 }
