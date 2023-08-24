@@ -29,10 +29,10 @@ describe('FileInput', () => {
 
   const getActualFileInput = wrapper =>
     wrapper.find('[data-testid="file-input"]');
-  const getProxyInput = wrapper =>
-    wrapper.find('input[data-testid="file-input-proxy-input"]');
   const getProxyButton = wrapper =>
     wrapper.find('button[data-testid="file-input-proxy-button"]');
+  const getFilenameContainer = wrapper =>
+    wrapper.find('[data-testid="filename-container"]');
 
   const createInput = (disabled = undefined) => {
     const wrapper = mount(
@@ -52,10 +52,14 @@ describe('FileInput', () => {
     const firstFile = createFile('foo');
     const fileInput = getActualFileInput(wrapper);
 
+    // We display a placeholder/CTA before any file has been selected
+    assert.equal(getFilenameContainer(wrapper).text(), 'Select a file');
+
     fillInputWithFiles(fileInput, [firstFile, createFile('bar')]);
     fileInput.simulate('change');
 
     assert.calledWith(fakeOnFileSelected, firstFile);
+    assert.equal(getFilenameContainer(wrapper).text(), 'foo.json');
   });
 
   it('does not call onFileSelected when input changes with no files', () => {
@@ -65,15 +69,6 @@ describe('FileInput', () => {
     fileInput.simulate('change');
 
     assert.notCalled(fakeOnFileSelected);
-  });
-
-  it('forwards click on proxy input to actual file input', () => {
-    const wrapper = createInput();
-    const proxyInput = getProxyInput(wrapper);
-
-    proxyInput.simulate('click');
-
-    assert.called(getActualFileInput(wrapper).getDOMNode().click);
   });
 
   it('forwards click on proxy button to actual file input', () => {
@@ -89,11 +84,9 @@ describe('FileInput', () => {
     it('disables all inner components when FileInput is disabled', () => {
       const wrapper = createInput(disabled);
       const fileInput = getActualFileInput(wrapper);
-      const proxyInput = getProxyInput(wrapper);
       const proxyButton = getProxyButton(wrapper);
 
       assert.equal(fileInput.prop('disabled'), disabled);
-      assert.equal(proxyInput.prop('disabled'), disabled);
       assert.equal(proxyButton.prop('disabled'), disabled);
     });
   });
@@ -102,12 +95,7 @@ describe('FileInput', () => {
     'should pass a11y checks',
     checkAccessibility([
       {
-        content: () =>
-          mount(
-            <div>
-              <FileInput onFileSelected={fakeOnFileSelected} />
-            </div>,
-          ),
+        content: () => mount(<FileInput onFileSelected={fakeOnFileSelected} />),
       },
     ]),
   );
