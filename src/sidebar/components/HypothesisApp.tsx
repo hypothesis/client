@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'preact/hooks';
 import { confirm } from '../../shared/prompts';
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
+import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
@@ -61,6 +62,12 @@ function HypothesisApp({
       store.openSidebarPanel('help');
     }
   }, [isSidebar, profile, settings, store]);
+
+  const isThirdParty = isThirdPartyService(settings);
+  const exportAnnotations = store.isFeatureEnabled('export_annotations');
+  const importAnnotations = store.isFeatureEnabled('import_annotations');
+  const showShareButton =
+    !isThirdParty || exportAnnotations || importAnnotations;
 
   const login = async () => {
     if (serviceConfig(settings)) {
@@ -155,12 +162,19 @@ function HypothesisApp({
           onSignUp={signUp}
           onLogout={logout}
           isSidebar={isSidebar}
+          showShareButton={showShareButton}
         />
       )}
       <div className="container">
         <ToastMessages />
         <HelpPanel />
-        <ShareDialog />
+        {showShareButton && (
+          <ShareDialog
+            shareTab={!isThirdParty}
+            exportTab={exportAnnotations}
+            importTab={importAnnotations}
+          />
+        )}
 
         {route && (
           <main>
