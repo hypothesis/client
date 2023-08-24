@@ -9,12 +9,9 @@ describe('TopBar', () => {
   let fakeFrameSync;
   let fakeStore;
   let fakeStreamer;
-  let fakeIsThirdPartyService;
   let fakeServiceConfig;
 
   beforeEach(() => {
-    fakeIsThirdPartyService = sinon.stub().returns(false);
-
     fakeStore = {
       filterQuery: sinon.stub().returns(null),
       hasFetchedProfile: sinon.stub().returns(false),
@@ -38,9 +35,6 @@ describe('TopBar', () => {
 
     $imports.$mock({
       '../store': { useSidebarStore: () => fakeStore },
-      '../helpers/is-third-party-service': {
-        isThirdPartyService: fakeIsThirdPartyService,
-      },
       '../config/service-config': { serviceConfig: fakeServiceConfig },
     });
   });
@@ -63,6 +57,7 @@ describe('TopBar', () => {
         isSidebar={true}
         settings={fakeSettings}
         streamer={fakeStreamer}
+        showShareButton
         {...props}
       />,
     );
@@ -149,13 +144,6 @@ describe('TopBar', () => {
     });
   });
 
-  it("checks whether we're using a third-party service", () => {
-    createTopBar();
-
-    assert.called(fakeIsThirdPartyService);
-    assert.alwaysCalledWithExactly(fakeIsThirdPartyService, fakeSettings);
-  });
-
   context('when using a first-party service', () => {
     it('shows the share annotations button', () => {
       const wrapper = createTopBar();
@@ -163,13 +151,9 @@ describe('TopBar', () => {
     });
   });
 
-  context('when using a third-party service', () => {
-    beforeEach(() => {
-      fakeIsThirdPartyService.returns(true);
-    });
-
+  context('when showShareButton is false', () => {
     it("doesn't show the share annotations button", () => {
-      const wrapper = createTopBar();
+      const wrapper = createTopBar({ showShareButton: false });
       assert.isFalse(
         wrapper.exists('[title="Share annotations on this page"]'),
       );

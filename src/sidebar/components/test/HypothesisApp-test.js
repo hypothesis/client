@@ -14,6 +14,7 @@ describe('HypothesisApp', () => {
   let fakeShouldAutoDisplayTutorial = null;
   let fakeSettings = null;
   let fakeToastMessenger = null;
+  let fakeIsThirdPartyService;
 
   const createComponent = (props = {}) => {
     return mount(
@@ -53,6 +54,7 @@ describe('HypothesisApp', () => {
       route: sinon.stub().returns('sidebar'),
 
       getLink: sinon.stub(),
+      isFeatureEnabled: sinon.stub().returns(true),
     };
 
     fakeAuth = {};
@@ -76,6 +78,8 @@ describe('HypothesisApp', () => {
 
     fakeConfirm = sinon.stub().resolves(false);
 
+    fakeIsThirdPartyService = sinon.stub().returns(false);
+
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../config/service-config': { serviceConfig: fakeServiceConfig },
@@ -85,6 +89,9 @@ describe('HypothesisApp', () => {
       },
       '../helpers/theme': { applyTheme: fakeApplyTheme },
       '../../shared/prompts': { confirm: fakeConfirm },
+      '../helpers/is-third-party-service': {
+        isThirdPartyService: fakeIsThirdPartyService,
+      },
     });
   });
 
@@ -398,6 +405,23 @@ describe('HypothesisApp', () => {
       const container = wrapper.find(appSelector);
 
       assert.isFalse(container.hasClass('theme-clean'));
+    });
+  });
+
+  context('when there are no sharing tabs to show', () => {
+    beforeEach(() => {
+      fakeStore.isFeatureEnabled.returns(false);
+      fakeIsThirdPartyService.returns(true);
+    });
+
+    it('does not render ShareDialog', () => {
+      const wrapper = createComponent();
+      assert.isFalse(wrapper.exists('ShareDialog'));
+    });
+
+    it('disables share button in TopBar', () => {
+      const wrapper = createComponent();
+      assert.isFalse(wrapper.find('TopBar').prop('showShareButton'));
     });
   });
 });

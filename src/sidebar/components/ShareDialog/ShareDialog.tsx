@@ -9,23 +9,34 @@ import ShareAnnotations from './ShareAnnotations';
 import TabHeader from './TabHeader';
 import TabPanel from './TabPanel';
 
+export type ShareDialogProps = {
+  /** If true, the share tab will be rendered. Defaults to false */
+  shareTab?: boolean;
+  /** If true, the export tab will be rendered. Defaults to false */
+  exportTab?: boolean;
+  /** If true, the import tab will be rendered. Defaults to false */
+  importTab?: boolean;
+};
+
 /**
  * Panel with sharing options.
- * - If export feature flag is enabled, will show a tabbed interface with
- *   share and export tabs
+ * - If provided tabs include `export` or `import`, will show a tabbed interface
  * - Else, shows a single "Share annotations" interface
  */
-export default function ShareDialog() {
+export default function ShareDialog({
+  shareTab,
+  exportTab,
+  importTab,
+}: ShareDialogProps) {
   const store = useSidebarStore();
   const focusedGroup = store.focusedGroup();
   const groupName = (focusedGroup && focusedGroup.name) || '...';
   const panelTitle = `Share Annotations in ${groupName}`;
 
-  const showExportTab = store.isFeatureEnabled('export_annotations');
-  const showImportTab = store.isFeatureEnabled('import_annotations');
-  const tabbedDialog = showExportTab || showImportTab;
+  const tabbedDialog = exportTab || importTab;
   const [selectedTab, setSelectedTab] = useState<'share' | 'export' | 'import'>(
-    'share',
+    // Determine initial selected tab, based on the first tab that will be displayed
+    shareTab ? 'share' : exportTab ? 'export' : 'import',
   );
 
   return (
@@ -37,17 +48,19 @@ export default function ShareDialog() {
       {tabbedDialog && (
         <>
           <TabHeader>
-            <Tab
-              id="share-panel-tab"
-              aria-controls="share-panel"
-              variant="tab"
-              selected={selectedTab === 'share'}
-              onClick={() => setSelectedTab('share')}
-              textContent={'Share'}
-            >
-              Share
-            </Tab>
-            {showExportTab && (
+            {shareTab && (
+              <Tab
+                id="share-panel-tab"
+                aria-controls="share-panel"
+                variant="tab"
+                selected={selectedTab === 'share'}
+                onClick={() => setSelectedTab('share')}
+                textContent="Share"
+              >
+                Share
+              </Tab>
+            )}
+            {exportTab && (
               <Tab
                 id="export-panel-tab"
                 aria-controls="export-panel"
@@ -59,7 +72,7 @@ export default function ShareDialog() {
                 Export
               </Tab>
             )}
-            {showImportTab && (
+            {importTab && (
               <Tab
                 id="import-panel-tab"
                 aria-controls="import-panel"
@@ -85,7 +98,7 @@ export default function ShareDialog() {
               id="export-panel"
               active={selectedTab === 'export'}
               aria-labelledby="export-panel-tab"
-              title={`Export from ${focusedGroup?.name ?? '...'}`}
+              title={`Export from ${groupName}`}
             >
               <ExportAnnotations />
             </TabPanel>
@@ -93,14 +106,14 @@ export default function ShareDialog() {
               id="import-panel"
               active={selectedTab === 'import'}
               aria-labelledby="import-panel-tab"
-              title={`Import into ${focusedGroup?.name ?? '...'}`}
+              title={`Import into ${groupName}`}
             >
               <ImportAnnotations />
             </TabPanel>
           </Card>
         </>
       )}
-      {!tabbedDialog && <ShareAnnotations />}
+      {shareTab && !tabbedDialog && <ShareAnnotations />}
     </SidebarPanel>
   );
 }

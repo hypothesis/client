@@ -14,12 +14,12 @@ describe('ShareDialog', () => {
     id: 'testprivate',
   };
 
-  const createComponent = () => mount(<ShareDialog />);
+  const createComponent = (props = {}) =>
+    mount(<ShareDialog shareTab exportTab importTab {...props} />);
 
   beforeEach(() => {
     fakeStore = {
       focusedGroup: sinon.stub().returns(fakePrivateGroup),
-      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -58,10 +58,6 @@ describe('ShareDialog', () => {
     });
   });
 
-  function enableFeature(feature) {
-    fakeStore.isFeatureEnabled.withArgs(feature).returns(true);
-  }
-
   function selectTab(wrapper, name) {
     wrapper
       .find(`Tab[aria-controls="${name}-panel"]`)
@@ -77,17 +73,20 @@ describe('ShareDialog', () => {
     return wrapper.find('TabPanel').filter({ active: true });
   }
 
-  it('does not render a tabbed dialog if import/export feature flags are not enabled', () => {
-    const wrapper = createComponent();
+  it('does not render a tabbed dialog if only share tab is provided', () => {
+    const wrapper = createComponent({ exportTab: false, importTab: false });
 
     assert.isFalse(wrapper.find('TabHeader').exists());
   });
 
-  ['export_annotations', 'import_annotations'].forEach(feature => {
-    it(`renders a tabbed dialog when ${feature} feature is enabled`, () => {
-      enableFeature('export_annotations');
-
-      const wrapper = createComponent();
+  [
+    [{ shareTab: false }],
+    [{ importTab: false }],
+    [{ exportTab: false }],
+    [{}],
+  ].forEach(props => {
+    it(`renders a tabbed dialog when more than one tab is provided`, () => {
+      const wrapper = createComponent(props);
 
       assert.isTrue(wrapper.find('TabHeader').exists());
       assert.isTrue(
@@ -98,9 +97,6 @@ describe('ShareDialog', () => {
   });
 
   it('shows correct tab panel when each tab is clicked', () => {
-    enableFeature('export_annotations');
-    enableFeature('import_annotations');
-
     const wrapper = createComponent();
 
     selectTab(wrapper, 'export');
@@ -119,24 +115,30 @@ describe('ShareDialog', () => {
     assert.equal(activeTabPanel(wrapper).props().id, 'share-panel');
   });
 
-  describe('a11y', () => {
-    beforeEach(() => {
-      enableFeature('export_annotations');
-      enableFeature('import_annotations');
+  it('renders empty if no tabs should be displayed', () => {
+    const wrapper = createComponent({
+      shareTab: false,
+      exportTab: false,
+      importTab: false,
     });
 
+    assert.isFalse(wrapper.exists('TabHeader'));
+    assert.isFalse(wrapper.exists('ShareAnnotations'));
+  });
+
+  describe('a11y', () => {
     it(
       'should pass a11y checks',
       checkAccessibility({
         content: () =>
           // ShareDialog renders a Fragment as its top-level component when
-          // `export_annotations` feature is enabled.
+          // it has import and/or export tabs.
           // Wrapping it in a `div` ensures `checkAccessibility` internal logic
           // does not discard all the Fragment children but the first one.
           // See https://github.com/hypothesis/client/issues/5671
           mount(
             <div>
-              <ShareDialog />
+              <ShareDialog shareTab exportTab importTab />
             </div>,
           ),
       }),
