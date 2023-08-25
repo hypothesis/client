@@ -8,12 +8,30 @@ import type { ToastMessengerService } from './toast-messenger';
 export const MAX_CONCURRENT_IMPORTS = 5;
 
 /**
+ * Non-standard metadata fields added to imported annotations.
+ *
+ * These are added for analytics / reporting purposes. If we decide to make
+ * other uses of it, we should migrate these to a proper annotation metadata
+ * field.
+ */
+type ImportExtra = {
+  extra: {
+    /** Indicator for where the annotation came from. */
+    source: 'import';
+
+    /** Original ID of the annotation that was imported. */
+    original_id?: string;
+  };
+};
+
+/**
  * The subset of annotation fields which are preserved during an import.
  */
 type ImportData = Pick<
   APIAnnotationData,
   'document' | 'tags' | 'text' | 'target' | 'uri'
->;
+> &
+  ImportExtra;
 
 /**
  * Return a copy of `ann` that contains only fields which can be preserved by
@@ -26,6 +44,10 @@ function getImportData(ann: APIAnnotationData): ImportData {
     text: ann.text,
     uri: ann.uri,
     document: ann.document,
+    extra: {
+      source: 'import',
+      original_id: ann.id,
+    },
   };
 }
 

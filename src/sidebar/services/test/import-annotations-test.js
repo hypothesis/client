@@ -43,6 +43,7 @@ describe('ImportAnnotationsService', () => {
   function generateAnnotation(fields = {}) {
     ++counter;
     return {
+      id: `id-${counter}`,
       uri: 'https://example.com',
       target: [
         {
@@ -53,6 +54,21 @@ describe('ImportAnnotationsService', () => {
       tags: ['foo'],
       document: { title: 'Example' },
       ...fields,
+    };
+  }
+
+  /** Return the expected imported annotation for a given annotation. */
+  function importedAnnotation(ann) {
+    return {
+      document: ann.document,
+      tags: ann.tags,
+      target: ann.target,
+      text: ann.text,
+      uri: ann.uri,
+      extra: {
+        source: 'import',
+        original_id: ann.id,
+      },
     };
   }
 
@@ -80,7 +96,7 @@ describe('ImportAnnotationsService', () => {
 
       assert.calledWith(fakeAnnotationsService.save, {
         $tag: 'dummy',
-        ...ann,
+        ...importedAnnotation(ann),
       });
     });
 
@@ -98,7 +114,7 @@ describe('ImportAnnotationsService', () => {
       for (const ann of anns) {
         assert.calledWith(fakeAnnotationsService.save, {
           $tag: 'dummy',
-          ...ann,
+          ...importedAnnotation(ann),
         });
       }
     });
