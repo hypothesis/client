@@ -37,12 +37,12 @@ type ImportData = Pick<
  * Return a copy of `ann` that contains only fields which can be preserved by
  * an import performed on the client.
  */
-function getImportData(ann: APIAnnotationData): ImportData {
+function getImportData(ann: APIAnnotationData, uri?: string): ImportData {
   return {
     target: ann.target,
     tags: ann.tags,
     text: ann.text,
-    uri: ann.uri,
+    uri: uri ?? ann.uri,
     document: ann.document,
     extra: {
       source: 'import',
@@ -150,6 +150,7 @@ export class ImportAnnotationsService {
     this._store.beginImport(anns.length);
 
     const existingAnns = this._store.allAnnotations();
+    const currentUri = this._store.mainFrame()?.uri;
 
     const importAnn = async (ann: APIAnnotationData): Promise<ImportResult> => {
       const existingAnn = existingAnns.find(ex => duplicateMatch(ann, ex));
@@ -158,8 +159,9 @@ export class ImportAnnotationsService {
       }
 
       try {
-        // Strip out all the fields that are ignored in an import.
-        const importData = getImportData(ann);
+        // Strip out all the fields that are ignored in an import, and overwrite
+        // the URI with current document's URI.
+        const importData = getImportData(ann, currentUri);
 
         // Fill out the annotation with default values for the current user and
         // group.
