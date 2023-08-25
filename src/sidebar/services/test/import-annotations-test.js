@@ -112,7 +112,7 @@ describe('ImportAnnotationsService', () => {
 
       assert.calledWith(fakeAnnotationsService.save, {
         $tag: 'dummy',
-        ...ann,
+        ...importedAnnotation(ann),
         uri: newUri,
       });
     });
