@@ -13,6 +13,7 @@ describe('ImportAnnotationsService', () => {
       allAnnotations: sinon.stub().returns([]),
       beginImport: sinon.stub(),
       completeImport: sinon.stub(),
+      mainFrame: sinon.stub(),
     };
 
     fakeToastMessenger = {
@@ -81,6 +82,22 @@ describe('ImportAnnotationsService', () => {
       assert.calledWith(fakeAnnotationsService.save, {
         $tag: 'dummy',
         ...ann,
+      });
+    });
+
+    it('overwrites annotation URI with current document one', async () => {
+      const newUri = 'new_document_uri';
+      fakeStore.mainFrame.returns({ uri: newUri });
+
+      const svc = createService();
+      const ann = generateAnnotation();
+
+      await svc.import([ann]);
+
+      assert.calledWith(fakeAnnotationsService.save, {
+        $tag: 'dummy',
+        ...ann,
+        uri: newUri,
       });
     });
 
