@@ -13,7 +13,7 @@ describe('ImportAnnotationsService', () => {
       allAnnotations: sinon.stub().returns([]),
       beginImport: sinon.stub(),
       completeImport: sinon.stub(),
-      mainFrame: sinon.stub(),
+      mainFrame: sinon.stub().returns(null),
     };
 
     fakeToastMessenger = {
@@ -59,13 +59,13 @@ describe('ImportAnnotationsService', () => {
   }
 
   /** Return the expected imported annotation for a given annotation. */
-  function importedAnnotation(ann) {
+  function importedAnnotation(ann, uri = undefined, document = undefined) {
     return {
-      document: ann.document,
+      document: document ?? ann.document,
       tags: ann.tags,
       target: ann.target,
       text: ann.text,
-      uri: ann.uri,
+      uri: uri ?? ann.uri,
       extra: {
         source: 'import',
         original_id: ann.id,
@@ -101,9 +101,13 @@ describe('ImportAnnotationsService', () => {
       });
     });
 
-    it('overwrites annotation URI with current document one', async () => {
+    it('sets annotation URI and document metadata to match current document', async () => {
       const newUri = 'new_document_uri';
-      fakeStore.mainFrame.returns({ uri: newUri });
+      const newTitle = 'new_document_title';
+      fakeStore.mainFrame.returns({
+        uri: newUri,
+        metadata: { title: newTitle },
+      });
 
       const svc = createService();
       const ann = generateAnnotation();
@@ -112,8 +116,7 @@ describe('ImportAnnotationsService', () => {
 
       assert.calledWith(fakeAnnotationsService.save, {
         $tag: 'dummy',
-        ...importedAnnotation(ann),
-        uri: newUri,
+        ...importedAnnotation(ann, newUri, { title: newTitle }),
       });
     });
 
