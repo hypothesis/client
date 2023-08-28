@@ -1,6 +1,7 @@
 import type { Annotation, APIAnnotationData } from '../../types/api';
 import { quote } from '../helpers/annotation-metadata';
 import type { SidebarStore } from '../store';
+import type { Frame } from '../store/modules/frames';
 import type { AnnotationsService } from './annotations';
 import type { ToastMessengerService } from './toast-messenger';
 
@@ -35,15 +36,19 @@ type ImportData = Pick<
 
 /**
  * Return a copy of `ann` that contains only fields which can be preserved by
- * an import performed on the client.
+ * an import performed on the client, overwriting some of them with the ones
+ * from current frame, if provided
  */
-function getImportData(ann: APIAnnotationData, uri?: string): ImportData {
+function getImportData(
+  ann: APIAnnotationData,
+  currentFrame: Frame | null,
+): ImportData {
   return {
     target: ann.target,
     tags: ann.tags,
     text: ann.text,
-    uri: uri ?? ann.uri,
-    document: ann.document,
+    uri: currentFrame?.uri ?? ann.uri,
+    document: currentFrame?.metadata ?? ann.document,
     extra: {
       source: 'import',
       original_id: ann.id,
@@ -150,7 +155,7 @@ export class ImportAnnotationsService {
     this._store.beginImport(anns.length);
 
     const existingAnns = this._store.allAnnotations();
-    const currentUri = this._store.mainFrame()?.uri;
+    const currentFrame = this._store.mainFrame();
 
     const importAnn = async (ann: APIAnnotationData): Promise<ImportResult> => {
       const existingAnn = existingAnns.find(ex => duplicateMatch(ann, ex));
@@ -161,7 +166,7 @@ export class ImportAnnotationsService {
       try {
         // Strip out all the fields that are ignored in an import, and overwrite
         // the URI with current document's URI.
-        const importData = getImportData(ann, currentUri);
+        const importData = getImportData(ann, currentFrame);
 
         // Fill out the annotation with default values for the current user and
         // group.
