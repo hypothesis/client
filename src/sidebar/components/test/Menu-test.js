@@ -52,6 +52,12 @@ describe('Menu', () => {
     assert.isFalse(isOpen(wrapper));
   });
 
+  it('disables menu if `disabled` prop is true', () => {
+    const wrapper = createMenu({ disabled: true });
+    const toggle = wrapper.find(toggleSelector);
+    assert.isTrue(toggle.prop('disabled'));
+  });
+
   it('leaves the management of open/closed state to parent component if `open` prop present', () => {
     // When `open` is present, `Menu` will invoke `onOpenChanged` on interactions
     // but will not modify the its open state directly.

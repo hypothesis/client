@@ -51,6 +51,8 @@ export type MenuProps = {
    */
   defaultOpen?: boolean;
 
+  disabled?: boolean;
+
   /** Whether to render an (arrow) indicator next to the Menu label */
   menuIndicator?: boolean;
 
@@ -98,6 +100,7 @@ export default function Menu({
   containerPositioned = true,
   contentClass,
   defaultOpen = false,
+  disabled = false,
   label,
   open,
   onOpenChanged,
@@ -201,6 +204,7 @@ export default function Menu({
           },
         )}
         data-testid="menu-toggle-button"
+        disabled={disabled}
         onMouseDown={toggleMenu}
         onClick={toggleMenu}
         aria-label={title}
