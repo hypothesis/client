@@ -42,8 +42,14 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
 
   const isSelectableProfile =
     !isThirdParty || serviceSupports('onProfileRequestProvided');
-  const isLogoutEnabled =
+
+  // Is logging out generally possible for the current user?
+  const logoutAvailable =
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
+
+  // Is logging out possible right now?
+  const logoutDisabled = store.importsPending() > 0;
+
   const isProfileEnabled = store.isFeatureEnabled('client_user_profile');
 
   const onSelectNotebook = () => {
@@ -104,9 +110,13 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
           )}
           <MenuItem label="Open notebook" onClick={() => onSelectNotebook()} />
         </MenuSection>
-        {isLogoutEnabled && (
+        {logoutAvailable && (
           <MenuSection>
-            <MenuItem label="Log out" onClick={onLogout} />
+            <MenuItem
+              isDisabled={logoutDisabled}
+              label="Log out"
+              onClick={onLogout}
+            />
           </MenuSection>
         )}
       </Menu>
