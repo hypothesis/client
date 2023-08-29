@@ -1,5 +1,10 @@
 import type { Annotation, APIAnnotationData } from '../../types/api';
 import { quote } from '../helpers/annotation-metadata';
+import {
+  isShared,
+  privatePermissions,
+  sharedPermissions,
+} from '../helpers/permissions';
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
 import type { AnnotationsService } from './annotations';
@@ -154,6 +159,15 @@ export class ImportAnnotationsService {
   async import(anns: APIAnnotationData[]): Promise<ImportResult[]> {
     this._store.beginImport(anns.length);
 
+    const currentUser = this._store.profile().userid;
+    if (!currentUser) {
+      throw new Error('Cannot import when logged out');
+    }
+    const currentGroup = this._store.focusedGroupId();
+    if (!currentGroup) {
+      throw new Error('Cannot import when no group is selected');
+    }
+
     const existingAnns = this._store.allAnnotations();
     const currentFrame = this._store.mainFrame();
 
@@ -172,6 +186,13 @@ export class ImportAnnotationsService {
         // group.
         const saveData =
           this._annotationsService.annotationFromData(importData);
+
+        // Preserve shared / private status from existing annotation. We map
+        // the existing permissions to a shared/not-shared boolean and
+        // regenerate permissions, since the current user/group may differ.
+        saveData.permissions = isShared(ann.permissions)
+          ? sharedPermissions(currentUser, currentGroup)
+          : privatePermissions(currentUser);
 
         // Persist the annotation.
         const saved = await this._annotationsService.save(saveData);
