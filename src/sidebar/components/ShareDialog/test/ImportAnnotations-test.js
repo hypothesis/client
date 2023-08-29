@@ -17,10 +17,14 @@ describe('ImportAnnotations', () => {
     };
 
     fakeStore = {
-      profile: sinon.stub().returns({ userid: 'acct:john@example.com' }),
       defaultAuthority: sinon.stub().returns('example.com'),
-      isFeatureEnabled: sinon.stub().returns(true),
+      focusedGroup: sinon.stub().returns({ id: 'group-1' }),
       importsPending: sinon.stub().returns(0),
+      isFeatureEnabled: sinon.stub().returns(true),
+      hasFetchedAnnotations: sinon.stub().returns(true),
+      isFetchingAnnotations: sinon.stub().returns(false),
+      mainFrame: sinon.stub().returns({}),
+      profile: sinon.stub().returns({ userid: 'acct:john@example.com' }),
     };
 
     $imports.$mock({
@@ -42,13 +46,6 @@ describe('ImportAnnotations', () => {
     );
   }
 
-  it('shows a notice if the user is not logged in', () => {
-    fakeStore.profile.returns({ userid: null });
-    const wrapper = createImportAnnotations();
-    assert.isTrue(wrapper.exists('[data-testid="log-in-message"]'));
-    assert.isFalse(wrapper.exists('input[type="file"]'));
-  });
-
   function getImportButton(wrapper) {
     return wrapper.find('button[data-testid="import-button"]');
   }
@@ -69,9 +66,59 @@ describe('ImportAnnotations', () => {
     fileInput.simulate('change');
   }
 
+  function importDisabled(wrapper) {
+    return Boolean(getImportButton(wrapper).prop('disabled'));
+  }
+
+  it('shows a notice if the user is not logged in', () => {
+    fakeStore.profile.returns({ userid: null });
+    const wrapper = createImportAnnotations();
+    assert.isTrue(wrapper.exists('[data-testid="log-in-message"]'));
+    assert.isFalse(wrapper.exists('input[type="file"]'));
+  });
+
+  it('disables import button if group, document or annotations are not loaded', async () => {
+    fakeStore.mainFrame.returns(null); // Document metadata not available
+    fakeStore.focusedGroup.returns(null); // No group set
+    fakeStore.hasFetchedAnnotations.returns(false); // Annotations still loading
+    fakeStore.isFetchingAnnotations.returns(true);
+
+    // Select annotations to import.
+    const wrapper = createImportAnnotations();
+    const annotations = [
+      {
+        user: 'acct:john@example.com',
+        user_info: {
+          display_name: 'John Smith',
+        },
+        text: 'Test annotation',
+      },
+    ];
+    selectFile(wrapper, annotations);
+    const userList = await waitForElement(wrapper, 'select');
+    assert.ok(userList.getDOMNode().value); // Current user should be auto-selected
+
+    // Import button should be disabled since we don't have the things we need
+    // to perform the import.
+    assert.isTrue(importDisabled(wrapper));
+
+    fakeStore.mainFrame.returns({}); // Document metadata available
+    wrapper.setProps({});
+    assert.isTrue(importDisabled(wrapper));
+
+    fakeStore.focusedGroup.returns({ id: 'group-1' }); // Group selected
+    wrapper.setProps({});
+    assert.isTrue(importDisabled(wrapper));
+
+    fakeStore.hasFetchedAnnotations.returns(true); // Annotation loading finishes
+    fakeStore.isFetchingAnnotations.returns(false);
+    wrapper.setProps({});
+    assert.isFalse(importDisabled(wrapper)); // Finally, we can start an import
+  });
+
   it('disables "Import" button when no file is selected', () => {
     const wrapper = createImportAnnotations();
-    assert.isTrue(getImportButton(wrapper).prop('disabled'));
+    assert.isTrue(importDisabled(wrapper));
   });
 
   [
