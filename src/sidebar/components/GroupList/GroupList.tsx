@@ -40,6 +40,9 @@ function GroupList({ settings }: GroupListProps) {
   const focusedGroup = store.focusedGroup();
   const userid = store.profile().userid;
 
+  // Prevent changing groups during an import
+  const disabled = store.importsPending() > 0;
+
   const myGroupsSorted = useMemo(
     () => groupsByOrganization(myGroups),
     [myGroups],
@@ -117,6 +120,7 @@ function GroupList({ settings }: GroupListProps) {
     <Menu
       align="left"
       contentClass="min-w-[250px]"
+      disabled={disabled}
       label={label}
       onOpenChanged={() => setExpandedGroup(null)}
       title={menuTitle}

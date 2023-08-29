@@ -48,6 +48,7 @@ describe('UserMenu', () => {
       focusedGroupId: sinon.stub().returns('mygroup'),
       getLink: sinon.stub(),
       profile: sinon.stub().returns(fakeProfile),
+      importsPending: sinon.stub().returns(0),
       isFeatureEnabled: fakeIsFeatureEnabled,
     };
 
@@ -296,6 +297,20 @@ describe('UserMenu', () => {
   });
 
   describe('log out menu item', () => {
+    it('is disabled if an import is in progress', () => {
+      fakeStore.importsPending.returns(1);
+      const wrapper = createUserMenu();
+
+      let logOutMenuItem = findMenuItem(wrapper, 'Log out');
+      assert.isTrue(logOutMenuItem.prop('isDisabled'));
+
+      fakeStore.importsPending.returns(0);
+      wrapper.setProps({});
+
+      logOutMenuItem = findMenuItem(wrapper, 'Log out');
+      assert.isFalse(logOutMenuItem.prop('isDisabled'));
+    });
+
     const tests = [
       {
         it: 'should be present for first-party user if no service configured',

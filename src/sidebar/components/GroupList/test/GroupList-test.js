@@ -50,6 +50,7 @@ describe('GroupList', () => {
       getLink: sinon.stub().returns(''),
       getMyGroups: sinon.stub().returns([]),
       focusedGroup: sinon.stub().returns(testGroup),
+      importsPending: sinon.stub().returns(0),
       profile: sinon.stub().returns({ userid: null }),
     };
     fakeServiceConfig = sinon.stub().returns(null);
@@ -70,6 +71,13 @@ describe('GroupList', () => {
     const menu = wrapper.find('Menu');
 
     assert.equal(menu.props().title, 'Select group (now viewing: Test group)');
+  });
+
+  it('disables menu if imports are in progress', () => {
+    fakeStore.importsPending.returns(1);
+    const wrapper = createGroupList();
+    const menu = wrapper.find('Menu');
+    assert.isTrue(menu.prop('disabled'));
   });
 
   it('adds descriptive label text if no currently-focused group', () => {
