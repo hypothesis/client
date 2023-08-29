@@ -1,3 +1,7 @@
+import {
+  privatePermissions,
+  sharedPermissions,
+} from '../../helpers/permissions';
 import { ImportAnnotationsService } from '../import-annotations';
 
 describe('ImportAnnotationsService', () => {
@@ -13,7 +17,11 @@ describe('ImportAnnotationsService', () => {
       allAnnotations: sinon.stub().returns([]),
       beginImport: sinon.stub(),
       completeImport: sinon.stub(),
+      focusedGroupId: sinon.stub().returns('group-a'),
       mainFrame: sinon.stub().returns(null),
+      profile: sinon.stub().returns({
+        userid: 'acct:foo@example.org',
+      }),
     };
 
     fakeToastMessenger = {
@@ -54,6 +62,14 @@ describe('ImportAnnotationsService', () => {
       text: `Annotation ${counter}`,
       tags: ['foo'],
       document: { title: 'Example' },
+      permissions: sharedPermissions(
+        fakeStore.profile().userid,
+
+        // nb. We intentionally use a different group ID here than the current
+        // "focused" group in the store. The shared-ness will be preserved, but
+        // not the group ID.
+        'some-other-group',
+      ),
       ...fields,
     };
   }
@@ -70,6 +86,10 @@ describe('ImportAnnotationsService', () => {
         source: 'import',
         original_id: ann.id,
       },
+      permissions: sharedPermissions(
+        fakeStore.profile().userid,
+        fakeStore.focusedGroupId(),
+      ),
     };
   }
 
@@ -98,6 +118,21 @@ describe('ImportAnnotationsService', () => {
       assert.calledWith(fakeAnnotationsService.save, {
         $tag: 'dummy',
         ...importedAnnotation(ann),
+      });
+    });
+
+    it('preserves the private status of private annotations', async () => {
+      const originalUser = 'acct:original@example.com';
+      const svc = createService();
+      const ann = generateAnnotation();
+      ann.permissions = privatePermissions(originalUser);
+
+      await svc.import([ann]);
+
+      assert.calledWith(fakeAnnotationsService.save, {
+        $tag: 'dummy',
+        ...importedAnnotation(ann),
+        permissions: privatePermissions(fakeStore.profile().userid),
       });
     });
 
@@ -189,6 +224,36 @@ describe('ImportAnnotationsService', () => {
       await svc.import([generateAnnotation(), generateAnnotation()]);
 
       assert.calledWith(fakeToastMessenger.error, '2 imports failed');
+    });
+
+    it('throws an error if called when user is logged out', async () => {
+      const svc = createService();
+      fakeStore.profile.returns({ userid: null });
+
+      let error;
+      try {
+        await svc.import([generateAnnotation()]);
+      } catch (err) {
+        error = err;
+      }
+
+      assert.instanceOf(error, Error);
+      assert.equal(error.message, 'Cannot import when logged out');
+    });
+
+    it('throws an error if called when no group is selected', async () => {
+      const svc = createService();
+      fakeStore.focusedGroupId.returns(null);
+
+      let error;
+      try {
+        await svc.import([generateAnnotation()]);
+      } catch (err) {
+        error = err;
+      }
+
+      assert.instanceOf(error, Error);
+      assert.equal(error.message, 'Cannot import when no group is selected');
     });
   });
 });
