@@ -87,8 +87,6 @@ function ImportAnnotations({
     [annotations, getDisplayName],
   );
 
-  const importsPending = store.importsPending();
-
   // Parse input file, extract annotations and update the user list.
   useEffect(() => {
     if (!currentUser || !file) {
@@ -135,11 +133,27 @@ function ImportAnnotations({
     );
   }
 
+  // In order to perform an import, we need:
+  //
+  //  1. A group to import into
+  //  2. A frame from which to get the document URI and metadata
+  //  3. Existing annotations for the group loaded so we can de-duplicate against
+  //     them
+  //  4. A file to import from and a selection of what to import
+  //     (`importAnnotations` will be falsey if this is not the case).
+  const importReady = Boolean(
+    store.focusedGroup() &&
+      store.mainFrame() &&
+      store.hasFetchedAnnotations() &&
+      !store.isFetchingAnnotations() &&
+      importAnnotations,
+  );
+
   // True if we're validating a JSON file after it has been selected.
   const parseInProgress = file && !annotations && !error;
 
   // True if we're validating or importing.
-  const busy = parseInProgress || importsPending > 0;
+  const busy = parseInProgress || store.importsPending() > 0;
 
   return (
     <>
@@ -183,7 +197,7 @@ function ImportAnnotations({
       <CardActions>
         <Button
           data-testid="import-button"
-          disabled={!importAnnotations || busy}
+          disabled={!importReady || busy}
           onClick={importAnnotations}
           variant="primary"
         >
