@@ -18,7 +18,7 @@ describe('ImportAnnotationsService', () => {
       beginImport: sinon.stub(),
       completeImport: sinon.stub(),
       focusedGroupId: sinon.stub().returns('group-a'),
-      mainFrame: sinon.stub().returns(null),
+      defaultContentFrame: sinon.stub().returns(null),
       profile: sinon.stub().returns({
         userid: 'acct:foo@example.org',
       }),
@@ -139,7 +139,7 @@ describe('ImportAnnotationsService', () => {
     it('sets annotation URI and document metadata to match current document', async () => {
       const newUri = 'new_document_uri';
       const newTitle = 'new_document_title';
-      fakeStore.mainFrame.returns({
+      fakeStore.defaultContentFrame.returns({
         uri: newUri,
         metadata: { title: newTitle },
       });
