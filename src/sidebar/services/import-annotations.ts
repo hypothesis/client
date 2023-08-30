@@ -35,6 +35,17 @@ type ImportData = Pick<
   ImportExtra;
 
 /**
+ * Enum of the result of an import operation for a single annotation.
+ */
+export type ImportResult =
+  /** Annotation was successfully imported. */
+  | { type: 'import'; annotation: Annotation }
+  /** Annotation was skipped because it is a duplicate. */
+  | { type: 'duplicate'; annotation: Annotation }
+  /** Annotation import failed. */
+  | { type: 'error'; error: Error };
+
+/**
  * Return a copy of `ann` that contains only fields which can be preserved by
  * an import performed on the client, overwriting some of them with the ones
  * from current frame, if provided
@@ -65,8 +76,17 @@ function importStatus(results: ImportResult[]): {
   messageType: 'success' | 'notice' | 'error';
   message: string;
 } {
-  const errorCount = results.filter(r => r.type === 'error').length;
-  const errorMessage = errorCount > 0 ? `${errorCount} imports failed` : '';
+  // In the event of an error we include the message of the first error as a
+  // debugging aid. Ideally this would be presented separately from the main
+  // message in a notification, but our toast message component doesn't
+  // currently support that.
+  const errors = results.filter(r => r.type === 'error') as Array<
+    Extract<ImportResult, { type: 'error' }>
+  >;
+  const errorMessage =
+    errors.length > 0
+      ? `${errors.length} imports failed (${errors[0].error.message})`
+      : '';
 
   const importCount = results.filter(r => r.type === 'import').length;
   const importMessage =
@@ -76,7 +96,7 @@ function importStatus(results: ImportResult[]): {
   const dupMessage = dupCount > 0 ? `${dupCount} duplicates skipped` : '';
 
   let messageType: 'success' | 'notice' | 'error';
-  if (errorCount === 0) {
+  if (errors.length === 0) {
     if (importCount > 0) {
       messageType = 'success';
     } else {
@@ -112,17 +132,6 @@ function duplicateMatch(a: APIAnnotationData, b: APIAnnotationData): boolean {
   }
   return quote(a) === quote(b);
 }
-
-/**
- * Enum of the result of an import operation for a single annotation.
- */
-export type ImportResult =
-  /** Annotation was successfully imported. */
-  | { type: 'import'; annotation: Annotation }
-  /** Annotation was skipped because it is a duplicate. */
-  | { type: 'duplicate'; annotation: Annotation }
-  /** Annotation import failed. */
-  | { type: 'error'; error: Error };
 
 /**
  * Imports annotations from a Hypothesis JSON file.
@@ -216,9 +225,13 @@ export class ImportAnnotationsService {
     if (messageType === 'success') {
       this._toastMessenger.success(message);
     } else if (messageType === 'notice') {
-      this._toastMessenger.notice(message);
+      this._toastMessenger.notice(message, {
+        autoDismiss: false,
+      });
     } else if (messageType === 'error') {
-      this._toastMessenger.error(message);
+      this._toastMessenger.error(message, {
+        autoDismiss: false,
+      });
     }
 
     return results;

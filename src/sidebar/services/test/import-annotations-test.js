@@ -178,7 +178,7 @@ describe('ImportAnnotationsService', () => {
 
       assert.calledWith(
         fakeToastMessenger.notice,
-        '1 annotations imported, 1 imports failed',
+        '1 annotations imported, 1 imports failed (Oh no)',
       );
     });
 
@@ -188,7 +188,10 @@ describe('ImportAnnotationsService', () => {
 
       await svc.import([generateAnnotation(), generateAnnotation()]);
 
-      assert.calledWith(fakeToastMessenger.error, '2 imports failed');
+      assert.calledWith(
+        fakeToastMessenger.error,
+        '2 imports failed (Something went wrong)',
+      );
     });
   });
 });
