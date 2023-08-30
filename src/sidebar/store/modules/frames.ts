@@ -132,6 +132,9 @@ function frames(state: State) {
   return state.frames;
 }
 
+const firstFrameWithoutId = (frames: Frame[]) =>
+  frames.find(f => !f.id) || null;
+
 /**
  * Return the "main" frame that the sidebar is connected to.
  *
@@ -147,7 +150,20 @@ const mainFrame = createSelector(
 
   // Sub-frames will all have a "frame identifier" set. The main frame is the
   // one with a `null` id.
-  frames => frames.find(f => !f.id) || null,
+  firstFrameWithoutId,
+);
+
+/**
+ * Return the default frame that annotations are assumed to be associated with,
+ * if they can't be matched to a more specific frame.
+ *
+ * For most document types this is the same as ({@see mainFrame}), but for
+ * eg. VitalSource books there is no main frame, but instead only a frame with
+ * the current chapter content.
+ */
+const defaultContentFrame = createSelector(
+  (state: State) => state.frames,
+  frames => firstFrameWithoutId(frames) ?? frames[0] ?? null,
 );
 
 function searchUrisForFrame(frame: Frame): string[] {
@@ -208,6 +224,7 @@ export const framesModule = createStoreModule(initialState, {
     getContentInfo,
     frames,
     mainFrame,
+    defaultContentFrame,
     searchUris,
   },
 });

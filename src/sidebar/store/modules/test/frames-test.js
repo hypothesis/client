@@ -108,6 +108,39 @@ describe('sidebar/store/modules/frames', () => {
     });
   });
 
+  describe('#defaultContentFrame', () => {
+    it('returns `null` if no frames are connected', () => {
+      assert.isNull(store.defaultContentFrame());
+    });
+
+    [
+      {
+        frames: [{ id: null, uri: 'https://example.org' }],
+        expectedFrame: 0,
+      },
+      {
+        frames: [
+          { id: 'iframe1', uri: 'https://foo.com/' },
+          { id: 'iframe2', uri: 'https://foo.com/' },
+          { id: null, uri: 'https://example.org' },
+        ],
+        expectedFrame: 2,
+      },
+      {
+        frames: [
+          { id: 'iframe1', uri: 'https://foo.com/' },
+          { id: 'iframe2', uri: 'https://example.org' },
+        ],
+        expectedFrame: 0,
+      },
+    ].forEach(({ frames, expectedFrame }) => {
+      it('returns the main frame or first connected frame', () => {
+        frames.forEach(frame => store.connectFrame(frame));
+        assert.equal(store.defaultContentFrame(), frames[expectedFrame]);
+      });
+    });
+  });
+
   describe('#searchUris', () => {
     [
       {

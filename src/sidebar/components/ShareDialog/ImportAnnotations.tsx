@@ -143,7 +143,7 @@ function ImportAnnotations({
   //     (`importAnnotations` will be falsey if this is not the case).
   const importReady = Boolean(
     store.focusedGroup() &&
-      store.mainFrame() &&
+      store.defaultContentFrame() &&
       store.hasFetchedAnnotations() &&
       !store.isFetchingAnnotations() &&
       importAnnotations,

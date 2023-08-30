@@ -178,7 +178,7 @@ export class ImportAnnotationsService {
     }
 
     const existingAnns = this._store.allAnnotations();
-    const currentFrame = this._store.mainFrame();
+    const currentFrame = this._store.defaultContentFrame();
 
     const importAnn = async (ann: APIAnnotationData): Promise<ImportResult> => {
       const existingAnn = existingAnns.find(ex => duplicateMatch(ann, ex));

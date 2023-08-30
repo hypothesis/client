@@ -23,7 +23,7 @@ describe('ImportAnnotations', () => {
       isFeatureEnabled: sinon.stub().returns(true),
       hasFetchedAnnotations: sinon.stub().returns(true),
       isFetchingAnnotations: sinon.stub().returns(false),
-      mainFrame: sinon.stub().returns({}),
+      defaultContentFrame: sinon.stub().returns({}),
       profile: sinon.stub().returns({ userid: 'acct:john@example.com' }),
     };
 
@@ -78,7 +78,7 @@ describe('ImportAnnotations', () => {
   });
 
   it('disables import button if group, document or annotations are not loaded', async () => {
-    fakeStore.mainFrame.returns(null); // Document metadata not available
+    fakeStore.defaultContentFrame.returns(null); // Document metadata not available
     fakeStore.focusedGroup.returns(null); // No group set
     fakeStore.hasFetchedAnnotations.returns(false); // Annotations still loading
     fakeStore.isFetchingAnnotations.returns(true);
@@ -102,7 +102,7 @@ describe('ImportAnnotations', () => {
     // to perform the import.
     assert.isTrue(importDisabled(wrapper));
 
-    fakeStore.mainFrame.returns({}); // Document metadata available
+    fakeStore.defaultContentFrame.returns({}); // Document metadata available
     wrapper.setProps({});
     assert.isTrue(importDisabled(wrapper));
 
