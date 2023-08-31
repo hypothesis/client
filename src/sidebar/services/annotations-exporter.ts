@@ -1,4 +1,4 @@
-import type { Annotation, APIAnnotationData } from '../../types/api';
+import type { APIAnnotationData } from '../../types/api';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
 import type { SidebarStore } from '../store';
@@ -23,7 +23,7 @@ export class AnnotationsExporter {
   }
 
   buildExportContent(
-    annotations: Annotation[],
+    annotations: APIAnnotationData[],
     /* istanbul ignore next - test seam */
     now = new Date(),
   ): ExportContent {

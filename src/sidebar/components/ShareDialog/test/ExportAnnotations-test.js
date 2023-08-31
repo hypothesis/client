@@ -2,6 +2,7 @@ import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
+import { waitForElement } from '../../../../test-util/wait';
 import * as fixtures from '../../../test/annotation-fixtures';
 import ExportAnnotations, { $imports } from '../ExportAnnotations';
 
@@ -35,6 +36,9 @@ describe('ExportAnnotations', () => {
     };
     fakeDownloadJSONFile = sinon.stub();
     fakeStore = {
+      defaultAuthority: sinon.stub().returns('example.com'),
+      isFeatureEnabled: sinon.stub().returns(true),
+      profile: sinon.stub().returns({ userid: 'acct:john@example.com' }),
       countDrafts: sinon.stub().returns(0),
       focusedGroup: sinon.stub().returns(fakePrivateGroup),
       isLoading: sinon.stub().returns(false),
@@ -84,39 +88,75 @@ describe('ExportAnnotations', () => {
   });
 
   [
-    {
-      annotations: [fixtures.oldAnnotation()],
-      message: 'Export 1 annotation in a file',
-    },
-    {
-      annotations: [fixtures.oldAnnotation(), fixtures.oldAnnotation()],
-      message: 'Export 2 annotations in a file',
-    },
+    // A mix of annotations and replies.
     {
       annotations: [
-        fixtures.oldAnnotation(),
-        fixtures.oldAnnotation(),
-        fixtures.oldReply(),
+        {
+          id: 'abc',
+          user: 'acct:john@example.com',
+          user_info: {
+            display_name: 'John Smith',
+          },
+          text: 'Test annotation',
+        },
+
+        {
+          id: 'def',
+          user: 'acct:brian@example.com',
+          user_info: {
+            display_name: 'Brian Smith',
+          },
+          text: 'Test annotation',
+        },
+        {
+          id: 'xyz',
+          user: 'acct:brian@example.com',
+          user_info: {
+            display_name: 'Brian Smith',
+          },
+          text: 'Test annotation',
+          references: ['abc'],
+        },
       ],
-      message: 'Export 2 annotations (and 1 reply) in a file',
+      userEntries: [
+        { value: '', text: 'All annotations (3)' }, // "No user selected" entry
+        { value: 'acct:brian@example.com', text: 'Brian Smith (2)' },
+        { value: 'acct:john@example.com', text: 'John Smith (1)' },
+      ],
     },
+
+    // A single reply.
     {
       annotations: [
-        fixtures.oldAnnotation(),
-        fixtures.oldAnnotation(),
-        fixtures.oldReply(),
-        fixtures.oldReply(),
+        {
+          id: 'xyz',
+          user: 'acct:brian@example.com',
+          user_info: {
+            display_name: 'Brian Smith',
+          },
+          text: 'Test annotation',
+          references: ['abc'],
+        },
       ],
-      message: 'Export 2 annotations (and 2 replies) in a file',
+      userEntries: [
+        { value: '', text: 'All annotations (1)' }, // "No user selected" entry
+        { value: 'acct:brian@example.com', text: 'Brian Smith (1)' },
+      ],
     },
-  ].forEach(({ annotations, message }) => {
-    it('shows a count of annotations for export', () => {
+  ].forEach(({ annotations, userEntries }) => {
+    it('displays a list with users who annotated the document', async () => {
       fakeStore.savedAnnotations.returns(annotations);
+
       const wrapper = createComponent();
-      assert.include(
-        wrapper.find('[data-testid="export-count"]').text(),
-        message,
-      );
+
+      const userList = await waitForElement(wrapper, 'Select');
+      const users = userList.find('option');
+      assert.equal(users.length, userEntries.length);
+
+      for (const [i, entry] of userEntries.entries()) {
+        assert.equal(users.at(i).prop('value'), entry.value);
+        assert.equal(users.at(i).text(), entry.text);
+      }
     });
   });
 
@@ -132,7 +172,7 @@ describe('ExportAnnotations', () => {
     const submitExportForm = wrapper =>
       wrapper.find('[data-testid="export-form"]').simulate('submit');
 
-    it('builds an export file from the non-draft annotations', () => {
+    it('builds an export file from all non-draft annotations', () => {
       const wrapper = createComponent();
       const annotationsToExport = [
         fixtures.oldAnnotation(),
@@ -148,6 +188,59 @@ describe('ExportAnnotations', () => {
         annotationsToExport,
       );
       assert.notCalled(fakeToastMessenger.error);
+    });
+
+    it('builds an export file from selected user annotations', async () => {
+      const selectedUserAnnotations = [
+        {
+          id: 'abc',
+          user: 'acct:john@example.com',
+          user_info: {
+            display_name: 'John Smith',
+          },
+          text: 'Test annotation',
+        },
+        {
+          id: 'xyz',
+          user: 'acct:john@example.com',
+          user_info: {
+            display_name: 'John Smith',
+          },
+          text: 'Test annotation',
+          references: ['def'],
+        },
+      ];
+      const allAnnotations = [
+        ...selectedUserAnnotations,
+        {
+          id: 'def',
+          user: 'acct:brian@example.com',
+          user_info: {
+            display_name: 'Brian Smith',
+          },
+          text: 'Test annotation',
+        },
+      ];
+      fakeStore.savedAnnotations.returns(allAnnotations);
+
+      const wrapper = createComponent();
+
+      // Select the user whose annotations we want to export
+      const userList = await waitForElement(wrapper, 'Select');
+      userList.prop('onChange')({
+        target: {
+          value: 'acct:john@example.com',
+        },
+      });
+      wrapper.update();
+
+      submitExportForm(wrapper);
+
+      assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
+      assert.calledWith(
+        fakeAnnotationsExporter.buildExportContent,
+        selectedUserAnnotations,
+      );
     });
 
     it('downloads a file using user-entered filename appended with `.json`', () => {

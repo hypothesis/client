@@ -1,8 +1,15 @@
-import { Button, CardActions, Input } from '@hypothesis/frontend-shared';
-import { useMemo, useState } from 'preact/hooks';
+import {
+  Button,
+  CardActions,
+  Input,
+  Select,
+} from '@hypothesis/frontend-shared';
+import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import { downloadJSONFile } from '../../../shared/download-json-file';
-import { isReply } from '../../helpers/annotation-metadata';
+import type { APIAnnotationData } from '../../../types/api';
+import { annotationDisplayName } from '../../helpers/annotation-user';
+import { annotationsByUser } from '../../helpers/annotations-by-user';
 import { withServices } from '../../service-context';
 import type { AnnotationsExporter } from '../../services/annotations-exporter';
 import type { ToastMessengerService } from '../../services/toast-messenger';
@@ -29,11 +36,22 @@ function ExportAnnotations({
   const exportReady = group && !store.isLoading();
 
   const exportableAnnotations = store.savedAnnotations();
-  const replyCount = useMemo(
-    () => exportableAnnotations.filter(ann => isReply(ann)).length,
-    [exportableAnnotations],
+  const defaultAuthority = store.defaultAuthority();
+  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
+  const getDisplayName = useCallback(
+    (ann: APIAnnotationData) =>
+      annotationDisplayName(ann, defaultAuthority, displayNamesEnabled),
+    [defaultAuthority, displayNamesEnabled],
   );
-  const nonReplyCount = exportableAnnotations.length - replyCount;
+  const userList = useMemo(
+    () =>
+      annotationsByUser({ annotations: exportableAnnotations, getDisplayName }),
+    [exportableAnnotations, getDisplayName],
+  );
+
+  // User whose annotations are going to be exported. Preselect current user
+  const currentUser = store.profile().userid;
+  const [selectedUser, setSelectedUser] = useState(currentUser);
 
   const draftCount = store.countDrafts();
 
@@ -51,10 +69,12 @@ function ExportAnnotations({
     e.preventDefault();
 
     try {
+      const annotationsToExport =
+        userList.find(item => item.userid === selectedUser)?.annotations ??
+        exportableAnnotations;
       const filename = `${customFilename ?? defaultFilename}.json`;
-      const exportData = annotationsExporter.buildExportContent(
-        exportableAnnotations,
-      );
+      const exportData =
+        annotationsExporter.buildExportContent(annotationsToExport);
       downloadJSONFile(exportData, filename);
     } catch (e) {
       toastMessenger.error('Exporting annotations failed');
@@ -75,19 +95,7 @@ function ExportAnnotations({
       {exportableAnnotations.length > 0 ? (
         <>
           <label data-testid="export-count" htmlFor="export-filename">
-            Export{' '}
-            <strong>
-              {nonReplyCount}{' '}
-              {pluralize(nonReplyCount, 'annotation', 'annotations')}
-            </strong>{' '}
-            {replyCount > 0
-              ? `(and ${replyCount} ${pluralize(
-                  replyCount,
-                  'reply',
-                  'replies',
-                )}) `
-              : ''}
-            in a file named:
+            Name of export file:
           </label>
           <Input
             data-testid="export-filename"
@@ -100,6 +108,28 @@ function ExportAnnotations({
             required
             maxLength={250}
           />
+          <label htmlFor="export-user" className="block">
+            Select which user{"'"}s annotations to export:
+          </label>
+          <Select
+            id="export-user"
+            onChange={e =>
+              setSelectedUser((e.target as HTMLSelectElement).value || null)
+            }
+          >
+            <option value="" selected={!selectedUser}>
+              All annotations ({exportableAnnotations.length})
+            </option>
+            {userList.map(userInfo => (
+              <option
+                key={userInfo.userid}
+                value={userInfo.userid}
+                selected={userInfo.userid === selectedUser}
+              >
+                {userInfo.displayName} ({userInfo.annotations.length})
+              </option>
+            ))}
+          </Select>
         </>
       ) : (
         <p data-testid="no-annotations-message">
