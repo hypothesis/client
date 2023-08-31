@@ -121,11 +121,25 @@ export function init(config: SentryConfig) {
 
   // Catch errors occuring in Hypothesis-related code in the host frame.
   removeFrameErrorHandler = handleErrorsInFrames((err, context) => {
-    Sentry.captureException(err, {
-      tags: {
-        context,
-      },
-    });
+    captureException(err, context);
+  });
+}
+
+/**
+ * Forward an error to Sentry.
+ *
+ * This can be used to report errors to Sentry even if they have been caught
+ * and handled by the application (eg. by presenting an error to the user).
+ *
+ * @param err - The error that occurred
+ * @param context - A string identifying the context in which the error
+ *   occurred. This is attached to the Sentry report as a tag.
+ */
+export function captureException(err: unknown, context: string) {
+  Sentry.captureException(err, {
+    tags: {
+      context,
+    },
   });
 }
 
