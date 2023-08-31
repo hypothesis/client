@@ -10,11 +10,11 @@ import { downloadJSONFile } from '../../../shared/download-json-file';
 import type { APIAnnotationData } from '../../../types/api';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import { annotationsByUser } from '../../helpers/annotations-by-user';
+import { suggestedFilename } from '../../helpers/export-annotations';
 import { withServices } from '../../service-context';
 import type { AnnotationsExporter } from '../../services/annotations-exporter';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
-import { suggestedFilename } from '../../util/export-annotations';
 import LoadingSpinner from './LoadingSpinner';
 
 export type ExportAnnotationsProps = {
@@ -34,6 +34,7 @@ function ExportAnnotations({
   const store = useSidebarStore();
   const group = store.focusedGroup();
   const exportReady = group && !store.isLoading();
+  const contentFrame = store.defaultContentFrame();
 
   const exportableAnnotations = store.savedAnnotations();
   const defaultAuthority = store.defaultAuthority();
@@ -56,8 +57,12 @@ function ExportAnnotations({
   const draftCount = store.countDrafts();
 
   const defaultFilename = useMemo(
-    () => suggestedFilename({ groupName: group?.name }),
-    [group],
+    () =>
+      suggestedFilename({
+        documentMetadata: contentFrame.metadata,
+        groupName: group?.name,
+      }),
+    [contentFrame, group],
   );
   const [customFilename, setCustomFilename] = useState<string>();
 

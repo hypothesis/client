@@ -11,6 +11,7 @@ describe('ExportAnnotations', () => {
   let fakeAnnotationsExporter;
   let fakeToastMessenger;
   let fakeDownloadJSONFile;
+  let fakeSuggestedFilename;
 
   const fakePrivateGroup = {
     type: 'private',
@@ -40,12 +41,16 @@ describe('ExportAnnotations', () => {
       isFeatureEnabled: sinon.stub().returns(true),
       profile: sinon.stub().returns({ userid: 'acct:john@example.com' }),
       countDrafts: sinon.stub().returns(0),
+      defaultContentFrame: sinon.stub().returns({
+        metadata: { title: 'Example document' },
+      }),
       focusedGroup: sinon.stub().returns(fakePrivateGroup),
       isLoading: sinon.stub().returns(false),
       savedAnnotations: sinon
         .stub()
         .returns([fixtures.oldAnnotation(), fixtures.oldAnnotation()]),
     };
+    fakeSuggestedFilename = sinon.stub().returns('suggested-filename');
 
     $imports.$mock(mockImportedComponents());
 
@@ -53,10 +58,10 @@ describe('ExportAnnotations', () => {
       '../../../shared/download-json-file': {
         downloadJSONFile: fakeDownloadJSONFile,
       },
-      '../../store': { useSidebarStore: () => fakeStore },
-      '../../util/export-annotations': {
-        suggestedFilename: () => 'suggested-filename',
+      '../../helpers/export-annotations': {
+        suggestedFilename: fakeSuggestedFilename,
       },
+      '../../store': { useSidebarStore: () => fakeStore },
     });
 
     // Restore this very simple component to get it test coverage
@@ -163,8 +168,12 @@ describe('ExportAnnotations', () => {
   it('provides a filename field with a default suggested name', () => {
     const wrapper = createComponent();
     const input = wrapper.find('Input');
-
     assert.isTrue(input.exists());
+
+    assert.calledWith(fakeSuggestedFilename, {
+      groupName: fakeStore.focusedGroup().name,
+      documentMetadata: fakeStore.defaultContentFrame().metadata,
+    });
     assert.equal(input.prop('defaultValue'), 'suggested-filename');
   });
 
