@@ -34,6 +34,15 @@ describe('suggestedFilename', () => {
       },
       expectedResult: '2020-11-05-Example domain-My-group-name',
     },
+    // Long title
+    {
+      date: new Date(2020, 10, 5),
+      groupName: 'My group name',
+      documentMetadata: {
+        title: 'a'.repeat(60),
+      },
+      expectedResult: `2020-11-05-${'a'.repeat(50)}-My-group-name`,
+    },
   ].forEach(({ date, documentMetadata, groupName, expectedResult }) => {
     it('builds expected filename for provided arguments', () => {
       assert.equal(

@@ -1,4 +1,5 @@
 import type { DocumentMetadata } from '../../types/annotator';
+import { truncate } from '../util/unicode';
 
 /** Format a date as an ISO `YYYY-MM-DD` string. */
 export function formatDate(date: Date): string {
@@ -37,7 +38,7 @@ export function suggestedFilename({
   const filenameSegments = [formatDate(date)];
 
   if (documentMetadata?.title) {
-    filenameSegments.push(documentMetadata.title);
+    filenameSegments.push(truncate(documentMetadata.title, 50));
   } else {
     filenameSegments.push('Hypothesis');
   }

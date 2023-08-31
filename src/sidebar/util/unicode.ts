@@ -17,3 +17,17 @@ export function fold(str: string): string {
 export function normalize(str: string): string {
   return str.normalize('NFKD');
 }
+
+/**
+ * Truncate a string to `maxLength` code points.
+ *
+ * Note this is different from `str.slice(0, maxLength)` which slices UTF-16
+ * code units.
+ */
+export function truncate(str: string, maxLength: number) {
+  const chars = Array.from(str);
+  if (chars.length <= maxLength) {
+    return str;
+  }
+  return chars.slice(0, maxLength).join('');
+}

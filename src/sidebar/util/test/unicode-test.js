@@ -52,4 +52,32 @@ describe('sidebar/util/unicode', () => {
       assert.equal(decoded, expected);
     });
   });
+
+  describe('truncate', () => {
+    [
+      // ASCII, not truncated
+      {
+        input: 'foobar',
+        length: 10,
+        expected: 'foobar',
+      },
+      // ASCII, truncated
+      {
+        input: 'foobar',
+        length: 3,
+        expected: 'foo',
+      },
+      // Unicode (with multiple code units per char), truncated
+      {
+        input: '😀!',
+        length: 1,
+        expected: '😀',
+      },
+    ].forEach(({ input, length, expected }) => {
+      it('truncates input to given length', () => {
+        const result = unicode.truncate(input, length);
+        assert.equal(result, expected);
+      });
+    });
+  });
 });
