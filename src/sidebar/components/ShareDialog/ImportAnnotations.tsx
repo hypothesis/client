@@ -2,51 +2,14 @@ import { Button, CardActions, Select } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useId, useMemo, useState } from 'preact/hooks';
 
 import type { APIAnnotationData } from '../../../types/api';
-import { isReply } from '../../helpers/annotation-metadata';
 import { annotationDisplayName } from '../../helpers/annotation-user';
+import { annotationsByUser } from '../../helpers/annotations-by-user';
 import { readExportFile } from '../../helpers/import';
 import { withServices } from '../../service-context';
 import type { ImportAnnotationsService } from '../../services/import-annotations';
 import { useSidebarStore } from '../../store';
 import FileInput from './FileInput';
 import LoadingSpinner from './LoadingSpinner';
-
-/** Details of a user and their annotations that are available to import. */
-type UserAnnotations = {
-  userid: string;
-  displayName: string;
-  annotations: APIAnnotationData[];
-};
-
-/**
- * Generate an alphabetized list of authors and their importable annotations.
- */
-function annotationsByUser(
-  anns: APIAnnotationData[],
-  getDisplayName: (ann: APIAnnotationData) => string,
-): UserAnnotations[] {
-  const userInfo = new Map<string, UserAnnotations>();
-  for (const ann of anns) {
-    if (isReply(ann)) {
-      // We decided to exclude replies from the initial implementation of
-      // annotation import, to simplify the feature.
-      continue;
-    }
-    let info = userInfo.get(ann.user);
-    if (!info) {
-      info = {
-        userid: ann.user,
-        displayName: getDisplayName(ann),
-        annotations: [],
-      };
-      userInfo.set(ann.user, info);
-    }
-    info.annotations.push(ann);
-  }
-  const userInfos = [...userInfo.values()];
-  userInfos.sort((a, b) => a.displayName.localeCompare(b.displayName));
-  return userInfos;
-}
 
 export type ImportAnnotationsProps = {
   importAnnotationsService: ImportAnnotationsService;
@@ -83,7 +46,16 @@ function ImportAnnotations({
     [defaultAuthority, displayNamesEnabled],
   );
   const userList = useMemo(
-    () => (annotations ? annotationsByUser(annotations, getDisplayName) : null),
+    () =>
+      annotations
+        ? annotationsByUser({
+            annotations,
+            getDisplayName,
+            // We decided to exclude replies from the initial implementation of
+            // annotation import, to simplify the feature.
+            excludeReplies: true,
+          })
+        : null,
     [annotations, getDisplayName],
   );
 
