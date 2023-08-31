@@ -7,6 +7,7 @@ import {
 } from '../helpers/permissions';
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
+import { captureException } from '../util/sentry';
 import type { AnnotationsService } from './annotations';
 import type { ToastMessengerService } from './toast-messenger';
 
@@ -208,6 +209,7 @@ export class ImportAnnotationsService {
 
         return { type: 'import', annotation: saved };
       } catch (error) {
+        captureException(error, 'annotation-import');
         return { type: 'error', error };
       }
     };

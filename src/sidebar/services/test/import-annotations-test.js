@@ -2,16 +2,19 @@ import {
   privatePermissions,
   sharedPermissions,
 } from '../../helpers/permissions';
-import { ImportAnnotationsService } from '../import-annotations';
+import { ImportAnnotationsService, $imports } from '../import-annotations';
 
 describe('ImportAnnotationsService', () => {
   let counter;
+  let fakeCaptureException;
   let fakeStore;
   let fakeToastMessenger;
   let fakeAnnotationsService;
 
   beforeEach(() => {
     counter = 0;
+
+    fakeCaptureException = sinon.stub();
 
     fakeStore = {
       allAnnotations: sinon.stub().returns([]),
@@ -39,6 +42,16 @@ describe('ImportAnnotationsService', () => {
       }),
       save: sinon.stub().resolves({}),
     };
+
+    $imports.$mock({
+      '../util/sentry': {
+        captureException: fakeCaptureException,
+      },
+    });
+  });
+
+  afterEach(() => {
+    $imports.$restore();
   });
 
   function createService() {
@@ -257,6 +270,16 @@ describe('ImportAnnotationsService', () => {
 
       assert.instanceOf(error, Error);
       assert.equal(error.message, 'Cannot import when no group is selected');
+    });
+
+    it('reports errors to Sentry', async () => {
+      const svc = createService();
+      const err = new Error('Something went wrong');
+      fakeAnnotationsService.save.rejects(err);
+
+      await svc.import([generateAnnotation()]);
+
+      assert.calledWith(fakeCaptureException, err, 'annotation-import');
     });
   });
 });
