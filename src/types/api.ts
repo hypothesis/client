@@ -158,6 +158,10 @@ export type UserInfo = {
   display_name: string | null;
 };
 
+/**
+ * Represents an annotation as returned by the h API.
+ * API docs: https://h.readthedocs.io/en/latest/api-reference/#tag/annotations
+ */
 export type APIAnnotationData = {
   /**
    * The server-assigned ID for the annotation. This is only set once the
@@ -211,6 +215,10 @@ export type APIAnnotationData = {
   user_info?: UserInfo;
 };
 
+/**
+ * Augmented annotation including what's returned by `h` API + client-internal
+ * properties
+ */
 export type Annotation = ClientAnnotationData & APIAnnotationData;
 
 /**
