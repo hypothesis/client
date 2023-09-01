@@ -4,10 +4,8 @@
  * We don't use the URL constructor here because IE and early versions of Edge
  * do not support it and this code runs early in the life of the app before any
  * polyfills can be loaded.
- *
- * @param {string} url
  */
-function extractOrigin(url) {
+function extractOrigin(url: string) {
   const match = url.match(/(https?):\/\/([^:/]+)/);
   if (!match) {
     return null;
@@ -16,9 +14,7 @@ function extractOrigin(url) {
 }
 
 function currentScriptOrigin(document_ = document) {
-  const scriptEl = /** @type {HTMLScriptElement|null} */ (
-    document_.currentScript
-  );
+  const scriptEl = document_.currentScript as HTMLScriptElement | null;
   if (!scriptEl) {
     // Function was called outside of initial script execution.
     return null;
@@ -34,11 +30,8 @@ function currentScriptOrigin(document_ = document) {
  * from a device or VM that is not the system where the development server is
  * running. In that case, all references to `localhost` need to be replaced
  * with the IP/hostname of the dev server.
- *
- * @param {string} url
- * @param {Document} document_
  */
-export function processUrlTemplate(url, document_ = document) {
+export function processUrlTemplate(url: string, document_ = document) {
   if (url.indexOf('{') === -1) {
     // Not a template. This should always be the case in production.
     return url;

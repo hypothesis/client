@@ -36,7 +36,7 @@ const assetRoot = isProd
   : `${localhost}:3001/hypothesis/${version}/`;
 
 export default {
-  input: 'src/boot/index.js',
+  input: 'src/boot/index.ts',
   output: {
     file: 'build/boot.js',
 

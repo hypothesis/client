@@ -12,11 +12,10 @@
  * setting names, scripts further down in the document override those further
  * up).
  *
- * @param {Document|Element} document - The root element to search.
+ * @param document - The root element to search.
  */
-export function parseJsonConfig(document) {
-  /** @type {Record<string, unknown>} */
-  const config = {};
+export function parseJsonConfig(document: Document | Element) {
+  const config: Record<string, unknown> = {};
   const settingsElements = document.querySelectorAll(
     'script.js-hypothesis-config',
   );

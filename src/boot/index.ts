@@ -8,26 +8,22 @@
 // @ts-ignore - This file is generated before the boot bundle is built.
 import manifest from '../../build/manifest.json';
 import { bootHypothesisClient, bootSidebarApp } from './boot';
+import type { AnnotatorConfig, SidebarAppConfig } from './boot';
 import { isBrowserSupported } from './browser-check';
 import { getExtensionId, hasExtensionConfig } from './browser-extension-utils';
 import { parseJsonConfig } from './parse-json-config';
 import { processUrlTemplate } from './url-template';
 
-/**
- * @typedef {import('./boot').AnnotatorConfig} AnnotatorConfig
- * @typedef {import('./boot').SidebarAppConfig} SidebarAppConfig
- */
-
 if (isBrowserSupported()) {
-  const config = /** @type {AnnotatorConfig|SidebarAppConfig} */ (
-    parseJsonConfig(document)
-  );
+  const config = parseJsonConfig(document) as
+    | AnnotatorConfig
+    | SidebarAppConfig;
   const assetRoot = processUrlTemplate(config.assetRoot || '__ASSET_ROOT__');
 
   // Check whether this is a mini-app (indicated by the presence of a
   // `<hypothesis-app>` element) and load the appropriate part of the client.
   if (document.querySelector('hypothesis-app')) {
-    const sidebarConfig = /** @type {SidebarAppConfig} */ (config);
+    const sidebarConfig = config as SidebarAppConfig;
     bootSidebarApp(document, {
       assetRoot,
       manifest,
@@ -45,7 +41,7 @@ if (isBrowserSupported()) {
 
     // nb. If new asset URLs are added here, the browser extension and
     // `hypothesis-injector.ts` need to be updated.
-    const annotatorConfig = /** @type {AnnotatorConfig} */ (config);
+    const annotatorConfig = config as AnnotatorConfig;
     const notebookAppUrl = processUrlTemplate(
       annotatorConfig.notebookAppUrl || '__NOTEBOOK_APP_URL__',
     );
