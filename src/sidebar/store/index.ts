@@ -66,7 +66,7 @@ export function createSidebarStore(settings: SidebarSettings) {
  * and re-renders the component when relevant data in the store changes. See
  * {@link useStore}.
  */
-export function useSidebarStore() {
+export function useSidebarStore(): SidebarStore {
   const store = useService('store') as SidebarStore;
   return useStore(store);
 }
