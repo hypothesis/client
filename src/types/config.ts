@@ -1,3 +1,5 @@
+import type { FocusUserInfo } from './rpc';
+
 /**
  * Configuration for an annotation service.
  *
@@ -6,95 +8,96 @@
  *  The `onXXX` functions may be set by the embedder of the client. The
  * `onXXXProvided` booleans are correspondingly set in the annotator if a
  *  particular function is provided.
- *
- * @typedef Service
- * @prop {string} apiUrl
- * @prop {string} authority
- * @prop {string} grantToken
- * @prop {string} [icon]
- * @prop {string[]|Promise<string[]>|'$rpc:requestGroups'} [groups] -
- *   List of IDs of groups to show. If the embedder specifies "$rpc:requestGroups",
- *   the list of groups is fetched from a parent frame and `groups` is
- *   replaced with a promise to represent the result.
- * @prop {boolean} [allowFlagging]
- * @prop {boolean} [allowLeavingGroups]
- * @prop {boolean} [enableShareLinks]
- * @prop {Function} [onLoginRequest]
- * @prop {boolean} [onLoginRequestProvided]
- * @prop {Function} [onLogoutRequest]
- * @prop {boolean} [onLogoutRequestProvided]
- * @prop {Function} [onSignupRequest]
- * @prop {boolean} [onSignupRequestProvided]
- * @prop {Function} [onProfileRequest]
- * @prop {boolean} [onProfileRequestProvided]
- * @prop {Function} [onHelpRequest]
- * @prop {boolean} [onHelpRequestProvided]
  */
+export type Service = {
+  apiUrl: string;
+  authority: string;
+  grantToken: string;
+  icon?: string;
+  /**
+   * List of IDs of groups to show. If the embedder specifies "$rpc:requestGroups",
+   * the list of groups is fetched from a parent frame and `groups` is
+   * replaced with a promise to represent the result.
+   */
+  groups?: string[] | Promise<string[]> | '$rpc:requestGroups';
+  allowFlagging?: boolean;
+  allowLeavingGroups?: boolean;
+  enableShareLinks?: boolean;
+  onHelpRequest?: () => void;
+  onHelpRequestProvided?: boolean;
+  onLoginRequest?: () => void;
+  onLoginRequestProvided?: boolean;
+  onLogoutRequest?: () => void;
+  onLogoutRequestProvided?: boolean;
+  onSignupRequest?: () => void;
+  onSignupRequestProvided?: boolean;
+  onProfileRequest?: () => void;
+  onProfileRequestProvided?: boolean;
+};
 
 /**
  * Configuration for the Sentry crash-reporting service.
- *
- * @typedef SentryConfig
- * @prop {string} dsn
- * @prop {string} environment
  */
+export type SentryConfig = {
+  dsn: string;
+  environment: string;
+};
 
 /**
  * Configuration for the sidebar app set by the Hypothesis backend ("h")
  * or baked into the sidebar app at build time (in the browser extension).
  *
  * See `h.views.client` in the "h" application.
- *
- * @typedef ConfigFromSidebar
- * @prop {string} apiUrl
- * @prop {string} authDomain
- * @prop {string} oauthClientId
- * @prop {string[]} rpcAllowedOrigins
- * @prop {SentryConfig} [sentry]
  */
+export type ConfigFromSidebar = {
+  apiUrl: string;
+  authDomain: string;
+  oauthClientId: string;
+  rpcAllowedOrigins: string[];
+  sentry?: SentryConfig;
+};
 
 /**
  * May be provided by `ConfigFromAnnotator` to configure a known ancestor
  * frame as the "embedder" frame. `ConfigFromEmbedder` will be requested from
  * this frame, and additional messaging (via postMessage) may be configured
  * between the sidebar frame and this embedder frame.
- *
- * @typedef EmbedderFrameConfig
- * @prop {number} ancestorLevel
- * @prop {string} origin
  */
+export type EmbedderFrameConfig = {
+  ancestorLevel: number;
+  origin: string;
+};
+
+export type AnnotationEventType = 'create' | 'update' | 'flag' | 'delete';
 
 /**
  * An "embedder frame" may provide configuration to be notified (via JSON RPC)
  * of qualifying annotation activity from the sidebar frame.
- *
- * @typedef {'create'|'update'|'flag'|'delete'} AnnotationEventType
- *
- * @typedef ReportAnnotationActivityConfig
- *   @prop {string} method - Name of method to call in embedder frame on
- *     qualifying annotation activity
- *   @prop {AnnotationEventType[]} events - Which events to notify about
- *
  */
+export type ReportAnnotationActivityConfig = {
+  /** Name of RPC method to call in embedded frame on qualifying annotation activity. */
+  method: string;
+  /** Which events to notify about. */
+  events: AnnotationEventType[];
+};
 
 /**
  * Structure of focus-mode config, provided in settings (app config)
- *
- * @typedef FocusConfig
- * @prop {import('./rpc').FocusUserInfo} [user]
  */
+export type FocusConfig = {
+  user?: FocusUserInfo;
+};
 
 /**
  * List of theme elements which can be customized.
- *
- * @typedef {'accentColor'|
- *   'annotationFontFamily' |
- *   'appBackgroundColor'|
- *   'ctaBackgroundColor'|
- *   'ctaTextColor'|
- *   'selectionFontFamily'
- * } ThemeProperty
  */
+export type ThemeProperty =
+  | 'accentColor'
+  | 'annotationFontFamily'
+  | 'appBackgroundColor'
+  | 'ctaBackgroundColor'
+  | 'ctaTextColor'
+  | 'selectionFontFamily';
 
 /**
  * Configuration provided by the annotator ("host frame") as
@@ -104,43 +107,68 @@
  * This is the subset of keys from
  * https://h.readthedocs.io/projects/client/en/latest/publishers/config/ which
  * excludes any keys used only by the "annotator" part of the application.
- *
- * @typedef ConfigFromHost
- * @prop {string} [annotations] - Direct-linked annotation ID
- * @prop {FocusConfig} [focus]
- * @prop {string} [group] - Direct-linked group ID
- * @prop {string} [query] - Initial filter query
- * @prop {string} [appType] - Method used to load the client
- * @prop {boolean} [openSidebar] - Whether to open the sidebar on the initial load
- * @prop {boolean} [showHighlights] - Whether to show highlights
- * @prop {Record<ThemeProperty, string>} [branding] -
- *   Theme properties (fonts, colors etc.)
- * @prop {boolean} [enableExperimentalNewNoteButton] -
- *   Whether to show the "New note" button on the "Page Notes" tab
- * @prop {EmbedderFrameConfig} [requestConfigFromFrame] - Allows annotator to
- *   designate an ancestor frame from which configuration should be requested.
- *   Only valid when provided by annotator ("host frame").
- * @prop {ReportAnnotationActivityConfig} [reportActivity] - Allows embedder to
- *   receive notifications on qualifying annotation activity. Only valid when
- *   provided by ancestor ("embedder frame").
- * @prop {Service[]} [services] -
- *   Configuration for the annotation services that the client connects to
- * @prop {string} [theme]
- *   Name of the base theme to use.
- * @prop {string} [usernameUrl]
- *   URL template for username links
  */
+export type ConfigFromHost = {
+  /** Direct-linked annotation ID. */
+  annotations?: string;
+
+  focus?: FocusConfig;
+
+  /** Direct-linked group ID */
+  group?: string;
+
+  /** Initial filter query. */
+  query?: string;
+
+  /** Method used to load the client (extension, Via proxy, embedded by publisher etc.) */
+  appType?: string;
+
+  /** Whether to open the sidebar on the initial load. */
+  openSidebar?: boolean;
+
+  /** Whether to show highlights. */
+  showHighlights?: boolean;
+
+  /** Theme properties (fonts, colors etc.) */
+  branding?: Record<ThemeProperty, string>;
+
+  /** Whether to show the "New note" button on the "Page notes" tab. */
+  enableExperimentalNewNoteButton?: boolean;
+
+  /**
+   * Instructs the client to fetch configuration from an ancestor of the host
+   * frame.
+   *
+   * This is primarily used in Hypothesis's LMS integration.
+   */
+  requestConfigFromFrame?: EmbedderFrameConfig;
+
+  /**
+   * Request notifications be delivered to the frame specified by
+   * `requestConfigFromFrame` when certain annotation activity happens.
+   */
+  reportActivity?: ReportAnnotationActivityConfig;
+
+  /** Configuration for the annotation services that the client connects to. */
+  services?: Service[];
+
+  /** Name of the base theme to use. */
+  theme?: string;
+
+  /** URL template for username links. */
+  usernameUrl?: string;
+};
 
 /**
  * Settings derived from `ConfigFromAnnotator["requestConfigFromFrame"]`.
  * These settings allow `ConfigFromEmbedder` to be requested from the
  * designated frame, and allows subsequent communication between the sidebar
  * and embedder frames.
- *
- * @typedef RPCSettings
- * @prop {Window} targetFrame
- * @prop {EmbedderFrameConfig['origin']} origin
  */
+export type RPCSettings = {
+  targetFrame: Window;
+  origin: EmbedderFrameConfig['origin'];
+};
 
 /**
  * `SidebarSettings` are created by merging "sidebar configuration"
@@ -190,11 +218,12 @@
  * |  |                 +---------------------+  |                          |
  * |  +------------------------------------------+                          |
  * +------------------------------------------------------------------------+
- *
- * @typedef {Omit<ConfigFromHost, "reportActivity">} ConfigFromAnnotator
- * @typedef {Omit<ConfigFromHost, "requestConfigFromFrame">} ConfigFromEmbedder
- * @typedef {ConfigFromHost & ConfigFromSidebar & { rpc?: RPCSettings }} SidebarSettings
  */
+export type SidebarSettings = ConfigFromHost &
+  ConfigFromSidebar & { rpc?: RPCSettings };
 
-// Make TypeScript treat this file as a module.
-export const unused = {};
+/** See {@link SidebarSettings} */
+export type ConfigFromAnnotator = Omit<ConfigFromHost, 'reportActivity'>;
+
+/** See {@link SidebarSettings} */
+export type ConfigFromEmbedder = Omit<ConfigFromHost, 'requestConfigFromFrame'>;
