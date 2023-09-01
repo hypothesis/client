@@ -32,7 +32,6 @@ export type SuggestedFilenameOptions = {
 export function suggestedFilename({
   documentMetadata,
   groupName,
-  /* istanbul ignore next - test seam */
   date = new Date(),
 }: SuggestedFilenameOptions) {
   const filenameSegments = [formatDate(date)];
