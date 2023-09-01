@@ -51,4 +51,10 @@ describe('suggestedFilename', () => {
       );
     });
   });
+
+  it('defaults to current date', () => {
+    const result = suggestedFilename({});
+    const dateStr = new Date().toISOString().slice(0, 10);
+    assert.equal(result, `${dateStr}-Hypothesis`);
+  });
 });
