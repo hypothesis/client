@@ -1,27 +1,35 @@
 import { useLayoutEffect, useRef, useReducer } from 'preact/hooks';
 
+import type { Store } from './create-store';
+
 /**
  * Result of a cached store selector method call.
  */
-class CacheEntry {
+class CacheEntry<Args extends any[], Result> {
+  name: string;
+  method: (...args: Args) => Result;
+  args: Args;
+  result: Result;
+
   /**
-   * @param {string} name - Method name
-   * @param {Function} method - Method implementation
-   * @param {unknown[]} args - Arguments to the selector
-   * @param {unknown} result - Result of the invocation
+   * @param name - Method name
+   * @param method - Method implementation
+   * @param args - Arguments to the selector
+   * @param result - Result of the invocation
    */
-  constructor(name, method, args, result) {
+  constructor(
+    name: string,
+    method: (...args: Args) => Result,
+    args: Args,
+    result: Result,
+  ) {
     this.name = name;
     this.method = method;
     this.args = args;
     this.result = result;
   }
 
-  /**
-   * @param {string} name
-   * @param {unknown[]} args
-   */
-  matches(name, args) {
+  matches(name: string, args: Args): boolean {
     return (
       this.name === name && this.args.every((value, i) => args[i] === value)
     );
@@ -77,11 +85,10 @@ class CacheEntry {
  *     );
  *   }
  *
- * @template {import('./create-store').Store<object, object, object>} Store
- * @param {Store} store - The store to wrap
- * @return {Store} - A proxy with the same API as `store`
+ * @param store - The store to wrap
+ * @return A proxy with the same API as `store`
  */
-export function useStore(store) {
+export function useStore<S extends Store<object, object, object>>(store: S): S {
   // Hack to trigger a component re-render.
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
@@ -91,23 +98,20 @@ export function useStore(store) {
   // This is currently just an array on the assumption that it will
   // only have a small number of entries. It could be changed to a map keyed
   // by method to handle many entries better.
-  const cacheRef = useRef(/** @type {CacheEntry[]} */ ([]));
+  const cacheRef = useRef<Array<CacheEntry<unknown[], unknown>>>([]);
   const cache = cacheRef.current;
 
   // Create the wrapper around the store.
-  const proxy = useRef(/** @type {Store|null} */ (null));
+  const proxy = useRef<S | null>(null);
   if (!proxy.current) {
     // Cached method wrappers.
-    /** @type {Map<string, Function>} */
-    const wrappedMethods = new Map();
+    const wrappedMethods = new Map<string, (...args: unknown[]) => unknown>();
 
-    /**
-     * @template {Store} StoreType
-     * @param {StoreType} store
-     * @param {keyof StoreType & string} prop
-     */
-    const get = (store, prop) => {
-      const method = store[prop];
+    const get = <StoreType extends S>(
+      store: StoreType,
+      prop: keyof StoreType & string,
+    ) => {
+      const method = store[prop] as (...args: unknown[]) => unknown;
       if (typeof method !== 'function') {
         return method;
       }
@@ -119,8 +123,7 @@ export function useStore(store) {
       }
 
       // Create method wrapper.
-      /** @param {unknown[]} args */
-      wrapped = (...args) => {
+      wrapped = (...args: unknown[]) => {
         const cacheEntry = cache.find(entry => entry.matches(prop, args));
         if (cacheEntry) {
           return cacheEntry.result;
@@ -167,5 +170,5 @@ export function useStore(store) {
     return cleanup;
   }, [cache, store]);
 
-  return /** @type {Store} */ (proxy.current);
+  return proxy.current as S;
 }
