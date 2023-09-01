@@ -5,10 +5,8 @@
  * We use feature tests to try to avoid false negatives, accepting some risk of
  * false positives due to the host page having loaded polyfills for APIs in order
  * to support older browsers.
- *
- * @return {boolean}
  */
-export function isBrowserSupported() {
+export function isBrowserSupported(): boolean {
   // Checks that return a truthy value if they succeed and throw or return
   // a falsey value if they fail.
   const checks = [

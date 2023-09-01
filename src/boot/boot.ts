@@ -1,42 +1,38 @@
-/**
- * @typedef SidebarAppConfig
- * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
- * @prop {Record<string,string>} manifest -
- *   A mapping from canonical asset path to cache-busted asset path
- * @prop {string} apiUrl
- */
+export type SidebarAppConfig = {
+  /** The root URL to which URLs in `manifest` are relative. */
+  assetRoot: string;
 
-/**
- * @typedef AnnotatorConfig
- * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
- * @prop {string} notebookAppUrl - The URL of the sidebar's notebook
- * @prop {string} profileAppUrl - The URL of the sidebar's user profile view
- * @prop {string} sidebarAppUrl - The URL of the sidebar's HTML page
- * @prop {Record<string,string>} manifest -
- *   A mapping from canonical asset path to cache-busted asset path
- */
+  /** A mapping from canonical asset path to cache-busted asset path. */
+  manifest: Record<string, string>;
+  apiUrl: string;
+};
 
-/**
- * @typedef {Window & { PDFViewerApplication?: object }} MaybePDFWindow
- */
+export type AnnotatorConfig = {
+  /** The root URL to which URLs in `manifest` are relative. */
+  assetRoot: string;
+  /** The URL of the sidebar's notebook. */
+  notebookAppUrl: string;
+  /** The URL of the sidebar's user profile view. */
+  profileAppUrl: string;
+  /** The URL of the sidebar's HTML page. */
+  sidebarAppUrl: string;
+  /** A mapping from canonical asset path to cache-busted asset path. */
+  manifest: Record<string, string>;
+};
+
+type MaybePDFWindow = Window & { PDFViewerApplication?: object };
 
 /**
  * Mark an element as having been added by the boot script.
  *
  * This marker is later used to know which elements to remove when unloading
  * the client.
- *
- * @param {HTMLElement} el
  */
-function tagElement(el) {
+function tagElement(el: HTMLElement) {
   el.setAttribute('data-hypothesis-asset', '');
 }
 
-/**
- * @param {Document} doc
- * @param {string} href
- */
-function injectStylesheet(doc, href) {
+function injectStylesheet(doc: Document, href: string) {
   const link = doc.createElement('link');
   link.rel = 'stylesheet';
   link.type = 'text/css';
@@ -46,14 +42,19 @@ function injectStylesheet(doc, href) {
   doc.head.appendChild(link);
 }
 
-/**
- * @param {Document} doc
- * @param {string} src - The script URL
- * @param {object} options
- *   @param {boolean} [options.esModule] - Whether to load the script as an ES module
- *   @param {boolean} [options.forceReload] - Whether to force re-evaluation of an ES module script
- */
-function injectScript(doc, src, { esModule = true, forceReload = false } = {}) {
+function injectScript(
+  doc: Document,
+  src: string,
+  {
+    esModule = true,
+    forceReload = false,
+  }: {
+    /** Whether to load the script as an ES module. */
+    esModule?: boolean;
+    /** Whether to force re-evaluation of an ES module script. */
+    forceReload?: boolean;
+  } = {},
+) {
   const script = doc.createElement('script');
 
   if (esModule) {
@@ -79,13 +80,12 @@ function injectScript(doc, src, { esModule = true, forceReload = false } = {}) {
   doc.head.appendChild(script);
 }
 
-/**
- * @param {Document} doc
- * @param {string} rel
- * @param {'html'|'javascript'} type
- * @param {string} url
- */
-function injectLink(doc, rel, type, url) {
+function injectLink(
+  doc: Document,
+  rel: string,
+  type: 'html' | 'javascript',
+  url: string,
+) {
   const link = doc.createElement('link');
   link.rel = rel;
   link.href = url;
@@ -100,12 +100,8 @@ function injectLink(doc, rel, type, url) {
  *
  * This can be used to preload an API request or other resource which we know
  * that the client will load.
- *
- * @param {Document} doc
- * @param {string} type - Type of resource
- * @param {string} url
  */
-function preloadURL(doc, type, url) {
+function preloadURL(doc: Document, type: string, url: string) {
   const link = doc.createElement('link');
   link.rel = 'preload';
   link.as = type;
@@ -122,11 +118,7 @@ function preloadURL(doc, type, url) {
   doc.head.appendChild(link);
 }
 
-/**
- * @param {SidebarAppConfig|AnnotatorConfig} config
- * @param {string} path
- */
-function assetURL(config, path) {
+function assetURL(config: SidebarAppConfig | AnnotatorConfig, path: string) {
   return config.assetRoot + 'build/' + config.manifest[path];
 }
 
@@ -136,11 +128,8 @@ function assetURL(config, path) {
  * This triggers loading of the necessary resources for the client in a host
  * or guest frame. We could in future simplify booting in guest-only frames
  * by omitting resources that are only needed in the host frame.
- *
- * @param {Document} doc
- * @param {AnnotatorConfig} config
  */
-export function bootHypothesisClient(doc, config) {
+export function bootHypothesisClient(doc: Document, config: AnnotatorConfig) {
   // Detect presence of Hypothesis in the page
   const appLinkEl = doc.querySelector(
     'link[type="application/annotator+html"]',
@@ -173,19 +162,17 @@ export function bootHypothesisClient(doc, config) {
   );
 
   const scripts = ['scripts/annotator.bundle.js'];
-  for (let path of scripts) {
+  for (const path of scripts) {
     const url = assetURL(config, path);
     injectScript(doc, url, { esModule: false });
   }
 
   const styles = [];
-  if (
-    /** @type {MaybePDFWindow} */ (window).PDFViewerApplication !== undefined
-  ) {
+  if ((window as MaybePDFWindow).PDFViewerApplication !== undefined) {
     styles.push('styles/pdfjs-overrides.css');
   }
   styles.push('styles/highlights.css');
-  for (let path of styles) {
+  for (const path of styles) {
     const url = assetURL(config, path);
     injectStylesheet(doc, url);
   }
@@ -193,23 +180,20 @@ export function bootHypothesisClient(doc, config) {
 
 /**
  * Bootstrap the sidebar application which displays annotations.
- *
- * @param {Document} doc
- * @param {SidebarAppConfig} config
  */
-export function bootSidebarApp(doc, config) {
+export function bootSidebarApp(doc: Document, config: SidebarAppConfig) {
   // Preload `/api/` and `/api/links` API responses.
   preloadURL(doc, 'fetch', config.apiUrl);
   preloadURL(doc, 'fetch', config.apiUrl + 'links');
 
   const scripts = ['scripts/sidebar.bundle.js'];
-  for (let path of scripts) {
+  for (const path of scripts) {
     const url = assetURL(config, path);
     injectScript(doc, url, { esModule: true });
   }
 
   const styles = ['styles/katex.min.css', 'styles/sidebar.css'];
-  for (let path of styles) {
+  for (const path of styles) {
     const url = assetURL(config, path);
     injectStylesheet(doc, url);
   }
