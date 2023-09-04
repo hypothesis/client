@@ -13,7 +13,7 @@
     "@babel/preset-typescript": "^7.16.7",
     "@hypothesis/frontend-build": "^2.0.0",
     "@hypothesis/frontend-shared": "^6.5.0",
-    "@npmcli/arborist": "^6.1.1",
+    "@npmcli/arborist": "^7.0.0",
     "@octokit/rest": "^20.0.1",
     "@rollup/plugin-babel": "^6.0.0",
     "@rollup/plugin-commonjs": "^25.0.0",
