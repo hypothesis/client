@@ -24,10 +24,11 @@ export type State = {
    */
   annotationResultCount: number | null;
 
-  /**
-   * Count of annotations waiting to be imported.
-   */
+  /** Count of remaining annotation imports. */
   importsPending: number;
+
+  /** Total number of imports in active import tasks. */
+  importsTotal: number;
 };
 
 const initialState: State = {
@@ -37,6 +38,7 @@ const initialState: State = {
   hasFetchedAnnotations: false,
   annotationResultCount: null,
   importsPending: 0,
+  importsTotal: 0,
 };
 
 const reducers = {
@@ -116,6 +118,7 @@ const reducers = {
   BEGIN_IMPORT(state: State, action: { count: number }) {
     return {
       importsPending: state.importsPending + action.count,
+      importsTotal: state.importsTotal + action.count,
     };
   },
 
@@ -123,8 +126,12 @@ const reducers = {
     if (!state.importsPending) {
       return state;
     }
+    const importsPending = Math.max(state.importsPending - action.count, 0);
+    const importsTotal = importsPending > 0 ? state.importsTotal : 0;
+
     return {
-      importsPending: Math.max(state.importsPending - action.count, 0),
+      importsPending,
+      importsTotal,
     };
   },
 };
@@ -179,6 +186,10 @@ function importsPending(state: State) {
   return state.importsPending;
 }
 
+function importsTotal(state: State) {
+  return state.importsTotal;
+}
+
 /**
  * Return true when annotations are actively being fetched.
  */
@@ -225,6 +236,7 @@ export const activityModule = createStoreModule(initialState, {
   selectors: {
     hasFetchedAnnotations,
     importsPending,
+    importsTotal,
     isLoading,
     isFetchingAnnotations,
     isSavingAnnotation,
