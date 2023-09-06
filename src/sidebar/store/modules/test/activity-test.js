@@ -225,28 +225,37 @@ describe('sidebar/store/modules/activity', () => {
   });
 
   describe('#beginImport', () => {
-    it('increments count of pending imports', () => {
+    it('updates count of pending and total imports', () => {
       assert.equal(store.importsPending(), 0);
       store.beginImport(2);
       assert.equal(store.importsPending(), 2);
+      assert.equal(store.importsTotal(), 2);
       store.beginImport(2);
       assert.equal(store.importsPending(), 4);
+      assert.equal(store.importsTotal(), 4);
     });
   });
 
   describe('#completeImport', () => {
-    it('decrements count of pending imports', () => {
+    it('updates count of pending and total imports', () => {
       store.beginImport(5);
       store.completeImport(2);
       assert.equal(store.importsPending(), 3);
+      assert.equal(store.importsTotal(), 5);
       store.completeImport(1);
       assert.equal(store.importsPending(), 2);
+      assert.equal(store.importsTotal(), 5);
       store.completeImport(2);
       assert.equal(store.importsPending(), 0);
+
+      // Once all the imports have completed, the count of total imports is
+      // reset.
+      assert.equal(store.importsTotal(), 0);
 
       // Value can't go below 0. We could choose to throw an error here instead.
       store.completeImport(1);
       assert.equal(store.importsPending(), 0);
+      assert.equal(store.importsTotal(), 0);
     });
   });
 });

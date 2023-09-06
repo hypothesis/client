@@ -20,6 +20,7 @@ describe('ImportAnnotations', () => {
       defaultAuthority: sinon.stub().returns('example.com'),
       focusedGroup: sinon.stub().returns({ id: 'group-1' }),
       importsPending: sinon.stub().returns(0),
+      importsTotal: sinon.stub().returns(0),
       isFeatureEnabled: sinon.stub().returns(true),
       hasFetchedAnnotations: sinon.stub().returns(true),
       isFetchingAnnotations: sinon.stub().returns(false),
@@ -293,15 +294,26 @@ describe('ImportAnnotations', () => {
     );
   });
 
-  it('shows loading spinner during import', () => {
-    fakeStore.importsPending.returns(2);
+  it('shows progress indicator during import', () => {
+    fakeStore.importsPending.returns(1);
+    fakeStore.importsTotal.returns(2);
+
     const wrapper = createImportAnnotations();
-    assert.isTrue(wrapper.exists('LoadingSpinner'));
+
+    const progressText = wrapper.find('[data-testid="progress-text"]');
+    assert.isTrue(progressText.exists());
+    assert.equal(progressText.text(), '50% complete');
+
+    const progress = wrapper.find('CircularProgress');
+    assert.isTrue(progress.exists());
+    assert.equal(progress.prop('value'), 50);
 
     fakeStore.importsPending.returns(0);
+    fakeStore.importsTotal.returns(0);
     wrapper.setProps({}); // Force re-render
 
-    assert.isFalse(wrapper.exists('LoadingSpinner'));
+    assert.isFalse(wrapper.exists('CircularProgress'));
+    assert.isFalse(wrapper.exists('[data-testid="progress-text"]'));
   });
 
   it(

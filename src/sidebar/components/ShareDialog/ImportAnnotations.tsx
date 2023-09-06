@@ -8,8 +8,8 @@ import { readExportFile } from '../../helpers/import';
 import { withServices } from '../../service-context';
 import type { ImportAnnotationsService } from '../../services/import-annotations';
 import { useSidebarStore } from '../../store';
+import CircularProgress from '../CircularProgress';
 import FileInput from './FileInput';
-import LoadingSpinner from './LoadingSpinner';
 
 export type ImportAnnotationsProps = {
   importAnnotationsService: ImportAnnotationsService;
@@ -125,7 +125,16 @@ function ImportAnnotations({
   const parseInProgress = file && !annotations && !error;
 
   // True if we're validating or importing.
-  const busy = parseInProgress || store.importsPending() > 0;
+  const importsPending = store.importsPending();
+  const importsTotal = store.importsTotal();
+  const importsCompleted = importsTotal - importsPending;
+
+  const busy = parseInProgress || importsPending > 0;
+
+  const importProgress =
+    importsPending > 0
+      ? Math.round((importsCompleted / importsTotal) * 100)
+      : null;
 
   return (
     <>
@@ -159,7 +168,6 @@ function ImportAnnotations({
           </Select>
         </>
       )}
-      {busy && <LoadingSpinner />}
       {error && (
         // TODO - Add a support link here.
         <p data-testid="error-info">
@@ -167,12 +175,20 @@ function ImportAnnotations({
         </p>
       )}
       <CardActions>
+        {importProgress !== null && (
+          <span data-testid="progress-text" className="text-grey-6">
+            {importProgress}% complete
+          </span>
+        )}
         <Button
           data-testid="import-button"
           disabled={!importReady || busy}
           onClick={importAnnotations}
           variant="primary"
         >
+          {importProgress !== null && (
+            <CircularProgress size={22} value={importProgress} />
+          )}
           Import
         </Button>
       </CardActions>
