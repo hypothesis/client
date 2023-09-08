@@ -1,16 +1,15 @@
 import { createStoreModule, makeAction } from '../create-store';
 
-/**
- * @typedef {'annotation'|'notebook'|'profile'|'sidebar'|'stream'} RouteName
- */
+export type RouteName =
+  | 'annotation'
+  | 'notebook'
+  | 'profile'
+  | 'sidebar'
+  | 'stream';
 
-const initialState = {
-  /**
-   * The current route.
-   *
-   * @type {RouteName|null}
-   */
-  name: null,
+export type State = {
+  /** The current route. */
+  name: RouteName | null;
 
   /**
    * Parameters of the current route.
@@ -18,20 +17,20 @@ const initialState = {
    * - The "annotation" route has an "id" (annotation ID) parameter.
    * - The "stream" route has a "q" (query) parameter.
    * - The "sidebar" route has no parameters.
-   *
-   * @type {Record<string, string | undefined>}
    */
+  params: Record<string, string | undefined>;
+};
+
+const initialState: State = {
+  name: null,
   params: {},
 };
 
-/** @typedef {typeof initialState} State */
-
 const reducers = {
-  /**
-   * @param {State} state
-   * @param {{ name: RouteName, params: Record<string, string> }} action
-   */
-  CHANGE_ROUTE(state, { name, params }) {
+  CHANGE_ROUTE(
+    state: State,
+    { name, params }: { name: RouteName; params: Record<string, string> },
+  ) {
     return { name, params };
   },
 };
@@ -39,29 +38,25 @@ const reducers = {
 /**
  * Change the active route.
  *
- * @param {RouteName} name - Name of the route to activate. See `initialState` for possible values
- * @param {Record<string,string>} params - Parameters associated with the route
+ * @param name - Name of the route to activate. See `initialState` for possible values
+ * @param params - Parameters associated with the route
  */
-function changeRoute(name, params = {}) {
+function changeRoute(name: RouteName, params: Record<string, string> = {}) {
   return makeAction(reducers, 'CHANGE_ROUTE', { name, params });
 }
 
 /**
  * Return the name of the current route.
- *
- * @param {State} state
  */
-function route(state) {
+function route(state: State) {
   return state.name;
 }
 
 /**
  * Return any parameters for the current route, extracted from the path and
  * query string.
- *
- * @param {State} state
  */
-function routeParams(state) {
+function routeParams(state: State) {
   return state.params;
 }
 

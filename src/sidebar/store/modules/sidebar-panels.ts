@@ -7,13 +7,10 @@
  * extant `SidebarPanel` components. Only one panel (as keyed by `panelName`)
  * may be "active" (open) at one time.
  */
-
-/**
- * @typedef {import("../../../types/sidebar").PanelName} PanelName
- */
+import type { PanelName } from '../../../types/sidebar';
 import { createStoreModule, makeAction } from '../create-store';
 
-const initialState = {
+export type State = {
   /**
    * The `panelName` of the currently-active sidebar panel.
    * Only one `panelName` may be active at a time, but it is valid (though not
@@ -22,28 +19,20 @@ const initialState = {
    *
    * e.g. If `activePanelName` were `foobar`, all `SidebarPanel` components
    * with `panelName` of `foobar` would be active, and thus visible.
-   *
-   * @type {PanelName|null}
    */
+  activePanelName: PanelName | null;
+};
+
+const initialState: State = {
   activePanelName: null,
 };
 
-/** @typedef {typeof initialState} State */
-
 const reducers = {
-  /**
-   * @param {State} state
-   * @param {{ panelName: PanelName }} action
-   */
-  OPEN_SIDEBAR_PANEL(state, action) {
+  OPEN_SIDEBAR_PANEL(state: State, action: { panelName: PanelName }) {
     return { activePanelName: action.panelName };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ panelName: PanelName }} action
-   */
-  CLOSE_SIDEBAR_PANEL(state, action) {
+  CLOSE_SIDEBAR_PANEL(state: State, action: { panelName: PanelName }) {
     let activePanelName = state.activePanelName;
     if (action.panelName === activePanelName) {
       // `action.panelName` is indeed the currently-active panel; deactivate
@@ -55,11 +44,10 @@ const reducers = {
     };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ panelName: PanelName, panelState?: boolean }} action
-   */
-  TOGGLE_SIDEBAR_PANEL: function (state, action) {
+  TOGGLE_SIDEBAR_PANEL(
+    state: State,
+    action: { panelName: PanelName; panelState?: boolean },
+  ) {
     let activePanelName;
     // Is the panel in question currently the active panel?
     const panelIsActive = state.activePanelName === action.panelName;
@@ -88,19 +76,15 @@ const reducers = {
 
 /**
  * Designate `panelName` as the currently-active panel name
- *
- * @param {PanelName} panelName
  */
-function openSidebarPanel(panelName) {
+function openSidebarPanel(panelName: PanelName) {
   return makeAction(reducers, 'OPEN_SIDEBAR_PANEL', { panelName });
 }
 
 /**
  * `panelName` should not be the active panel
- *
- * @param {PanelName} panelName
  */
-function closeSidebarPanel(panelName) {
+function closeSidebarPanel(panelName: PanelName) {
   return makeAction(reducers, 'CLOSE_SIDEBAR_PANEL', { panelName });
 }
 
@@ -108,11 +92,10 @@ function closeSidebarPanel(panelName) {
  * Toggle a sidebar panel from its current state, or set it to the
  * designated `panelState`.
  *
- * @param {PanelName} panelName
- * @param {boolean} [panelState] -
+ * @param panelState -
  *   Should the panel be active? Omit this prop to simply toggle the value.
  */
-function toggleSidebarPanel(panelName, panelState) {
+function toggleSidebarPanel(panelName: PanelName, panelState?: boolean) {
   return makeAction(reducers, 'TOGGLE_SIDEBAR_PANEL', {
     panelName,
     panelState,
@@ -121,11 +104,8 @@ function toggleSidebarPanel(panelName, panelState) {
 
 /**
  * Is the panel indicated by `panelName` currently active (open)?
- *
- * @param {State} state
- * @param {PanelName} panelName
  */
-function isSidebarPanelOpen(state, panelName) {
+function isSidebarPanelOpen(state: State, panelName: PanelName) {
   return state.activePanelName === panelName;
 }
 

@@ -1,16 +1,12 @@
 import { replaceURLParams } from '../../util/url';
 import { createStoreModule, makeAction } from '../create-store';
 
-const initialState = /** @type {Record<string, string>|null} */ (null);
+export type State = Record<string, string> | null;
 
-/** @typedef {typeof initialState} State */
+const initialState: State = null;
 
 const reducers = {
-  /**
-   * @param {State} state
-   * @param {{ links: Record<string, string> }} action
-   */
-  UPDATE_LINKS(state, action) {
+  UPDATE_LINKS(state: State, action: { links: Record<string, string> }) {
     return {
       ...action.links,
     };
@@ -20,9 +16,9 @@ const reducers = {
 /**
  * Update the link map
  *
- * @param {Record<string, string>} links - Link map fetched from the `/api/links` endpoint
+ * @param links - Link map fetched from the `/api/links` endpoint
  */
-function updateLinks(links) {
+function updateLinks(links: Record<string, string>) {
   return makeAction(reducers, 'UPDATE_LINKS', { links });
 }
 
@@ -30,12 +26,12 @@ function updateLinks(links) {
  * Render a service link (URL) using the given `params`
  *
  * Returns an empty string if links have not been fetched yet.
- *
- * @param {State} state
- * @param {string} linkName
- * @param {Record<string, string>} [params]
  */
-function getLink(state, linkName, params = {}) {
+function getLink(
+  state: State,
+  linkName: string,
+  params: Record<string, string> = {},
+) {
   if (!state) {
     return '';
   }
@@ -51,7 +47,7 @@ function getLink(state, linkName, params = {}) {
   return url;
 }
 
-export const linksModule = createStoreModule(initialState, {
+export const linksModule = createStoreModule(initialState as State, {
   namespace: 'links',
   reducers,
   actionCreators: {
