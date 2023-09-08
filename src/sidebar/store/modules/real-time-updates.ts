@@ -2,53 +2,47 @@
  * This module contains state related to real-time updates received via the
  * WebSocket connection to h's real-time API.
  */
-
-/**
- * @typedef {import('../../../types/api').Annotation} Annotation
- * @typedef {import('./annotations').State} AnnotationsState
- * @typedef {import('./groups').State} GroupsState
- * @typedef {import('./route').State} RouteState
- */
+import type { Dispatch } from 'redux';
 import { createSelector } from 'reselect';
 
 import { hasOwn } from '../../../shared/has-own';
+import type { Annotation } from '../../../types/api';
 import { createStoreModule, makeAction } from '../create-store';
+import type { State as AnnotationsState } from './annotations';
 import { annotationsModule } from './annotations';
+import type { State as GroupsState } from './groups';
 import { groupsModule } from './groups';
+import type { State as RouteState } from './route';
 import { routeModule } from './route';
 
-/**
- * @typedef {Record<string, Annotation>} AnnotationMap
- * @typedef {Record<string, boolean>} BooleanMap
- */
+export type AnnotationMap = Record<string, Annotation>;
+export type BooleanMap = Record<string, boolean>;
 
-const initialState = {
+export type State = {
   /**
    * Map of ID -> updated annotation for updates that have been received over
    * the WebSocket but not yet applied (ie. saved to the "annotations" store
    * module and shown in the UI).
-   *
-   * @type {AnnotationMap}
    */
-  pendingUpdates: {},
+  pendingUpdates: AnnotationMap;
 
   /**
    * Set of IDs of annotations which have been deleted but for which the
    * deletion has not yet been applied
-   *
-   * @type {BooleanMap}
    */
+  pendingDeletions: BooleanMap;
+};
+
+const initialState: State = {
+  pendingUpdates: {},
   pendingDeletions: {},
 };
 
-/** @typedef {typeof initialState} State */
-
 const reducers = {
-  /**
-   * @param {State} state
-   * @param {{ pendingUpdates: AnnotationMap, pendingDeletions: BooleanMap }} action
-   */
-  RECEIVE_REAL_TIME_UPDATES(state, action) {
+  RECEIVE_REAL_TIME_UPDATES(
+    state: State,
+    action: { pendingUpdates: AnnotationMap; pendingDeletions: BooleanMap },
+  ) {
     return {
       pendingUpdates: { ...action.pendingUpdates },
       pendingDeletions: { ...action.pendingDeletions },
@@ -59,11 +53,10 @@ const reducers = {
     return { pendingUpdates: {}, pendingDeletions: {} };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ annotations: Annotation[] }} action
-   */
-  ADD_ANNOTATIONS(state, { annotations }) {
+  ADD_ANNOTATIONS(
+    state: State,
+    { annotations }: { annotations: Annotation[] },
+  ) {
     // Discard any pending updates which conflict with an annotation added
     // locally or fetched via an API call.
     //
@@ -72,7 +65,7 @@ const reducers = {
     // annotation that has been deleted on the server.
     const pendingUpdates = { ...state.pendingUpdates };
 
-    for (let ann of annotations) {
+    for (const ann of annotations) {
       if (ann.id) {
         delete pendingUpdates[ann.id];
       }
@@ -81,18 +74,17 @@ const reducers = {
     return { pendingUpdates };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ annotationsToRemove: Annotation[] }} action
-   */
-  REMOVE_ANNOTATIONS(state, { annotationsToRemove }) {
+  REMOVE_ANNOTATIONS(
+    state: State,
+    { annotationsToRemove }: { annotationsToRemove: Annotation[] },
+  ) {
     // Discard any pending updates which conflict with an annotation removed
     // locally.
 
     const pendingUpdates = { ...state.pendingUpdates };
     const pendingDeletions = { ...state.pendingDeletions };
 
-    for (let ann of annotationsToRemove) {
+    for (const ann of annotationsToRemove) {
       if (ann.id) {
         delete pendingUpdates[ann.id];
         delete pendingDeletions[ann.id];
@@ -112,20 +104,23 @@ const reducers = {
 /**
  * Record pending updates representing changes on the server that the client
  * has been notified about but has not yet applied.
- *
- * @param {object} args
- * @param {Annotation[]} [args.updatedAnnotations]
- * @param {Annotation[]} [args.deletedAnnotations]
  */
 function receiveRealTimeUpdates({
   updatedAnnotations = [],
   deletedAnnotations = [],
+}: {
+  updatedAnnotations?: Annotation[];
+  deletedAnnotations?: Annotation[];
 }) {
-  /**
-   * @param {import('redux').Dispatch} dispatch
-   * @param {() => { realTimeUpdates: State, annotations: AnnotationsState, groups: GroupsState, route: RouteState }} getState
-   */
-  return (dispatch, getState) => {
+  return (
+    dispatch: Dispatch,
+    getState: () => {
+      realTimeUpdates: State;
+      annotations: AnnotationsState;
+      groups: GroupsState;
+      route: RouteState;
+    },
+  ) => {
     const pendingUpdates = { ...getState().realTimeUpdates.pendingUpdates };
     const pendingDeletions = { ...getState().realTimeUpdates.pendingDeletions };
 
@@ -141,11 +136,11 @@ function receiveRealTimeUpdates({
         ann.group === groupsModule.selectors.focusedGroupId(groupState) ||
         routeModule.selectors.route(routeState) !== 'sidebar'
       ) {
-        pendingUpdates[/** @type {string} */ (ann.id)] = ann;
+        pendingUpdates[ann.id!] = ann;
       }
     });
     deletedAnnotations.forEach(ann => {
-      const id = /** @type {string} */ (ann.id);
+      const id = ann.id!;
       // Discard any pending but not-yet-applied updates for this annotation
       delete pendingUpdates[id];
 
@@ -179,20 +174,16 @@ function clearPendingUpdates() {
 /**
  * Return added or updated annotations received via the WebSocket
  * which have not been applied to the local state.
- *
- * @param {State} state
  */
-function pendingUpdates(state) {
+function pendingUpdates(state: State) {
   return state.pendingUpdates;
 }
 
 /**
  * Return IDs of annotations which have been deleted on the server but not
  * yet removed from the local state.
- *
- * @param {State} state
  */
-function pendingDeletions(state) {
+function pendingDeletions(state: State) {
   return state.pendingDeletions;
 }
 
@@ -200,8 +191,7 @@ function pendingDeletions(state) {
  * Return a total count of pending updates and deletions.
  */
 const pendingUpdateCount = createSelector(
-  /** @param {State} state */
-  state => [state.pendingUpdates, state.pendingDeletions],
+  (state: State) => [state.pendingUpdates, state.pendingDeletions],
   ([pendingUpdates, pendingDeletions]) =>
     Object.keys(pendingUpdates).length + Object.keys(pendingDeletions).length,
 );
@@ -209,22 +199,16 @@ const pendingUpdateCount = createSelector(
 /**
  * Return true if an annotation has been deleted on the server but the deletion
  * has not yet been applied.
- *
- * @param {State} state
- * @param {string} id
  */
-function hasPendingDeletion(state, id) {
+function hasPendingDeletion(state: State, id: string) {
   return hasOwn(state.pendingDeletions, id);
 }
 
 /**
  * Return true if an annotation has been created on the server, but it has not
  * yet been applied.
- *
- * @param {State} state
- * @return {boolean}
  */
-function hasPendingUpdates(state) {
+function hasPendingUpdates(state: State): boolean {
   return Object.keys(state.pendingUpdates).length > 0;
 }
 

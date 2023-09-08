@@ -1,17 +1,17 @@
+import type { Profile } from '../../../types/api';
+import type { SidebarSettings } from '../../../types/config';
 import { createStoreModule, makeAction } from '../create-store';
 
-/**
- * @typedef {import('../../../types/api').Profile} Profile
- * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
- */
+export type State = {
+  defaultAuthority: string;
+  profile: Profile;
+};
 
 /**
  * A dummy profile returned by the `profile` selector before the real profile
  * is fetched.
- *
- * @type Profile
  */
-const initialProfile = {
+const initialProfile: Profile = {
   /** A map of features that are enabled for the current user. */
   features: {},
   /** A map of preference names and values. */
@@ -22,14 +22,7 @@ const initialProfile = {
   userid: null,
 };
 
-/**
- * @typedef State
- * @prop {string} defaultAuthority
- * @prop {Profile} profile
- */
-
-/** @param {SidebarSettings} settings */
-function initialState(settings) {
+function initialState(settings: SidebarSettings) {
   return {
     /**
      * The app's default authority (user identity provider), from settings,
@@ -48,11 +41,7 @@ function initialState(settings) {
 }
 
 const reducers = {
-  /**
-   * @param {State} state
-   * @param {{ profile: Profile }} action
-   */
-  UPDATE_PROFILE(state, action) {
+  UPDATE_PROFILE(state: State, action: { profile: Profile }) {
     return {
       profile: { ...action.profile },
     };
@@ -61,37 +50,29 @@ const reducers = {
 
 /**
  * Update the profile information for the current user.
- *
- * @param {Profile} profile
  */
-function updateProfile(profile) {
+function updateProfile(profile: Profile) {
   return makeAction(reducers, 'UPDATE_PROFILE', { profile });
 }
 
-/**
- * @param {State} state
- */
-function defaultAuthority(state) {
+function defaultAuthority(state: State) {
   return state.defaultAuthority;
 }
 
 /**
  * Return true if a user is logged in and false otherwise.
- *
- * @param {State} state
  */
-function isLoggedIn(state) {
+function isLoggedIn(state: State) {
   return state.profile.userid !== null;
 }
 
 /**
  * Return true if a given feature flag is enabled for the current user.
  *
- * @param {State} state
- * @param {string} feature - The name of the feature flag. This matches the
- *        name of the feature flag as declared in the Hypothesis service.
+ * @param feature - The name of the feature flag. This matches the name of the
+ *   feature flag as declared in the Hypothesis service.
  */
-function isFeatureEnabled(state, feature) {
+function isFeatureEnabled(state: State, feature: string) {
   return !!state.profile.features[feature];
 }
 
@@ -99,10 +80,8 @@ function isFeatureEnabled(state, feature) {
  * Return true if the user's profile has been fetched. This can be used to
  * distinguish the dummy profile returned by `profile()` on startup from a
  * logged-out user profile returned by the server.
- *
- * @param {State} state
  */
-function hasFetchedProfile(state) {
+function hasFetchedProfile(state: State) {
   return state.profile !== initialProfile;
 }
 
@@ -113,10 +92,8 @@ function hasFetchedProfile(state) {
  *
  * If the profile has not yet been fetched yet, a dummy logged-out profile is
  * returned. This allows code to skip a null check.
- *
- * @param {State} state
  */
-function profile(state) {
+function profile(state: State) {
   return state.profile;
 }
 
