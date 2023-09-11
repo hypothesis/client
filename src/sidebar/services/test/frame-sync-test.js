@@ -104,8 +104,8 @@ describe('FrameSyncService', () => {
     fakeStore = fakeReduxStore(
       {
         annotations: [],
+        features: {},
         frames: [],
-        profile: { features: {} },
         contentInfo: null,
       },
       {
@@ -132,12 +132,12 @@ describe('FrameSyncService', () => {
           this.setState({ frames: frames.filter(f => f.id !== frame.id) });
         },
 
-        frames() {
-          return this.getState().frames;
+        features() {
+          return this.getState().features;
         },
 
-        profile() {
-          return this.getState().profile;
+        frames() {
+          return this.getState().frames;
         },
 
         getContentInfo() {
@@ -1081,8 +1081,8 @@ describe('FrameSyncService', () => {
   });
 
   describe('sending feature flags to frames', () => {
-    const currentFlags = () => fakeStore.getState().profile.features;
-    const setFlags = features => fakeStore.setState({ profile: { features } });
+    const currentFlags = () => fakeStore.getState().features;
+    const setFlags = features => fakeStore.setState({ features });
 
     beforeEach(async () => {
       // Set some initial flags before the host frame is even connected.

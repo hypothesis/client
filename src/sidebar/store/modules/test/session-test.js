@@ -58,6 +58,43 @@ describe('sidebar/store/modules/session', () => {
         assert.equal(store.isFeatureEnabled('some_feature'), enabled);
       });
     });
+
+    it('returns true if feature is enabled in global `features` setting', () => {
+      const settings = {
+        ...fakeSettings,
+        features: ['some_feature'],
+      };
+      store = createStore([sessionModule], [settings]);
+      assert.isTrue(store.isFeatureEnabled('some_feature'));
+    });
+  });
+
+  describe('#features', () => {
+    beforeEach(() => {
+      const settings = {
+        ...fakeSettings,
+        features: ['global_feature'],
+      };
+      store = createStore([sessionModule], [settings]);
+    });
+
+    it('returns only global features before profile is loaded', () => {
+      assert.deepEqual(store.features(), {
+        global_feature: true,
+      });
+    });
+
+    it('returns combined features after profile is loaded', () => {
+      store.updateProfile({
+        userid: null,
+        features: { user_feature: true, other_feature: false },
+      });
+      assert.deepEqual(store.features(), {
+        global_feature: true,
+        user_feature: true,
+        other_feature: false,
+      });
+    });
   });
 
   describe('#hasFetchedProfile', () => {

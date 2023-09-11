@@ -476,7 +476,7 @@ export class FrameSyncService {
 
     // Synchronize highlight visibility in this guest with the sidebar's controls.
     guestRPC.call('setHighlightsVisible', this._highlightsVisible);
-    guestRPC.call('featureFlagsUpdated', this._store.profile().features);
+    guestRPC.call('featureFlagsUpdated', this._store.features());
 
     // If we have content banner data, send it to the guest. If there are
     // multiple guests the banner is likely only appropriate for the main one.
@@ -514,7 +514,7 @@ export class FrameSyncService {
    * Set up synchronization of feature flags to host and guest frames.
    */
   private _setupFeatureFlagSync() {
-    const getFlags = () => this._store.profile().features;
+    const getFlags = () => this._store.features();
 
     const sendFlags = (flags: Record<string, boolean>) => {
       this._hostRPC.call('featureFlagsUpdated', flags);
