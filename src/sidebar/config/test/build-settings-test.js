@@ -123,7 +123,7 @@ describe('sidebar/config/build-settings', () => {
         );
       });
 
-      it('adds RPC settings to resulting SidebarSettings', async () => {
+      it('adds settings received via RPC to merged settings', async () => {
         fakeJsonRpc.call.resolves({ foo: 'baz' }); // host config
 
         const result = await buildSettings({}, fakeWindow);
@@ -134,7 +134,7 @@ describe('sidebar/config/build-settings', () => {
         });
       });
 
-      it('merges ConfigFromHost returned from RPC with ConfigFromSidebar', async () => {
+      it('merges settings received via RPC with sidebar settings', async () => {
         const configFromSidebar = { foo: 'bar', appType: 'via' };
         fakeJsonRpc.call.resolves({ foo: 'baz' }); // host config
         const result = await buildSettings(configFromSidebar, fakeWindow);
@@ -149,7 +149,7 @@ describe('sidebar/config/build-settings', () => {
         });
       });
 
-      it('rejects if RPC request for ConfigFromHost fails', async () => {
+      it('rejects if RPC request for config fails', async () => {
         fakeJsonRpc.call.rejects(new Error('Nope'));
         const configFromSidebar = { foo: 'bar', appType: 'via' };
         await assert.rejects(

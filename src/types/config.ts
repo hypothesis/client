@@ -104,7 +104,7 @@ export type ThemeProperty =
  * `ConfigFromAnnotator` OR by an ancestor ("embedder frame") as
  * `ConfigFromEmbedder`.
  *
- * This is the subset of keys from
+ * This is mostly a subset of keys from
  * https://h.readthedocs.io/projects/client/en/latest/publishers/config/ which
  * excludes any keys used only by the "annotator" part of the application.
  */
@@ -134,20 +134,6 @@ export type ConfigFromHost = {
 
   /** Whether to show the "New note" button on the "Page notes" tab. */
   enableExperimentalNewNoteButton?: boolean;
-
-  /**
-   * Instructs the client to fetch configuration from an ancestor of the host
-   * frame.
-   *
-   * This is primarily used in Hypothesis's LMS integration.
-   */
-  requestConfigFromFrame?: EmbedderFrameConfig;
-
-  /**
-   * Request notifications be delivered to the frame specified by
-   * `requestConfigFromFrame` when certain annotation activity happens.
-   */
-  reportActivity?: ReportAnnotationActivityConfig;
 
   /** Configuration for the annotation services that the client connects to. */
   services?: Service[];
@@ -219,11 +205,41 @@ export type RPCSettings = {
  * |  +------------------------------------------+                          |
  * +------------------------------------------------------------------------+
  */
-export type SidebarSettings = ConfigFromHost &
+export type SidebarSettings = ConfigFromAnnotator &
+  ConfigFromEmbedder &
   ConfigFromSidebar & { rpc?: RPCSettings };
 
-/** See {@link SidebarSettings} */
-export type ConfigFromAnnotator = Omit<ConfigFromHost, 'reportActivity'>;
+/**
+ * Configuration passed to Hypothesis client from the host frame.
+ */
+export type ConfigFromAnnotator = ConfigFromHost & {
+  /**
+   * Instructs the client to fetch configuration from an ancestor of the host
+   * frame.
+   *
+   * This is primarily used in Hypothesis's LMS integration.
+   */
+  requestConfigFromFrame?: EmbedderFrameConfig;
+};
 
-/** See {@link SidebarSettings} */
-export type ConfigFromEmbedder = Omit<ConfigFromHost, 'requestConfigFromFrame'>;
+/**
+ * Configuration passed to Hypothesis client from the embedder frame. This is
+ * primarily used in Hypothesis's LMS integration.
+ *
+ * This is a superset of the configuration which can be passed from the host
+ * frame which enables some additional configuration that we don't want to
+ * allow arbitrary web pages to set.
+ */
+export type ConfigFromEmbedder = ConfigFromHost & {
+  /**
+   * Feature flags to enable. When a flag is listed here, it will be turned
+   * on even if disabled in the H user profile.
+   */
+  features?: string[];
+
+  /**
+   * Request notifications be delivered to the frame specified by
+   * `requestConfigFromFrame` when certain annotation activity happens.
+   */
+  reportActivity?: ReportAnnotationActivityConfig;
+};
