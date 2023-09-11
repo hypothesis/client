@@ -89,10 +89,8 @@ const features = createSelector(
   (state: State) => state.features,
   (profile: Profile, features: string[]): Record<string, boolean> => {
     const combinedFeatures = { ...profile.features };
-    if (features) {
-      for (const feat of features) {
-        combinedFeatures[feat] = true;
-      }
+    for (const feat of features) {
+      combinedFeatures[feat] = true;
     }
     return combinedFeatures;
   },
