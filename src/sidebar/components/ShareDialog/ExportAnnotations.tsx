@@ -1,6 +1,7 @@
 import {
   Button,
   CardActions,
+  Link,
   Input,
   Select,
 } from '@hypothesis/frontend-shared';
@@ -99,7 +100,22 @@ function ExportAnnotations({
     >
       {exportableAnnotations.length > 0 ? (
         <>
-          <label data-testid="export-count" htmlFor="export-filename">
+          <p className="text-color-text-light mb-3">
+            <Link
+              variant="text-light"
+              underline="always"
+              href="https://web.hypothes.is/help/exporting-and-importing-annotations-in-the-hypothesis-web-app/"
+              target="_blank"
+            >
+              Learn more
+            </Link>{' '}
+            about copying and exporting annotations.
+          </p>
+          <label
+            data-testid="export-count"
+            htmlFor="export-filename"
+            className="font-medium"
+          >
             Name of export file:
           </label>
           <Input
@@ -113,7 +129,7 @@ function ExportAnnotations({
             required
             maxLength={250}
           />
-          <label htmlFor="export-user" className="block">
+          <label htmlFor="export-user" className="block font-medium">
             Select which user{"'"}s annotations to export:
           </label>
           <Select

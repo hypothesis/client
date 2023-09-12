@@ -5,11 +5,15 @@ import { useRef, useState } from 'preact/hooks';
 export type FileInputProps = {
   onFileSelected: (file: File) => void;
   disabled?: boolean;
+
+  /** ID for the `<input type="file">` element. */
+  id?: string;
 };
 
 export default function FileInput({
   onFileSelected,
   disabled,
+  id,
 }: FileInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [filename, setFilename] = useState<string | null>(null);
@@ -29,6 +33,7 @@ export default function FileInput({
       <input
         ref={fileInputRef}
         accept=".json"
+        id={id}
         type="file"
         disabled={disabled}
         className="invisible absolute w-0 h-0"

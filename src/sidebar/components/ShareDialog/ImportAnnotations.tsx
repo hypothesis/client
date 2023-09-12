@@ -1,4 +1,4 @@
-import { Button, CardActions, Select } from '@hypothesis/frontend-shared';
+import { Button, CardActions, Link, Select } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useId, useMemo, useState } from 'preact/hooks';
 
 import type { APIAnnotationData } from '../../../types/api';
@@ -96,6 +96,7 @@ function ImportAnnotations({
     };
   }
 
+  const fileInputId = useId();
   const userSelectId = useId();
 
   if (!currentUser) {
@@ -138,14 +139,25 @@ function ImportAnnotations({
 
   return (
     <>
-      <p>Select Hypothesis export file:</p>
-      <FileInput onFileSelected={setFile} disabled={busy} />
+      <p className="text-color-text-light mb-3">
+        <Link
+          variant="text-light"
+          underline="always"
+          href="https://web.hypothes.is/help/exporting-and-importing-annotations-in-the-hypothesis-web-app/"
+          target="_blank"
+        >
+          Learn more
+        </Link>{' '}
+        about importing annotations.
+      </p>
+      <label htmlFor={fileInputId} className="font-medium">
+        Select Hypothesis export file:
+      </label>
+      <FileInput onFileSelected={setFile} disabled={busy} id={fileInputId} />
       {userList && (
         <>
-          <label htmlFor={userSelectId}>
-            <p className="mt-3">
-              Select which user&apos;s annotations to import:
-            </p>
+          <label htmlFor={userSelectId} className="block font-medium">
+            Select which user&apos;s annotations to import:
           </label>
           <Select
             id={userSelectId}
