@@ -60,7 +60,7 @@ function ExportAnnotations({
   const defaultFilename = useMemo(
     () =>
       suggestedFilename({
-        documentMetadata: contentFrame.metadata,
+        documentMetadata: contentFrame?.metadata,
         groupName: group?.name,
       }),
     [contentFrame, group],
