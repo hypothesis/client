@@ -163,7 +163,16 @@ const mainFrame = createSelector(
  */
 const defaultContentFrame = createSelector(
   (state: State) => state.frames,
-  frames => firstFrameWithoutId(frames) ?? frames[0] ?? null,
+  frames => {
+    const mainFrame = firstFrameWithoutId(frames);
+    if (mainFrame) {
+      return mainFrame;
+    } else if (frames.length > 0) {
+      return frames[0];
+    } else {
+      return null;
+    }
+  },
 );
 
 function searchUrisForFrame(frame: Frame): string[] {
