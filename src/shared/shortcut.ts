@@ -24,6 +24,14 @@ const modifiers = {
  * would be "!" instead. See also https://github.com/w3c/uievents/issues/247.
  */
 export function matchShortcut(event: KeyboardEvent, shortcut: string): boolean {
+  // Work around an issue where Chrome autofill can dispatch "keydown" events
+  // with an argument that is not a `KeyboardEvent`.
+  //
+  // See https://bugs.chromium.org/p/chromium/issues/detail?id=739792.
+  if (!(event instanceof KeyboardEvent)) {
+    return false;
+  }
+
   const parts = shortcut.split('+').map(p => p.toLowerCase());
 
   let requiredModifiers = 0;

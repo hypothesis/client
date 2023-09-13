@@ -4,13 +4,13 @@ import { act } from 'preact/test-utils';
 import { matchShortcut, installShortcut, useShortcut } from '../shortcut';
 
 function createEvent(key, { ctrl, alt, shift, meta } = {}) {
-  return {
+  return new KeyboardEvent('keydown', {
     key,
     ctrlKey: !!ctrl,
     altKey: !!alt,
     shiftKey: !!shift,
     metaKey: !!meta,
-  };
+  });
 }
 
 describe('shared/shortcut', () => {
@@ -81,6 +81,10 @@ describe('shared/shortcut', () => {
       assert.throws(() => {
         matchShortcut(createEvent('a'), 'a+b');
       }, 'Multiple non-modifier keys specified');
+    });
+
+    it('should return false if event is not a `KeyboardEvent`', () => {
+      assert.isFalse(matchShortcut(new Event('keydown'), 'a'));
     });
   });
 
