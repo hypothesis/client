@@ -103,11 +103,24 @@ function initServices(
 }
 
 /**
+ * Setup connection between sidebar and host page.
+ *
  * @inject
  */
-function setupFrameSync(frameSync: FrameSyncService, store: SidebarStore) {
+function setupFrameSync(
+  frameSync: FrameSyncService,
+  store: SidebarStore,
+  toastMessenger: ToastMessengerService,
+) {
   if (store.route() === 'sidebar') {
-    frameSync.connect();
+    frameSync.connect().catch(() => {
+      toastMessenger.error(
+        'Hypothesis failed to connect to the web page. Try reloading the page.',
+        {
+          autoDismiss: false,
+        },
+      );
+    });
   }
 }
 
