@@ -166,7 +166,11 @@ export class AnnotationsService {
       return;
     }
     const pageNoteAnnotation = {
-      target: [],
+      target: [
+        {
+          source: topLevelFrame.uri,
+        },
+      ],
       uri: topLevelFrame.uri,
     };
     this.create(pageNoteAnnotation);
