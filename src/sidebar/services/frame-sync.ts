@@ -388,16 +388,22 @@ export class FrameSyncService {
 
     // A new annotation, note or highlight was created in the frame
     guestRPC.on('createAnnotation', (annot: AnnotationData) => {
-      // If user is not logged in, we can't really create a meaningful highlight
-      // or annotation. Instead, we need to open the sidebar, show an error,
-      // and delete the (unsaved) annotation so it gets un-selected in the
-      // target document
-      if (!this._store.isLoggedIn()) {
+      // If user is not logged in, or groups haven't loaded yet, we can't create
+      // a meaningful highlight or annotation. Instead, we need to open the
+      // sidebar, show an error, and delete the (unsaved) annotation so it gets
+      // un-selected in the target document
+      const isLoggedIn = this._store.isLoggedIn();
+      const hasGroup = this._store.focusedGroup() !== null;
+
+      if (!isLoggedIn || !hasGroup) {
         this._hostRPC.call('openSidebar');
-        this._store.openSidebarPanel('loginPrompt');
+        if (!isLoggedIn) {
+          this._store.openSidebarPanel('loginPrompt');
+        }
         this._guestRPC.forEach(rpc => rpc.call('deleteAnnotation', annot.$tag));
         return;
       }
+
       this._inFrame.add(annot.$tag);
 
       // Open the sidebar so that the user can immediately edit the draft

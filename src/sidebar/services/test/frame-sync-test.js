@@ -149,6 +149,7 @@ describe('FrameSyncService', () => {
         },
 
         findIDsForTags: sinon.stub().returns([]),
+        focusedGroup: sinon.stub().returns({ id: 'foobar' }),
         hoverAnnotations: sinon.stub(),
         isLoggedIn: sinon.stub().returns(false),
         openSidebarPanel: sinon.stub(),
@@ -583,7 +584,7 @@ describe('FrameSyncService', () => {
       assert.calledWith(hostRPC().call, 'showHighlights');
     });
 
-    context('when an authenticated user is present', () => {
+    context('user is logged in and there is a focused group', () => {
       beforeEach(async () => {
         frameSync.connect();
         await connectGuest();
@@ -619,13 +620,7 @@ describe('FrameSyncService', () => {
       });
     });
 
-    context('when no authenticated user is present', () => {
-      beforeEach(async () => {
-        fakeStore.isLoggedIn.returns(false);
-        frameSync.connect();
-        await connectGuest();
-      });
-
+    const addCommonNotReadyTests = () => {
       it('should not create an annotation in the sidebar', () => {
         emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
 
@@ -638,17 +633,38 @@ describe('FrameSyncService', () => {
         assert.calledWith(hostRPC().call, 'openSidebar');
       });
 
-      it('should open the login prompt panel', () => {
-        emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
-
-        assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
-      });
-
       it('should send a "deleteAnnotation" message to the frame', () => {
         emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
 
         assert.calledWith(guestRPC().call, 'deleteAnnotation');
       });
+    };
+
+    context('user is not logged in', () => {
+      beforeEach(async () => {
+        fakeStore.isLoggedIn.returns(false);
+        frameSync.connect();
+        await connectGuest();
+      });
+
+      addCommonNotReadyTests();
+
+      it('should open the login prompt panel', () => {
+        emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
+
+        assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
+      });
+    });
+
+    context('groups have not loaded', () => {
+      beforeEach(async () => {
+        fakeStore.isLoggedIn.returns(true);
+        fakeStore.focusedGroup.returns(null);
+        frameSync.connect();
+        await connectGuest();
+      });
+
+      addCommonNotReadyTests();
     });
   });
 
