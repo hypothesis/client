@@ -75,6 +75,7 @@ export class PortProvider implements Destroyable {
 
   private _listeners: ListenerCollection;
   private _sidebarHostChannel: MessageChannel;
+  private _sidebarConnected: boolean;
 
   /**
    * Begin listening to port requests from other frames.
@@ -91,6 +92,7 @@ export class PortProvider implements Destroyable {
     // Create the `sidebar-host` channel immediately, while other channels are
     // created on demand
     this._sidebarHostChannel = new MessageChannel();
+    this._sidebarConnected = false;
 
     this._listeners = new ListenerCollection();
 
@@ -180,19 +182,6 @@ export class PortProvider implements Destroyable {
       }
       this._handledRequests.add(requestId);
 
-      // Create the channel for these two frames to communicate and send the
-      // corresponding ports to them.
-      const messageChannel =
-        channel === 'sidebar-host'
-          ? this._sidebarHostChannel
-          : new MessageChannel();
-
-      // The message that is sent to the target frame that the source wants to
-      // connect to, as well as the source frame requesting the connection.
-      // Each message is accompanied by a port for the appropriate end of the
-      // connection.
-      const message = { frame1, frame2, type: 'offer', requestId, sourceId };
-
       // If the source window has an opaque origin [1], `event.origin` will be
       // the string "null". This is not a legal value for the `targetOrigin`
       // parameter to `postMessage`, so remap it to "*".
@@ -201,6 +190,35 @@ export class PortProvider implements Destroyable {
       //     Documents with opaque origins include file:// URLs and
       //     sandboxed iframes.
       const targetOrigin = origin === 'null' ? '*' : origin;
+
+      // Create the channel for these two frames to communicate and send the
+      // corresponding ports to them.
+      const messageChannel =
+        channel === 'sidebar-host'
+          ? this._sidebarHostChannel
+          : new MessageChannel();
+
+      // The sidebar can only connect once. It might try to connect a second
+      // time if something causes the iframe to reload. We can't recover from
+      // this yet. Instead we just log a warning here. The port discovery
+      // protocol doesn't have a way to return errors, so the sidebar will only
+      // learn about this when it times out waiting for a response.
+      if (messageChannel === this._sidebarHostChannel) {
+        if (this._sidebarConnected) {
+          console.warn(
+            'Ignoring second request from Hypothesis sidebar to connect to host frame',
+          );
+          return;
+        }
+        this._sidebarConnected = true;
+      }
+
+      // The message that is sent to the target frame that the source wants to
+      // connect to, as well as the source frame requesting the connection.
+      // Each message is accompanied by a port for the appropriate end of the
+      // connection.
+      const message = { frame1, frame2, type: 'offer', requestId, sourceId };
+
       source.postMessage(message, targetOrigin, [messageChannel.port1]);
 
       if (frame2 === 'sidebar') {

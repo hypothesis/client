@@ -173,6 +173,33 @@ describe('PortProvider', () => {
       );
     });
 
+    it('ignores a second request from sidebar frame for sidebar <-> host connection', async () => {
+      const warnStub = sinon.stub(console, 'warn');
+      try {
+        const data = {
+          frame1: 'sidebar',
+          frame2: 'host',
+          type: 'request',
+          sourceId: undefined,
+        };
+        await sendPortFinderRequest({
+          data: { ...data, requestId: 'first' },
+        });
+        window.postMessage.resetHistory();
+
+        await sendPortFinderRequest({
+          data: { ...data, requestId: 'second' },
+        });
+        assert.notCalled(window.postMessage);
+        assert.calledWith(
+          warnStub,
+          'Ignoring second request from Hypothesis sidebar to connect to host frame',
+        );
+      } finally {
+        warnStub.restore();
+      }
+    });
+
     it('responds to a valid port request from a source with an opaque origin', async () => {
       const data = {
         frame1: 'guest',
