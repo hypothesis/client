@@ -279,7 +279,11 @@ describe('AnnotationsService', () => {
       const annotation = getLastAddedAnnotation();
 
       assert.equal(annotation.uri, 'http://www.example.com');
-      assert.deepEqual(annotation.target, []);
+      assert.deepEqual(annotation.target, [
+        {
+          source: 'http://www.example.com',
+        },
+      ]);
     });
   });
 
