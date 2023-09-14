@@ -90,7 +90,12 @@ export function installShortcut(
     // which is used as a root element in some other places because the body
     // element is not keyboard-focusable in XHTML documents in Safari/Chrome.
     // See https://github.com/hypothesis/client/issues/4364.
-    rootElement = document.documentElement,
+    //
+    // nb. `documentElement` is non-null in TS types, but it can be null if
+    // the root element is explicitly removed. We don't know how this happens,
+    // but it has been observed on some ChromeOS devices. See
+    // https://hypothesis.sentry.io/issues/3987992034.
+    rootElement = (document.documentElement as HTMLElement | null) ?? undefined,
   }: ShortcutOptions = {},
 ) {
   const onKeydown = (event: KeyboardEvent) => {
@@ -98,6 +103,9 @@ export function installShortcut(
       onPress(event);
     }
   };
+  if (!rootElement) {
+    return () => {};
+  }
   rootElement.addEventListener('keydown', onKeydown);
   return () => rootElement.removeEventListener('keydown', onKeydown);
 }
