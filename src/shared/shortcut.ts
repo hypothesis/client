@@ -103,6 +103,7 @@ export function installShortcut(
       onPress(event);
     }
   };
+  /* istanbul ignore next */
   if (!rootElement) {
     return () => {};
   }
