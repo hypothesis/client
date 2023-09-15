@@ -35,6 +35,31 @@ const sidebarLinkElement = document.querySelector(
 ) as HTMLLinkElement;
 
 /**
+ * Find and remove existing `<hypothesis-sidebar>` elements, and other
+ * Hypothesis application containers, which are created in the host frame.
+ *
+ * These might exist if the current page is a local snapshot of a web page saved
+ * with the browser's "Save Page As" feature. In that case the snapshot can
+ * include both the annotator bundle JS and the DOM elements it created. See
+ * https://github.com/hypothesis/client/issues/5827.
+ *
+ * Having duplicates of these elements is problematic because they contain
+ * iframed apps which will try to communicate with the host frame, and the
+ * host frame assumes there is only one of each.
+ *
+ * Returns true if any such elements were found.
+ */
+function removeExistingHypothesisAppElements(): boolean {
+  const appElements = document.querySelectorAll(
+    ['hypothesis-sidebar', 'hypothesis-notebook', 'hypothesis-profile'].join(
+      ',',
+    ),
+  );
+  appElements.forEach(el => el.remove());
+  return appElements.length > 0;
+}
+
+/**
  * Entry point for the part of the Hypothesis client that runs in the page being
  * annotated.
  *
@@ -60,6 +85,17 @@ function init() {
   const destroyables = [] as Destroyable[];
 
   if (hostFrame === window) {
+    if (removeExistingHypothesisAppElements()) {
+      // If there were existing `<hypothesis-sidebar>` etc. elements, we are in
+      // an "abnormal" environment such as a snapshot of a web page where
+      // Hypothesis was loaded. We assume we can't function in such an
+      // environment, so we clean up the previous elements and abort.
+      console.warn(
+        'Hypothesis did not load because it found an existing instance on the page.',
+      );
+      return;
+    }
+
     // Ensure port "close" notifications from eg. guest frames are delivered properly.
     const removeWorkaround = installPortCloseWorkaroundForSafari();
     destroyables.push({ destroy: removeWorkaround });
