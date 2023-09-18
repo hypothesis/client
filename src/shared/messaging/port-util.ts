@@ -19,6 +19,9 @@ export type Message = {
    */
   type: 'offer' | 'request';
 
+  /** If set on an `offer` message, indicates that the request was rejected. */
+  error?: string;
+
   /**
    * ID of the request. Used to associate "offer" messages with their
    * corresponding "request" messages.

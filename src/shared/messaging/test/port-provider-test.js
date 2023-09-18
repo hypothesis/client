@@ -190,7 +190,15 @@ describe('PortProvider', () => {
         await sendPortFinderRequest({
           data: { ...data, requestId: 'second' },
         });
-        assert.notCalled(window.postMessage);
+        assert.calledWith(
+          window.postMessage,
+          sinon.match({
+            ...data,
+            type: 'offer',
+            error: 'Received duplicate port request',
+          }),
+          window.location.origin,
+        );
         assert.calledWith(
           warnStub,
           'Ignoring second request from Hypothesis sidebar to connect to host frame',

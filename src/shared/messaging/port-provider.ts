@@ -74,6 +74,8 @@ export class PortProvider implements Destroyable {
   private _handledRequests: Set<string>;
 
   private _listeners: ListenerCollection;
+
+  // Message channels for connections from Hypothesis apps to the host frame.
   private _sidebarHostChannel: MessageChannel;
   private _sidebarConnected: boolean;
 
@@ -198,6 +200,18 @@ export class PortProvider implements Destroyable {
           ? this._sidebarHostChannel
           : new MessageChannel();
 
+      // The message that is sent to the target frame that the source wants to
+      // connect to, as well as the source frame requesting the connection.
+      // Each message is accompanied by a port for the appropriate end of the
+      // connection.
+      const message: Message = {
+        frame1,
+        frame2,
+        type: 'offer',
+        requestId,
+        sourceId,
+      };
+
       // The sidebar can only connect once. It might try to connect a second
       // time if something causes the iframe to reload. We can't recover from
       // this yet. Instead we just log a warning here. The port discovery
@@ -208,16 +222,12 @@ export class PortProvider implements Destroyable {
           console.warn(
             'Ignoring second request from Hypothesis sidebar to connect to host frame',
           );
+          message.error = 'Received duplicate port request';
+          source.postMessage(message, targetOrigin);
           return;
         }
         this._sidebarConnected = true;
       }
-
-      // The message that is sent to the target frame that the source wants to
-      // connect to, as well as the source frame requesting the connection.
-      // Each message is accompanied by a port for the appropriate end of the
-      // connection.
-      const message = { frame1, frame2, type: 'offer', requestId, sourceId };
 
       source.postMessage(message, targetOrigin, [messageChannel.port1]);
 
