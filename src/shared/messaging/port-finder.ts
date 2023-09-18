@@ -49,20 +49,6 @@ export class PortFinder implements Destroyable {
    * @param target - the frame aiming to be discovered
    */
   async discover(target: Frame): Promise<MessagePort> {
-    let isValidRequest = false;
-    if (
-      (this._source === 'guest' && target === 'host') ||
-      (this._source === 'guest' && target === 'sidebar') ||
-      (this._source === 'sidebar' && target === 'host') ||
-      (this._source === 'notebook' && target === 'sidebar')
-    ) {
-      isValidRequest = true;
-    }
-
-    if (!isValidRequest) {
-      throw new Error('Invalid request of channel/port');
-    }
-
     const requestId = generateHexString(6);
 
     return new Promise((resolve, reject) => {
