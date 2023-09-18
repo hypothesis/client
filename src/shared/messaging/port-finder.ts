@@ -1,7 +1,7 @@
 import type { Destroyable } from '../../types/annotator';
 import { ListenerCollection } from '../listener-collection';
 import { generateHexString } from '../random';
-import { isMessageEqual } from './port-util';
+import { isMessage } from './port-util';
 import type { Frame } from './port-util';
 
 /** Timeout for waiting for the host frame to respond to a port request. */
@@ -20,6 +20,13 @@ export type Options = {
   /** The frame where the `PortProvider` is listening for messages. */
   hostFrame: Window;
 };
+
+/** Error thrown when a {@link PortFinder.discover} request fails. */
+export class PortRequestError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
 
 /**
  * PortFinder is used by non-host frames in the client to establish a
@@ -78,7 +85,7 @@ export class PortFinder implements Destroyable {
       const timeoutId = setTimeout(() => {
         clearInterval(intervalId);
         reject(
-          new Error(
+          new PortRequestError(
             `Unable to establish ${this._source}-${target} communication channel`,
           ),
         );
@@ -86,18 +93,36 @@ export class PortFinder implements Destroyable {
 
       const listenerId = this._listeners.add(window, 'message', event => {
         const { data, ports } = event;
+
+        // Ignore messages that are:
+        //
+        // - Not related to port discovery
+        // - Not a response to the request we sent above. Note that the host
+        //   frame may be the same as the current window, since eg. the host
+        //   frame can also be a guest frame. Therefore we check `data.type` as
+        //   well to make sure this is a response.
         if (
-          isMessageEqual(data, {
-            frame1: this._source,
-            frame2: target,
-            type: 'offer',
-            requestId,
-          })
+          !isMessage(data) ||
+          data.requestId !== requestId ||
+          data.type === 'request'
         ) {
-          clearInterval(intervalId);
-          clearTimeout(timeoutId);
-          this._listeners.remove(listenerId);
+          return;
+        }
+
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+        this._listeners.remove(listenerId);
+
+        if (typeof data.error === 'string') {
+          reject(new PortRequestError(data.error));
+        } else if (ports.length > 0) {
           resolve(ports[0]);
+        } else {
+          reject(
+            new PortRequestError(
+              `${this._source}-${target} port request failed`,
+            ),
+          );
         }
       });
 

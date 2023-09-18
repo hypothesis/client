@@ -3,6 +3,7 @@ import {
   MAX_WAIT_FOR_PORT,
   POLLING_INTERVAL_FOR_PORT,
   PortFinder,
+  PortRequestError,
   $imports,
 } from '../port-finder';
 
@@ -79,6 +80,7 @@ describe('PortFinder', () => {
 
       await delay(0);
 
+      assert.instanceOf(error, PortRequestError);
       assert.equal(
         error.message,
         'Unable to establish guest-host communication channel',
@@ -167,10 +169,53 @@ describe('PortFinder', () => {
 
       await delay(0);
 
+      assert.instanceOf(error, PortRequestError);
       assert.equal(
         error.message,
         'Unable to establish guest-host communication channel',
       );
+    });
+
+    it('rejects if host frame rejects port request with an explicit reason', async () => {
+      let error;
+
+      const done = portFinder.discover('host').catch(e => (error = e));
+
+      sendPortProviderOffer({
+        data: {
+          frame1: 'guest',
+          frame2: 'host',
+          requestId,
+          type: 'offer',
+          error: 'Host frame says no',
+        },
+      });
+
+      await done;
+
+      assert.instanceOf(error, PortRequestError);
+      assert.equal(error.message, 'Host frame says no');
+    });
+
+    it('rejects if host frame does not send a port', async () => {
+      let error;
+
+      const done = portFinder.discover('host').catch(e => (error = e));
+
+      sendPortProviderOffer({
+        // This is a valid response, except that the ports are missing.
+        data: {
+          frame1: 'guest',
+          frame2: 'host',
+          requestId,
+          type: 'offer',
+        },
+      });
+
+      await done;
+
+      assert.instanceOf(error, PortRequestError);
+      assert.equal(error.message, 'guest-host port request failed');
     });
   });
 });
