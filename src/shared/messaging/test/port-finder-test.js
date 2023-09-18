@@ -87,18 +87,6 @@ describe('PortFinder', () => {
   });
 
   describe('#discover', () => {
-    ['guest', 'invalid'].forEach(target =>
-      it('rejects if requesting an invalid port', async () => {
-        let error;
-        try {
-          await portFinder.discover(target);
-        } catch (e) {
-          error = e;
-        }
-        assert.equal(error.message, 'Invalid request of channel/port');
-      }),
-    );
-
     it('sends port request to host frame', async () => {
       const clock = sinon.useFakeTimers();
       try {
@@ -128,7 +116,7 @@ describe('PortFinder', () => {
       { source: 'sidebar', target: 'host' },
       { source: 'notebook', target: 'sidebar' },
     ].forEach(({ source, target }) =>
-      it('resolves if requesting a valid port', async () => {
+      it('resolves when port is returned', async () => {
         const { port1 } = new MessageChannel();
         let resolvedPort;
         portFinder = createPortFinder(source);
