@@ -147,8 +147,13 @@ export class PortProvider implements Destroyable {
     const handleRequest = (event: MessageEvent) => {
       const { data, origin, source } = event;
 
+      // Ignore messages where the sender went away before we can send a response.
+      if (!source) {
+        return;
+      }
+
+      // Ignore messages that don't look like port requests.
       if (!isMessage(data) || data.type !== 'request') {
-        // If this does not look like a message intended for us, ignore it.
         return;
       }
 
