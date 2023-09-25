@@ -2859,11 +2859,11 @@ __metadata:
   linkType: hard
 
 "@types/dompurify@npm:^3.0.0":
-  version: 3.0.2
-  resolution: "@types/dompurify@npm:3.0.2"
+  version: 3.0.3
+  resolution: "@types/dompurify@npm:3.0.3"
   dependencies:
     "@types/trusted-types": "*"
-  checksum: dc017e16a46bcc77086af7d4dc5d2bf4102f16bf1a11b2937e90380da50e77716a2a608ff52990b1293250fefc2ad7593a1378fe07e3a7e21f200d702f0a7878
+  checksum: ff629277db4d19d836b0d878e93efb27d876d1073db81507c39d44d509b30ee3bcdc9e951dbbf9574b1fc6c52e1eaa95abf4279fa45aca281868717f8a7298da
   languageName: node
   linkType: hard
 
