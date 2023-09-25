@@ -128,7 +128,20 @@ describe('PortProvider', () => {
           requestId: 'abcdef',
         },
         source: null,
-        reason: 'comes from invalid source',
+        reason: 'source frame went away',
+      },
+      {
+        data: {
+          frame1: 'sidebar',
+          frame2: 'host',
+          type: 'request',
+          requestId: 'abcdef',
+        },
+        // In reality a non-Window sender of a message to a window is most
+        // likely to be a worker of some kind, but a MessagePort is easier to
+        // construct.
+        source: new MessageChannel().port1,
+        reason: 'source is not a window',
       },
       {
         data: {
