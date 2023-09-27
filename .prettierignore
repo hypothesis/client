@@ -1,4 +1,5 @@
-.*/**
+.tox/
+.yalc/
 build/
 coverage/
 docs/
