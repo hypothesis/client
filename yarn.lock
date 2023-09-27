@@ -2975,9 +2975,9 @@ __metadata:
   linkType: hard
 
 "@types/showdown@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "@types/showdown@npm:2.0.1"
-  checksum: 75078b292d645bb6adbda7d440415fa06f37433225ba097d8f56391fc6f1234beaeb7339baf01c4093b5f1be51fa285f81b32d11055892758294bb63de92fb01
+  version: 2.0.2
+  resolution: "@types/showdown@npm:2.0.2"
+  checksum: 25c2299c10a5a4d55d2e53ee9541aac37ded3c8973da9b19d806a0033d6e03b6dd310ccfe3a5d78c63e0bc77cd7384bca6aa686f046366701a1ebe653a6c36e0
   languageName: node
   linkType: hard
 
