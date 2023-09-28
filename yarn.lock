@@ -3012,9 +3012,9 @@ __metadata:
   linkType: hard
 
 "@types/retry@npm:^0.12.1":
-  version: 0.12.2
-  resolution: "@types/retry@npm:0.12.2"
-  checksum: e5675035717b39ce4f42f339657cae9637cf0c0051cf54314a6a2c44d38d91f6544be9ddc0280587789b6afd056be5d99dbe3e9f4df68c286c36321579b1bf4a
+  version: 0.12.3
+  resolution: "@types/retry@npm:0.12.3"
+  checksum: 813557eb2ea13dd98b5f25a01d162441ebea9047a18d1852375a71b97c047e156814e812a1faf9c4657b673f0bef373653f2a596c1617cc4668668e9a41b7015
   languageName: node
   linkType: hard
 
@@ -3033,9 +3033,9 @@ __metadata:
   linkType: hard
 
 "@types/shallowequal@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@types/shallowequal@npm:1.1.1"
-  checksum: ed724c42d61b42e52306dfeb8c1af913a97f616a2098831a3f0801db3d391f00470dfe47f76fb213a087e4277dbf80857098aa2e56acb700f156befe06f6431f
+  version: 1.1.2
+  resolution: "@types/shallowequal@npm:1.1.2"
+  checksum: 457ce1a4bb8e8dacb93707d4c01ea0d08107e328e1edb04cc936f80f1370d99099d378170f99b7b143367bb2f8d223e567b1af91b8652ccfe60fa1fc9f700c83
   languageName: node
   linkType: hard
 
