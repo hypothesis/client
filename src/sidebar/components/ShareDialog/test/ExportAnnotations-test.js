@@ -1,9 +1,11 @@
+import { SelectNext } from '@hypothesis/frontend-shared';
 import {
   checkAccessibility,
   mockImportedComponents,
   waitForElement,
 } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
+import { act } from 'preact/test-utils';
 
 import * as fixtures from '../../../test/annotation-fixtures';
 import ExportAnnotations, { $imports } from '../ExportAnnotations';
@@ -66,9 +68,12 @@ describe('ExportAnnotations', () => {
       '../../store': { useSidebarStore: () => fakeStore },
     });
 
-    // Restore this very simple component to get it test coverage
     $imports.$restore({
+      // Restore this very simple component to get it test coverage
       './LoadingSpinner': true,
+      // Restore UserAnnotationsListItem, as it's used as some buttons' content
+      // and is needed to make a11y tests pass
+      './UserAnnotationsListItem': true,
     });
   });
 
@@ -126,9 +131,21 @@ describe('ExportAnnotations', () => {
         },
       ],
       userEntries: [
-        { value: '', text: 'All annotations (3)' }, // "No user selected" entry
-        { value: 'acct:brian@example.com', text: 'Brian Smith (2)' },
-        { value: 'acct:john@example.com', text: 'John Smith (1)' },
+        {
+          // "No user selected" entry
+          displayName: 'All annotations',
+          annotationsCount: 3,
+        },
+        {
+          userid: 'acct:brian@example.com',
+          displayName: 'Brian Smith',
+          annotationsCount: 2,
+        },
+        {
+          userid: 'acct:john@example.com',
+          displayName: 'John Smith',
+          annotationsCount: 1,
+        },
       ],
     },
 
@@ -146,8 +163,16 @@ describe('ExportAnnotations', () => {
         },
       ],
       userEntries: [
-        { value: '', text: 'All annotations (1)' }, // "No user selected" entry
-        { value: 'acct:brian@example.com', text: 'Brian Smith (1)' },
+        {
+          // "No user selected" entry
+          displayName: 'All annotations',
+          annotationsCount: 1,
+        },
+        {
+          userid: 'acct:brian@example.com',
+          displayName: 'Brian Smith',
+          annotationsCount: 1,
+        },
       ],
     },
   ].forEach(({ annotations, userEntries }) => {
@@ -156,13 +181,16 @@ describe('ExportAnnotations', () => {
 
       const wrapper = createComponent();
 
-      const userList = await waitForElement(wrapper, 'Select');
-      const users = userList.find('option');
+      const userList = await waitForElement(wrapper, SelectNext);
+      const users = userList.find(SelectNext.Option);
       assert.equal(users.length, userEntries.length);
 
       for (const [i, entry] of userEntries.entries()) {
-        assert.equal(users.at(i).prop('value'), entry.value);
-        assert.equal(users.at(i).text(), entry.text);
+        const value = users.at(i).prop('value');
+
+        assert.equal(value.userid, entry.userid);
+        assert.equal(value.displayName, entry.displayName);
+        assert.equal(value.annotations.length, entry.annotationsCount);
       }
     });
   });
@@ -237,11 +265,15 @@ describe('ExportAnnotations', () => {
       const wrapper = createComponent();
 
       // Select the user whose annotations we want to export
-      const userList = await waitForElement(wrapper, 'Select');
-      userList.prop('onChange')({
-        target: {
-          value: 'acct:john@example.com',
-        },
+      const userList = await waitForElement(wrapper, SelectNext);
+      const option = userList
+        .find(SelectNext.Option)
+        .filterWhere(
+          option => option.prop('value').userid === 'acct:john@example.com',
+        )
+        .first();
+      act(() => {
+        userList.prop('onChange')(option.prop('value'));
       });
       wrapper.update();
 

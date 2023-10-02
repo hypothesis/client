@@ -1,3 +1,4 @@
+import { SelectNext } from '@hypothesis/frontend-shared';
 import {
   checkAccessibility,
   waitFor,
@@ -99,8 +100,8 @@ describe('ImportAnnotations', () => {
       },
     ];
     selectFile(wrapper, annotations);
-    const userList = await waitForElement(wrapper, 'select');
-    assert.ok(userList.getDOMNode().value); // Current user should be auto-selected
+    const userList = await waitForElement(wrapper, SelectNext);
+    assert.ok(userList.prop('value')); // Current user should be auto-selected
 
     // Import button should be disabled since we don't have the things we need
     // to perform the import.
@@ -159,9 +160,16 @@ describe('ImportAnnotations', () => {
         },
       ],
       userEntries: [
-        { value: '', text: '' }, // "No user selected" entry
-        { value: 'acct:brian@example.com', text: 'Brian Smith (1)' },
-        { value: 'acct:john@example.com', text: 'John Smith (1)' },
+        {
+          userid: 'acct:brian@example.com',
+          displayName: 'Brian Smith',
+          annotationsCount: 1,
+        },
+        {
+          userid: 'acct:john@example.com',
+          displayName: 'John Smith',
+          annotationsCount: 1,
+        },
       ],
     },
 
@@ -178,9 +186,7 @@ describe('ImportAnnotations', () => {
           references: ['abc'],
         },
       ],
-      userEntries: [
-        { value: '', text: '' }, // "No user selected" entry
-      ],
+      userEntries: [],
     },
   ].forEach(({ annotations, userEntries }) => {
     it('displays user list when a valid file is selected', async () => {
@@ -188,13 +194,17 @@ describe('ImportAnnotations', () => {
 
       selectFile(wrapper, annotations);
 
-      const userList = await waitForElement(wrapper, 'Select');
-      const users = userList.find('option');
+      const userList = await waitForElement(wrapper, SelectNext);
+      const users = userList.find(SelectNext.Option);
+
       assert.equal(users.length, userEntries.length);
 
       for (const [i, entry] of userEntries.entries()) {
-        assert.equal(users.at(i).prop('value'), entry.value);
-        assert.equal(users.at(i).text(), entry.text);
+        const optionValue = users.at(i).prop('value');
+
+        assert.equal(optionValue.userid, entry.userid);
+        assert.equal(optionValue.displayName, entry.displayName);
+        assert.equal(optionValue.annotations.length, entry.annotationsCount);
       }
     });
   });
@@ -225,8 +235,8 @@ describe('ImportAnnotations', () => {
     ];
     selectFile(wrapper, annotations);
 
-    const userList = await waitForElement(wrapper, 'Select');
-    assert.equal(userList.getDOMNode().value, 'acct:john@example.com');
+    const userList = await waitForElement(wrapper, SelectNext);
+    assert.equal(userList.props().value.userid, 'acct:john@example.com');
   });
 
   it('does not select a user if no user matches logged-in user', async () => {
@@ -243,8 +253,8 @@ describe('ImportAnnotations', () => {
     ];
     selectFile(wrapper, annotations);
 
-    const userList = await waitForElement(wrapper, 'Select');
-    assert.equal(userList.getDOMNode().value, '');
+    const userList = await waitForElement(wrapper, SelectNext);
+    assert.equal(userList.prop('value'), null);
   });
 
   it('imports annotations when "Import" button is clicked', async () => {
@@ -281,9 +291,16 @@ describe('ImportAnnotations', () => {
 
     selectFile(wrapper, annotations);
 
-    const userList = await waitForElement(wrapper, 'select');
-    userList.getDOMNode().value = 'acct:brian@example.com';
-    userList.simulate('change');
+    const userList = await waitForElement(wrapper, SelectNext);
+    const option = userList
+      .find(SelectNext.Option)
+      .filterWhere(
+        option => option.prop('value').userid === 'acct:brian@example.com',
+      )
+      .first();
+
+    userList.prop('onChange')(option.prop('value'));
+    wrapper.update();
 
     const importButton = getImportButton(wrapper).getDOMNode();
     await waitFor(() => !importButton.disabled);

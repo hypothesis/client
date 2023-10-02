@@ -3,13 +3,14 @@ import {
   CardActions,
   Link,
   Input,
-  Select,
+  SelectNext,
 } from '@hypothesis/frontend-shared';
-import { useCallback, useMemo, useState } from 'preact/hooks';
+import { useCallback, useId, useMemo, useState } from 'preact/hooks';
 
 import { downloadJSONFile } from '../../../shared/download-json-file';
 import type { APIAnnotationData } from '../../../types/api';
 import { annotationDisplayName } from '../../helpers/annotation-user';
+import type { UserAnnotations } from '../../helpers/annotations-by-user';
 import { annotationsByUser } from '../../helpers/annotations-by-user';
 import { suggestedFilename } from '../../helpers/export-annotations';
 import { withServices } from '../../service-context';
@@ -17,6 +18,7 @@ import type { AnnotationsExporter } from '../../services/annotations-exporter';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import LoadingSpinner from './LoadingSpinner';
+import { UserAnnotationsListItem } from './UserAnnotationsListItem';
 
 export type ExportAnnotationsProps = {
   // injected
@@ -51,9 +53,23 @@ function ExportAnnotations({
     [exportableAnnotations, getDisplayName],
   );
 
-  // User whose annotations are going to be exported. Preselect current user
+  // User whose annotations are going to be exported.
   const currentUser = store.profile().userid;
-  const [selectedUser, setSelectedUser] = useState(currentUser);
+  const allAnnotationsOption: Omit<UserAnnotations, 'userid'> = useMemo(
+    () => ({
+      annotations: exportableAnnotations,
+      displayName: 'All annotations',
+    }),
+    [exportableAnnotations],
+  );
+  const [selectedUser, setSelectedUser] = useState(
+    // Try to preselect current user
+    userList.find(userInfo => userInfo.userid === currentUser) ??
+      allAnnotationsOption,
+  );
+
+  const fileInputId = useId();
+  const userSelectId = useId();
 
   const draftCount = store.countDrafts();
 
@@ -76,8 +92,7 @@ function ExportAnnotations({
 
     try {
       const annotationsToExport =
-        userList.find(item => item.userid === selectedUser)?.annotations ??
-        exportableAnnotations;
+        selectedUser?.annotations ?? exportableAnnotations;
       const filename = `${customFilename ?? defaultFilename}.json`;
       const exportData =
         annotationsExporter.buildExportContent(annotationsToExport);
@@ -113,14 +128,14 @@ function ExportAnnotations({
           </p>
           <label
             data-testid="export-count"
-            htmlFor="export-filename"
+            htmlFor={fileInputId}
             className="font-medium"
           >
             Name of export file:
           </label>
           <Input
             data-testid="export-filename"
-            id="export-filename"
+            id={fileInputId}
             defaultValue={defaultFilename}
             value={customFilename}
             onChange={e =>
@@ -129,28 +144,30 @@ function ExportAnnotations({
             required
             maxLength={250}
           />
-          <label htmlFor="export-user" className="block font-medium">
+          <label htmlFor={userSelectId} className="block font-medium">
             Select which user{"'"}s annotations to export:
           </label>
-          <Select
-            id="export-user"
-            onChange={e =>
-              setSelectedUser((e.target as HTMLSelectElement).value || null)
+          <SelectNext
+            value={selectedUser}
+            onChange={setSelectedUser}
+            buttonId={userSelectId}
+            buttonContent={
+              <UserAnnotationsListItem userAnnotations={selectedUser} />
             }
           >
-            <option value="" selected={!selectedUser}>
-              All annotations ({exportableAnnotations.length})
-            </option>
+            <SelectNext.Option value={allAnnotationsOption}>
+              {() => (
+                <UserAnnotationsListItem
+                  userAnnotations={allAnnotationsOption}
+                />
+              )}
+            </SelectNext.Option>
             {userList.map(userInfo => (
-              <option
-                key={userInfo.userid}
-                value={userInfo.userid}
-                selected={userInfo.userid === selectedUser}
-              >
-                {userInfo.displayName} ({userInfo.annotations.length})
-              </option>
+              <SelectNext.Option key={userInfo.userid} value={userInfo}>
+                {() => <UserAnnotationsListItem userAnnotations={userInfo} />}
+              </SelectNext.Option>
             ))}
-          </Select>
+          </SelectNext>
         </>
       ) : (
         <p data-testid="no-annotations-message">

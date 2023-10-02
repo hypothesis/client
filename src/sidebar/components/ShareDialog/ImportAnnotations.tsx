@@ -1,4 +1,9 @@
-import { Button, CardActions, Link, Select } from '@hypothesis/frontend-shared';
+import {
+  Button,
+  CardActions,
+  Link,
+  SelectNext,
+} from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useId, useMemo, useState } from 'preact/hooks';
 
 import type { APIAnnotationData } from '../../../types/api';
@@ -10,6 +15,7 @@ import type { ImportAnnotationsService } from '../../services/import-annotations
 import { useSidebarStore } from '../../store';
 import CircularProgress from '../CircularProgress';
 import FileInput from './FileInput';
+import { UserAnnotationsListItem } from './UserAnnotationsListItem';
 
 export type ImportAnnotationsProps = {
   importAnnotationsService: ImportAnnotationsService;
@@ -31,9 +37,6 @@ function ImportAnnotations({
     null,
   );
   const [error, setError] = useState<string | null>(null);
-
-  // User whose annotations are going to be imported.
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   const store = useSidebarStore();
   const currentUser = store.profile().userid;
@@ -59,6 +62,13 @@ function ImportAnnotations({
     [annotations, getDisplayName],
   );
 
+  // User whose annotations are going to be imported.
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const selectedUser = useMemo(
+    () => userList?.find(user => user.userid === selectedUserId) ?? null,
+    [selectedUserId, userList],
+  );
+
   // Parse input file, extract annotations and update the user list.
   useEffect(() => {
     if (!currentUser || !file) {
@@ -66,7 +76,7 @@ function ImportAnnotations({
     }
     setAnnotations(null);
     setError(null);
-    setSelectedUser(null);
+    setSelectedUserId(null);
     readExportFile(file)
       .then(annotations => {
         setAnnotations(annotations);
@@ -74,7 +84,7 @@ function ImportAnnotations({
         // Pre-select the current user in the list, if at least one of the
         // annotations was authored by them.
         const userMatch = annotations.some(ann => ann.user === currentUser);
-        setSelectedUser(userMatch ? currentUser : null);
+        setSelectedUserId(userMatch ? currentUser : null);
       })
       .catch(err => {
         setError(err.message);
@@ -82,17 +92,11 @@ function ImportAnnotations({
   }, [currentUser, file]);
 
   let importAnnotations;
-  if (annotations && selectedUser && userList) {
+  if (selectedUser) {
     importAnnotations = async () => {
-      const userEntry = userList.find(item => item.userid === selectedUser);
-      /* istanbul ignore next - This should never be triggered */
-      if (!userEntry) {
-        return;
-      }
-
       // nb. In the event of an error, `import` will report that directly via
       // a toast message, so we don't do that ourselves.
-      importAnnotationsService.import(userEntry.annotations);
+      importAnnotationsService.import(selectedUser.annotations);
     };
   }
 
@@ -159,25 +163,24 @@ function ImportAnnotations({
           <label htmlFor={userSelectId} className="block font-medium">
             Select which user&apos;s annotations to import:
           </label>
-          <Select
-            id={userSelectId}
-            data-testid="user-list"
-            disabled={busy}
-            onChange={e =>
-              setSelectedUser((e.target as HTMLSelectElement).value || null)
+          <SelectNext
+            value={selectedUser}
+            onChange={newValue => setSelectedUserId(newValue?.userid ?? null)}
+            buttonId={userSelectId}
+            buttonContent={
+              selectedUser ? (
+                <UserAnnotationsListItem userAnnotations={selectedUser} />
+              ) : (
+                <span className="text-grey-6">Select a user...</span>
+              )
             }
           >
-            <option value="" selected={!selectedUser} />
             {userList.map(userInfo => (
-              <option
-                key={userInfo.userid}
-                value={userInfo.userid}
-                selected={userInfo.userid === selectedUser}
-              >
-                {userInfo.displayName} ({userInfo.annotations.length})
-              </option>
+              <SelectNext.Option key={userInfo.userid} value={userInfo}>
+                {() => <UserAnnotationsListItem userAnnotations={userInfo} />}
+              </SelectNext.Option>
             ))}
-          </Select>
+          </SelectNext>
         </>
       )}
       {error && (
