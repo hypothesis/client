@@ -1,3 +1,4 @@
+import { Tab } from '@hypothesis/frontend-shared';
 import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
@@ -59,14 +60,11 @@ describe('ShareDialog', () => {
   });
 
   function selectTab(wrapper, name) {
-    wrapper
-      .find(`Tab[aria-controls="${name}-panel"]`)
-      .find('button')
-      .simulate('click');
+    wrapper.find(`button[aria-controls="${name}-panel"]`).simulate('click');
   }
 
   function getActiveTab(wrapper) {
-    return wrapper.find('Tab').filter({ selected: true });
+    return wrapper.find(Tab).filter({ selected: true });
   }
 
   function activeTabPanel(wrapper) {
@@ -79,18 +77,14 @@ describe('ShareDialog', () => {
     assert.isFalse(wrapper.find('TabHeader').exists());
   });
 
-  [
-    [{ shareTab: false }],
-    [{ importTab: false }],
-    [{ exportTab: false }],
-    [{}],
-  ].forEach(props => {
+  [{ importTab: false }, { exportTab: false }, {}].forEach(props => {
     it(`renders a tabbed dialog when more than one tab is provided`, () => {
       const wrapper = createComponent(props);
 
       assert.isTrue(wrapper.find('TabHeader').exists());
       assert.isTrue(
-        wrapper.find('Tab[aria-controls="share-panel"]').props().selected,
+        wrapper.find(Tab).filter('[aria-controls="share-panel"]').props()
+          .selected,
       );
       assert.isTrue(wrapper.find('TabPanel[id="share-panel"]').props().active);
     });
