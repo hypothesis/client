@@ -103,7 +103,7 @@ tornado==6.3.3
     # via livereload
 typing-extensions==4.3.0
     # via myst-parser
-urllib3==1.26.11
+urllib3==1.26.17
     # via requests
 wheel==0.38.1
     # via pip-tools
