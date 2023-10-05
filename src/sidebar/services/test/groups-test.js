@@ -1,4 +1,5 @@
-import { delay, waitFor } from '../../../test-util/wait';
+import { delay, waitFor } from '@hypothesis/frontend-testing';
+
 import { fakeReduxStore } from '../../test/fake-redux-store';
 import { GroupsService, $imports } from '../groups';
 

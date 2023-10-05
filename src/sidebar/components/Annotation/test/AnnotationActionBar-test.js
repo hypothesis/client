@@ -1,9 +1,11 @@
+import {
+  checkAccessibility,
+  mockImportedComponents,
+  waitFor,
+} from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import { checkAccessibility } from '../../../../test-util/accessibility';
-import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
-import { waitFor } from '../../../../test-util/wait';
 import * as fixtures from '../../../test/annotation-fixtures';
 import AnnotationActionBar, { $imports } from '../AnnotationActionBar';
 

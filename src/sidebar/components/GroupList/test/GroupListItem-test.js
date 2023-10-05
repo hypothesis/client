@@ -1,7 +1,7 @@
+import { delay } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import { delay } from '../../../../test-util/wait';
 import GroupListItem, { $imports } from '../GroupListItem';
 
 describe('GroupListItem', () => {

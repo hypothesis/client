@@ -1,7 +1,10 @@
+import {
+  checkAccessibility,
+  waitFor,
+  waitForElement,
+} from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 
-import { checkAccessibility } from '../../../../test-util/accessibility';
-import { waitFor, waitForElement } from '../../../../test-util/wait';
 import ImportAnnotations, { $imports } from '../ImportAnnotations';
 
 describe('ImportAnnotations', () => {

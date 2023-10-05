@@ -1,4 +1,5 @@
-import { waitFor } from '../../../test-util/wait';
+import { waitFor } from '@hypothesis/frontend-testing';
+
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import { fakeReduxStore } from '../../test/fake-redux-store';
 import { AutosaveService, $imports } from '../autosave';

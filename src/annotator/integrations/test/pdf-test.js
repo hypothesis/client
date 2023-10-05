@@ -1,4 +1,5 @@
-import { delay } from '../../../test-util/wait';
+import { delay } from '@hypothesis/frontend-testing';
+
 import { RenderingStates } from '../../anchoring/pdf';
 import { createPlaceholder } from '../../anchoring/placeholder';
 import { FakePDFViewerApplication } from '../../anchoring/test/fake-pdf-viewer-application';

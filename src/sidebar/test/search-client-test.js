@@ -1,4 +1,5 @@
-import { delay } from '../../test-util/wait';
+import { delay } from '@hypothesis/frontend-testing';
+
 import { ResultSizeError, SearchClient } from '../search-client';
 
 function awaitEvent(emitter, event) {

@@ -1,4 +1,5 @@
-import { delay } from '../../../test-util/wait';
+import { delay } from '@hypothesis/frontend-testing';
+
 import { ImageTextLayer } from '../image-text-layer';
 
 // Sizes and spacing between character bounding boxes in these tests, expressed

@@ -1,6 +1,6 @@
+import { mockImportedComponents } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import ToastMessages, { $imports } from '../ToastMessages';
 
 describe('ToastMessages', () => {

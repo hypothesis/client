@@ -1,4 +1,5 @@
-import { delay } from '../../../test-util/wait';
+import { delay } from '@hypothesis/frontend-testing';
+
 import { ListenerCollection as ListenerCollection_ } from '../../listener-collection';
 import {
   PortFinder as PortFinder_,

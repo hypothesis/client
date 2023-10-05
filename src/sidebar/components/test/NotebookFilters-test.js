@@ -1,7 +1,7 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared';
+import { mockImportedComponents } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import NotebookFilters from '../NotebookFilters';
 import { $imports } from '../NotebookFilters';
 
