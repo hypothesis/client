@@ -1,6 +1,6 @@
+import { delay } from '@hypothesis/frontend-testing';
 import EventEmitter from 'tiny-emitter';
 
-import { delay } from '../../../test-util/wait';
 import { fakeReduxStore } from '../../test/fake-redux-store';
 import { StreamerService, $imports } from '../streamer';
 

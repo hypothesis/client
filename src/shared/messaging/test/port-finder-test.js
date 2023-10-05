@@ -1,4 +1,5 @@
-import { delay } from '../../../test-util/wait';
+import { delay } from '@hypothesis/frontend-testing';
+
 import {
   MAX_WAIT_FOR_PORT,
   POLLING_INTERVAL_FOR_PORT,

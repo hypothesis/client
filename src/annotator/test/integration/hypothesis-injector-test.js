@@ -1,4 +1,5 @@
-import { delay, waitFor } from '../../../test-util/wait';
+import { delay, waitFor } from '@hypothesis/frontend-testing';
+
 import { DEBOUNCE_WAIT, onNextDocumentReady } from '../../frame-observer';
 import {
   HypothesisInjector,

@@ -1,8 +1,10 @@
+import {
+  checkAccessibility,
+  mockImportedComponents,
+  waitForElement,
+} from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 
-import { checkAccessibility } from '../../../../test-util/accessibility';
-import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
-import { waitForElement } from '../../../../test-util/wait';
 import * as fixtures from '../../../test/annotation-fixtures';
 import ExportAnnotations, { $imports } from '../ExportAnnotations';
 

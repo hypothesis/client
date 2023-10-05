@@ -1,6 +1,6 @@
+import { delay } from '@hypothesis/frontend-testing';
 import { TinyEmitter } from 'tiny-emitter';
 
-import { delay } from '../../test-util/wait';
 import { Guest, $imports } from '../guest';
 
 class FakeAdder {

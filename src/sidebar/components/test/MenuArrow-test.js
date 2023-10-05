@@ -1,6 +1,6 @@
+import { mockImportedComponents } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import MenuArrow, { $imports } from '../MenuArrow';
 
 describe('MenuArrow', () => {

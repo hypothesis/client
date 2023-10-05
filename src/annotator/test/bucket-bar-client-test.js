@@ -1,4 +1,5 @@
-import { delay } from '../../test-util/wait';
+import { delay } from '@hypothesis/frontend-testing';
+
 import { BucketBarClient, $imports } from '../bucket-bar-client';
 
 describe('BucketBarClient', () => {

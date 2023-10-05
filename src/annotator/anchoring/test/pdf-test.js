@@ -1,4 +1,5 @@
-import { delay } from '../../../test-util/wait';
+import { delay } from '@hypothesis/frontend-testing';
+
 import { matchQuote } from '../match-quote';
 import * as pdfAnchoring from '../pdf';
 import { TextRange } from '../text-range';

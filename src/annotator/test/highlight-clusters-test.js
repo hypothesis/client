@@ -1,4 +1,5 @@
-import { waitFor } from '../../test-util/wait';
+import { waitFor } from '@hypothesis/frontend-testing';
+
 import { FeatureFlags } from '../features';
 import { HighlightClusterController, $imports } from '../highlight-clusters';
 
