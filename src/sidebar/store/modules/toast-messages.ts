@@ -1,4 +1,5 @@
-import type { ToastMessage } from '../../../shared/components/ToastMessages';
+import type { ToastMessage } from '@hypothesis/frontend-shared';
+
 import { createStoreModule, makeAction } from '../create-store';
 
 /**

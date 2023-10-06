@@ -1,8 +1,8 @@
+import type { ToastMessage } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import * as Hammer from 'hammerjs';
 import { render } from 'preact';
 
-import type { ToastMessage } from '../shared/components/ToastMessages';
 import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
 import { ListenerCollection } from '../shared/listener-collection';

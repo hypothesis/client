@@ -1,6 +1,6 @@
+import type { ToastMessage } from '@hypothesis/frontend-shared';
 import { TinyEmitter } from 'tiny-emitter';
 
-import type { ToastMessage } from '../../shared/components/ToastMessages';
 import { generateHexString } from '../../shared/random';
 import type { SidebarStore } from '../store';
 
