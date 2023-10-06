@@ -1,6 +1,6 @@
+import { ToastMessages as BaseToastMessages } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import BaseToastMessages from '../../shared/components/ToastMessages';
 import { withServices } from '../service-context';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
