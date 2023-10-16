@@ -2038,24 +2038,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hypothesis/frontend-build@npm:^2.0.0":
-  version: 2.2.0
-  resolution: "@hypothesis/frontend-build@npm:2.2.0"
+"@hypothesis/frontend-build@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@hypothesis/frontend-build@npm:3.0.0"
   dependencies:
-    commander: ^10.0.0
+    commander: ^11.0.0
     fancy-log: ^2.0.0
     glob: ^10.0.0
   peerDependencies:
     autoprefixer: ^10.3.7
     karma: ^6.3.4
     postcss: ^8.3.9
-    rollup: ^3.2.2
+    rollup: ^4.0.2
     sass: ^1.43.2
     tailwindcss: ^3.0.11
   peerDependenciesMeta:
     tailwindcss:
       optional: true
-  checksum: 545da8a341c75ef049bc671fec3e9ab62c90869c1fedbe7fe8dbacc9bdf1c16ad19c3476da0c273310c523ab1a0f8333637d2a9480109cafe35636c500b985f9
+  checksum: ea05f3c00bc9054cd37aaabb5bc391e39cf7c8abecfc002950a22a6fe61d13a28b89194d2bbba6619d234d37a1c8ca5874a191ad8e50485ed66e77805b8fe385
   languageName: node
   linkType: hard
 
@@ -4687,13 +4687,6 @@ __metadata:
   bin:
     color-support: bin.js
   checksum: 9b7356817670b9a13a26ca5af1c21615463b500783b739b7634a0c2047c16cef4b2865d7576875c31c3cddf9dd621fa19285e628f20198b233a5cfdda6d0793b
-  languageName: node
-  linkType: hard
-
-"commander@npm:^10.0.0":
-  version: 10.0.1
-  resolution: "commander@npm:10.0.1"
-  checksum: 436901d64a818295803c1996cd856621a74f30b9f9e28a588e726b2b1670665bccd7c1a77007ebf328729f0139838a88a19265858a0fa7a8728c4656796db948
   languageName: node
   linkType: hard
 
@@ -7495,7 +7488,7 @@ __metadata:
     "@babel/preset-env": ^7.1.6
     "@babel/preset-react": ^7.0.0
     "@babel/preset-typescript": ^7.16.7
-    "@hypothesis/frontend-build": ^2.0.0
+    "@hypothesis/frontend-build": ^3.0.0
     "@hypothesis/frontend-shared": ^6.8.1
     "@hypothesis/frontend-testing": ^1.0.1
     "@npmcli/arborist": ^7.0.0

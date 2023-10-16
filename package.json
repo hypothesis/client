@@ -11,7 +11,7 @@
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.16.7",
-    "@hypothesis/frontend-build": "^2.0.0",
+    "@hypothesis/frontend-build": "^3.0.0",
     "@hypothesis/frontend-shared": "^6.8.1",
     "@hypothesis/frontend-testing": "^1.0.1",
     "@npmcli/arborist": "^7.0.0",
