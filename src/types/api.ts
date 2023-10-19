@@ -213,6 +213,15 @@ export type APIAnnotationData = {
   };
 
   user_info?: UserInfo;
+
+  /**
+   * An opaque object that contains metadata about the current context,
+   * provided by the embedder via the `annotationMetadata` config.
+   *
+   * The Hypothesis LMS app uses this field to attach information about the
+   * current assignment, course etc. to annotations.
+   */
+  metadata?: object;
 };
 
 /**

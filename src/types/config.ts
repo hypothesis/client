@@ -232,6 +232,15 @@ export type ConfigFromAnnotator = ConfigFromHost & {
  */
 export type ConfigFromEmbedder = ConfigFromHost & {
   /**
+   * Metadata about the context which the client should store with new
+   * annotations in the `metadata` field.
+   *
+   * The Hypothesis LMS app uses this field to attach information about the
+   * current assignment, course etc. to annotations.
+   */
+  annotationMetadata?: object;
+
+  /**
    * Feature flags to enable. When a flag is listed here, it will be turned
    * on even if disabled in the H user profile.
    */
