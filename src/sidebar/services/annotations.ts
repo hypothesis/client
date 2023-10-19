@@ -5,7 +5,7 @@ import type {
   Annotation,
   SavedAnnotation,
 } from '../../types/api';
-import type { AnnotationEventType } from '../../types/config';
+import type { AnnotationEventType, SidebarSettings } from '../../types/config';
 import * as metadata from '../helpers/annotation-metadata';
 import {
   defaultPermissions,
@@ -24,15 +24,18 @@ import type { APIService } from './api';
 export class AnnotationsService {
   private _activity: AnnotationActivityService;
   private _api: APIService;
+  private _settings: SidebarSettings;
   private _store: SidebarStore;
 
   constructor(
     annotationActivity: AnnotationActivityService,
     api: APIService,
+    settings: SidebarSettings,
     store: SidebarStore,
   ) {
     this._activity = annotationActivity;
     this._api = api;
+    this._settings = settings;
     this._store = store;
   }
 
@@ -109,6 +112,12 @@ export class AnnotationsService {
     if (metadata.isHighlight(annotation)) {
       annotation.permissions = privatePermissions(userid);
     }
+
+    // Attach information about the current context (eg. LMS assignment).
+    if (this._settings.annotationMetadata) {
+      annotation.metadata = { ...this._settings.annotationMetadata };
+    }
+
     return annotation;
   }
 
