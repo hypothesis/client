@@ -339,16 +339,13 @@ describe('ImportAnnotations', () => {
   it(
     'should pass a11y checks',
     checkAccessibility({
-      content: () =>
-        mount(
-          // re. outer div, see https://github.com/hypothesis/client/issues/5690
-          <div>
-            <ImportAnnotations
-              store={fakeStore}
-              importAnnotationsService={fakeImportAnnotationsService}
-            />
-          </div>,
-        ),
+      // re. not using `mount`, see https://github.com/hypothesis/client/issues/5690
+      content: () => (
+        <ImportAnnotations
+          store={fakeStore}
+          importAnnotationsService={fakeImportAnnotationsService}
+        />
+      ),
     }),
   );
 });

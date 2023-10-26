@@ -418,10 +418,7 @@ describe('ThreadList', () => {
   it(
     'should pass a11y checks',
     checkAccessibility({
-      content: () => {
-        const wrapper = createComponent();
-        return wrapper;
-      },
+      content: () => createComponent(),
     }),
   );
 });
