@@ -126,10 +126,6 @@ describe('ShareDialog', () => {
     it(
       'should pass a11y checks',
       checkAccessibility({
-        // ShareDialog renders a Fragment as its top-level component when
-        // it has import and/or export tabs.
-        // Returning the VNode verbatim ensures no children are discarded.
-        // See https://github.com/hypothesis/client/issues/5671
         content: () => <ShareDialog shareTab exportTab importTab />,
       }),
     );

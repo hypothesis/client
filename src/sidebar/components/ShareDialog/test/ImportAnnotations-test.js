@@ -339,7 +339,6 @@ describe('ImportAnnotations', () => {
   it(
     'should pass a11y checks',
     checkAccessibility({
-      // re. not using `mount`, see https://github.com/hypothesis/client/issues/5690
       content: () => (
         <ImportAnnotations
           store={fakeStore}
