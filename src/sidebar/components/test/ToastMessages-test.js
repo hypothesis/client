@@ -7,10 +7,10 @@ describe('ToastMessages', () => {
   let fakeStore;
   let fakeToastMessenger;
 
-  const fakeMessage = () => ({
+  const fakeMessage = (id = 'someId') => ({
+    id,
     type: 'notice',
     message: 'you should know...',
-    id: 'someId',
     isDismissed: false,
     moreInfoURL: 'http://www.example.com',
   });
@@ -42,9 +42,9 @@ describe('ToastMessages', () => {
 
   it('should render all messages returned by the store', () => {
     fakeStore.getToastMessages.returns([
-      fakeMessage(),
-      fakeMessage(),
-      fakeMessage(),
+      fakeMessage('someId1'),
+      fakeMessage('someId2'),
+      fakeMessage('someId3'),
     ]);
 
     const wrapper = createComponent();
