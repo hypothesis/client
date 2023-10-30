@@ -1948,13 +1948,13 @@ __metadata:
   linkType: hard
 
 "@hypothesis/frontend-testing@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@hypothesis/frontend-testing@npm:1.0.1"
+  version: 1.1.0
+  resolution: "@hypothesis/frontend-testing@npm:1.1.0"
   dependencies:
     axe-core: ^4.8.2
     enzyme: ^3.11.0
     preact: ^10.18.1
-  checksum: fafd09a34503262adaa52ccd31040ea6fd1c41e8ee947f38b2649ba5323c1618338964d4d10ba344df6571561f268249e0a91cb4390de420b9eada21de750d44
+  checksum: 3edc90f5c448bf6f20dd7ef0b8d6cac5cecdd3aa5f77d39b1f00e97c4d1d954f0ffb7def52f2d98005ba7a3c95eba5cfe6edf58e9547dbeee38b1e51b10571d4
   languageName: node
   linkType: hard
 
