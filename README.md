@@ -17,7 +17,7 @@ It’s used by the [Hypothesis browser extension][ext], and can also be
 
 [service]: https://github.com/hypothesis/h
 [ext]: https://chrome.google.com/webstore/detail/hypothesis-web-pdf-annota/bjfhmglciegochdpefhhlphglcehbmek
-[embed]: https://h.readthedocs.io/projects/client/en/latest/publishers/embedding/
+[embed]: https://h.readthedocs.io/projects/client/en/latest/publishers/embedding.html
 
 Development
 -----------
