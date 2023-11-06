@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { useEffect, useMemo } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useMemo } from 'preact/hooks';
 
 import { confirm } from '../../shared/prompts';
 import type { SidebarSettings } from '../../types/config';
@@ -48,6 +48,20 @@ function HypothesisApp({
   const profile = store.profile();
   const route = store.route();
   const isModalRoute = route === 'notebook' || route === 'profile';
+
+  const roundedCornersEnabled = store.isFeatureEnabled('rounded_corners');
+  useLayoutEffect(() => {
+    const html = document.querySelector('html');
+
+    html?.style.setProperty(
+      '--h-border-radius',
+      roundedCornersEnabled ? '0.25rem' : null,
+    );
+    html?.style.setProperty(
+      '--h-border-radius-lg',
+      roundedCornersEnabled ? '0.5rem' : null,
+    );
+  }, [roundedCornersEnabled]);
 
   const backgroundStyle = useMemo(
     () => applyTheme(['appBackgroundColor'], settings),
