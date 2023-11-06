@@ -69,6 +69,7 @@ export default function SidebarPanel({
           onClose={closePanel}
           transitionComponent={Slider}
           variant={variant}
+          scrollable={false}
         >
           {children}
         </Dialog>

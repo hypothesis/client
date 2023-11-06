@@ -37,7 +37,7 @@ function ClusterStyleControl({
     <div className="space-y-2">
       <div className="flex items-center gap-x-2 text-annotator-base">
         <div
-          className="grow text-color-text px-2 py-1 rounded-[4px]"
+          className="grow text-color-text px-2 py-1 rounded"
           style={{
             backgroundColor: highlightStyles[appliedStyleName].color,
           }}
@@ -130,9 +130,10 @@ export default function ClusterToolbar({
   }
 
   return (
-    <Card>
+    <Card classes="overflow-hidden">
       <div className="flex flex-col text-annotator-base text-color-text">
         <Button
+          classes="rounded-none"
           data-testid="control-toggle-button"
           onClick={() => setOpen(!isOpen)}
           title={isOpen ? 'Hide highlight settings' : 'Show highlight settings'}

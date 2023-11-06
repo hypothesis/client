@@ -31,7 +31,7 @@ function ToolbarButton({ icon: Icon, ...buttonProps }: ToolbarButtonProps) {
   return (
     <Button
       classes={classnames(
-        'justify-center rounded-[4px]',
+        'justify-center rounded',
         'w-[30px] h-[30px]',
         'shadow border bg-white text-grey-6 hover:text-grey-9',
       )}
@@ -162,7 +162,7 @@ export default function Toolbar({
             classes={classnames(
               'transition-colors focus-visible-ring ring-inset',
               // Height and width to align with the sidebar's top bar
-              'h-[40px] w-[33px] pl-[6px]',
+              'h-[40px] w-[33px] pl-[6px] rounded-bl',
               'bg-white text-grey-5 hover:text-grey-9',
               // Turn on left and bottom borders to continue the
               // border of the sidebar's top bar

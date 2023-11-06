@@ -217,7 +217,7 @@ describe('Menu', () => {
     assert.isTrue(wrapper.find(contentSelector).hasClass('left-0'));
 
     wrapper.setProps({ align: 'right' });
-    assert.isTrue(wrapper.find(contentSelector).hasClass('right-0'));
+    assert.isTrue(wrapper.find(contentSelector).hasClass('-right-1'));
   });
 
   it('applies custom content class', () => {

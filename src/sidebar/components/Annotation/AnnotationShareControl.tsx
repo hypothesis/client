@@ -144,7 +144,7 @@ function AnnotationShareControl({
         <div
           // Position this Card above its IconButton. Account for larger
           // IconButtons in touch interfaces
-          className="absolute bottom-8 right-1 touch:bottom-touch-minimum"
+          className="absolute bottom-8 right-0 touch:bottom-touch-minimum"
         >
           <Card
             classes={classnames(
@@ -195,7 +195,7 @@ function AnnotationShareControl({
             {showShareLinks && <ShareLinks shareURI={shareUri} />}
             <MenuArrow
               direction="down"
-              classes="bottom-[-8px] right-1 touch:right-[9px]"
+              classes="bottom-[-8px] right-2 touch:right-[9px]"
             />
           </Card>
         </div>

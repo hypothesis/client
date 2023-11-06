@@ -232,7 +232,7 @@ export default function Menu({
             direction="up"
             classes={classnames(
               // Position menu-arrow caret near bottom right of menu label/toggle control
-              'right-0 top-[calc(100%-3px)] w-[15px]',
+              'right-1 top-[calc(100%-3px)] w-[15px]',
               arrowClass,
             )}
           />
@@ -240,11 +240,13 @@ export default function Menu({
             className={classnames(
               'focus-visible-ring',
               // Position menu content near bottom of menu label/toggle control
-              'absolute top-[calc(100%+5px)] z-1 border shadow',
-              'bg-white text-md',
+              'absolute top-[calc(100%+5px)] z-1',
+              'border shadow rounded-lg overflow-hidden bg-white text-md',
               {
                 'left-0': align === 'left',
-                'right-0': align === 'right',
+                // Adding negative right distance so that the menu arrow does
+                // not overlap with the top-right corner when it's rounded
+                '-right-1': align === 'right',
               },
               contentClass,
             )}

@@ -19,7 +19,7 @@ function NavigationButton({ ...buttonProps }: NavigationButtonProps) {
     <Button
       classes={classnames(
         'px-3.5 py-2.5 gap-x-1',
-        'font-semibold',
+        'font-semibold rounded',
         // These colors are the same as the "dark" variant of IconButton
         'text-grey-7 bg-grey-2 enabled:hover:text-grey-9 enabled:hover:bg-grey-3',
         'disabled:text-grey-5 aria-pressed:bg-grey-3 aria-expanded:bg-grey-3',

@@ -93,7 +93,7 @@ function AnnotationPublishControl({
         <div
           className={classnames(
             // Round the right side of this menu-open button only
-            'flex flex-row rounded-r-sm bg-grey-7 hover:bg-grey-8',
+            'flex flex-row rounded-r bg-grey-7 hover:bg-grey-8',
           )}
           style={buttonStyle}
         >

@@ -1,4 +1,5 @@
 import { Card, Tab } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 import { useState } from 'preact/hooks';
 
 import { useSidebarStore } from '../../store';
@@ -34,10 +35,12 @@ export default function ShareDialog({
   const panelTitle = `Share Annotations in ${groupName}`;
 
   const tabbedDialog = exportTab || importTab;
+  // Determine initial selected tab, based on the first tab that will be displayed
+  const initialTab = shareTab ? 'share' : exportTab ? 'export' : 'import';
   const [selectedTab, setSelectedTab] = useState<'share' | 'export' | 'import'>(
-    // Determine initial selected tab, based on the first tab that will be displayed
-    shareTab ? 'share' : exportTab ? 'export' : 'import',
+    initialTab,
   );
+  const isFirstTabSelected = tabbedDialog && selectedTab === initialTab;
 
   return (
     <SidebarPanel
@@ -85,7 +88,7 @@ export default function ShareDialog({
               </Tab>
             )}
           </TabHeader>
-          <Card>
+          <Card classes={classnames({ 'rounded-tl-none': isFirstTabSelected })}>
             <TabPanel
               id="share-panel"
               active={selectedTab === 'share'}

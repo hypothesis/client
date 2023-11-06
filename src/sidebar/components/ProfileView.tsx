@@ -39,7 +39,7 @@ function ToastBadge({
   return (
     <div
       className={classnames(
-        'flex items-center gap-x-1 py-1 px-2 rounded-[4px]',
+        'flex items-center gap-x-1 py-1 px-2 rounded',
         'bg-green-success/10 animate-pulse-fade-out',
         classes,
       )}
@@ -97,13 +97,13 @@ export default function ProfileView() {
 
   // Render save-success message after each successful save, but do not render
   // it when a "request is in flight". This removal and re-adding across a
-  // sequence of saves ensures that the browser sees the message as newly- added
-  // to the accessiblity DOM and screen readers should announce it at the
+  // sequence of saves ensures that the browser sees the message as newly-added
+  // to the accessibility DOM and screen readers should announce it at the
   // appropriate times.
   const withSaveMessage = saveCount > 0 && !loading;
 
   return (
-    <Card data-testid="profile-container">
+    <Card data-testid="profile-container" classes="overflow-hidden">
       <div
         className={classnames(
           // Ensure there is enough height to clear both the heading text and the
