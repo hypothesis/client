@@ -33,7 +33,7 @@ export default function SortMenu() {
   );
 
   return (
-    <div className="SortMenu">
+    <div data-component="SortMenu">
       <Menu
         label={menuLabel}
         title={`Sort by ${sortKey}`}

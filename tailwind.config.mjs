@@ -24,10 +24,6 @@ export default {
         'pulse-fade-out': 'pulse-fade-out 5s ease-in-out forwards',
         'slide-in-from-right': 'slide-in-from-right 0.3s forwards ease-in-out',
       },
-      borderRadius: {
-        // Equivalent to tailwind default `rounded-sm` size
-        DEFAULT: '0.125rem',
-      },
       boxShadow: {
         'adder-toolbar': '0px 2px 10px 0px rgba(0, 0, 0, 0.25)',
         focus: `0 0 0 2px ${focusBlue}`,

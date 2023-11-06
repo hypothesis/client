@@ -239,7 +239,7 @@ export default function MenuItem({
   const wrapperClasses = classnames(
     'focus-visible-ring ring-inset',
     'w-full min-w-[150px] flex items-center select-none',
-    'border-b',
+    'border-b rounded-none cursor-pointer',
     // Set this container as a "group" so that children may style based on its
     // layout state.
     // See https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state
@@ -263,7 +263,7 @@ export default function MenuItem({
       'border-b-grey-3': isExpanded,
       'border-b-transparent': !isExpanded,
       'text-color-text-light': isDisabled,
-      'text-color-text': !isDisabled,
+      'text-color-text hover:text-color-text': !isDisabled,
     },
   );
 

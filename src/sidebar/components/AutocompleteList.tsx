@@ -107,11 +107,11 @@ export default function AutocompleteList<Item>({
         )}
         data-testid="autocomplete-list-container"
       >
-        <Card width="auto">
+        <Card width="auto" classes="overflow-hidden">
           <ul tabIndex={-1} aria-label="Suggestions" role="listbox" {...props}>
             {items}
           </ul>
-          <MenuArrow direction="up" classes="top-[-8px] left-[3px]" />
+          <MenuArrow direction="up" classes="top-[-8px] left-2" />
         </Card>
       </div>
     </div>
