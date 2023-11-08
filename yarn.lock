@@ -1944,26 +1944,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hypothesis/frontend-shared@npm:^6.8.1":
-  version: 6.9.0
-  resolution: "@hypothesis/frontend-shared@npm:6.9.0"
+"@hypothesis/frontend-shared@npm:^6.10.0":
+  version: 6.10.0
+  resolution: "@hypothesis/frontend-shared@npm:6.10.0"
   dependencies:
     highlight.js: ^11.6.0
     wouter-preact: ^2.10.0-alpha.1
   peerDependencies:
     preact: ^10.4.0
-  checksum: e8fe4a40a7502476f7eb16957803158084e140b8dc95b0ff54aae25cf02a2c780953e42c776715f7eddf8bc5e1119223b5aeaa070ae65c194ba38b06dfff650a
+  checksum: bf58240a46270ab6674e2c1bbd2ea5994ac6112b9bb531ae69bc3dbb7418e335a62577bf99660369264fff9ae1813f47d27cb9ecd6764a7fe1cd471ee9bb825d
   languageName: node
   linkType: hard
 
-"@hypothesis/frontend-testing@npm:^1.0.1":
-  version: 1.1.0
-  resolution: "@hypothesis/frontend-testing@npm:1.1.0"
+"@hypothesis/frontend-testing@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@hypothesis/frontend-testing@npm:1.2.0"
   dependencies:
     axe-core: ^4.8.2
     enzyme: ^3.11.0
     preact: ^10.18.1
-  checksum: 3edc90f5c448bf6f20dd7ef0b8d6cac5cecdd3aa5f77d39b1f00e97c4d1d954f0ffb7def52f2d98005ba7a3c95eba5cfe6edf58e9547dbeee38b1e51b10571d4
+  checksum: 0bd15494c81df6da2b0e3a738ee5abfafdbcdd6f0a3c17a3ac7b87b457c03d0c4a82e0fa3c37392f5f14209ec6f716cc1e24c734b16c1c917152fbdb01b850d2
   languageName: node
   linkType: hard
 
@@ -7630,8 +7630,8 @@ __metadata:
     "@babel/preset-react": ^7.0.0
     "@babel/preset-typescript": ^7.16.7
     "@hypothesis/frontend-build": ^3.0.0
-    "@hypothesis/frontend-shared": ^6.8.1
-    "@hypothesis/frontend-testing": ^1.0.1
+    "@hypothesis/frontend-shared": ^6.10.0
+    "@hypothesis/frontend-testing": ^1.2.0
     "@npmcli/arborist": ^7.0.0
     "@octokit/rest": ^20.0.1
     "@rollup/plugin-babel": ^6.0.0

@@ -374,10 +374,28 @@ describe('ExportAnnotations', () => {
     });
   });
 
-  it(
-    'should pass a11y checks',
-    checkAccessibility({
-      content: () => createComponent(),
-    }),
-  );
+  it('should pass a11y checks', async () => {
+    const wrapper = createComponent();
+    const select = await waitForElement(wrapper, SelectNext);
+
+    await checkAccessibility({
+      content: () => wrapper,
+      shouldIgnoreViolation: ({ id, nodes }) => {
+        if (id !== 'button-name') {
+          return false;
+        }
+
+        // axe-core can report a violation on any button[role="combobox"] linked
+        // to a label if it does not have aria-label or aria-labelledby, because
+        // the Dragon NaturallySpeaking screen reader does not play well with
+        // that combination.
+        // Since its use is marginal, we want to ignore the "button-name"
+        // violation if reported on SelectNext.
+        // See https://github.com/dequelabs/axe-core/issues/4235 for context
+
+        const targets = nodes.flatMap(node => node.target);
+        return targets.includes(`#${select.prop('buttonId')}`);
+      },
+    })();
+  });
 });
