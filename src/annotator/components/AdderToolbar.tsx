@@ -238,7 +238,7 @@ export default function AdderToolbar({
         // default border values from Tailwind and have to be explicit about all
         // border attributes.
         'border border-solid border-grey-3',
-        'absolute select-none bg-white rounded shadow-adder-toolbar',
+        'absolute select-none bg-white rounded shadow-intense',
         // Start at a very low opacity as we're going to fade-in in the animation
         'opacity-5',
         {
