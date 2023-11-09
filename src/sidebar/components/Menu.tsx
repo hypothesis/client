@@ -4,7 +4,6 @@ import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
-import MenuArrow from './MenuArrow';
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
 
 /**
@@ -20,13 +19,6 @@ export type MenuProps = {
    * of the toggle element.
    */
   align?: 'left' | 'right';
-
-  /**
-   * Additional CSS class for the arrow caret at the edge of the menu content
-   * that "points" toward the menu's toggle button. This can be used to adjust
-   * the position of that caret respective to the toggle button.
-   */
-  arrowClass?: string;
 
   /**
    * Label element or string for the toggle button that hides and shows the menu
@@ -95,7 +87,6 @@ const noop = () => {};
  */
 export default function Menu({
   align = 'left',
-  arrowClass = '',
   children,
   containerPositioned = true,
   contentClass,
@@ -227,40 +218,28 @@ export default function Menu({
         </span>
       </button>
       {isOpen && (
-        <>
-          <MenuArrow
-            direction="up"
-            classes={classnames(
-              // Position menu-arrow caret near bottom right of menu label/toggle control
-              'right-1 top-[calc(100%-3px)] w-[15px]',
-              arrowClass,
-            )}
-          />
-          <div
-            className={classnames(
-              'focus-visible-ring',
-              // Position menu content near bottom of menu label/toggle control
-              'absolute top-[calc(100%+5px)] z-1',
-              'border shadow rounded-lg overflow-hidden bg-white text-md',
-              {
-                'left-0': align === 'left',
-                // Adding negative right distance so that the menu arrow does
-                // not overlap with the top-right corner when it's rounded
-                '-right-1': align === 'right',
-              },
-              contentClass,
-            )}
-            data-testid="menu-content"
-            role="menu"
-            tabIndex={-1}
-            onClick={closeMenu}
-            onKeyDown={handleMenuKeyDown}
-          >
-            <MenuKeyboardNavigation visible={true}>
-              {children}
-            </MenuKeyboardNavigation>
-          </div>
-        </>
+        <div
+          className={classnames(
+            'focus-visible-ring',
+            // Position menu content near bottom of menu label/toggle control
+            'absolute top-[calc(100%+3px)] z-1',
+            'border shadow rounded-lg overflow-hidden bg-white text-md',
+            {
+              'left-0': align === 'left',
+              'right-0': align === 'right',
+            },
+            contentClass,
+          )}
+          data-testid="menu-content"
+          role="menu"
+          tabIndex={-1}
+          onClick={closeMenu}
+          onKeyDown={handleMenuKeyDown}
+        >
+          <MenuKeyboardNavigation visible={true}>
+            {children}
+          </MenuKeyboardNavigation>
+        </div>
       )}
     </div>
   );

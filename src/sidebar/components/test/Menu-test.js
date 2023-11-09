@@ -217,7 +217,7 @@ describe('Menu', () => {
     assert.isTrue(wrapper.find(contentSelector).hasClass('left-0'));
 
     wrapper.setProps({ align: 'right' });
-    assert.isTrue(wrapper.find(contentSelector).hasClass('-right-1'));
+    assert.isTrue(wrapper.find(contentSelector).hasClass('right-0'));
   });
 
   it('applies custom content class', () => {
@@ -227,16 +227,6 @@ describe('Menu', () => {
     });
     const content = wrapper.find(contentSelector);
     assert.isTrue(content.hasClass('special-menu'));
-  });
-
-  it('applies custom arrow class', () => {
-    const wrapper = createMenu({
-      arrowClass: 'my-arrow-class',
-      defaultOpen: true,
-    });
-    const arrow = wrapper.find('MenuArrow');
-
-    assert.include(arrow.props().classes, 'my-arrow-class');
   });
 
   it('has relative positioning if `containerPositioned` is `true`', () => {

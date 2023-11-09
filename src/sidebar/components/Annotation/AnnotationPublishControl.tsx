@@ -98,11 +98,6 @@ function AnnotationPublishControl({
           style={buttonStyle}
         >
           <Menu
-            arrowClass={classnames(
-              // Position up-pointing menu caret aligned beneath the
-              // down-pointing menu-open button icon
-              'right-[10px]',
-            )}
             containerPositioned={false}
             contentClass={classnames(
               // Ensure the menu is wide enough to "reach" the right-aligned
