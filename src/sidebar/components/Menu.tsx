@@ -223,7 +223,7 @@ export default function Menu({
             'focus-visible-ring',
             // Position menu content near bottom of menu label/toggle control
             'absolute top-[calc(100%+3px)] z-1',
-            'border shadow rounded-lg overflow-hidden bg-white text-md',
+            'border shadow-intense rounded-lg overflow-hidden bg-white text-md',
             {
               'left-0': align === 'left',
               'right-0': align === 'right',
