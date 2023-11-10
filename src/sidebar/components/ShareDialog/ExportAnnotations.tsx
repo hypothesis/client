@@ -156,15 +156,11 @@ function ExportAnnotations({
             }
           >
             <SelectNext.Option value={allAnnotationsOption}>
-              {() => (
-                <UserAnnotationsListItem
-                  userAnnotations={allAnnotationsOption}
-                />
-              )}
+              <UserAnnotationsListItem userAnnotations={allAnnotationsOption} />
             </SelectNext.Option>
             {userList.map(userInfo => (
               <SelectNext.Option key={userInfo.userid} value={userInfo}>
-                {() => <UserAnnotationsListItem userAnnotations={userInfo} />}
+                <UserAnnotationsListItem userAnnotations={userInfo} />
               </SelectNext.Option>
             ))}
           </SelectNext>

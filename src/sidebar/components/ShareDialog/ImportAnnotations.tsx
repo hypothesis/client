@@ -177,7 +177,7 @@ function ImportAnnotations({
           >
             {userList.map(userInfo => (
               <SelectNext.Option key={userInfo.userid} value={userInfo}>
-                {() => <UserAnnotationsListItem userAnnotations={userInfo} />}
+                <UserAnnotationsListItem userAnnotations={userInfo} />
               </SelectNext.Option>
             ))}
           </SelectNext>
