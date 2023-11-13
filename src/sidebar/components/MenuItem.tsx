@@ -239,7 +239,11 @@ export default function MenuItem({
   const wrapperClasses = classnames(
     'focus-visible-ring ring-inset',
     'w-full min-w-[150px] flex items-center select-none',
-    'border-b rounded-none cursor-pointer',
+    'rounded-none cursor-pointer',
+    {
+      'focus-visible:rounded-lg': !isSelected,
+      'focus-visible:rounded-r-lg': isSelected,
+    },
     // Set this container as a "group" so that children may style based on its
     // layout state.
     // See https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state
@@ -260,8 +264,6 @@ export default function MenuItem({
       // of a transparent left border to make focus ring cover the full
       // menu item. Otherwise the focus ring will be inset on the left too far.
       'pl-[4px]': !isSelected,
-      'border-b-grey-3': isExpanded,
-      'border-b-transparent': !isExpanded,
       'text-color-text-light': isDisabled,
       'text-color-text hover:text-color-text': !isDisabled,
     },
@@ -312,7 +314,7 @@ export default function MenuItem({
           <MenuKeyboardNavigation
             closeMenu={onCloseSubmenu}
             visible={isSubmenuVisible}
-            className="border-b"
+            className="border-y border-grey-3"
           >
             {submenu}
           </MenuKeyboardNavigation>
