@@ -27,7 +27,8 @@ export type ExportAnnotationsProps = {
 };
 
 type ExportFormat = {
-  value: 'json' | 'csv' | 'text' | 'html';
+  /** Unique format identifier used also as file extension */
+  value: 'json' | 'csv' | 'txt' | 'html';
   name: string;
 };
 
@@ -36,18 +37,20 @@ const exportFormats: ExportFormat[] = [
     value: 'json',
     name: 'JSON',
   },
-  {
-    value: 'csv',
-    name: 'CSV',
-  },
-  {
-    value: 'text',
-    name: 'Text',
-  },
-  {
-    value: 'html',
-    name: 'HTML',
-  },
+
+  // TODO Enable these formats when implemented
+  // {
+  //   value: 'csv',
+  //   name: 'CSV',
+  // },
+  // {
+  //   value: 'txt',
+  //   name: 'Text',
+  // },
+  // {
+  //   value: 'html',
+  //   name: 'HTML',
+  // },
 ];
 
 /**
@@ -118,12 +121,16 @@ function ExportAnnotations({
     e.preventDefault();
 
     try {
+      const format = exportFormat.value;
       const annotationsToExport =
         selectedUser?.annotations ?? exportableAnnotations;
-      const filename = `${customFilename ?? defaultFilename}.json`;
-      const exportData =
-        annotationsExporter.buildExportContent(annotationsToExport);
-      downloadJSONFile(exportData, filename);
+      const filename = `${customFilename ?? defaultFilename}.${format}`;
+
+      if (format === 'json') {
+        const exportData =
+          annotationsExporter.buildJSONExportContent(annotationsToExport);
+        downloadJSONFile(exportData, filename);
+      }
     } catch (e) {
       toastMessenger.error('Exporting annotations failed');
     }

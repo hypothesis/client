@@ -34,7 +34,7 @@ describe('ExportAnnotations', () => {
 
   beforeEach(() => {
     fakeAnnotationsExporter = {
-      buildExportContent: sinon.stub().returns({}),
+      buildJSONExportContent: sinon.stub().returns({}),
     };
     fakeToastMessenger = {
       error: sinon.stub(),
@@ -240,9 +240,9 @@ describe('ExportAnnotations', () => {
 
       submitExportForm(wrapper);
 
-      assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
+      assert.calledOnce(fakeAnnotationsExporter.buildJSONExportContent);
       assert.calledWith(
-        fakeAnnotationsExporter.buildExportContent,
+        fakeAnnotationsExporter.buildJSONExportContent,
         annotationsToExport,
       );
       assert.notCalled(fakeToastMessenger.error);
@@ -298,9 +298,9 @@ describe('ExportAnnotations', () => {
 
       submitExportForm(wrapper);
 
-      assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
+      assert.calledOnce(fakeAnnotationsExporter.buildJSONExportContent);
       assert.calledWith(
-        fakeAnnotationsExporter.buildExportContent,
+        fakeAnnotationsExporter.buildJSONExportContent,
         selectedUserAnnotations,
       );
     });
@@ -326,7 +326,7 @@ describe('ExportAnnotations', () => {
 
     context('when exporting annotations fails', () => {
       it('displays error toast message', () => {
-        fakeAnnotationsExporter.buildExportContent.throws(
+        fakeAnnotationsExporter.buildJSONExportContent.throws(
           new Error('Error exporting'),
         );
 
@@ -335,7 +335,7 @@ describe('ExportAnnotations', () => {
         submitExportForm(wrapper);
 
         assert.notCalled(fakeDownloadJSONFile);
-        assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
+        assert.calledOnce(fakeAnnotationsExporter.buildJSONExportContent);
         assert.calledWith(
           fakeToastMessenger.error,
           'Exporting annotations failed',
