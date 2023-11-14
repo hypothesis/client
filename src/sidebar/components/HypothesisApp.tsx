@@ -154,7 +154,7 @@ function HypothesisApp({
   return (
     <div
       className={classnames(
-        'h-full min-h-full overflow-scroll',
+        'h-full min-h-full overflow-auto',
         // Precise padding to align with annotation cards in content
         // Larger padding on bottom for wide screens
         'lg:pb-16 bg-grey-2',
