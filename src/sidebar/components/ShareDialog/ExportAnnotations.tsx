@@ -26,6 +26,30 @@ export type ExportAnnotationsProps = {
   toastMessenger: ToastMessengerService;
 };
 
+type ExportFormat = {
+  value: 'json' | 'csv' | 'text' | 'html';
+  name: string;
+};
+
+const exportFormats: ExportFormat[] = [
+  {
+    value: 'json',
+    name: 'JSON',
+  },
+  {
+    value: 'csv',
+    name: 'CSV',
+  },
+  {
+    value: 'text',
+    name: 'Text',
+  },
+  {
+    value: 'html',
+    name: 'HTML',
+  },
+];
+
 /**
  * Render content for "export" tab panel: allow user to export annotations
  * with a specified filename.
@@ -67,6 +91,9 @@ function ExportAnnotations({
     userList.find(userInfo => userInfo.userid === currentUser) ??
       allAnnotationsOption,
   );
+
+  const exportFormatsEnabled = store.isFeatureEnabled('export_formats');
+  const [exportFormat, setExportFormat] = useState(exportFormats[0]);
 
   const fileInputId = useId();
   const userSelectId = useId();
@@ -133,17 +160,39 @@ function ExportAnnotations({
           >
             Name of export file:
           </label>
-          <Input
-            data-testid="export-filename"
-            id={fileInputId}
-            defaultValue={defaultFilename}
-            value={customFilename}
-            onChange={e =>
-              setCustomFilename((e.target as HTMLInputElement).value)
-            }
-            required
-            maxLength={250}
-          />
+          <div className="flex">
+            <Input
+              classes="grow"
+              data-testid="export-filename"
+              id={fileInputId}
+              defaultValue={defaultFilename}
+              value={customFilename}
+              onChange={e =>
+                setCustomFilename((e.target as HTMLInputElement).value)
+              }
+              required
+              maxLength={250}
+            />
+            {exportFormatsEnabled && (
+              <div className="grow-0 ml-2 min-w-[5rem]">
+                <SelectNext
+                  value={exportFormat}
+                  onChange={setExportFormat}
+                  buttonContent={exportFormat.name}
+                  data-testid="export-format-select"
+                >
+                  {exportFormats.map(exportFormat => (
+                    <SelectNext.Option
+                      key={exportFormat.value}
+                      value={exportFormat}
+                    >
+                      {exportFormat.name}
+                    </SelectNext.Option>
+                  ))}
+                </SelectNext>
+              </div>
+            )}
+          </div>
           <label htmlFor={userSelectId} className="block font-medium">
             Select which user{"'"}s annotations to export:
           </label>
@@ -154,6 +203,7 @@ function ExportAnnotations({
             buttonContent={
               <UserAnnotationsListItem userAnnotations={selectedUser} />
             }
+            data-testid="user-select"
           >
             <SelectNext.Option value={allAnnotationsOption}>
               <UserAnnotationsListItem userAnnotations={allAnnotationsOption} />

@@ -81,6 +81,9 @@ describe('ExportAnnotations', () => {
     $imports.$restore();
   });
 
+  const waitForTestId = async (wrapper, testId) =>
+    waitForElement(wrapper, `[data-testid="${testId}"]`);
+
   context('export annotations not ready (loading)', () => {
     it('renders a loading spinner if there is no focused group', () => {
       fakeStore.focusedGroup.returns(null);
@@ -181,7 +184,7 @@ describe('ExportAnnotations', () => {
 
       const wrapper = createComponent();
 
-      const userList = await waitForElement(wrapper, SelectNext);
+      const userList = await waitForTestId(wrapper, 'user-select');
       const users = userList.find(SelectNext.Option);
       assert.equal(users.length, userEntries.length);
 
@@ -205,6 +208,22 @@ describe('ExportAnnotations', () => {
       documentMetadata: fakeStore.defaultContentFrame().metadata,
     });
     assert.equal(input.prop('defaultValue'), 'suggested-filename');
+  });
+
+  [
+    { exportFormatsEnabled: true, expectedAmountOfSelects: 2 },
+    { exportFormatsEnabled: false, expectedAmountOfSelects: 1 },
+  ].forEach(({ exportFormatsEnabled, expectedAmountOfSelects }) => {
+    it('displays format selector when feature is enabled', async () => {
+      fakeStore.isFeatureEnabled.callsFake(
+        ff => exportFormatsEnabled || ff !== 'export_formats',
+      );
+
+      const wrapper = createComponent();
+      const selects = await waitForElement(wrapper, SelectNext);
+
+      assert.equal(selects.length, expectedAmountOfSelects);
+    });
   });
 
   describe('export form submitted', () => {
@@ -265,7 +284,7 @@ describe('ExportAnnotations', () => {
       const wrapper = createComponent();
 
       // Select the user whose annotations we want to export
-      const userList = await waitForElement(wrapper, SelectNext);
+      const userList = await waitForTestId(wrapper, 'user-select');
       const option = userList
         .find(SelectNext.Option)
         .filterWhere(
@@ -376,7 +395,7 @@ describe('ExportAnnotations', () => {
 
   it('should pass a11y checks', async () => {
     const wrapper = createComponent();
-    const select = await waitForElement(wrapper, SelectNext);
+    const select = await waitForTestId(wrapper, 'user-select');
 
     await checkAccessibility({
       content: () => wrapper,
