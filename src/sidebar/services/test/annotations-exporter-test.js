@@ -27,7 +27,7 @@ describe('AnnotationsExporter', () => {
       },
     ];
 
-    const result = exporter.buildExportContent(annotations, now);
+    const result = exporter.buildJSONExportContent(annotations, now);
 
     assert.deepEqual(result, {
       export_date: now.toISOString(),

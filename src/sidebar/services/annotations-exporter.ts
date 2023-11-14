@@ -22,7 +22,7 @@ export class AnnotationsExporter {
     this._store = store;
   }
 
-  buildExportContent(
+  buildJSONExportContent(
     annotations: APIAnnotationData[],
     /* istanbul ignore next - test seam */
     now = new Date(),
