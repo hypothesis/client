@@ -235,8 +235,8 @@ describe('annotator/highlighter', () => {
       assert.equal(result[0].textContent, 'one two');
     });
 
-    it('skips text node spans which consist only of spaces', () => {
-      const el = document.createElement('span');
+    it('skips non-<span> text node spans which consist only of spaces', () => {
+      const el = document.createElement('div');
       el.appendChild(document.createTextNode(' '));
       el.appendChild(document.createTextNode(''));
       el.appendChild(document.createTextNode('   '));
@@ -247,6 +247,37 @@ describe('annotator/highlighter', () => {
       const result = highlightRange(range);
 
       assert.equal(result.length, 0);
+    });
+
+    it('includes whitespace elements if <span> parent', () => {
+      // Real-world examples:
+      // - Codeblocks on https://h.readthedocs.io/en/latest/developing/install
+      // - Text layer on https://archive.org/details/goodytwoshoes00newyiala
+      const parent = document.createElement('div');
+      const word1 = document.createElement('span');
+      word1.textContent = 'one';
+      parent.appendChild(word1);
+
+      // This will be ignored because the parent is a div.
+      parent.appendChild(document.createTextNode(' '));
+
+      // This will not be ignored because the parent is a span.
+      const space = document.createElement('span');
+      space.textContent = ' ';
+      parent.appendChild(space);
+
+      const word2 = document.createElement('span');
+      word2.textContent = 'two';
+      parent.appendChild(word2);
+      const range = new Range();
+      range.setStartBefore(word1.childNodes[0]);
+      range.setEndAfter(word2.childNodes[0]);
+
+      const result = highlightRange(range);
+      assert.equal(result.length, 3);
+      assert.equal(result[0].textContent, 'one');
+      assert.equal(result[1].textContent, ' ');
+      assert.equal(result[2].textContent, 'two');
     });
 
     context('when the highlighted text is part of a PDF.js text layer', () => {

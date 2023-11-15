@@ -140,6 +140,23 @@
       ullamcorper commodo. Nunc at nisi ut arcu euismod venenatis quis in nisl.
     </p>
     </div>
+
+    <h3>Syntaxhighlighting Codeblocks</h3>
+
+    <h4>Highlight js - whitespace &lt;span&gt;s</h4>
+    <div class="testcase">
+      <div class="highlight-bash notranslate">
+        <div class="highlight">
+          <pre><span></span>tox<span class="w"> </span>-qe<span class="w"> </span>dev<span class="w"> </span>--<span class="w"> </span>sh<span class="w"> </span>bin/hypothesis<span class="w"> </span>--dev<span class="w"> </span>user<span class="w"> </span>admin<span class="w"> </span>&lt;username&gt;
+          </pre>
+        </div>
+      </div>
+    </div>
+
+    <h4>Codemirror - whitespace between &lt;span&gt;s</h4>
+    <div class="testcase">
+      <pre><code type="javascript"><span class="tok-keyword">import</span> <span class="tok-punctuation">{</span><span class="tok-variableName tok-definition">EditorView</span><span class="tok-punctuation">,</span> <span class="tok-variableName tok-definition">keymap</span><span class="tok-punctuation">}</span> <span class="tok-keyword">from</span> <span class="tok-string">"@codemirror/view"</span></code></pre>
+    </div>
     {{{ hypothesisScript }}}
   </body>
 </html>
