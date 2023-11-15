@@ -234,10 +234,16 @@ export function highlightRange(
   // inserting highlight elements in places that can only contain a restricted
   // subset of nodes such as table rows and lists.
   const whitespace = /^\s*$/;
-  textNodeSpans = textNodeSpans.filter(span =>
-    // Check for at least one text node with non-space content.
-    span.some(node => !whitespace.test(node.data)),
-  );
+  textNodeSpans = textNodeSpans.filter(span => {
+    const parentElement = span[0].parentElement;
+    return (
+      // Whitespace <span>s should be highlighted since they affect layout
+      (parentElement?.childNodes.length === 1 &&
+        parentElement?.tagName.match(/^SPAN$/i)) ||
+      // Otherwise ignore white-space only Text node spans
+      span.some(node => !whitespace.test(node.data))
+    );
+  });
 
   // Wrap each text node span with a `<hypothesis-highlight>` element.
   const highlights: HighlightElement[] = [];
