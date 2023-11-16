@@ -235,7 +235,7 @@ describe('annotator/highlighter', () => {
       assert.equal(result[0].textContent, 'one two');
     });
 
-    it('skips non-<span> text node spans which consist only of spaces', () => {
+    it('skips whitespace-only text node spans, except inside <span>s', () => {
       const el = document.createElement('div');
       el.appendChild(document.createTextNode(' '));
       el.appendChild(document.createTextNode(''));
@@ -249,7 +249,7 @@ describe('annotator/highlighter', () => {
       assert.equal(result.length, 0);
     });
 
-    it('includes whitespace elements if <span> parent', () => {
+    it('wraps whitespace-only text if <span> parent', () => {
       // Real-world examples:
       // - Codeblocks on https://h.readthedocs.io/en/latest/developing/install
       // - Text layer on https://archive.org/details/goodytwoshoes00newyiala
