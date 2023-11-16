@@ -142,24 +142,6 @@ describe('HypothesisApp', () => {
     });
   });
 
-  [true, false].forEach(roundedCornersEnabled => {
-    it('defines border-radius CSS vars when the feature flag is enabled', () => {
-      fakeStore.isFeatureEnabled.returns(roundedCornersEnabled);
-      createComponent();
-
-      const styles = document.querySelector('html')?.style;
-
-      assert.equal(
-        styles.getPropertyValue('--h-border-radius'),
-        roundedCornersEnabled ? '0.25rem' : '',
-      );
-      assert.equal(
-        styles.getPropertyValue('--h-border-radius-lg'),
-        roundedCornersEnabled ? '0.5rem' : '',
-      );
-    });
-  });
-
   describe('auto-opening tutorial', () => {
     it('should open tutorial on profile load when criteria are met', () => {
       fakeShouldAutoDisplayTutorial.returns(true);

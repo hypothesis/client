@@ -24,6 +24,12 @@ export default {
         'pulse-fade-out': 'pulse-fade-out 5s ease-in-out forwards',
         'slide-in-from-right': 'slide-in-from-right 0.3s forwards ease-in-out',
       },
+      borderRadius: {
+        // Equivalent to tailwind defaults, but overriding values from frontend-shared preset
+        // Once the preset stops defining borderRadius, we can remove this
+        DEFAULT: '0.25rem',
+        lg: '0.5rem',
+      },
       boxShadow: {
         // A more prominent shadow than the one used by tailwind, intended for
         // popovers and menus
