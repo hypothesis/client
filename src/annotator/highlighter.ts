@@ -237,9 +237,10 @@ export function highlightRange(
   textNodeSpans = textNodeSpans.filter(span => {
     const parentElement = span[0].parentElement;
     return (
-      // Whitespace <span>s should be highlighted since they affect layout
+      // Whitespace <span>s should be highlighted since they affect layout in
+      // some code editors
       (parentElement?.childNodes.length === 1 &&
-        parentElement?.tagName.match(/^SPAN$/i)) ||
+        parentElement?.tagName === 'SPAN') ||
       // Otherwise ignore white-space only Text node spans
       span.some(node => !whitespace.test(node.data))
     );
