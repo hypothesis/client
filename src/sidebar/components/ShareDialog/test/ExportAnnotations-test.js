@@ -59,7 +59,7 @@ describe('ExportAnnotations', () => {
     $imports.$mock(mockImportedComponents());
 
     $imports.$mock({
-      '../../../shared/download-json-file': {
+      '../../../shared/download-file': {
         downloadJSONFile: fakeDownloadJSONFile,
       },
       '../../helpers/export-annotations': {

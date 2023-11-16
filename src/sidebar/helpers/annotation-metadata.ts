@@ -18,7 +18,9 @@ export type DocumentMetadata = {
 /**
  * Extract document metadata from an annotation.
  */
-export function documentMetadata(annotation: Annotation): DocumentMetadata {
+export function documentMetadata(
+  annotation: APIAnnotationData,
+): DocumentMetadata {
   const uri = annotation.uri;
 
   let domain;

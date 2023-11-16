@@ -1,4 +1,4 @@
-import { downloadJSONFile } from '../download-json-file';
+import { downloadJSONFile } from '../download-file';
 
 describe('download-json-file', () => {
   let fakeLink;
