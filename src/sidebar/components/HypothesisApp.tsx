@@ -17,6 +17,7 @@ import AnnotationView from './AnnotationView';
 import HelpPanel from './HelpPanel';
 import NotebookView from './NotebookView';
 import ProfileView from './ProfileView';
+import SearchPanel from './SearchPanel';
 import ShareDialog from './ShareDialog';
 import SidebarView from './SidebarView';
 import StreamView from './StreamView';
@@ -168,6 +169,7 @@ function HypothesisApp({
       <div className="container">
         <ToastMessages />
         <HelpPanel />
+        <SearchPanel />
         {showShareButton && (
           <ShareDialog
             shareTab={!isThirdParty}

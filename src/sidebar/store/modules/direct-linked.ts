@@ -1,5 +1,11 @@
+import { createSelector } from 'reselect';
+
 import type { SidebarSettings } from '../../../types/config';
 import { createStoreModule, makeAction } from '../create-store';
+import type { State as ActivityState } from './activity';
+import { activityModule } from './activity';
+import type { State as AnnotationsState } from './annotations';
+import { annotationsModule } from './annotations';
 
 export type State = {
   /**
@@ -135,6 +141,40 @@ function directLinkedGroupFetchFailed(state: State) {
   return state.directLinkedGroupFetchFailed;
 }
 
+type RootState = {
+  directLinked: State;
+  annotations: AnnotationsState;
+  activity: ActivityState;
+};
+
+/**
+ * Has any direct linking failed?
+ * Potential causes could be an invalid annotation ID, an invalid group ID, a
+ * network or server issue, etc.
+ */
+const hasDirectLinkedError = createSelector(
+  (rootState: RootState) => {
+    const linkedAnnotationId = directLinkedAnnotationId(rootState.directLinked);
+    const linkedAnnotation = linkedAnnotationId
+      ? annotationsModule.selectors.findAnnotationByID(
+          rootState.annotations,
+          linkedAnnotationId,
+        )
+      : undefined;
+
+    // If, after loading completes, no `linkedAnnotation` object is present when
+    // a `linkedAnnotationId` is set, that indicates an error
+    return !activityModule.selectors.isLoading(rootState.activity) &&
+      linkedAnnotationId
+      ? !linkedAnnotation
+      : false;
+  },
+  (rootState: RootState) =>
+    directLinkedGroupFetchFailed(rootState.directLinked),
+  (hasDirectLinkedAnnotationError, hasDirectLinkedGroupError) =>
+    hasDirectLinkedAnnotationError || hasDirectLinkedGroupError,
+);
+
 export const directLinkedModule = createStoreModule(initialState, {
   namespace: 'directLinked',
   reducers,
@@ -149,5 +189,8 @@ export const directLinkedModule = createStoreModule(initialState, {
     directLinkedAnnotationId,
     directLinkedGroupFetchFailed,
     directLinkedGroupId,
+  },
+  rootSelectors: {
+    hasDirectLinkedError,
   },
 });

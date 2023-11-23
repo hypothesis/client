@@ -1,10 +1,4 @@
-import {
-  Button,
-  CancelIcon,
-  Card,
-  CardContent,
-  Spinner,
-} from '@hypothesis/frontend-shared';
+import { Button, CancelIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
@@ -209,66 +203,53 @@ export default function FilterStatus() {
 
   return (
     <div
-      // This container element needs to be present at all times but
-      // should only be visible when there are applied filters
-      className={classnames('mb-3', { 'sr-only': !filterMode })}
-      data-testid="filter-status-container"
+      className={classnames('flex items-center justify-center space-x-1', {
+        // This container element needs to be present at all times but
+        // should only be visible when there are applied filters
+        'sr-only': !filterMode,
+      })}
     >
-      <Card>
-        <CardContent>
-          {store.isLoading() ? (
-            <Spinner size="md" />
-          ) : (
-            <div className="flex items-center justify-center space-x-1">
-              <div
-                className={classnames(
-                  // Setting `min-width: 0` here allows wrapping to work as
-                  // expected for long `filterQuery` strings. See
-                  // https://css-tricks.com/flexbox-truncated-text/
-                  'grow min-w-[0]',
-                )}
-                role="status"
-              >
-                {filterMode && (
-                  <FilterStatusMessage
-                    additionalCount={additionalCount}
-                    entitySingular={
-                      filterMode === 'query' ? 'result' : 'annotation'
-                    }
-                    entityPlural={
-                      filterMode === 'query' ? 'results' : 'annotations'
-                    }
-                    filterQuery={filterQuery}
-                    focusDisplayName={
-                      filterMode !== 'selection' && focusState.active
-                        ? focusState.displayName
-                        : ''
-                    }
-                    resultCount={resultCount}
-                  />
-                )}
-              </div>
-              {filterMode && (
-                <Button
-                  onClick={
-                    filterMode === 'focus' && !forcedVisibleCount
-                      ? () => store.toggleFocusMode()
-                      : () => store.clearSelection()
-                  }
-                  size="sm"
-                  title={buttonText}
-                  variant="primary"
-                  data-testid="clear-button"
-                >
-                  {/** @TODO: Set `icon` prop in `Button` instead when https://github.com/hypothesis/frontend-shared/issues/675 is fixed*/}
-                  {filterMode !== 'focus' && <CancelIcon />}
-                  {buttonText}
-                </Button>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <div
+        className={classnames(
+          // Setting `min-width: 0` here allows wrapping to work as
+          // expected for long `filterQuery` strings. See
+          // https://css-tricks.com/flexbox-truncated-text/
+          'grow min-w-[0]',
+        )}
+        role="status"
+      >
+        {filterMode && (
+          <FilterStatusMessage
+            additionalCount={additionalCount}
+            entitySingular={filterMode === 'query' ? 'result' : 'annotation'}
+            entityPlural={filterMode === 'query' ? 'results' : 'annotations'}
+            filterQuery={filterQuery}
+            focusDisplayName={
+              filterMode !== 'selection' && focusState.active
+                ? focusState.displayName
+                : ''
+            }
+            resultCount={resultCount}
+          />
+        )}
+      </div>
+      {filterMode && (
+        <Button
+          onClick={
+            filterMode === 'focus' && !forcedVisibleCount
+              ? () => store.toggleFocusMode()
+              : () => store.clearSelection()
+          }
+          size="sm"
+          title={buttonText}
+          variant="primary"
+          data-testid="clear-button"
+        >
+          {/** @TODO: Set `icon` prop in `Button` instead when https://github.com/hypothesis/frontend-shared/issues/675 is fixed*/}
+          {filterMode !== 'focus' && <CancelIcon />}
+          {buttonText}
+        </Button>
+      )}
     </div>
   );
 }

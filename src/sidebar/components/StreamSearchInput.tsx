@@ -21,9 +21,7 @@ function StreamSearchInput({ router }: StreamSearchInputProps) {
     router.navigate('stream', { q: query });
   };
 
-  return (
-    <SearchInput query={q ?? ''} onSearch={setQuery} alwaysExpanded={true} />
-  );
+  return <SearchInput query={q ?? ''} onSearch={setQuery} />;
 }
 
 export default withServices(StreamSearchInput, ['router']);

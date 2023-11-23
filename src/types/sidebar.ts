@@ -5,7 +5,11 @@
 /**
  * Defined panel components available in the sidebar.
  */
-export type PanelName = 'help' | 'loginPrompt' | 'shareGroupAnnotations';
+export type PanelName =
+  | 'help'
+  | 'loginPrompt'
+  | 'shareGroupAnnotations'
+  | 'searchAnnotations';
 
 /**
  * The top-level tabs in the sidebar interface. Used to reference which tab

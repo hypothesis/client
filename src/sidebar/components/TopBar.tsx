@@ -10,7 +10,7 @@ import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
 import PendingUpdatesButton from './PendingUpdatesButton';
 import PressableIconButton from './PressableIconButton';
-import SearchInput from './SearchInput';
+import SearchIconButton from './SearchInconButton';
 import SortMenu from './SortMenu';
 import StreamSearchInput from './StreamSearchInput';
 import UserMenu from './UserMenu';
@@ -51,7 +51,6 @@ function TopBar({
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
   const store = useSidebarStore();
-  const filterQuery = store.filterQuery();
   const isLoggedIn = store.isLoggedIn();
   const hasFetchedProfile = store.hasFetchedProfile();
 
@@ -98,10 +97,7 @@ function TopBar({
           {isSidebar && (
             <>
               <PendingUpdatesButton />
-              <SearchInput
-                query={filterQuery || null}
-                onSearch={store.setFilterQuery}
-              />
+              <SearchIconButton />
               <SortMenu />
               {showShareButton && (
                 <PressableIconButton

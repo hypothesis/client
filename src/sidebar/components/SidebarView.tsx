@@ -6,7 +6,6 @@ import type { FrameSyncService } from '../services/frame-sync';
 import type { LoadAnnotationsService } from '../services/load-annotations';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
-import FilterStatus from './FilterStatus';
 import LoggedOutMessage from './LoggedOutMessage';
 import LoginPromptPanel from './LoginPromptPanel';
 import SelectionTabs from './SelectionTabs';
@@ -66,7 +65,6 @@ function SidebarView({
   const hasContentError =
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
-  const showFilterStatus = !hasContentError;
   const showTabs = !hasContentError && !hasAppliedFilter;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
@@ -131,7 +129,6 @@ function SidebarView({
   return (
     <div>
       <h2 className="sr-only">Annotations</h2>
-      {showFilterStatus && <FilterStatus />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError
