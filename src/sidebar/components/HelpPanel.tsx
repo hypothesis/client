@@ -25,7 +25,7 @@ function HelpPanelNavigationButton({
   onClick,
 }: HelpPanelNavigationButtonProps) {
   return (
-    <LinkButton color="brand" onClick={onClick} underline="hover">
+    <LinkButton variant="brand" onClick={onClick} underline="hover">
       <div className="flex items-center gap-x-1">
         {children}
         <ArrowRightIcon className="w-em h-em" />

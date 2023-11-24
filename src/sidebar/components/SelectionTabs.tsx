@@ -58,7 +58,7 @@ function Tab({
       classes={classnames('bg-transparent min-w-[5.25rem]', {
         'font-bold': isSelected,
       })}
-      color="text"
+      variant="text"
       // Listen for `onMouseDown` so that the tab is selected when _pressed_
       // as this makes the UI feel faster. Also listen for `onClick` as a fallback
       // to enable selecting the tab via other input methods.
