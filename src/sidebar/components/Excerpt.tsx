@@ -40,7 +40,7 @@ function InlineControls({
     >
       <div className="flex justify-end">
         <LinkButton
-          color="text"
+          variant="text"
           onClick={() => setCollapsed(!isCollapsed)}
           expanded={!isCollapsed}
           title="Toggle visibility of full excerpt text"

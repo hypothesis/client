@@ -115,7 +115,7 @@ function AnnotationHeader({
         <AnnotationUser authorLink={authorLink} displayName={authorName} />
         {replyCount > 0 && isCollapsedReply && (
           <LinkButton
-            color="text-light"
+            variant="text-light"
             onClick={onReplyCountClick}
             title="Expand replies"
             underline="hover"

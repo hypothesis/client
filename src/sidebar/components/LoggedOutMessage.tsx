@@ -28,7 +28,7 @@ function LoggedOutMessage({ onLogin }: LoggedOutMessageProps) {
           create a free account
         </Link>{' '}
         or{' '}
-        <LinkButton inline color="text" onClick={onLogin} underline="always">
+        <LinkButton inline variant="text" onClick={onLogin} underline="always">
           log in
         </LinkButton>
         .
