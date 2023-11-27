@@ -5,10 +5,25 @@ function trimEmptyLines(str: string): string {
   return str.replace(/^\s*\n|\n\s*$/g, '');
 }
 
+export type DedentOptions = {
+  /**
+   * When true, it will completely remove indentation from every line.
+   * When false, it will only remove the common indentation among lines.
+   * Defaults to false.
+   */
+  fullDedent?: boolean;
+};
+
 /**
- * Remove common indentation from each line of a string.
+ * Remove indentation from each line of a string.
  */
-function dedent(str: string) {
+function dedent(str: string, options?: DedentOptions) {
+  if (options?.fullDedent) {
+    // Remove all tabs or spaces at the beginning of every line
+    // (`m` regex modifier means multiline)
+    return str.replace(/^[ \t]+/gm, '');
+  }
+
   // Match the smallest indentation
   const match = str.match(/^[ \t]*(?=\S)/gm);
   const indent = match && Math.min(...match.map(el => el.length));
@@ -20,6 +35,8 @@ function dedent(str: string) {
 
   return str;
 }
+
+export type TrimAndDedentOptions = DedentOptions;
 
 /**
  * Remove leading and trailing empty lines from a string, then remove common
@@ -50,6 +67,9 @@ function dedent(str: string) {
  *     }
  *   }
  */
-export function trimAndDedent(str: string): string {
-  return dedent(trimEmptyLines(str));
+export function trimAndDedent(
+  str: string,
+  options?: TrimAndDedentOptions,
+): string {
+  return dedent(trimEmptyLines(str), options);
 }

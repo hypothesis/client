@@ -24,9 +24,22 @@ describe('trimAndDedent', () => {
   Indented line
 Goodbye, John!`,
     ],
-  ].forEach(([str, expectedResult]) => {
+    [
+      `
+      
+        Hello, Jane!
+          Indented line
+        Goodbye, John!
+      
+      `,
+      `Hello, Jane!
+Indented line
+Goodbye, John!`,
+      { fullDedent: true },
+    ],
+  ].forEach(([str, expectedResult, options]) => {
     it('normalizes strings with multiple lines', () => {
-      const result = trimAndDedent(str);
+      const result = trimAndDedent(str, options);
       assert.equal(result, expectedResult);
     });
   });
