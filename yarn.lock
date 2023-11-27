@@ -2935,9 +2935,9 @@ __metadata:
   linkType: hard
 
 "@types/hammerjs@npm:^2.0.41":
-  version: 2.0.44
-  resolution: "@types/hammerjs@npm:2.0.44"
-  checksum: fb0a1ad24e189fb478cd39a5f93b4fad636522c4e0907f40caa329627cba267de5397c1bddcdabb431f85638a3671e8b0f22fc11347846a7be107a67007cd496
+  version: 2.0.45
+  resolution: "@types/hammerjs@npm:2.0.45"
+  checksum: 40a29067c485a2a1f4345718104218fcf769adb1dbe091cdb6f679b3293dfa0798b207eb498ee7fd79ae8664c999117738fa0c01753f7465a639128f38c3ff5b
   languageName: node
   linkType: hard
 
@@ -2949,9 +2949,9 @@ __metadata:
   linkType: hard
 
 "@types/katex@npm:^0.16.0":
-  version: 0.16.6
-  resolution: "@types/katex@npm:0.16.6"
-  checksum: 20166070de2c92c4658c066bf13af5c0cd705a9c6d43e30aa6f097725fd30d5892ccbd2320257894eab9c224444c356070376a94886fdc19ec33a1458f793bf8
+  version: 0.16.7
+  resolution: "@types/katex@npm:0.16.7"
+  checksum: 4fd15d93553be97c02c064e16be18d7ccbabf66ec72a9dc7fd5bfa47f0c7581da2f942f693c7cb59499de4c843c2189796e49c9647d336cbd52b777b6722a95a
   languageName: node
   linkType: hard
 
@@ -2998,16 +2998,16 @@ __metadata:
   linkType: hard
 
 "@types/shallowequal@npm:^1.1.1":
-  version: 1.1.4
-  resolution: "@types/shallowequal@npm:1.1.4"
-  checksum: c87465a8eeedf006cea667929b327ddcd9959981e4c889dfc96db2822a758bb1674477fd4ca7a0d8860713242c47042416ecd33605214ffb93f7779924ee907e
+  version: 1.1.5
+  resolution: "@types/shallowequal@npm:1.1.5"
+  checksum: 9f7dde131fa006623836b4204ccb68154ae6d2a91f908c00f52f138f7fdcd198e471489f649d2f34d788fb82e717ac16b773dac280e1ab44a927f14b12f67f6c
   languageName: node
   linkType: hard
 
 "@types/showdown@npm:^2.0.0":
-  version: 2.0.4
-  resolution: "@types/showdown@npm:2.0.4"
-  checksum: a6cbce0f8c5d6ddb1ae79d9fb5f06d35f800ed256863554520c1d4a2950d768008d82425405bda05edf06f1ccf6c45fe8d7170712245d062701661b2ae005edf
+  version: 2.0.6
+  resolution: "@types/showdown@npm:2.0.6"
+  checksum: c4c341e4a93061cabed6168f2c2eb7b83c08bc57284f5c14bc2e5d18c6b42b533cc2efc4fa3e4cd96e009520ae2fa8c40997be31e4409239aabf8a2cf37c1ada
   languageName: node
   linkType: hard
 
