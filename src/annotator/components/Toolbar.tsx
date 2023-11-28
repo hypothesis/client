@@ -8,7 +8,7 @@ import {
   NoteIcon,
   ShowIcon,
 } from '@hypothesis/frontend-shared';
-import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
+import type { ButtonProps } from '@hypothesis/frontend-shared/lib/components/input/Button';
 import type {
   IconComponent,
   PresentationalProps,
@@ -19,7 +19,7 @@ import type { JSX, RefObject } from 'preact';
 // TODO: ToolbarButton should be extracted as a shared design pattern or
 // component
 type ToolbarButtonProps = PresentationalProps &
-  ButtonCommonProps &
+  ButtonProps &
   Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'icon' | 'size'> & {
     icon: IconComponent;
   };
