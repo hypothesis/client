@@ -3,7 +3,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
 } from '@hypothesis/frontend-shared';
-import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
+import type { ButtonProps } from '@hypothesis/frontend-shared/lib/components/input/Button';
 import type { PresentationalProps } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 import type { JSX } from 'preact';
@@ -11,7 +11,7 @@ import type { JSX } from 'preact';
 import { pageNumberOptions } from '../util/pagination';
 
 type NavigationButtonProps = PresentationalProps &
-  ButtonCommonProps &
+  ButtonProps &
   Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'icon' | 'size'>;
 
 function NavigationButton({ ...buttonProps }: NavigationButtonProps) {
