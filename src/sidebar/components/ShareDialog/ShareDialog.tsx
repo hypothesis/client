@@ -4,11 +4,11 @@ import { useState } from 'preact/hooks';
 
 import { useSidebarStore } from '../../store';
 import SidebarPanel from '../SidebarPanel';
+import TabHeader from '../tabs/TabHeader';
+import TabPanel from '../tabs/TabPanel';
 import ExportAnnotations from './ExportAnnotations';
 import ImportAnnotations from './ImportAnnotations';
 import ShareAnnotations from './ShareAnnotations';
-import TabHeader from './TabHeader';
-import TabPanel from './TabPanel';
 
 export type ShareDialogProps = {
   /** If true, the share tab will be rendered. Defaults to false */

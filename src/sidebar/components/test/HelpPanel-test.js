@@ -48,8 +48,8 @@ describe('HelpPanel', () => {
     });
     $imports.$restore({
       // Rendering TabHeader and TabPanel is needed for a11y tests
-      './ShareDialog/TabHeader': true,
-      './ShareDialog/TabPanel': true,
+      './tabs/TabHeader': true,
+      './tabs/TabPanel': true,
     });
   });
 

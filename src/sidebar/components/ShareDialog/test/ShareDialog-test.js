@@ -28,8 +28,8 @@ describe('ShareDialog', () => {
     $imports.$mock(mockImportedComponents());
     // Don't mock these related components for now
     $imports.$restore({
-      './TabHeader': true,
-      './TabPanel': true,
+      '../tabs/TabHeader': true,
+      '../tabs/TabPanel': true,
     });
     $imports.$mock({
       '../../store': { useSidebarStore: () => fakeStore },
