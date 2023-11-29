@@ -39,17 +39,22 @@ describe('TopBar', () => {
       '../store': { useSidebarStore: () => fakeStore },
       '../config/service-config': { serviceConfig: fakeServiceConfig },
     });
+    $imports.$restore({
+      // `PressableIconButton` is a presentation-only component. Not mocking it
+      // allows to get it covered.
+      './PressableIconButton': true,
+    });
   });
 
   afterEach(() => {
     $imports.$restore();
   });
 
-  // Helper to retrieve an `Button` by icon name, for convenience
-  function getButton(wrapper, iconName) {
+  // Helper to retrieve an `Button` by test ID, for convenience
+  function getButton(wrapper, testId) {
     return wrapper
-      .find('IconButton')
-      .filterWhere(n => n.find(iconName).exists());
+      .find('PressableIconButton')
+      .filterWhere(n => n.find(`[data-testid="${testId}"]`).exists());
   }
 
   function createTopBar(props = {}) {
@@ -69,7 +74,7 @@ describe('TopBar', () => {
     context('no help service handler configured in services (default)', () => {
       it('toggles Help Panel on click', () => {
         const wrapper = createTopBar();
-        const helpButton = getButton(wrapper, 'HelpIcon');
+        const helpButton = getButton(wrapper, 'help-icon-button');
 
         helpButton.props().onClick();
 
@@ -79,7 +84,7 @@ describe('TopBar', () => {
       it('displays a help icon active state when help panel active', () => {
         fakeStore.isSidebarPanelOpen.withArgs('help').returns(true);
         const wrapper = createTopBar();
-        const helpButton = getButton(wrapper, 'HelpIcon');
+        const helpButton = getButton(wrapper, 'help-icon-button');
 
         wrapper.update();
 
@@ -91,7 +96,7 @@ describe('TopBar', () => {
           fakeServiceConfig.returns({ onHelpRequestProvided: true });
           const wrapper = createTopBar();
 
-          const helpButton = getButton(wrapper, 'HelpIcon');
+          const helpButton = getButton(wrapper, 'help-icon-button');
 
           helpButton.props().onClick();
 
@@ -164,7 +169,7 @@ describe('TopBar', () => {
 
   it('toggles the share annotations panel when "Share" is clicked', () => {
     const wrapper = createTopBar();
-    const shareButton = getButton(wrapper, 'ShareIcon');
+    const shareButton = getButton(wrapper, 'share-icon-button');
 
     shareButton.props().onClick();
 
@@ -176,7 +181,7 @@ describe('TopBar', () => {
       .withArgs('shareGroupAnnotations')
       .returns(true);
     const wrapper = createTopBar();
-    const shareButton = getButton(wrapper, 'ShareIcon');
+    const shareButton = getButton(wrapper, 'share-icon-button');
 
     assert.isTrue(shareButton.prop('expanded'));
   });
