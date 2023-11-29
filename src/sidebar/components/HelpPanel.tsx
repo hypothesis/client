@@ -8,11 +8,11 @@ import { VersionData } from '../helpers/version-data';
 import { withServices } from '../service-context';
 import type { SessionService } from '../services/session';
 import { useSidebarStore } from '../store';
-import TabHeader from './ShareDialog/TabHeader';
-import TabPanel from './ShareDialog/TabPanel';
 import SidebarPanel from './SidebarPanel';
 import Tutorial from './Tutorial';
 import VersionInfo from './VersionInfo';
+import TabHeader from './tabs/TabHeader';
+import TabPanel from './tabs/TabPanel';
 
 type HelpPanelTabProps = {
   /** What the tab's link should say. */
