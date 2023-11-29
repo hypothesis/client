@@ -1,9 +1,4 @@
-import {
-  IconButton,
-  LinkButton,
-  HelpIcon,
-  ShareIcon,
-} from '@hypothesis/frontend-shared';
+import { LinkButton, HelpIcon, ShareIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../types/config';
@@ -14,6 +9,7 @@ import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
 import PendingUpdatesButton from './PendingUpdatesButton';
+import PressableIconButton from './PressableIconButton';
 import SearchInput from './SearchInput';
 import SortMenu from './SortMenu';
 import StreamSearchInput from './StreamSearchInput';
@@ -108,28 +104,32 @@ function TopBar({
               />
               <SortMenu />
               {showShareButton && (
-                <IconButton
+                <PressableIconButton
                   icon={ShareIcon}
                   expanded={isAnnotationsPanelOpen}
+                  pressed={isAnnotationsPanelOpen}
                   onClick={toggleSharePanel}
                   size="xs"
                   title="Share annotations on this page"
+                  data-testid="share-icon-button"
                 />
               )}
             </>
           )}
-          <IconButton
+          <PressableIconButton
             icon={HelpIcon}
             expanded={isHelpPanelOpen}
+            pressed={isHelpPanelOpen}
             onClick={requestHelp}
             size="xs"
             title="Help"
+            data-testid="help-icon-button"
           />
           {isLoggedIn ? (
             <UserMenu onLogout={onLogout} />
           ) : (
             <div
-              className="flex items-center text-md font-medium space-x-1"
+              className="flex items-center text-md font-medium space-x-1 pl-1"
               data-testid="login-links"
             >
               {!isLoggedIn && !hasFetchedProfile && <span>⋯</span>}
