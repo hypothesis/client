@@ -392,7 +392,11 @@ describe('annotator/integrations/vitalsource', () => {
       });
 
       const pageSelector = selectors.find(s => s.type === 'PageSelector');
-      assert.notOk(pageSelector);
+      assert.deepEqual(pageSelector, {
+        type: 'PageSelector',
+        index: 1,
+        label: '20',
+      });
     });
 
     it('adds selector for current PDF book page', async () => {
