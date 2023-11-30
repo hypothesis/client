@@ -164,6 +164,9 @@ export type MosaicBookElement = HTMLElement & {
    */
   getCurrentPage(): Promise<PageInfo>;
 
+  /** Get the list of pages in the book. */
+  getPages(): Promise<DataResponse<PageInfo[]>>;
+
   /** Retrieve the book's table of contents. */
   getTOC(): Promise<DataResponse<TableOfContentsEntry[]>>;
 

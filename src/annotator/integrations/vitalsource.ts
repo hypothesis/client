@@ -9,7 +9,11 @@ import type {
   SegmentInfo,
   SidebarLayout,
 } from '../../types/annotator';
-import type { EPUBContentSelector, Selector } from '../../types/api';
+import type {
+  EPUBContentSelector,
+  PageSelector,
+  Selector,
+} from '../../types/api';
 import type {
   ContentFrameGlobals,
   MosaicBookElement,
@@ -172,6 +176,23 @@ function makeContentFrameScrollable(frame: HTMLIFrameElement) {
   const attrObserver = new MutationObserver(removeScrollingAttr);
   attrObserver.observe(frame, { attributes: true });
 }
+
+/**
+ * Lookup options for fetching page metadata from VitalSource.
+ *
+ * Enabling this options involves some extra work, so should be skipped if
+ * the data is not needed.
+ */
+type PageInfoOptions = {
+  /** Whether to fetch the title. */
+  includeTitle?: boolean;
+
+  /**
+   * Whether to use a fallback strategy to get the page index if not available
+   * in the {@link MosaicBookElement.getCurrentPage} response.
+   */
+  includePageIndex?: boolean;
+};
 
 /**
  * Return a copy of URL with the origin removed.
@@ -338,19 +359,18 @@ export class VitalSourceContentIntegration
       page: pageLabel,
       title,
       url,
-    } = await this._getPageInfo(true /* includeTitle */);
+    } = await this._getPageInfo({ includeTitle: true, includePageIndex: true });
 
     // We generate an "EPUBContentSelector" with a CFI for all VS books,
     // although for PDF-based books the CFI is a string generated from the
     // page number.
-    const extraSelectors: Selector[] = [
-      {
-        type: 'EPUBContentSelector',
-        cfi,
-        url,
-        title,
-      },
-    ];
+    const cfiSelector: EPUBContentSelector = {
+      type: 'EPUBContentSelector',
+      cfi,
+      url,
+      title,
+    };
+    const extraSelectors: Selector[] = [cfiSelector];
 
     // Add page number if available. PDF-based books always have them.
     // Publishers are encouraged to provide page numbers for EPUB-based books,
@@ -359,11 +379,12 @@ export class VitalSourceContentIntegration
     //
     // [1] https://www.vitalsource.com/en-uk/products/vitalsource-epub3-implementation-guide-vitalsource-vvstdocsepub3implementguide?term=VST-DOCS-EPUB3IMPLEMENTGUIDE
     if (typeof pageIndex === 'number') {
-      extraSelectors.push({
+      const pageSelector: PageSelector = {
         type: 'PageSelector',
         index: pageIndex,
         label: pageLabel,
-      });
+      };
+      extraSelectors.push(pageSelector);
     }
 
     selectors.push(...extraSelectors);
@@ -451,14 +472,15 @@ export class VitalSourceContentIntegration
   /**
    * Retrieve information about the currently displayed content document or
    * page.
-   *
-   * @param includeTitle - Whether to fetch the title. This involves some extra
-   *   work so should be skipped when not required.
    */
-  async _getPageInfo(includeTitle: boolean) {
-    const [pageInfo, toc] = await Promise.all([
+  async _getPageInfo({
+    includeTitle = false,
+    includePageIndex = false,
+  }: PageInfoOptions = {}) {
+    const [pageInfo, toc, pages] = await Promise.all([
       this._bookElement.getCurrentPage(),
       includeTitle ? this._bookElement.getTOC() : undefined,
+      includePageIndex ? this._bookElement.getPages() : undefined,
     ]);
 
     // If changes in VitalSource ever mean that critical chapter/page metadata
@@ -474,7 +496,6 @@ export class VitalSourceContentIntegration
     }
 
     let title;
-
     if (toc) {
       title = pageInfo.chapterTitle;
 
@@ -490,9 +511,20 @@ export class VitalSourceContentIntegration
       }
     }
 
+    // For PDF-based books, the `pageInfo.index` property should be populated.
+    // For EPUB-based books, it may not be. In that case we try to find a
+    // page number in the complete page list instead.
+    let pageIndex = pageInfo.index;
+    if (pageIndex === undefined && pages) {
+      const index = pages.data?.findIndex(page => page.cfi === pageInfo.cfi);
+      if (index !== -1) {
+        pageIndex = index;
+      }
+    }
+
     return {
       cfi: pageInfo.cfi,
-      index: pageInfo.index,
+      index: pageIndex,
       page: pageInfo.page,
       title,
 
@@ -503,7 +535,7 @@ export class VitalSourceContentIntegration
   }
 
   async segmentInfo(): Promise<SegmentInfo> {
-    const { cfi, url } = await this._getPageInfo(false /* includeTitle */);
+    const { cfi, url } = await this._getPageInfo();
     return { cfi, url };
   }
 
