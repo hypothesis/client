@@ -61,21 +61,21 @@ export class MosaicBookElement extends HTMLElement {
           absoluteURL: '/document/little-women-1',
           chapterTitle: 'Chapter One',
           cfi: '/2',
-          index: 0,
+          index: undefined,
           page: '10',
         },
         {
           absoluteURL: '/document/little-women-2',
           chapterTitle: 'Chapter Two',
           cfi: '/4',
-          index: 1,
+          index: undefined,
           page: '20',
         },
         {
           absoluteURL: '/document/little-women-3',
           chapterTitle: 'Chapter Three',
           cfi: '/6',
-          index: 2,
+          index: undefined,
           page: '30',
         },
       ];
@@ -168,6 +168,10 @@ export class MosaicBookElement extends HTMLElement {
 
   async getCurrentPage() {
     return this.pageData[this.pageIndex];
+  }
+
+  async getPages() {
+    return { ok: true, data: [...this.pageData], status: 200 };
   }
 
   async getTOC() {

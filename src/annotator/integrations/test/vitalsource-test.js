@@ -236,7 +236,7 @@ describe('annotator/integrations/vitalsource', () => {
           absoluteURL: '/pages/chapter_02.xhtml',
           cfi: '/2',
           chapterTitle: 'Chapter two',
-          index: 1,
+          index: undefined,
           page: '20',
         };
       } else if (this._format === 'pbk') {
@@ -250,6 +250,12 @@ describe('annotator/integrations/vitalsource', () => {
       } else {
         throw new Error('Unknown book');
       }
+    }
+
+    async getPages() {
+      const pageData = await this.getCurrentPage();
+      const data = [pageData];
+      return { ok: true, data };
     }
 
     async getTOC() {
@@ -394,7 +400,7 @@ describe('annotator/integrations/vitalsource', () => {
       const pageSelector = selectors.find(s => s.type === 'PageSelector');
       assert.deepEqual(pageSelector, {
         type: 'PageSelector',
-        index: 1,
+        index: 0,
         label: '20',
       });
     });
