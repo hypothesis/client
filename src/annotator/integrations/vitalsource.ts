@@ -352,13 +352,13 @@ export class VitalSourceContentIntegration
       },
     ];
 
-    // If this is a PDF-based book, add a page selector. PDFs always have page
-    // numbers available. EPUB-based books _may_ have information about how
-    // content maps to page numbers in a printed edition of the book. We
-    // currently limit page number selectors to PDFs until more is understood
-    // about when EPUB page numbers are reliable/likely to remain stable.
-    const bookInfo = this._bookElement.getBookInfo();
-    if (bookInfo.format === 'pbk' && typeof pageIndex === 'number') {
+    // Add page number if available. PDF-based books always have them.
+    // Publishers are encouraged to provide page numbers for EPUB-based books,
+    // but not all do. See mentions of page numbers in the "VitalSource ePub3
+    // Submission Guide" [1].
+    //
+    // [1] https://www.vitalsource.com/en-uk/products/vitalsource-epub3-implementation-guide-vitalsource-vvstdocsepub3implementguide?term=VST-DOCS-EPUB3IMPLEMENTGUIDE
+    if (typeof pageIndex === 'number') {
       extraSelectors.push({
         type: 'PageSelector',
         index: pageIndex,
