@@ -91,6 +91,14 @@ export type PDFPageProxy = {
 export type PDFPageView = {
   /** Container element for the PDF page. */
   div: HTMLElement;
+
+  /**
+   * The page label that is displayed in the current page input field.
+   *
+   * If null, PDF.js will display a 1-based page number instead.
+   */
+  pageLabel: string | null;
+
   pdfPage: PDFPageProxy;
   textLayer: TextLayer | null;
   /** See `RenderingStates` enum in src/annotator/anchoring/pdf.js */

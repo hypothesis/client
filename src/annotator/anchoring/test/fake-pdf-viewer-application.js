@@ -135,6 +135,7 @@ class FakePDFPageView {
       ? RenderingStates.FINISHED
       : RenderingStates.INITIAL;
     this.pdfPage = new FakePDFPageProxy(text, config);
+    this.pageLabel = null;
   }
 
   dispose() {

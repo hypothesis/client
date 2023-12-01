@@ -1,6 +1,7 @@
 /* global PDFViewerApplication */
 import { warnOnce } from '../../shared/warn-once';
 import type {
+  PageSelector,
   TextPositionSelector,
   TextQuoteSelector,
   Selector,
@@ -646,7 +647,10 @@ export async function describe(
   ).relativeTo(textLayer);
 
   const startPageIndex = getSiblingIndex(textLayer.parentNode!);
+  const pageNumber = startPageIndex + 1;
   const pageOffset = await getPageOffset(startPageIndex);
+
+  const pageView = await getPageView(startPageIndex);
 
   const position = {
     type: 'TextPositionSelector',
@@ -656,7 +660,13 @@ export async function describe(
 
   const quote = TextQuoteAnchor.fromRange(root, textRange).toSelector();
 
-  return [position, quote];
+  const pageSelector: PageSelector = {
+    type: 'PageSelector',
+    index: startPageIndex,
+    label: pageView.pageLabel ?? pageNumber.toString(),
+  };
+
+  return [position, quote, pageSelector];
 }
 
 /**
