@@ -91,15 +91,19 @@ describe('annotator/anchoring/pdf', () => {
   });
 
   describe('describe', () => {
-    it('returns position and quote selectors', () => {
+    it('returns position and quote selectors', async () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
-      return pdfAnchoring.describe(container, range).then(selectors => {
-        const types = selectors.map(s => {
-          return s.type;
-        });
-        assert.deepEqual(types, ['TextPositionSelector', 'TextQuoteSelector']);
-      });
+
+      const selectors = await pdfAnchoring.describe(container, range);
+      selectors.sort((a, b) => a.type.localeCompare(b.type));
+
+      const types = selectors.map(s => s.type);
+      assert.deepEqual(types, [
+        'PageSelector',
+        'TextPositionSelector',
+        'TextQuoteSelector',
+      ]);
     });
 
     it('returns a position selector with correct start/end offsets', async () => {
@@ -109,17 +113,18 @@ describe('annotator/anchoring/pdf', () => {
       const contentStr = fixtures.pdfPages.join('');
       const expectedPos = contentStr.replace(/\n/g, '').lastIndexOf(quote);
 
-      const [positionSelector] = await pdfAnchoring.describe(container, range);
+      const selectors = await pdfAnchoring.describe(container, range);
+      const position = selectors.find(s => s.type === 'TextPositionSelector');
 
-      assert.equal(positionSelector.start, expectedPos);
-      assert.equal(positionSelector.end, expectedPos + quote.length);
+      assert.equal(position.start, expectedPos);
+      assert.equal(position.end, expectedPos + quote.length);
     });
 
     it('returns a quote selector with the correct quote', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
       return pdfAnchoring.describe(container, range).then(selectors => {
-        const quote = selectors[1];
+        const quote = selectors.find(s => s.type === 'TextQuoteSelector');
 
         assert.deepEqual(quote, {
           type: 'TextQuoteSelector',
@@ -127,6 +132,35 @@ describe('annotator/anchoring/pdf', () => {
           prefix: 'im one day, "have you heard that',
           suffix: ' is occupied again?" ',
         });
+      });
+    });
+
+    it('returns a page selector with the page number as the label', async () => {
+      viewer.pdfViewer.setCurrentPage(2);
+      const range = findText(container, 'Netherfield Park');
+
+      const selectors = await pdfAnchoring.describe(container, range);
+
+      const page = selectors.find(s => s.type === 'PageSelector');
+      assert.deepEqual(page, {
+        type: 'PageSelector',
+        index: 2,
+        label: '3',
+      });
+    });
+
+    it('returns a page selector with the custom page label as the label', async () => {
+      viewer.pdfViewer.setCurrentPage(2);
+      viewer.pdfViewer.getPageView(2).pageLabel = 'iv';
+      const range = findText(container, 'Netherfield Park');
+
+      const selectors = await pdfAnchoring.describe(container, range);
+
+      const page = selectors.find(s => s.type === 'PageSelector');
+      assert.deepEqual(page, {
+        type: 'PageSelector',
+        index: 2,
+        label: 'iv',
       });
     });
 
