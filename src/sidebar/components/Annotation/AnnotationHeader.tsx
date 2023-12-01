@@ -12,6 +12,7 @@ import {
   isHighlight,
   isReply,
   hasBeenEdited,
+  pageLabel as getPageLabel,
 } from '../../helpers/annotation-metadata';
 import {
   annotationAuthorLink,
@@ -54,6 +55,7 @@ function AnnotationHeader({
   const defaultAuthority = store.defaultAuthority();
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
   const userURL = store.getLink('user', { user: annotation.user });
+  const pageNumbersEnabled = store.isFeatureEnabled('page_numbers');
 
   const authorName = useMemo(
     () =>
@@ -101,7 +103,14 @@ function AnnotationHeader({
     // an ID.
     store.setExpanded(annotation.id!, true);
 
-  const group = store.getGroup(annotation.group);
+  // As part of the `page_numbers` feature, we are hiding the group on cards in
+  // contexts where it is the same for all cards and is shown elsewhere in the
+  // UI (eg. the top bar). This is to reduce visual clutter.
+  let group;
+  if (!pageNumbersEnabled || store.route() !== 'sidebar') {
+    group = store.getGroup(annotation.group);
+  }
+  const pageNumber = pageNumbersEnabled ? getPageLabel(annotation) : undefined;
 
   return (
     <header>
@@ -153,12 +162,21 @@ function AnnotationHeader({
               className="w-[10px] h-[10px] text-color-text-light"
             />
           )}
-          {showDocumentInfo && (
-            <AnnotationDocumentInfo
-              domain={documentInfo.domain}
-              link={documentLink}
-              title={documentInfo.titleText}
-            />
+          {(showDocumentInfo || pageNumber) && (
+            <span className="flex">
+              {showDocumentInfo && (
+                <AnnotationDocumentInfo
+                  domain={documentInfo.domain}
+                  link={documentLink}
+                  title={documentInfo.titleText}
+                />
+              )}
+              {pageNumber && (
+                <span className="text-grey-6" data-testid="page-number">
+                  {showDocumentInfo && ', '}p.{pageNumber}
+                </span>
+              )}
+            </span>
           )}
         </div>
       )}
