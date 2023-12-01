@@ -4,6 +4,7 @@ import {
   documentMetadata,
   domainAndTitle,
   isSaved,
+  pageLabel,
 } from '../annotation-metadata';
 
 describe('sidebar/helpers/annotation-metadata', () => {
@@ -584,6 +585,27 @@ describe('sidebar/helpers/annotation-metadata', () => {
         ],
       };
       assert.equal(annotationMetadata.quote(ann), null);
+    });
+  });
+
+  describe('pageLabel', () => {
+    it('returns page label for annotation', () => {
+      const ann = {
+        target: [
+          {
+            source: 'https://publisher.org/article.pdf',
+            selector: [{ type: 'PageSelector', index: 10, label: '11' }],
+          },
+        ],
+      };
+      assert.equal(pageLabel(ann), '11');
+    });
+
+    it('returns undefined if annotation has no `PageSelector` selector', () => {
+      const anns = [fixtures.newPageNote(), fixtures.newAnnotation()];
+      for (const ann of anns) {
+        assert.isUndefined(pageLabel(ann));
+      }
     });
   });
 

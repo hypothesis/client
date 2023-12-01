@@ -1,6 +1,7 @@
 import type {
   APIAnnotationData,
   Annotation,
+  PageSelector,
   SavedAnnotation,
   TextQuoteSelector,
 } from '../../types/api';
@@ -339,6 +340,18 @@ export function quote(annotation: APIAnnotationData): string | null {
     | TextQuoteSelector
     | undefined;
   return quoteSel ? quoteSel.exact : null;
+}
+
+/**
+ * Return the label of the page that an annotation comes from.
+ *
+ * This is usually a 1-based page number, but can also be roman numerals etc.
+ */
+export function pageLabel(annotation: APIAnnotationData): string | undefined {
+  const pageSel = annotation.target[0]?.selector?.find(
+    s => s.type === 'PageSelector',
+  ) as PageSelector | undefined;
+  return pageSel?.label;
 }
 
 /**
