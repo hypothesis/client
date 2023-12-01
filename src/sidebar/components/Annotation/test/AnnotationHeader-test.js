@@ -8,6 +8,7 @@ import * as fixtures from '../../../test/annotation-fixtures';
 import AnnotationHeader, { $imports } from '../AnnotationHeader';
 
 describe('AnnotationHeader', () => {
+  let activeFeatures;
   let fakeAnnotationAuthorLink;
   let fakeAnnotationDisplayName;
   let fakeDomainAndTitle;
@@ -33,6 +34,11 @@ describe('AnnotationHeader', () => {
   };
 
   beforeEach(() => {
+    activeFeatures = {
+      client_display_names: true,
+      page_numbers: false,
+    };
+
     fakeAnnotationAuthorLink = sinon
       .stub()
       .returns('http://www.example.com/user/');
@@ -54,10 +60,13 @@ describe('AnnotationHeader', () => {
 
     fakeStore = {
       defaultAuthority: sinon.stub().returns('example.com'),
-      isFeatureEnabled: sinon
-        .stub()
-        .withArgs('client_display_names')
-        .returns(true),
+      isFeatureEnabled: sinon.stub().callsFake(feature => {
+        const enabled = activeFeatures[feature];
+        if (enabled === undefined) {
+          throw new Error(`Unknown feature "${feature}"`);
+        }
+        return enabled;
+      }),
       getGroup: sinon.stub().returns(fakeGroup),
       getLink: sinon
         .stub()
@@ -440,6 +449,52 @@ describe('AnnotationHeader', () => {
       const highlight = wrapper.find('Icon[name="highlight"]');
 
       assert.isFalse(highlight.exists());
+    });
+  });
+
+  context('when page_numbers feature is enabled', () => {
+    beforeEach(() => {
+      activeFeatures.page_numbers = true;
+
+      // Un-mock the `pageLabel` function.
+      $imports.$restore({
+        '../../helpers/annotation-metadata': true,
+      });
+    });
+
+    it('should not display page number if missing', () => {
+      const annotation = fixtures.defaultAnnotation();
+      const wrapper = createAnnotationHeader({ annotation });
+      assert.isFalse(wrapper.exists('[data-testid="page-number"]'));
+    });
+
+    it('should display page number if available', () => {
+      const annotation = fixtures.defaultAnnotation();
+      annotation.target[0].selector.push({
+        type: 'PageSelector',
+        index: 10,
+        label: '11',
+      });
+      const wrapper = createAnnotationHeader({ annotation });
+      const pageNumber = wrapper.find('[data-testid="page-number"]');
+      assert.isTrue(pageNumber.exists());
+      assert.equal(pageNumber.text(), 'p.11');
+    });
+
+    it('should hide group name in sidebar', () => {
+      fakeStore.route.returns('sidebar');
+      const wrapper = createAnnotationHeader({
+        annotation: fixtures.defaultAnnotation(),
+      });
+      assert.isFalse(wrapper.exists('AnnotationShareInfo'));
+    });
+
+    it('should still show group name outside the sidebar', () => {
+      fakeStore.route.returns('annotation');
+      const wrapper = createAnnotationHeader({
+        annotation: fixtures.defaultAnnotation(),
+      });
+      assert.isTrue(wrapper.exists('AnnotationShareInfo'));
     });
   });
 
