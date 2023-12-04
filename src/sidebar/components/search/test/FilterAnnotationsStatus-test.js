@@ -257,4 +257,40 @@ describe('FilterAnnotationsStatus', () => {
       });
     });
   });
+
+  it('shows focused page range', () => {
+    fakeStore.focusState.returns({
+      active: true,
+      configured: true,
+      pageRange: '5-10',
+    });
+    fakeThreadUtil.countVisible.returns(7);
+    assertFilterText(createComponent(), 'Showing 7 annotations in pages 5-10');
+  });
+
+  it('shows focused content range', () => {
+    fakeStore.focusState.returns({
+      active: true,
+      configured: true,
+      contentRange: 'Chapter 2',
+    });
+    fakeThreadUtil.countVisible.returns(3);
+    assertFilterText(createComponent(), 'Showing 3 annotations in Chapter 2');
+  });
+
+  [{ pageRange: '5-10' }, { contentRange: 'Chapter 2' }].forEach(focusState => {
+    it('shows button to reset focus mode if content focus is configured but inactive', () => {
+      fakeStore.focusState.returns({
+        active: false,
+        configured: true,
+        ...focusState,
+      });
+      fakeThreadUtil.countVisible.returns(7);
+      assertButton(createComponent(), {
+        text: 'Reset filter',
+        icon: false,
+        callback: fakeStore.toggleFocusMode,
+      });
+    });
+  });
 });
