@@ -20,7 +20,9 @@ function splitTerm(term: string): [null | string, string] {
   }
 
   if (
-    ['group', 'quote', 'since', 'tag', 'text', 'uri', 'user'].includes(filter)
+    ['group', 'quote', 'page', 'since', 'tag', 'text', 'uri', 'user'].includes(
+      filter,
+    )
   ) {
     const data = term.slice(filter.length + 1);
     return [filter, data];
@@ -128,6 +130,7 @@ export function generateFacetedFilter(
   focusFilters: FocusFilter = {},
 ): Record<string, Facet> {
   const any = [];
+  const page = [];
   const quote = [];
   const since = [];
   const tag = [];
@@ -144,6 +147,9 @@ export function generateFacetedFilter(
     switch (filter) {
       case 'quote':
         quote.push(fieldValue);
+        break;
+      case 'page':
+        page.push(fieldValue);
         break;
       case 'since':
         {
@@ -193,6 +199,10 @@ export function generateFacetedFilter(
     quote: {
       terms: quote,
       operator: 'and',
+    },
+    page: {
+      terms: page,
+      operator: 'or',
     },
     since: {
       terms: since,
