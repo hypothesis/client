@@ -238,6 +238,35 @@ describe('sidebar/helpers/view-filter', () => {
     });
   });
 
+  describe('"page" field', () => {
+    const annotation = {
+      id: 1,
+      target: [
+        {
+          selector: [
+            {
+              type: 'PageSelector',
+              index: 4,
+              label: '5',
+            },
+          ],
+        },
+      ],
+    };
+
+    it('matches if annotation is in page range', () => {
+      const filters = { page: { terms: ['4-6'], operator: 'or' } };
+      const result = filterAnnotations([annotation], filters);
+      assert.deepEqual(result, [1]);
+    });
+
+    it('does not match if annotation is outside of page range', () => {
+      const filters = { page: { terms: ['6-8'], operator: 'or' } };
+      const result = filterAnnotations([annotation], filters);
+      assert.deepEqual(result, []);
+    });
+  });
+
   it('ignores filters with no terms in the query', () => {
     const annotation = {
       id: 1,

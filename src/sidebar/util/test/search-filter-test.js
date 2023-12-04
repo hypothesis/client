@@ -162,6 +162,15 @@ describe('sidebar/util/search-filter', () => {
           },
         },
       },
+      {
+        query: 'page:5-10',
+        expectedFilter: {
+          page: {
+            operator: 'or',
+            terms: ['5-10'],
+          },
+        },
+      },
     ].forEach(({ query, expectedFilter }) => {
       it('parses a search query', () => {
         const filter = searchFilter.generateFacetedFilter(query);

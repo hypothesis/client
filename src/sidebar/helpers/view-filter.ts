@@ -1,7 +1,8 @@
 import type { Annotation } from '../../types/api';
+import { pageLabelInRange } from '../util/page-range';
 import type { Facet } from '../util/search-filter';
 import * as unicodeUtils from '../util/unicode';
-import { quote } from './annotation-metadata';
+import { quote, pageLabel } from './annotation-metadata';
 
 type Filter = {
   matches: (ann: Annotation) => boolean;
@@ -102,6 +103,12 @@ function stringFieldMatcher(
  */
 const fieldMatchers: Record<string, Matcher | Matcher<number>> = {
   quote: stringFieldMatcher(ann => [quote(ann) ?? '']),
+  page: {
+    fieldValues: ann => [pageLabel(ann)?.trim() ?? ''],
+    matches: (pageLabel: string, pageTerm: string) =>
+      pageLabelInRange(pageLabel, pageTerm),
+    normalize: (val: string) => val.trim(),
+  },
 
   since: {
     fieldValues: ann => [new Date(ann.updated).valueOf()],
