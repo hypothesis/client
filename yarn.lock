@@ -7756,7 +7756,7 @@ __metadata:
     prettier: 3.1.0
     redux: ^4.0.1
     redux-thunk: ^2.1.0
-    reselect: ^4.0.0
+    reselect: ^5.0.0
     retry: ^0.13.1
     rollup: ^4.0.2
     rollup-plugin-string: ^3.0.0
@@ -11690,10 +11690,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reselect@npm:^4.0.0":
-  version: 4.1.8
-  resolution: "reselect@npm:4.1.8"
-  checksum: a4ac87cedab198769a29be92bc221c32da76cfdad6911eda67b4d3e7136dca86208c3b210e31632eae31ebd2cded18596f0dd230d3ccc9e978df22f233b5583e
+"reselect@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "reselect@npm:5.0.0"
+  checksum: 9bf3e6ca753d276c45436d4404d952bfc0fc7de2e4b3832df3bafde941edff274f703100fcd2d1f753e4b14a65ef1af8bd0bc68ea5e76ccf2ddde5d2aa27968f
   languageName: node
   linkType: hard
 
