@@ -15,14 +15,30 @@ export type FilterOption = {
 /**
  * Valid/recognized filters
  */
-export type FilterKey = 'user';
+export type FilterKey = 'cfi' | 'page' | 'user';
 
 export type Filters = Partial<Record<FilterKey, FilterOption | undefined>>;
 
-type FocusState = {
+/**
+ * Summary of the state of focus filters.
+ */
+export type FocusState = {
   active: boolean;
   configured: boolean;
-  displayName: string;
+
+  /** Display name of the user that is focused. */
+  displayName?: string;
+
+  /** Page range that is focused. */
+  pageRange?: string;
+
+  /**
+   * Description of content this is focused.
+   *
+   * This is used in ebooks if the content is e.g. a chapter rather than page
+   * range.
+   */
+  contentRange?: string;
 };
 
 /**
@@ -62,37 +78,63 @@ function initialState(settings: SidebarSettings): State {
 }
 
 /**
- * Given the provided focusConfig: is it a valid configuration for focus?
- * At this time, a `user` filter is required.
+ * Return true if a focus filter configuration is valid.
  */
 function isValidFocusConfig(focusConfig: FocusConfig): boolean {
-  return !!(focusConfig.user?.username || focusConfig.user?.userid);
+  if (focusConfig.user) {
+    return Boolean(focusConfig.user.username || focusConfig.user.userid);
+  }
+  if (focusConfig.cfi?.range || focusConfig.pages) {
+    return true;
+  }
+  return false;
 }
 
 /**
  * Compose an object of keyed `FilterOption`s from the given `focusConfig`.
- * At present, this will create a `user` `FilterOption` if the config is valid.
  */
 function focusFiltersFromConfig(focusConfig: FocusConfig): Filters {
-  const user = focusConfig.user;
-  if (!user || !isValidFocusConfig(focusConfig)) {
+  if (!isValidFocusConfig(focusConfig)) {
     return {};
   }
 
-  const userFilterValue = user.username || user.userid || '';
-  return {
-    user: {
+  const filters: Filters = {};
+
+  const user = focusConfig.user;
+  if (user) {
+    const userFilterValue = user.username || user.userid || '';
+    filters.user = {
       value: userFilterValue,
       display: user.displayName || userFilterValue,
-    },
-  };
+    };
+  }
+
+  if (focusConfig.pages) {
+    filters.page = {
+      value: focusConfig.pages,
+      display: focusConfig.pages,
+    };
+  }
+
+  if (focusConfig.cfi) {
+    filters.cfi = {
+      value: focusConfig.cfi.range,
+      display: focusConfig.cfi.label,
+    };
+  }
+
+  return filters;
 }
 
 const reducers = {
   CHANGE_FOCUS_MODE_USER(state: State, action: { user: FocusUserInfo }) {
+    const { user } = focusFiltersFromConfig({ user: action.user });
     return {
       focusActive: isValidFocusConfig({ user: action.user }),
-      focusFilters: focusFiltersFromConfig({ user: action.user }),
+      focusFilters: {
+        ...state.focusFilters,
+        user,
+      },
     };
   },
 
@@ -188,8 +230,13 @@ const focusState = createSelector(
   (focusActive, focusFilters): FocusState => {
     return {
       active: focusActive,
-      configured: !!focusFilters?.user,
-      displayName: focusFilters?.user?.display || '',
+      // Check for filter with non-empty value.
+      configured: Object.values(focusFilters ?? {}).some(
+        val => typeof val !== 'undefined',
+      ),
+      displayName: focusFilters?.user?.display ?? '',
+      contentRange: focusFilters?.cfi?.display,
+      pageRange: focusFilters?.page?.display,
     };
   },
 );

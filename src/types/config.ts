@@ -82,9 +82,33 @@ export type ReportAnnotationActivityConfig = {
 };
 
 /**
- * Structure of focus-mode config, provided in settings (app config)
+ * Configure the client to focus on a specific subset of annotations.
+ *
+ * This hides annotations which do not match the filter when the client starts,
+ * and shows an option to toggle the filters on or off.
+ *
+ * This is used in the LMS for example when a teacher is grading a specific
+ * student's annotations or in an assignment where students are being directed
+ * to annotate a specific chapter.
  */
 export type FocusConfig = {
+  /** Specify a range of content in an ebook as a CFI range. */
+  cfi?: {
+    /**
+     * CFI range specified as `[startCFI]-[endCFI]`. The range is exclusive of
+     * the end point.
+     */
+    range: string;
+    /** Descriptive label for this CFI range. */
+    label: string;
+  };
+
+  /**
+   * Page range in the form `[start]-[end]`. The range is inclusive of the
+   * end page.
+   */
+  pages?: string;
+
   user?: FocusUserInfo;
 };
 

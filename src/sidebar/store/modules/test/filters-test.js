@@ -10,6 +10,19 @@ describe('sidebar/store/modules/filters', () => {
     return store.getState().filters;
   };
 
+  // Values for the `focus` settings key which turn on filters when the client
+  // starts.
+  const userFocusConfig = {
+    user: { username: 'somebody', displayName: 'Ding Bat' },
+  };
+  const pageFocusConfig = { pages: '5-10' };
+  const cfiFocusConfig = {
+    cfi: {
+      range: '/2-/4',
+      label: 'Chapter 1',
+    },
+  };
+
   beforeEach(() => {
     store = createStore([filtersModule, selectionModule], fakeSettings);
   });
@@ -181,6 +194,22 @@ describe('sidebar/store/modules/filters', () => {
         assert.equal(focusState.displayName, 'Pantomime Nutball');
       });
 
+      it('returns page focus info', () => {
+        store = createStore([filtersModule], [{ focus: pageFocusConfig }]);
+        const focusState = store.focusState();
+        assert.isTrue(focusState.active);
+        assert.isTrue(focusState.configured);
+        assert.equal(focusState.pageRange, pageFocusConfig.pages);
+      });
+
+      it('returns CFI focus info', () => {
+        store = createStore([filtersModule], [{ focus: cfiFocusConfig }]);
+        const focusState = store.focusState();
+        assert.isTrue(focusState.active);
+        assert.isTrue(focusState.configured);
+        assert.equal(focusState.contentRange, cfiFocusConfig.cfi.label);
+      });
+
       it('returns empty focus values when no focus is configured or set', () => {
         const focusState = store.focusState();
         assert.isFalse(focusState.active);
@@ -284,22 +313,44 @@ describe('sidebar/store/modules/filters', () => {
     });
 
     describe('getFocusFilters', () => {
-      it('returns any set focus filters', () => {
-        store = createStore(
-          [filtersModule],
-          [
-            {
-              focus: {
-                user: { username: 'somebody', displayName: 'Ding Bat' },
+      [
+        {
+          focusConfig: userFocusConfig,
+          filterKey: 'user',
+          filterValue: {
+            value: 'somebody',
+            display: 'Ding Bat',
+          },
+        },
+        {
+          focusConfig: pageFocusConfig,
+          filterKey: 'page',
+          filterValue: {
+            value: '5-10',
+            display: '5-10',
+          },
+        },
+        {
+          focusConfig: cfiFocusConfig,
+          filterKey: 'cfi',
+          filterValue: {
+            value: '/2-/4',
+            display: 'Chapter 1',
+          },
+        },
+      ].forEach(({ focusConfig, filterKey, filterValue }) => {
+        it('returns any set focus filters', () => {
+          store = createStore(
+            [filtersModule],
+            [
+              {
+                focus: focusConfig,
               },
-            },
-          ],
-        );
-        const focusFilters = store.getFocusFilters();
-        assert.exists(focusFilters.user);
-        assert.deepEqual(focusFilters.user, {
-          value: 'somebody',
-          display: 'Ding Bat',
+            ],
+          );
+          const focusFilters = store.getFocusFilters();
+          assert.exists(focusFilters[filterKey]);
+          assert.deepEqual(focusFilters[filterKey], filterValue);
         });
       });
     });
@@ -311,14 +362,20 @@ describe('sidebar/store/modules/filters', () => {
         assert.isTrue(store.hasAppliedFilter());
       });
 
-      it('returns true if user-focused mode is active', () => {
-        store = createStore(
-          [filtersModule],
-          [{ focus: { user: { username: 'somebody' } } }],
-        );
+      [userFocusConfig, pageFocusConfig, cfiFocusConfig].forEach(
+        focusConfig => {
+          it('returns true if focused mode is active', () => {
+            store = createStore(
+              [filtersModule],
+              [{ focus: { ...focusConfig } }],
+            );
 
-        assert.isTrue(store.hasAppliedFilter());
-      });
+            assert.isTrue(store.hasAppliedFilter());
+            store.toggleFocusMode(false);
+            assert.isFalse(store.hasAppliedFilter());
+          });
+        },
+      );
 
       it('returns true if there is an applied filter', () => {
         store.setFilter('anyWhichWay', { value: 'nope', display: 'Fatigue' });
@@ -334,16 +391,6 @@ describe('sidebar/store/modules/filters', () => {
         store.setFilter('anyWhichWay', { value: 'nope', display: 'Fatigue' });
 
         assert.isTrue(store.hasAppliedFilter());
-      });
-
-      it('returns false if user-focused mode is configured but inactive', () => {
-        store = createStore(
-          [filtersModule],
-          [{ focus: { user: { username: 'somebody' } } }],
-        );
-        store.toggleFocusMode(false);
-
-        assert.isFalse(store.hasAppliedFilter());
       });
     });
   });

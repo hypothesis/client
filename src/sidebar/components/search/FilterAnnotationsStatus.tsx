@@ -25,8 +25,14 @@ type FilterStatusMessageProps = {
   /** Plural unit of the items being shown */
   entityPlural: string;
 
+  /** Range of content currently focused (if not a page range). */
+  focusContentRange?: string | null;
+
   /** Display name for the user currently focused, if any */
   focusDisplayName?: string | null;
+
+  /** Page range that is currently focused, if any */
+  focusPageRange?: string | null;
 
   /**
    * The number of items that match the current filter(s). When focusing on a
@@ -44,9 +50,18 @@ function FilterStatusMessage({
   additionalCount,
   entitySingular,
   entityPlural,
+  focusContentRange,
   focusDisplayName,
+  focusPageRange,
   resultCount,
 }: FilterStatusMessageProps) {
+  let contentLabel;
+  if (focusContentRange) {
+    contentLabel = <span> in {focusContentRange}</span>;
+  } else if (focusPageRange) {
+    contentLabel = <span> in pages {focusPageRange}</span>;
+  }
+
   return (
     <>
       {resultCount > 0 && <span>Showing </span>}
@@ -63,6 +78,7 @@ function FilterStatusMessage({
           </span>
         </span>
       )}
+      {contentLabel}
       {additionalCount > 0 && (
         <span className="whitespace-nowrap italic text-color-text-light">
           {' '}
@@ -172,9 +188,16 @@ export default function FilterAnnotationsStatus() {
       if (forcedVisibleCount > 0) {
         return 'Reset filters';
       }
-      return focusState.active
-        ? 'Show all'
-        : `Show only ${focusState.displayName}`;
+
+      if (focusState.active) {
+        return 'Show all';
+      } else if (focusState.displayName) {
+        return `Show only ${focusState.displayName}`;
+      } else if (focusState.configured) {
+        // Generic label for button to re-enable focus mode, if we don't have
+        // a more specific one.
+        return 'Reset filter';
+      }
     }
     return 'Clear search';
   }, [
@@ -184,6 +207,8 @@ export default function FilterAnnotationsStatus() {
     filterMode,
     forcedVisibleCount,
   ]);
+
+  const showFocusHint = filterMode !== 'selection' && focusState.active;
 
   return (
     <div
@@ -212,11 +237,13 @@ export default function FilterAnnotationsStatus() {
                     additionalCount={additionalCount}
                     entitySingular="annotation"
                     entityPlural="annotations"
-                    focusDisplayName={
-                      filterMode !== 'selection' && focusState.active
-                        ? focusState.displayName
-                        : ''
+                    focusContentRange={
+                      showFocusHint ? focusState.contentRange : null
                     }
+                    focusDisplayName={
+                      showFocusHint ? focusState.displayName : null
+                    }
+                    focusPageRange={showFocusHint ? focusState.pageRange : null}
                     resultCount={resultCount}
                   />
                 )}
