@@ -24,3 +24,8 @@ updates:
       typescript-types:
         patterns:
           - '@types/*'
+      redux:
+        patterns:
+          - 'redux'
+          - 'redux-thunk'
+          - 'reselect'
