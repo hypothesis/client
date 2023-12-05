@@ -424,4 +424,16 @@ describe('HypothesisApp', () => {
       assert.isFalse(wrapper.find('TopBar').prop('showShareButton'));
     });
   });
+
+  describe('search panel', () => {
+    [true, false].forEach(searchPanelEnabled => {
+      it('renders SearchPanel when feature is enabled', () => {
+        fakeStore.isFeatureEnabled.returns(searchPanelEnabled);
+
+        const wrapper = createComponent();
+
+        assert.equal(wrapper.exists('SearchPanel'), searchPanelEnabled);
+      });
+    });
+  });
 });

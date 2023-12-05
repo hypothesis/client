@@ -22,6 +22,7 @@ import SidebarView from './SidebarView';
 import StreamView from './StreamView';
 import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
+import SearchPanel from './search/SearchPanel';
 
 export type HypothesisAppProps = {
   auth: AuthService;
@@ -68,6 +69,8 @@ function HypothesisApp({
   const importAnnotations = store.isFeatureEnabled('import_annotations');
   const showShareButton =
     !isThirdParty || exportAnnotations || importAnnotations;
+
+  const searchPanelEnabled = store.isFeatureEnabled('search_panel');
 
   const login = async () => {
     if (serviceConfig(settings)) {
@@ -168,6 +171,7 @@ function HypothesisApp({
       <div className="container">
         <ToastMessages />
         <HelpPanel />
+        {searchPanelEnabled && <SearchPanel />}
         {showShareButton && (
           <ShareDialog
             shareTab={!isThirdParty}

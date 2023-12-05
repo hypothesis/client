@@ -1,3 +1,4 @@
+import type { DialogProps } from '@hypothesis/frontend-shared';
 import { Dialog, Slider } from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import type { ComponentChildren } from 'preact';
@@ -22,6 +23,7 @@ export type SidebarPanelProps = {
   onActiveChanged?: (active: boolean) => void;
   /** What Dialog variant to use */
   variant?: 'panel' | 'custom';
+  initialFocus?: DialogProps['initialFocus'];
 };
 
 /**
@@ -35,6 +37,7 @@ export default function SidebarPanel({
   title,
   variant = 'panel',
   onActiveChanged,
+  initialFocus,
 }: SidebarPanelProps) {
   const store = useSidebarStore();
   const panelIsActive = store.isSidebarPanelOpen(panelName);
@@ -61,6 +64,7 @@ export default function SidebarPanel({
     <>
       {panelIsActive && (
         <Dialog
+          initialFocus={initialFocus}
           restoreFocus
           ref={panelElement}
           classes="mb-4"
