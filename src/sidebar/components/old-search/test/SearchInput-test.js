@@ -34,8 +34,8 @@ describe('SearchInput', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store': { useSidebarStore: () => fakeStore },
-      '../../shared/user-agent': {
+      '../../store': { useSidebarStore: () => fakeStore },
+      '../../../shared/user-agent': {
         isMacOS: fakeIsMacOS,
       },
     });

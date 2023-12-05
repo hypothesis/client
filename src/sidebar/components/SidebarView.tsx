@@ -6,13 +6,14 @@ import type { FrameSyncService } from '../services/frame-sync';
 import type { LoadAnnotationsService } from '../services/load-annotations';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
-import FilterStatus from './FilterStatus';
 import LoggedOutMessage from './LoggedOutMessage';
 import LoginPromptPanel from './LoginPromptPanel';
 import SelectionTabs from './SelectionTabs';
 import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
 import { useRootThread } from './hooks/use-root-thread';
+import FilterStatus from './old-search/FilterStatus';
+import FilterAnnotationsStatus from './search/FilterAnnotationsStatus';
 
 export type SidebarViewProps = {
   onLogin: () => void;
@@ -66,7 +67,8 @@ function SidebarView({
   const hasContentError =
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
-  const showFilterStatus = !hasContentError;
+  const searchPanelEnabled = store.isFeatureEnabled('search_panel');
+  const showFilterStatus = !hasContentError && !searchPanelEnabled;
   const showTabs = !hasContentError && !hasAppliedFilter;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
@@ -132,6 +134,7 @@ function SidebarView({
     <div>
       <h2 className="sr-only">Annotations</h2>
       {showFilterStatus && <FilterStatus />}
+      {searchPanelEnabled && <FilterAnnotationsStatus />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError

@@ -10,10 +10,11 @@ import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
 import PendingUpdatesButton from './PendingUpdatesButton';
 import PressableIconButton from './PressableIconButton';
-import SearchInput from './SearchInput';
 import SortMenu from './SortMenu';
-import StreamSearchInput from './StreamSearchInput';
 import UserMenu from './UserMenu';
+import SearchInput from './old-search/SearchInput';
+import SearchIconButton from './search/SearchIconButton';
+import StreamSearchInput from './search/StreamSearchInput';
 
 export type TopBarProps = {
   showShareButton: boolean;
@@ -54,6 +55,7 @@ function TopBar({
   const filterQuery = store.filterQuery();
   const isLoggedIn = store.isLoggedIn();
   const hasFetchedProfile = store.hasFetchedProfile();
+  const searchPanelEnabled = store.isFeatureEnabled('search_panel');
 
   const toggleSharePanel = () => {
     store.toggleSidebarPanel('shareGroupAnnotations');
@@ -98,10 +100,13 @@ function TopBar({
           {isSidebar && (
             <>
               <PendingUpdatesButton />
-              <SearchInput
-                query={filterQuery || null}
-                onSearch={store.setFilterQuery}
-              />
+              {!searchPanelEnabled && (
+                <SearchInput
+                  query={filterQuery || null}
+                  onSearch={store.setFilterQuery}
+                />
+              )}
+              {searchPanelEnabled && <SearchIconButton />}
               <SortMenu />
               {showShareButton && (
                 <PressableIconButton

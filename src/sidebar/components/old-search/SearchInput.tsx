@@ -8,9 +8,9 @@ import classnames from 'classnames';
 import type { RefObject } from 'preact';
 import { useCallback, useRef, useState } from 'preact/hooks';
 
-import { useShortcut } from '../../shared/shortcut';
-import { isMacOS } from '../../shared/user-agent';
-import { useSidebarStore } from '../store';
+import { useShortcut } from '../../../shared/shortcut';
+import { isMacOS } from '../../../shared/user-agent';
+import { useSidebarStore } from '../../store';
 
 /**
  * Respond to keydown events on the document (shortcut keys):

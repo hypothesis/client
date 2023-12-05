@@ -62,6 +62,7 @@ describe('SidebarView', () => {
       profile: sinon.stub().returns({ userid: null }),
       searchUris: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     fakeTabsUtil = {
@@ -240,9 +241,20 @@ describe('SidebarView', () => {
   });
 
   context('user-focus mode', () => {
-    it('shows filter status when focus mode configured', () => {
+    it('shows old filter status when focus mode configured', () => {
       const wrapper = createComponent();
+
       assert.isTrue(wrapper.find('FilterStatus').exists());
+      assert.isFalse(wrapper.find('FilterAnnotationsStatus').exists());
+    });
+
+    it('shows filter status when focus mode configured', () => {
+      fakeStore.isFeatureEnabled.returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('FilterStatus').exists());
+      assert.isTrue(wrapper.find('FilterAnnotationsStatus').exists());
     });
   });
 
@@ -262,11 +274,6 @@ describe('SidebarView', () => {
       wrapper.setProps({});
       assert.calledOnce(fakeStreamer.connect);
     });
-  });
-
-  it('renders the filter status', () => {
-    const wrapper = createComponent();
-    assert.isTrue(wrapper.find('FilterStatus').exists());
   });
 
   describe('selection tabs', () => {

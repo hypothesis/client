@@ -40,9 +40,9 @@ describe('FilterStatus', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
-      '../store': { useSidebarStore: () => fakeStore },
-      '../helpers/thread': fakeThreadUtil,
+      '../hooks/use-root-thread': { useRootThread: fakeUseRootThread },
+      '../../store': { useSidebarStore: () => fakeStore },
+      '../../helpers/thread': fakeThreadUtil,
     });
   });
 

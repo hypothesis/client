@@ -21,6 +21,7 @@ describe('TopBar', () => {
       isSidebarPanelOpen: sinon.stub().returns(false),
       setFilterQuery: sinon.stub(),
       toggleSidebarPanel: sinon.stub(),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     fakeFrameSync = {
@@ -210,6 +211,17 @@ describe('TopBar', () => {
       assert.isFalse(wrapper.exists('GroupList'));
       assert.isFalse(wrapper.exists('SortMenu'));
       assert.isFalse(wrapper.exists('button[title="Share this page"]'));
+    });
+  });
+
+  context('when sidebar panel feature is enabled', () => {
+    it('displays search input in the sidebar', () => {
+      fakeStore.isFeatureEnabled.returns(true);
+
+      const wrapper = createTopBar();
+
+      assert.isFalse(wrapper.exists('SearchInput'));
+      assert.isTrue(wrapper.exists('SearchIconButton'));
     });
   });
 

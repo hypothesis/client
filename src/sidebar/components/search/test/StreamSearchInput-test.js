@@ -14,10 +14,11 @@ describe('StreamSearchInput', () => {
     };
     fakeStore = {
       routeParams: sinon.stub().returns({}),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store': { useSidebarStore: () => fakeStore },
+      '../../store': { useSidebarStore: () => fakeStore },
     });
   });
 
@@ -41,5 +42,14 @@ describe('StreamSearchInput', () => {
       wrapper.find('SearchInput').props().onSearch('new-query');
     });
     assert.calledWith(fakeRouter.navigate, 'stream', { q: 'new-query' });
+  });
+
+  it('renders new SearchField when search panel feature is enabled', () => {
+    fakeStore.isFeatureEnabled.returns(true);
+
+    const wrapper = createSearchInput();
+
+    assert.isFalse(wrapper.exists('SearchInput'));
+    assert.isTrue(wrapper.exists('SearchField'));
   });
 });

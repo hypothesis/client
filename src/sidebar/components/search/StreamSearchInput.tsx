@@ -1,7 +1,8 @@
-import { withServices } from '../service-context';
-import type { RouterService } from '../services/router';
-import { useSidebarStore } from '../store';
-import SearchInput from './SearchInput';
+import { withServices } from '../../service-context';
+import type { RouterService } from '../../services/router';
+import { useSidebarStore } from '../../store';
+import SearchInput from '../old-search/SearchInput';
+import SearchField from './SearchField';
 
 export type StreamSearchInputProps = {
   router: RouterService;
@@ -14,6 +15,7 @@ export type StreamSearchInputProps = {
  */
 function StreamSearchInput({ router }: StreamSearchInputProps) {
   const store = useSidebarStore();
+  const searchPanelEnabled = store.isFeatureEnabled('search_panel');
   const { q } = store.routeParams();
   const setQuery = (query: string) => {
     // Re-route the user to `/stream` if they are on `/a/:id` and then set
@@ -21,8 +23,10 @@ function StreamSearchInput({ router }: StreamSearchInputProps) {
     router.navigate('stream', { q: query });
   };
 
-  return (
-    <SearchInput query={q ?? ''} onSearch={setQuery} alwaysExpanded={true} />
+  return searchPanelEnabled ? (
+    <SearchField query={q ?? ''} onSearch={setQuery} />
+  ) : (
+    <SearchInput query={q ?? ''} onSearch={setQuery} alwaysExpanded />
   );
 }
 
