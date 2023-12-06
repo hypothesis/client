@@ -1,8 +1,4 @@
-import {
-  createSelector,
-  createSelectorCreator,
-  defaultMemoize,
-} from 'reselect';
+import { createSelector, createSelectorCreator, lruMemoize } from 'reselect';
 import shallowEqual from 'shallowequal';
 
 import type {
@@ -197,7 +193,7 @@ function searchUrisForFrame(frame: Frame): string[] {
 
 // "selector creator" that uses `shallowEqual` instead of `===` for memoization
 const createShallowEqualSelector = createSelectorCreator(
-  defaultMemoize,
+  lruMemoize,
   shallowEqual,
 );
 
