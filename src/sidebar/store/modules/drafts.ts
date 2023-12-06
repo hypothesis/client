@@ -2,7 +2,7 @@
  * The drafts store provides temporary storage for unsaved edits to new or
  * existing annotations.
  */
-import type { Dispatch } from 'redux';
+import type { ThunkDispatch } from 'redux-thunk';
 import { createSelector } from 'reselect';
 
 import type { Annotation } from '../../../types/api';
@@ -105,7 +105,10 @@ function createDraft(annotation: AnnotationID, changes: DraftChanges) {
  * An empty draft has no text and no reference tags.
  */
 function deleteNewAndEmptyDrafts() {
-  return (dispatch: Dispatch, getState: () => { drafts: State }) => {
+  return (
+    dispatch: ThunkDispatch<{ drafts: State }, void, any>,
+    getState: () => { drafts: State },
+  ) => {
     const newDrafts = getState().drafts.drafts.filter(draft => {
       return (
         !draft.annotation.id &&

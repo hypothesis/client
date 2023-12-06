@@ -1,6 +1,6 @@
 /* global process */
 import * as redux from 'redux';
-import thunk from 'redux-thunk';
+import { thunk } from 'redux-thunk';
 
 import { immutable } from '../util/immutable';
 import type { OmitFirstArg, TupleToIntersection } from './type-utils';
