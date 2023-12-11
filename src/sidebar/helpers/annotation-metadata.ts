@@ -1,6 +1,7 @@
 import type {
   APIAnnotationData,
   Annotation,
+  EPUBContentSelector,
   PageSelector,
   SavedAnnotation,
   TextQuoteSelector,
@@ -340,6 +341,20 @@ export function quote(annotation: APIAnnotationData): string | null {
     | TextQuoteSelector
     | undefined;
   return quoteSel ? quoteSel.exact : null;
+}
+
+/**
+ * Return the EPUB Canonical Fragment Identifier for the table of contents entry
+ * associated with the part of the book / document that an annotation was made
+ * on.
+ *
+ * See {@link EPUBContentSelector}.
+ */
+export function cfi(annotation: APIAnnotationData): string | undefined {
+  const epubSel = annotation.target[0]?.selector?.find(
+    s => s.type === 'EPUBContentSelector',
+  ) as EPUBContentSelector | undefined;
+  return epubSel?.cfi;
 }
 
 /**

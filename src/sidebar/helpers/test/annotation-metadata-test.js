@@ -1,6 +1,7 @@
 import * as fixtures from '../../test/annotation-fixtures';
 import * as annotationMetadata from '../annotation-metadata';
 import {
+  cfi,
   documentMetadata,
   domainAndTitle,
   isSaved,
@@ -602,6 +603,27 @@ describe('sidebar/helpers/annotation-metadata', () => {
     });
 
     it('returns undefined if annotation has no `PageSelector` selector', () => {
+      const anns = [fixtures.newPageNote(), fixtures.newAnnotation()];
+      for (const ann of anns) {
+        assert.isUndefined(pageLabel(ann));
+      }
+    });
+  });
+
+  describe('cfi', () => {
+    it('returns CFI for annotation', () => {
+      const ann = {
+        target: [
+          {
+            source: 'https://publisher.org/article.pdf',
+            selector: [{ type: 'EPUBContentSelector', cfi: '/2/4' }],
+          },
+        ],
+      };
+      assert.equal(cfi(ann), '/2/4');
+    });
+
+    it('returns undefined if annotation has no `EPUBContentSelector` selector', () => {
       const anns = [fixtures.newPageNote(), fixtures.newAnnotation()];
       for (const ann of anns) {
         assert.isUndefined(pageLabel(ann));

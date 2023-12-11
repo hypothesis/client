@@ -1,8 +1,9 @@
+import { cfiInRange, stripCFIAssertions } from '../../shared/cfi';
 import type { Annotation } from '../../types/api';
 import { pageLabelInRange } from '../util/page-range';
 import type { Facet } from '../util/search-filter';
 import * as unicodeUtils from '../util/unicode';
-import { quote, pageLabel } from './annotation-metadata';
+import { cfi as getCFI, quote, pageLabel } from './annotation-metadata';
 
 type Filter = {
   matches: (ann: Annotation) => boolean;
@@ -103,6 +104,25 @@ function stringFieldMatcher(
  */
 const fieldMatchers: Record<string, Matcher | Matcher<number>> = {
   quote: stringFieldMatcher(ann => [quote(ann) ?? '']),
+
+  cfi: {
+    fieldValues: ann => [getCFI(ann)?.trim() ?? ''],
+    matches: (cfi: string, cfiTerm: string) => {
+      // Here we use "-" as a separator between the start and end part of the
+      // range, as it is easy to parse.
+      //
+      // If we wanted to use a more standard CFI range representation,
+      // we could follow https://idpf.org/epub/linking/cfi/#sec-ranges.
+      if (cfiTerm.includes('-')) {
+        const [start, end] = cfiTerm.split('-');
+        return cfiInRange(cfi, start, end);
+      } else {
+        return false;
+      }
+    },
+    normalize: (val: string) => stripCFIAssertions(val.trim()),
+  },
+
   page: {
     fieldValues: ann => [pageLabel(ann)?.trim() ?? ''],
     matches: (pageLabel: string, pageTerm: string) =>

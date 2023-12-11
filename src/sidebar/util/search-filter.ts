@@ -6,6 +6,18 @@
  * filter annotations displayed to the user or fetched from the API.
  */
 
+const filterFields = [
+  'cfi',
+  'group',
+  'quote',
+  'page',
+  'since',
+  'tag',
+  'text',
+  'uri',
+  'user',
+];
+
 /**
  * Splits a search term into filter and data.
  *
@@ -19,11 +31,7 @@ function splitTerm(term: string): [null | string, string] {
     return [null, term];
   }
 
-  if (
-    ['group', 'quote', 'page', 'since', 'tag', 'text', 'uri', 'user'].includes(
-      filter,
-    )
-  ) {
+  if (filterFields.includes(filter)) {
     const data = term.slice(filter.length + 1);
     return [filter, data];
   } else {
@@ -130,6 +138,7 @@ export function generateFacetedFilter(
   focusFilters: FocusFilter = {},
 ): Record<string, Facet> {
   const any = [];
+  const cfi = [];
   const page = [];
   const quote = [];
   const since = [];
@@ -145,6 +154,9 @@ export function generateFacetedFilter(
     const fieldValue = term.slice(filter.length + 1);
 
     switch (filter) {
+      case 'cfi':
+        cfi.push(fieldValue);
+        break;
       case 'quote':
         quote.push(fieldValue);
         break;
@@ -191,10 +203,18 @@ export function generateFacetedFilter(
     }
   }
 
+  // Filter terms use an "AND" operator if it is possible for an annotation to
+  // match more than one term (eg. an annotation can have multiple tags) or "OR"
+  // otherwise (eg. an annotation cannot match two distinct user terms).
+
   return {
     any: {
       terms: any,
       operator: 'and',
+    },
+    cfi: {
+      terms: cfi,
+      operator: 'or',
     },
     quote: {
       terms: quote,
