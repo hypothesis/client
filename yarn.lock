@@ -7859,12 +7859,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ignore-walk@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "ignore-walk@npm:6.0.0"
+"ignore-walk@npm:^6.0.4":
+  version: 6.0.4
+  resolution: "ignore-walk@npm:6.0.4"
   dependencies:
-    minimatch: ^5.0.1
-  checksum: b94da5517922d65a721f95caa8a884bb8672e80a29691cc3402a4db1eb77f61165dc5c499d8c8efe5e3d9874ff3e9ab05734234ad929b28ba219cf73197ea98c
+    minimatch: ^9.0.0
+  checksum: 8161bb3232eee92367049b186a02ad35e3a47edda2de0c0eb216aa89cf6183c33c46aef22b25e1bf5105c643bd2cc2bb722f474870a93a3c56ef8cca22eb64a1
   languageName: node
   linkType: hard
 
@@ -10280,11 +10280,11 @@ __metadata:
   linkType: hard
 
 "npm-packlist@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "npm-packlist@npm:8.0.0"
+  version: 8.0.1
+  resolution: "npm-packlist@npm:8.0.1"
   dependencies:
-    ignore-walk: ^6.0.0
-  checksum: 7b6ac15710a1d6d8b7fca2db4cdbb87641eb8398ea70efde288538e7713a66a21c43ead7635affcf00bfd46b6643e18b03078449986e25b0753078c05b37cbcc
+    ignore-walk: ^6.0.4
+  checksum: f271c564c3bd196916a0a82e88f15be29d4ba2db714180d2214515a3852af1575ec86f81be88a086210ab657f9b1b7fcce40181ccc61d0f616ad859ea7502009
   languageName: node
   linkType: hard
 
