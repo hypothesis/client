@@ -267,6 +267,49 @@ describe('sidebar/helpers/view-filter', () => {
     });
   });
 
+  describe('"cfi" field', () => {
+    const annotation = {
+      id: 1,
+      target: [
+        {
+          selector: [
+            {
+              type: 'EPUBContentSelector',
+              cfi: '/2/4',
+            },
+          ],
+        },
+      ],
+    };
+
+    [
+      '/2/2-/2/6',
+      // CFI containing assertions in square brackets. Hyphens inside assertions
+      // should be ignored.
+      '/2/2[-/2/2]-/2/6',
+    ].forEach(range => {
+      it('matches if annotation is in range', () => {
+        const filters = { cfi: { terms: [range], operator: 'or' } };
+        const result = filterAnnotations([annotation], filters);
+        assert.deepEqual(result, [1]);
+      });
+    });
+
+    it('does not match if annotation is outside of range', () => {
+      const filters = { cfi: { terms: ['/2/6-/2/8'], operator: 'or' } };
+      const result = filterAnnotations([annotation], filters);
+      assert.deepEqual(result, []);
+    });
+
+    ['/2/2', '/2/2[-/2/6]'].forEach(range => {
+      it('does not match if term is not a range', () => {
+        const filters = { cfi: { terms: [range], operator: 'or' } };
+        const result = filterAnnotations([annotation], filters);
+        assert.deepEqual(result, []);
+      });
+    });
+  });
+
   it('ignores filters with no terms in the query', () => {
     const annotation = {
       id: 1,

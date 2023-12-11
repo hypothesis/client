@@ -171,6 +171,15 @@ describe('sidebar/util/search-filter', () => {
           },
         },
       },
+      {
+        query: 'cfi:/2-/4',
+        expectedFilter: {
+          cfi: {
+            operator: 'or',
+            terms: ['/2-/4'],
+          },
+        },
+      },
     ].forEach(({ query, expectedFilter }) => {
       it('parses a search query', () => {
         const filter = searchFilter.generateFacetedFilter(query);

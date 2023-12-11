@@ -116,6 +116,13 @@ export function compareCFIs(a: string, b: string): number {
 }
 
 /**
+ * Return true if the CFI `cfi` lies in the range [start, end).
+ */
+export function cfiInRange(cfi: string, start: string, end: string): boolean {
+  return compareCFIs(cfi, start) >= 0 && compareCFIs(cfi, end) < 0;
+}
+
+/**
  * Return a slice of `cfi` up to the first step indirection [1], with assertions
  * removed.
  *
