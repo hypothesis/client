@@ -2,10 +2,10 @@ import { trimAndDedent } from '../trim-and-dedent';
 
 describe('trimAndDedent', () => {
   [
-    ['Foo', 'Foo'],
-    ['   Foo', 'Foo'],
+    [() => trimAndDedent`Foo`, 'Foo'],
+    [() => trimAndDedent`   Foo`, 'Foo'],
     [
-      `First line
+      () => trimAndDedent`First line
   Second line
     Third line`,
       `First line
@@ -13,7 +13,7 @@ describe('trimAndDedent', () => {
     Third line`,
     ],
     [
-      `
+      () => trimAndDedent`
       
         Hello, Jane!
           Indented line
@@ -24,10 +24,38 @@ describe('trimAndDedent', () => {
   Indented line
 Goodbye, John!`,
     ],
-  ].forEach(([str, expectedResult]) => {
+    [
+      () => {
+        const firstVar = `                                 very indented`;
+        const secondVar = `
+        multiple
+lines
+with no indentation
+        `;
+
+        return trimAndDedent`
+      
+            Hello, Jane!
+            ${firstVar}
+              Indented line
+            Goodbye, John!
+            ${secondVar}
+        
+        `;
+      },
+      `Hello, Jane!
+                                 very indented
+  Indented line
+Goodbye, John!
+
+        multiple
+lines
+with no indentation
+        `,
+    ],
+  ].forEach(([getResult, expectedResult]) => {
     it('normalizes strings with multiple lines', () => {
-      const result = trimAndDedent(str);
-      assert.equal(result, expectedResult);
+      assert.equal(getResult(), expectedResult);
     });
   });
 });

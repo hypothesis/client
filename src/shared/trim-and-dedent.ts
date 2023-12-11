@@ -1,24 +1,41 @@
-/**
- * Remove leading and trailing empty lines from a string.
- */
-function trimEmptyLines(str: string): string {
-  return str.replace(/^\s*\n|\n\s*$/g, '');
+function trimLeadingEmptyLines(str: string): string {
+  return str.replace(/^\s*\n/g, '');
+}
+
+function trimTrailingEmptyLines(str: string): string {
+  return str.replace(/\n\s*$/g, '');
 }
 
 /**
- * Remove common indentation from each line of a string.
+ * Remove specified indentation from each line of a string.
  */
-function dedent(str: string) {
-  // Match the smallest indentation
-  const match = str.match(/^[ \t]*(?=\S)/gm);
-  const indent = match && Math.min(...match.map(el => el.length));
+function dedentStr(str: string, indent: number) {
+  const indentRegexp = new RegExp(`^ {${indent}}`, 'gm');
+  return str.replace(indentRegexp, '');
+}
 
-  if (indent) {
-    const regexp = new RegExp(`^ {${indent}}`, 'gm');
-    return str.replace(regexp, '');
+/**
+ * Remove common indentation from each line of every string, then interpolate
+ * params verbatim.
+ */
+function dedent(strings: string[], ...params: any[]) {
+  // Match the smallest indentation among all strings
+  const indents = strings
+    .map(str => {
+      const match = str.match(/^[ \t]*(?=\S)/gm);
+      return match ? Math.min(...match.map(el => el.length)) : -1;
+    })
+    // Exclude lines where indentation could not be matched
+    .filter(num => num > -1);
+  const smallestIndent = indents.length > 0 ? Math.min(...indents) : 0;
+
+  let result = '';
+  for (const [i, param] of params.entries()) {
+    result += dedentStr(strings[i], smallestIndent);
+    result += param;
   }
 
-  return str;
+  return result + dedentStr(strings[strings.length - 1], smallestIndent);
 }
 
 /**
@@ -35,21 +52,45 @@ function dedent(str: string) {
  *     if (arg === 3) {
  *       console.log(`First line
  *   Second line
- *   Third line`);
+ *   ${var}
+ *   Fourth line`);
  *     }
  *   }
  *
  * to this:
  *   function foo(arg) {
  *     if (arg === 3) {
- *       console.log(trimAndDedent(`
+ *       console.log(trimAndDedent`
  *         First line
  *         Second line
- *         Third line
- *       `));
+ *         ${var}
+ *         Fourth line
+ *       `);
  *     }
  *   }
  */
-export function trimAndDedent(str: string): string {
-  return dedent(trimEmptyLines(str));
+export function trimAndDedent(
+  strings: TemplateStringsArray,
+  ...params: any[]
+): string {
+  if (strings.length < 2) {
+    // Trim leading and trailing empty lines from first (and only) string
+    const trimmedLines = [
+      trimLeadingEmptyLines(trimTrailingEmptyLines(strings[0])),
+    ];
+    return dedent(trimmedLines, ...params);
+  }
+
+  const firstString = strings[0];
+  const lastString = strings[strings.length - 1];
+  const middle = strings.slice(1, strings.length - 1);
+
+  // Trim empty leading lines from first string, and empty trailing lines from last one
+  const trimmedLines = [
+    trimLeadingEmptyLines(firstString),
+    ...middle,
+    trimTrailingEmptyLines(lastString),
+  ];
+
+  return dedent(trimmedLines, ...params);
 }
