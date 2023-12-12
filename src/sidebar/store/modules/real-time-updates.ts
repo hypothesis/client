@@ -191,8 +191,9 @@ function pendingDeletions(state: State) {
  * Return a total count of pending updates and deletions.
  */
 const pendingUpdateCount = createSelector(
-  (state: State) => [state.pendingUpdates, state.pendingDeletions],
-  ([pendingUpdates, pendingDeletions]) =>
+  (state: State) => state.pendingUpdates,
+  (state: State) => state.pendingDeletions,
+  (pendingUpdates, pendingDeletions) =>
     Object.keys(pendingUpdates).length + Object.keys(pendingDeletions).length,
 );
 
