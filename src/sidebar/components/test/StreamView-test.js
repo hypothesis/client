@@ -40,7 +40,7 @@ describe('StreamView', () => {
     $imports.$mock({
       './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../store': { useSidebarStore: () => fakeStore },
-      '../util/query-parser': fakeQueryParser,
+      '../helpers/query-parser': fakeQueryParser,
     });
   });
 

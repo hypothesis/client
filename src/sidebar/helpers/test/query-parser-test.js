@@ -1,6 +1,6 @@
 import { parseHypothesisSearchQuery, parseFilterQuery } from '../query-parser';
 
-describe('sidebar/util/query-parser', () => {
+describe('sidebar/helpers/query-parser', () => {
   function isEmptyFilter(filter) {
     return Object.values(filter).every(value => value.length === 0);
   }
