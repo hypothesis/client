@@ -6,7 +6,7 @@ import StreamView, { $imports } from '../StreamView';
 describe('StreamView', () => {
   let fakeApi;
   let fakeUseRootThread;
-  let fakeSearchFilter;
+  let fakeQueryParser;
   let fakeStore;
   let fakeToastMessenger;
 
@@ -19,8 +19,8 @@ describe('StreamView', () => {
       children: [],
     });
 
-    fakeSearchFilter = {
-      toObject: sinon.stub().returns({}),
+    fakeQueryParser = {
+      parseHypothesisSearchQuery: sinon.stub().returns({}),
     };
 
     fakeStore = {
@@ -40,7 +40,7 @@ describe('StreamView', () => {
     $imports.$mock({
       './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../store': { useSidebarStore: () => fakeStore },
-      '../util/search-filter': fakeSearchFilter,
+      '../util/query-parser': fakeQueryParser,
     });
   });
 
@@ -98,7 +98,7 @@ describe('StreamView', () => {
     ]);
 
     // Assert that we use an empty string as query, when the `q` param is not set
-    assert.calledWith(fakeSearchFilter.toObject, '');
+    assert.calledWith(fakeQueryParser.parseHypothesisSearchQuery, '');
   });
 
   it('displays an error if fetching annotations fails', async () => {

@@ -4,7 +4,7 @@ import { withServices } from '../service-context';
 import type { APIService } from '../services/api';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
-import * as searchFilter from '../util/search-filter';
+import { parseHypothesisSearchQuery } from '../util/query-parser';
 import ThreadList from './ThreadList';
 import { useRootThread } from './hooks/use-root-thread';
 
@@ -34,7 +34,7 @@ function StreamView({ api, toastMessenger }: StreamViewProps) {
         offset: 0,
         limit: 20,
 
-        ...searchFilter.toObject(query),
+        ...parseHypothesisSearchQuery(query),
       };
       try {
         store.annotationFetchStarted();

@@ -20,7 +20,6 @@ import { createStoreModule, makeAction } from '../create-store';
  *   active (applied).
  * - query: String query that is either typed in by the user or provided in
  *   settings. A query string may contain supported facets.
- *   (see `util/search-filter`)
  */
 
 export type FilterOption = {

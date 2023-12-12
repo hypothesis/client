@@ -1,6 +1,6 @@
 import type { Annotation } from '../../types/api';
 import { memoize } from '../util/memoize';
-import { generateFacetedFilter } from '../util/search-filter';
+import { parseFilterQuery } from '../util/query-parser';
 import { buildThread } from './build-thread';
 import type { Thread, BuildThreadOptions } from './build-thread';
 import { shouldShowInTab } from './tabs';
@@ -40,7 +40,7 @@ function buildRootThread(threadState: ThreadState): Thread {
     !!selection.filterQuery || Object.keys(selection.filters).length > 0;
 
   if (annotationsFiltered) {
-    const filters = generateFacetedFilter(
+    const filters = parseFilterQuery(
       selection.filterQuery || '',
       selection.filters,
     );

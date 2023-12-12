@@ -1,24 +1,24 @@
-import * as searchFilter from '../search-filter';
+import { parseHypothesisSearchQuery, parseFilterQuery } from '../query-parser';
 
-describe('sidebar/util/search-filter', () => {
+describe('sidebar/util/query-parser', () => {
   function isEmptyFilter(filter) {
     return Object.values(filter).every(value => value.length === 0);
   }
 
-  describe('toObject', () => {
+  describe('parseHypothesisSearchQuery', () => {
     it('puts a simple search string under the "any" filter', () => {
       const query = 'foo';
-      const result = searchFilter.toObject(query);
+      const result = parseHypothesisSearchQuery(query);
       assert.equal(result.any[0], query);
     });
 
     it('returns an empty filter if input query is empty', () => {
       // Verify `isEmptyFilter` returns false for non-empty query.
-      assert.isFalse(isEmptyFilter(searchFilter.toObject('some query')));
+      assert.isFalse(isEmptyFilter(parseHypothesisSearchQuery('some query')));
 
       // Now check various queries which should produce empty filters
       for (let emptyQuery of ['', '""', "''", ' ']) {
-        const result = searchFilter.toObject(emptyQuery);
+        const result = parseHypothesisSearchQuery(emptyQuery);
         assert.isTrue(
           isEmptyFilter(result),
           `expected "${emptyQuery}" to produce empty filter`,
@@ -28,7 +28,7 @@ describe('sidebar/util/search-filter', () => {
 
     it('uses the filters as keys in the result object', () => {
       const query = 'user:john text:foo quote:bar group:agroup other';
-      const result = searchFilter.toObject(query);
+      const result = parseHypothesisSearchQuery(query);
 
       assert.equal(result.any[0], 'other');
       assert.equal(result.user[0], 'john');
@@ -40,7 +40,7 @@ describe('sidebar/util/search-filter', () => {
     it('collects the same filters into a list', () => {
       const query =
         'user:john text:foo quote:bar other user:doe text:fuu text:fii';
-      const result = searchFilter.toObject(query);
+      const result = parseHypothesisSearchQuery(query);
 
       assert.equal(result.any[0], 'other');
       assert.equal(result.user[0], 'john');
@@ -53,14 +53,14 @@ describe('sidebar/util/search-filter', () => {
 
     it('preserves data with semicolon characters', () => {
       const query = 'uri:http://test.uri';
-      const result = searchFilter.toObject(query);
+      const result = parseHypothesisSearchQuery(query);
       assert.equal(result.uri[0], 'http://test.uri');
     });
 
     it('collects valid filters and puts invalid into the "any" category', () => {
       const query =
         'uri:test foo:bar text:hey john:doe quote:according hi-fi a:bc';
-      const result = searchFilter.toObject(query);
+      const result = parseHypothesisSearchQuery(query);
 
       assert.isUndefined(result.foo);
       assert.isUndefined(result.john);
@@ -75,14 +75,14 @@ describe('sidebar/util/search-filter', () => {
     });
 
     it('supports quoting terms', () => {
-      const parsed = searchFilter.toObject('user:"Dan Whaley"');
+      const parsed = parseHypothesisSearchQuery('user:"Dan Whaley"');
       assert.deepEqual(parsed, {
         user: ['Dan Whaley'],
       });
     });
 
     it('assigns unquoted terms to "any" category', () => {
-      const parsed = searchFilter.toObject('user:Dan Whaley');
+      const parsed = parseHypothesisSearchQuery('user:Dan Whaley');
       assert.deepEqual(parsed, {
         any: ['Whaley'],
         user: ['Dan'],
@@ -90,7 +90,7 @@ describe('sidebar/util/search-filter', () => {
     });
   });
 
-  describe('generateFacetedFilter', () => {
+  describe('parseFilterQuery', () => {
     [
       // Empty queries.
       {
@@ -181,8 +181,8 @@ describe('sidebar/util/search-filter', () => {
         },
       },
     ].forEach(({ query, expectedFilter }) => {
-      it('parses a search query', () => {
-        const filter = searchFilter.generateFacetedFilter(query);
+      it('parses a query', () => {
+        const filter = parseFilterQuery(query);
 
         // Remove empty facets.
         Object.keys(filter).forEach(k => {
@@ -231,7 +231,7 @@ describe('sidebar/util/search-filter', () => {
     ].forEach(({ timeExpr, expectedSecs }) => {
       it('parses a "since:" query', () => {
         const query = `since:${timeExpr}`;
-        const filter = searchFilter.generateFacetedFilter(query);
+        const filter = parseFilterQuery(query);
 
         if (expectedSecs === null) {
           assert.deepEqual(filter.since.terms, []);
@@ -241,8 +241,8 @@ describe('sidebar/util/search-filter', () => {
       });
     });
 
-    it('filters to a focused user', () => {
-      const filter = searchFilter.generateFacetedFilter('', {
+    it('adds additional filters to result', () => {
+      const filter = parseFilterQuery('', {
         user: 'fakeusername',
       });
       // Remove empty facets.
