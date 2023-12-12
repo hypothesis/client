@@ -208,6 +208,19 @@ const searchUris = createShallowEqualSelector(
       [],
     ),
   uris => uris,
+  {
+    // This selector does the actual work in its "input" functions and then
+    // relies on Reselect not to call the identity result function if the
+    // result of the input function is value-equal to the previous result.
+    //
+    // This is not really how Reselect is supposed to be used, but it works.
+    //
+    // What we want to achieve is that the output doesn't change if the result
+    // is value-equal to the previous result (ie. the `state.frames` might
+    // have changed, but if the search URL array produced from them hasn't
+    // changed, the output reference should stay the same).
+    devModeChecks: { identityFunctionCheck: 'never' },
+  },
 );
 
 function getContentInfo(state: State) {
