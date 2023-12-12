@@ -1,9 +1,9 @@
 import { cfiInRange, stripCFIAssertions } from '../../shared/cfi';
 import type { Annotation } from '../../types/api';
 import { pageLabelInRange } from '../util/page-range';
-import type { Facet } from '../util/query-parser';
 import * as unicodeUtils from '../util/unicode';
 import { cfi as getCFI, quote, pageLabel } from './annotation-metadata';
+import type { Facet } from './query-parser';
 
 type Filter = {
   matches: (ann: Annotation) => boolean;
