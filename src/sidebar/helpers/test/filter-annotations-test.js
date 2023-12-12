@@ -1,4 +1,4 @@
-import { filterAnnotations, $imports } from '../view-filter';
+import { filterAnnotations, $imports } from '../filter-annotations';
 
 function isoDateWithAge(age) {
   return new Date(Date.now() - age * 1000).toISOString();
@@ -17,7 +17,7 @@ const poem = {
           Only this and nothing more.”`,
 };
 
-describe('sidebar/helpers/view-filter', () => {
+describe('sidebar/helpers/filter-annotations', () => {
   let fakeUnicode;
 
   beforeEach(() => {

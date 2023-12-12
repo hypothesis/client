@@ -3,9 +3,9 @@ import { memoize } from '../util/memoize';
 import { parseFilterQuery } from '../util/query-parser';
 import { buildThread } from './build-thread';
 import type { Thread, BuildThreadOptions } from './build-thread';
+import { filterAnnotations } from './filter-annotations';
 import { shouldShowInTab } from './tabs';
 import { sorters } from './thread-sorters';
-import { filterAnnotations } from './view-filter';
 
 export type ThreadState = {
   annotations: Annotation[];

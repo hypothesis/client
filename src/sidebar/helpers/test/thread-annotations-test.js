@@ -45,7 +45,7 @@ describe('sidebar/helpers/thread-annotations', () => {
     $imports.$mock({
       './build-thread': { buildThread: fakeBuildThread },
       '../util/query-parser': fakeQueryParser,
-      './view-filter': { filterAnnotations: fakeFilterAnnotations },
+      './filter-annotations': { filterAnnotations: fakeFilterAnnotations },
     });
   });
 
