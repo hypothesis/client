@@ -173,7 +173,7 @@ function AnnotationHeader({
               )}
               {pageNumber && (
                 <span className="text-grey-6" data-testid="page-number">
-                  {showDocumentInfo && ', '}p.{pageNumber}
+                  {showDocumentInfo && ', '}p. {pageNumber}
                 </span>
               )}
             </span>
