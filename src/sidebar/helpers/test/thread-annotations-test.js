@@ -18,7 +18,7 @@ const fixtures = immutable({
 describe('sidebar/helpers/thread-annotations', () => {
   let fakeBuildThread;
   let fakeFilterAnnotations;
-  let fakeSearchFilter;
+  let fakeQueryParser;
   let fakeThreadState;
 
   beforeEach(() => {
@@ -38,13 +38,13 @@ describe('sidebar/helpers/thread-annotations', () => {
 
     fakeBuildThread = sinon.stub().returns(fixtures.emptyThread);
     fakeFilterAnnotations = sinon.stub();
-    fakeSearchFilter = {
-      generateFacetedFilter: sinon.stub(),
+    fakeQueryParser = {
+      parseFilterQuery: sinon.stub(),
     };
 
     $imports.$mock({
       './build-thread': { buildThread: fakeBuildThread },
-      '../util/search-filter': fakeSearchFilter,
+      '../util/query-parser': fakeQueryParser,
       './view-filter': { filterAnnotations: fakeFilterAnnotations },
     });
   });
@@ -187,9 +187,9 @@ describe('sidebar/helpers/thread-annotations', () => {
         const filterFn = fakeBuildThread.args[0][1].filterFn;
 
         assert.isFunction(filterFn);
-        assert.calledOnce(fakeSearchFilter.generateFacetedFilter);
+        assert.calledOnce(fakeQueryParser.parseFilterQuery);
         assert.calledWith(
-          fakeSearchFilter.generateFacetedFilter,
+          fakeQueryParser.parseFilterQuery,
           fakeThreadState.selection.filterQuery,
           fakeThreadState.selection.filters,
         );
@@ -203,7 +203,7 @@ describe('sidebar/helpers/thread-annotations', () => {
 
         assert.isFunction(fakeBuildThread.args[0][1].filterFn);
         assert.calledWith(
-          fakeSearchFilter.generateFacetedFilter,
+          fakeQueryParser.parseFilterQuery,
           sinon.match.any,
           sinon.match({ user: 'somebody' }),
         );

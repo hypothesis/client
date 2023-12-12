@@ -44,10 +44,10 @@ function splitTerm(term: string): [null | string, string] {
  * Remove a quote character from the beginning and end of the string, but
  * only if they match. ie:
  *
--*   'foo' -> foo
--*   "bar" -> bar
--*   'foo" -> 'foo"
--*    bar"  -> bar"
+ *   'foo' -> foo
+ *   "bar" -> bar
+ *   'foo" -> 'foo"
+ *    bar"  -> bar"
  */
 function removeSurroundingQuotes(text: string) {
   const start = text.slice(0, 1);
@@ -87,9 +87,12 @@ function tokenize(searchText: string): string[] {
 }
 
 /**
- * Parse a search query into a map of search field to term.
+ * Parse a user-provided query ("term:value ...") into a key/value map that can
+ * be used when constructing queries to the Hypothesis search API.
  */
-export function toObject(searchText: string): Record<string, string[]> {
+export function parseHypothesisSearchQuery(
+  searchText: string,
+): Record<string, string[]> {
   const obj = {} as Record<string, string[]>;
 
   const backendFilter = (field: string) => (field === 'tag' ? 'tags' : field);
@@ -123,17 +126,16 @@ export type FocusFilter = {
 };
 
 /**
- * Parse a search query into a map of filters.
+ * Parse a user-provided query into a map of filter field to term.
  *
- * Returns an object mapping facet names to Facet.
- *
- * Terms that are not associated with a particular facet are stored in the "any"
- * facet.
+ * Terms that are not associated with any particular field are stored under the
+ * "any" property.
  *
  * @param searchText - Filter query to parse
- * @param focusFilters - Additional filter terms to mix in
+ * @param focusFilters - Additional query terms to merge with the results of
+ *   parsing `searchText`.
  */
-export function generateFacetedFilter(
+export function parseFilterQuery(
   searchText: string,
   focusFilters: FocusFilter = {},
 ): Record<string, Facet> {
