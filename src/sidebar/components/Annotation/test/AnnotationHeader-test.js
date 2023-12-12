@@ -478,7 +478,7 @@ describe('AnnotationHeader', () => {
       const wrapper = createAnnotationHeader({ annotation });
       const pageNumber = wrapper.find('[data-testid="page-number"]');
       assert.isTrue(pageNumber.exists());
-      assert.equal(pageNumber.text(), 'p.11');
+      assert.equal(pageNumber.text(), 'p. 11');
     });
 
     it('should hide group name in sidebar', () => {
