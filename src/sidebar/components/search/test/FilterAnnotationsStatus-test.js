@@ -69,7 +69,7 @@ describe('FilterAnnotationsStatus', () => {
     });
   });
 
-  context('(State 1): no search filters active', () => {
+  context('no search filters active', () => {
     it('should render hidden but available to screen readers', () => {
       const wrapper = createComponent();
       const containerEl = wrapper
@@ -81,7 +81,7 @@ describe('FilterAnnotationsStatus', () => {
     });
   });
 
-  context('(State 2): selected annotations', () => {
+  context('selected annotations', () => {
     beforeEach(() => {
       fakeStore.selectedAnnotations.returns([1]);
     });
@@ -142,7 +142,7 @@ describe('FilterAnnotationsStatus', () => {
     });
   });
 
-  context('(State 3): user-focus mode active', () => {
+  context('user-focus mode active', () => {
     beforeEach(() => {
       fakeStore.focusState.returns({
         active: true,
@@ -184,50 +184,7 @@ describe('FilterAnnotationsStatus', () => {
     });
   });
 
-  context('(State 4): user-focus mode active', () => {
-    beforeEach(() => {
-      fakeStore.focusState.returns({
-        active: true,
-        configured: true,
-        displayName: 'Ebenezer Studentolog',
-      });
-      fakeThreadUtil.countVisible.returns(1);
-    });
-
-    it('should show a count of annotations by the focused user', () => {
-      assertFilterText(
-        createComponent(),
-        'Showing 1 annotation by Ebenezer Studentolog',
-      );
-    });
-
-    it('should pluralize annotations when needed', () => {
-      fakeThreadUtil.countVisible.returns(3);
-      assertFilterText(
-        createComponent(),
-        'Showing 3 annotations by Ebenezer Studentolog',
-      );
-    });
-
-    it('should show a no results message when user has no annotations', () => {
-      fakeThreadUtil.countVisible.returns(0);
-      assertFilterText(
-        createComponent(),
-        'No annotations by Ebenezer Studentolog',
-      );
-    });
-
-    it('should provide a "Show all" button', () => {
-      const wrapper = createComponent();
-      const button = wrapper.find('Button[data-testid="clear-button"]');
-
-      assert.equal(button.text(), 'Show all');
-      button.props().onClick();
-      assert.calledOnce(fakeStore.toggleFocusMode);
-    });
-  });
-
-  context('(State 5): user-focus mode active, force-expanded threads', () => {
+  context('user-focus mode active, force-expanded threads', () => {
     beforeEach(() => {
       fakeStore.focusState.returns({
         active: true,
@@ -255,7 +212,7 @@ describe('FilterAnnotationsStatus', () => {
     });
   });
 
-  context('(State 6): user-focus mode active, selected annotations', () => {
+  context('user-focus mode active, selected annotations', () => {
     beforeEach(() => {
       fakeStore.focusState.returns({
         active: true,
@@ -278,42 +235,7 @@ describe('FilterAnnotationsStatus', () => {
     });
   });
 
-  context('(State 7): user-focus mode active, force-expanded threads', () => {
-    beforeEach(() => {
-      fakeStore.focusState.returns({
-        active: true,
-        configured: true,
-        displayName: 'Ebenezer Studentolog',
-      });
-      fakeStore.forcedVisibleThreads.returns([1, 2, 3]);
-      fakeThreadUtil.countVisible.returns(7);
-    });
-
-    it('should show count of user results separately from forced-visible threads', () => {
-      assertFilterText(
-        createComponent(),
-        'Showing 4 annotations by Ebenezer Studentolog (and 3 more)',
-      );
-    });
-
-    it('should handle cases when there are no focused-user annotations', () => {
-      fakeStore.forcedVisibleThreads.returns([1, 2, 3, 4, 5, 6, 7]);
-      assertFilterText(
-        createComponent(),
-        'No annotations by Ebenezer Studentolog (and 7 more)',
-      );
-    });
-
-    it('should provide a "Reset filters" button', () => {
-      assertButton(createComponent(), {
-        text: 'Reset filters',
-        icon: false,
-        callback: fakeStore.clearSelection,
-      });
-    });
-  });
-
-  context('(State 8): user-focus mode configured but inactive', () => {
+  context('user-focus mode configured but inactive', () => {
     beforeEach(() => {
       fakeStore.focusState.returns({
         active: false,
