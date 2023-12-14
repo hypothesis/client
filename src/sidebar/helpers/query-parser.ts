@@ -1,18 +1,4 @@
-/**
- * Names of supported fields that can be specified via `{filename}:{term}`
- * in {@link parseFilterQuery}.
- */
-export type FilterField =
-  | 'cfi'
-  | 'quote'
-  | 'page'
-  | 'since'
-  | 'tag'
-  | 'text'
-  | 'uri'
-  | 'user';
-
-const filterFields: FilterField[] = [
+const filterFields = [
   'cfi',
   'quote',
   'page',
@@ -21,22 +7,21 @@ const filterFields: FilterField[] = [
   'text',
   'uri',
   'user',
-];
+] as const;
+
+/**
+ * Names of supported fields that can be specified via `{filename}:{term}`
+ * in {@link parseFilterQuery}.
+ */
+export type FilterField = (typeof filterFields)[number];
+
+const searchFields = ['group', 'quote', 'tag', 'text', 'uri', 'user'] as const;
 
 /**
  * Names of fields that can be used in `{field}:{term}` queries with
  * {@link parseHypothesisSearchQuery}.
  */
-export type SearchField = 'group' | 'quote' | 'tag' | 'text' | 'uri' | 'user';
-
-const searchFields: SearchField[] = [
-  'group',
-  'quote',
-  'tag',
-  'text',
-  'uri',
-  'user',
-];
+export type SearchField = (typeof searchFields)[number];
 
 /**
  * Splits a search term into filter and data.
@@ -49,7 +34,7 @@ const searchFields: SearchField[] = [
  */
 function splitTerm(
   term: string,
-  fieldNames: string[],
+  fieldNames: readonly string[],
 ): [null | string, string] {
   const filter = term.slice(0, term.indexOf(':'));
   if (!filter) {
@@ -91,7 +76,7 @@ function removeSurroundingQuotes(text: string) {
  * within quotes are split on whitespace. Terms inside single or double quotes
  * are returned as whole tokens, with the surrounding quotes removed.
  */
-function tokenize(query: string, fieldNames: string[]): string[] {
+function tokenize(query: string, fieldNames: readonly string[]): string[] {
   const tokenMatches = query.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
   if (!tokenMatches) {
     return [];
