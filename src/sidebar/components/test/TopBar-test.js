@@ -65,7 +65,6 @@ describe('TopBar', () => {
         isSidebar={true}
         settings={fakeSettings}
         streamer={fakeStreamer}
-        showShareButton
         {...props}
       />,
     );
@@ -156,15 +155,6 @@ describe('TopBar', () => {
     it('shows the share annotations button', () => {
       const wrapper = createTopBar();
       assert.isTrue(wrapper.exists('[title="Share annotations on this page"]'));
-    });
-  });
-
-  context('when showShareButton is false', () => {
-    it("doesn't show the share annotations button", () => {
-      const wrapper = createTopBar({ showShareButton: false });
-      assert.isFalse(
-        wrapper.exists('[title="Share annotations on this page"]'),
-      );
     });
   });
 

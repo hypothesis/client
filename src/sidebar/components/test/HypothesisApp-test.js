@@ -408,23 +408,6 @@ describe('HypothesisApp', () => {
     });
   });
 
-  context('when there are no sharing tabs to show', () => {
-    beforeEach(() => {
-      fakeStore.isFeatureEnabled.returns(false);
-      fakeIsThirdPartyService.returns(true);
-    });
-
-    it('does not render ShareDialog', () => {
-      const wrapper = createComponent();
-      assert.isFalse(wrapper.exists('ShareDialog'));
-    });
-
-    it('disables share button in TopBar', () => {
-      const wrapper = createComponent();
-      assert.isFalse(wrapper.find('TopBar').prop('showShareButton'));
-    });
-  });
-
   describe('search panel', () => {
     [true, false].forEach(searchPanelEnabled => {
       it('renders SearchPanel when feature is enabled', () => {

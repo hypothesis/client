@@ -18,7 +18,7 @@ describe('ShareDialog', () => {
   };
 
   const createComponent = (props = {}) =>
-    mount(<ShareDialog shareTab exportTab importTab {...props} />);
+    mount(<ShareDialog shareTab {...props} />);
 
   beforeEach(() => {
     fakeStore = {
@@ -73,25 +73,6 @@ describe('ShareDialog', () => {
     return wrapper.find('TabPanel').filter({ active: true });
   }
 
-  it('does not render a tabbed dialog if only share tab is provided', () => {
-    const wrapper = createComponent({ exportTab: false, importTab: false });
-
-    assert.isFalse(wrapper.find('TabHeader').exists());
-  });
-
-  [{ importTab: false }, { exportTab: false }, {}].forEach(props => {
-    it(`renders a tabbed dialog when more than one tab is provided`, () => {
-      const wrapper = createComponent(props);
-
-      assert.isTrue(wrapper.find('TabHeader').exists());
-      assert.isTrue(
-        wrapper.find(Tab).filter('[aria-controls="share-panel"]').props()
-          .selected,
-      );
-      assert.isTrue(wrapper.find('TabPanel[id="share-panel"]').props().active);
-    });
-  });
-
   it('shows correct tab panel when each tab is clicked', () => {
     const wrapper = createComponent();
 
@@ -111,22 +92,11 @@ describe('ShareDialog', () => {
     assert.equal(activeTabPanel(wrapper).props().id, 'share-panel');
   });
 
-  it('renders empty if no tabs should be displayed', () => {
-    const wrapper = createComponent({
-      shareTab: false,
-      exportTab: false,
-      importTab: false,
-    });
-
-    assert.isFalse(wrapper.exists('TabHeader'));
-    assert.isFalse(wrapper.exists('ShareAnnotations'));
-  });
-
   describe('a11y', () => {
     it(
       'should pass a11y checks',
       checkAccessibility({
-        content: () => <ShareDialog shareTab exportTab importTab />,
+        content: () => <ShareDialog shareTab />,
       }),
     );
   });
