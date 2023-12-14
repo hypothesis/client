@@ -7,7 +7,10 @@ import {
 } from '@hypothesis/frontend-shared';
 import { useCallback, useId, useMemo, useState } from 'preact/hooks';
 
-import { downloadJSONFile } from '../../../shared/download-json-file';
+import {
+  downloadJSONFile,
+  downloadTextFile,
+} from '../../../shared/download-file';
 import type { APIAnnotationData } from '../../../types/api';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import type { UserAnnotations } from '../../helpers/annotations-by-user';
@@ -37,15 +40,15 @@ const exportFormats: ExportFormat[] = [
     value: 'json',
     name: 'JSON',
   },
+  {
+    value: 'txt',
+    name: 'Text',
+  },
 
   // TODO Enable these formats when implemented
   // {
   //   value: 'csv',
   //   name: 'CSV',
-  // },
-  // {
-  //   value: 'txt',
-  //   name: 'Text',
   // },
   // {
   //   value: 'html',
@@ -126,10 +129,21 @@ function ExportAnnotations({
         selectedUser?.annotations ?? exportableAnnotations;
       const filename = `${customFilename ?? defaultFilename}.${format}`;
 
-      if (format === 'json') {
-        const exportData =
-          annotationsExporter.buildJSONExportContent(annotationsToExport);
-        downloadJSONFile(exportData, filename);
+      switch (format) {
+        case 'json': {
+          const exportData =
+            annotationsExporter.buildJSONExportContent(annotationsToExport);
+          downloadJSONFile(exportData, filename);
+          break;
+        }
+        case 'txt': {
+          const exportData = annotationsExporter.buildTextExportContent(
+            annotationsToExport,
+            group?.name,
+          );
+          downloadTextFile(exportData, filename);
+          break;
+        }
       }
     } catch (e) {
       toastMessenger.error('Exporting annotations failed');
@@ -187,6 +201,7 @@ function ExportAnnotations({
                   onChange={setExportFormat}
                   buttonContent={exportFormat.name}
                   data-testid="export-format-select"
+                  right
                 >
                   {exportFormats.map(exportFormat => (
                     <SelectNext.Option

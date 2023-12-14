@@ -15,6 +15,7 @@ describe('ExportAnnotations', () => {
   let fakeAnnotationsExporter;
   let fakeToastMessenger;
   let fakeDownloadJSONFile;
+  let fakeDownloadTextFile;
   let fakeSuggestedFilename;
 
   const fakePrivateGroup = {
@@ -35,11 +36,13 @@ describe('ExportAnnotations', () => {
   beforeEach(() => {
     fakeAnnotationsExporter = {
       buildJSONExportContent: sinon.stub().returns({}),
+      buildTextExportContent: sinon.stub().returns(''),
     };
     fakeToastMessenger = {
       error: sinon.stub(),
     };
     fakeDownloadJSONFile = sinon.stub();
+    fakeDownloadTextFile = sinon.stub();
     fakeStore = {
       defaultAuthority: sinon.stub().returns('example.com'),
       isFeatureEnabled: sinon.stub().returns(true),
@@ -59,8 +62,9 @@ describe('ExportAnnotations', () => {
     $imports.$mock(mockImportedComponents());
 
     $imports.$mock({
-      '../../../shared/download-json-file': {
+      '../../../shared/download-file': {
         downloadJSONFile: fakeDownloadJSONFile,
+        downloadTextFile: fakeDownloadTextFile,
       },
       '../../helpers/export-annotations': {
         suggestedFilename: fakeSuggestedFilename,
@@ -226,26 +230,60 @@ describe('ExportAnnotations', () => {
     });
   });
 
+  it('lists supported export formats', async () => {
+    const wrapper = createComponent();
+    const select = await waitForElement(
+      wrapper,
+      '[data-testid="export-format-select"]',
+    );
+    const options = select.find(SelectNext.Option);
+
+    assert.equal(options.length, 2);
+    assert.equal(options.at(0).text(), 'JSON');
+    assert.equal(options.at(1).text(), 'Text');
+  });
+
   describe('export form submitted', () => {
     const submitExportForm = wrapper =>
       wrapper.find('[data-testid="export-form"]').simulate('submit');
-
-    it('builds an export file from all non-draft annotations', () => {
-      const wrapper = createComponent();
-      const annotationsToExport = [
-        fixtures.oldAnnotation(),
-        fixtures.oldAnnotation(),
-      ];
-      fakeStore.savedAnnotations.returns(annotationsToExport);
-
-      submitExportForm(wrapper);
-
-      assert.calledOnce(fakeAnnotationsExporter.buildJSONExportContent);
-      assert.calledWith(
-        fakeAnnotationsExporter.buildJSONExportContent,
-        annotationsToExport,
+    const selectExportFormat = async (wrapper, format) => {
+      const select = await waitForElement(
+        wrapper,
+        '[data-testid="export-format-select"]',
       );
-      assert.notCalled(fakeToastMessenger.error);
+      select.props().onChange({ value: format });
+      wrapper.update();
+    };
+
+    [
+      {
+        format: 'json',
+        getExpectedInvokedContentBuilder: () =>
+          fakeAnnotationsExporter.buildJSONExportContent,
+      },
+      {
+        format: 'txt',
+        getExpectedInvokedContentBuilder: () =>
+          fakeAnnotationsExporter.buildTextExportContent,
+      },
+    ].forEach(({ format, getExpectedInvokedContentBuilder }) => {
+      it('builds an export file from all non-draft annotations', async () => {
+        const wrapper = createComponent();
+        const annotationsToExport = [
+          fixtures.oldAnnotation(),
+          fixtures.oldAnnotation(),
+        ];
+        fakeStore.savedAnnotations.returns(annotationsToExport);
+
+        await selectExportFormat(wrapper, format);
+
+        submitExportForm(wrapper);
+
+        const invokedContentBuilder = getExpectedInvokedContentBuilder();
+        assert.calledOnce(invokedContentBuilder);
+        assert.calledWith(invokedContentBuilder, annotationsToExport);
+        assert.notCalled(fakeToastMessenger.error);
+      });
     });
 
     it('builds an export file from selected user annotations', async () => {
@@ -305,23 +343,37 @@ describe('ExportAnnotations', () => {
       );
     });
 
-    it('downloads a file using user-entered filename appended with `.json`', () => {
-      const wrapper = createComponent();
-      const filenameInput = wrapper.find(
-        'input[data-testid="export-filename"]',
-      );
+    [
+      {
+        format: 'json',
+        getExpectedInvokedDownloader: () => fakeDownloadJSONFile,
+      },
+      {
+        format: 'txt',
+        getExpectedInvokedDownloader: () => fakeDownloadTextFile,
+      },
+    ].forEach(({ format, getExpectedInvokedDownloader }) => {
+      it('downloads a file using user-entered filename appended with proper extension', async () => {
+        const wrapper = createComponent();
+        const filenameInput = wrapper.find(
+          'input[data-testid="export-filename"]',
+        );
 
-      filenameInput.getDOMNode().value = 'my-filename';
-      filenameInput.simulate('change');
+        filenameInput.getDOMNode().value = 'my-filename';
+        filenameInput.simulate('change');
 
-      submitExportForm(wrapper);
+        await selectExportFormat(wrapper, format);
 
-      assert.calledOnce(fakeDownloadJSONFile);
-      assert.calledWith(
-        fakeDownloadJSONFile,
-        sinon.match.object,
-        'my-filename.json',
-      );
+        submitExportForm(wrapper);
+
+        const invokedDownloader = getExpectedInvokedDownloader();
+        assert.calledOnce(invokedDownloader);
+        assert.calledWith(
+          invokedDownloader,
+          sinon.match.any,
+          `my-filename.${format}`,
+        );
+      });
     });
 
     context('when exporting annotations fails', () => {
