@@ -5,23 +5,6 @@ import type { FocusConfig, SidebarSettings } from '../../../types/config';
 import type { FocusUserInfo } from '../../../types/rpc';
 import { createStoreModule, makeAction } from '../create-store';
 
-/**
- * Manage state pertaining to the filtering of annotations in the UI.
- *
- * There are a few sources of filtering that gets applied to annotations:
- *
- * - focusFilters: Filters defined by config/settings. Currently, supports a
- *   user filter. Application of these filters may be toggled on/off by user
- *   interaction (`focusActive`), but the values of these filters are set by
- *   config/settings or RPC (not by user directly). The value(s) of
- *   focusFilters are retained even when focus is inactive such that they might
- *   be re-applied later.
- * - filters: Filters set by faceting/filtering UI. Any filter here is currently
- *   active (applied).
- * - query: String query that is either typed in by the user or provided in
- *   settings. A query string may contain supported facets.
- */
-
 export type FilterOption = {
   /** The machine-readable value of the option */
   value: string;
@@ -42,6 +25,22 @@ type FocusState = {
   displayName: string;
 };
 
+/**
+ * State pertaining to the filtering of annotations in the UI.
+ *
+ * There are a few sources of filtering that gets applied to annotations:
+ *
+ * - focusFilters: Filters defined by config/settings. Currently, supports a
+ *   user filter. Application of these filters may be toggled on/off by user
+ *   interaction (`focusActive`), but the values of these filters are set by
+ *   config/settings or RPC (not by user directly). The value(s) of
+ *   focusFilters are retained even when focus is inactive such that they might
+ *   be re-applied later.
+ * - filters: Filters set by faceting/filtering UI. Any filter here is currently
+ *   active (applied).
+ * - query: String query that is either typed in by the user or provided in
+ *   settings. A query string may contain supported facets.
+ */
 export type State = {
   filters: Filters;
   focusActive: boolean;
