@@ -1,14 +1,19 @@
 /**
- * Parse annotation filter queries into structured representations.
- *
- * Provides methods to parse Lucene-style queries ("foo tag: bar")
- * into structured representations which are then used by other services to
- * filter annotations displayed to the user or fetched from the API.
+ * Names of supported fields that can be specified via `{filename}:{term}`
+ * in {@link parseFilterQuery}.
  */
+export type FilterField =
+  | 'cfi'
+  | 'quote'
+  | 'page'
+  | 'since'
+  | 'tag'
+  | 'text'
+  | 'uri'
+  | 'user';
 
-const filterFields = [
+const filterFields: FilterField[] = [
   'cfi',
-  'group',
   'quote',
   'page',
   'since',
@@ -19,19 +24,40 @@ const filterFields = [
 ];
 
 /**
+ * Names of fields that can be used in `{field}:{term}` queries with
+ * {@link parseHypothesisSearchQuery}.
+ */
+export type SearchField = 'group' | 'quote' | 'tag' | 'text' | 'uri' | 'user';
+
+const searchFields: SearchField[] = [
+  'group',
+  'quote',
+  'tag',
+  'text',
+  'uri',
+  'user',
+];
+
+/**
  * Splits a search term into filter and data.
  *
- * ie. 'user:johndoe' -> ['user', 'johndoe']
+ * eg. 'user:johndoe' -> ['user', 'johndoe']
  *     'example:text' -> [null, 'example:text']
+ *
+ * @param term - The query term to parse
+ * @param fieldNames - The set of recognized field names
  */
-function splitTerm(term: string): [null | string, string] {
+function splitTerm(
+  term: string,
+  fieldNames: string[],
+): [null | string, string] {
   const filter = term.slice(0, term.indexOf(':'));
   if (!filter) {
     // The whole term is data
     return [null, term];
   }
 
-  if (filterFields.includes(filter)) {
+  if (fieldNames.includes(filter)) {
     const data = term.slice(filter.length + 1);
     return [filter, data];
   } else {
@@ -61,12 +87,12 @@ function removeSurroundingQuotes(text: string) {
 /**
  * Tokenize a search query.
  *
- * Split `searchText` into an array of non-empty tokens. Terms not contained
+ * Split `query` into an array of non-empty tokens. Terms not contained
  * within quotes are split on whitespace. Terms inside single or double quotes
  * are returned as whole tokens, with the surrounding quotes removed.
  */
-function tokenize(searchText: string): string[] {
-  const tokenMatches = searchText.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
+function tokenize(query: string, fieldNames: string[]): string[] {
+  const tokenMatches = query.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
   if (!tokenMatches) {
     return [];
   }
@@ -77,7 +103,7 @@ function tokenize(searchText: string): string[] {
     .map(token => {
       // Strip quotes from field values.
       // eg. `tag:"foo bar"` => `tag:foo bar`.
-      const [filter, data] = splitTerm(token);
+      const [filter, data] = splitTerm(token, fieldNames);
       if (filter) {
         return filter + ':' + removeSurroundingQuotes(data);
       } else {
@@ -91,15 +117,15 @@ function tokenize(searchText: string): string[] {
  * be used when constructing queries to the Hypothesis search API.
  */
 export function parseHypothesisSearchQuery(
-  searchText: string,
+  query: string,
 ): Record<string, string[]> {
   const obj = {} as Record<string, string[]>;
 
   const backendFilter = (field: string) => (field === 'tag' ? 'tags' : field);
 
-  const terms = tokenize(searchText);
+  const terms = tokenize(query, searchFields);
   for (const term of terms) {
-    let [field, data] = splitTerm(term);
+    let [field, data] = splitTerm(term, searchFields);
     if (!field) {
       field = 'any';
       data = term;
@@ -117,13 +143,15 @@ export function parseHypothesisSearchQuery(
 }
 
 export type Facet = {
+  /**
+   * Whether to require annotations match all values in `terms` ("and") or at
+   * least one value in `terms` ("or").
+   */
   operator: 'and' | 'or';
   terms: string[] | number[];
 };
 
-export type FocusFilter = {
-  user?: string;
-};
+export type ParsedQuery = Record<FilterField | 'any', Facet>;
 
 /**
  * Parse a user-provided query into a map of filter field to term.
@@ -131,25 +159,35 @@ export type FocusFilter = {
  * Terms that are not associated with any particular field are stored under the
  * "any" property.
  *
- * @param searchText - Filter query to parse
- * @param focusFilters - Additional query terms to merge with the results of
- *   parsing `searchText`.
+ * @param query - Filter query to parse
+ * @param addedFilters - Additional query terms to merge with the results of
+ *   parsing `query`.
  */
 export function parseFilterQuery(
-  searchText: string,
-  focusFilters: FocusFilter = {},
-): Record<string, Facet> {
-  const any = [];
-  const cfi = [];
-  const page = [];
-  const quote = [];
-  const since = [];
-  const tag = [];
-  const text = [];
-  const uri = [];
-  const user = focusFilters.user ? [focusFilters.user] : [];
+  query: string,
+  addedFilters: Partial<Record<FilterField, string>> = {},
+): ParsedQuery {
+  const initialTerms = (field: FilterField) => {
+    const init = addedFilters[field];
+    if (typeof init === 'string') {
+      return [init];
+    } else {
+      return [];
+    }
+  };
 
-  const terms = tokenize(searchText);
+  const cfi = initialTerms('cfi');
+  const page = initialTerms('page');
+  const quote = initialTerms('quote');
+  const tag = initialTerms('tag');
+  const text = initialTerms('text');
+  const uri = initialTerms('uri');
+  const user = initialTerms('user');
+
+  const any = [];
+  const since: number[] = [];
+
+  const terms = tokenize(query, filterFields);
 
   for (const term of terms) {
     const filter = term.slice(0, term.indexOf(':'));
