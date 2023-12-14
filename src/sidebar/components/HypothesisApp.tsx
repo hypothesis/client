@@ -65,10 +65,6 @@ function HypothesisApp({
   }, [isSidebar, profile, settings, store]);
 
   const isThirdParty = isThirdPartyService(settings);
-  const exportAnnotations = store.isFeatureEnabled('export_annotations');
-  const importAnnotations = store.isFeatureEnabled('import_annotations');
-  const showShareButton =
-    !isThirdParty || exportAnnotations || importAnnotations;
 
   const searchPanelEnabled = store.isFeatureEnabled('search_panel');
 
@@ -165,20 +161,13 @@ function HypothesisApp({
           onSignUp={signUp}
           onLogout={logout}
           isSidebar={isSidebar}
-          showShareButton={showShareButton}
         />
       )}
       <div className="container">
         <ToastMessages />
         <HelpPanel />
         {searchPanelEnabled && <SearchPanel />}
-        {showShareButton && (
-          <ShareDialog
-            shareTab={!isThirdParty}
-            exportTab={exportAnnotations}
-            importTab={importAnnotations}
-          />
-        )}
+        <ShareDialog shareTab={!isThirdParty} />
 
         {route && (
           <main>

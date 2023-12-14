@@ -17,8 +17,6 @@ import SearchIconButton from './search/SearchIconButton';
 import StreamSearchInput from './search/StreamSearchInput';
 
 export type TopBarProps = {
-  showShareButton: boolean;
-
   /** Flag indicating whether the app is in a sidebar context */
   isSidebar: boolean;
 
@@ -47,7 +45,6 @@ function TopBar({
   onSignUp,
   frameSync,
   settings,
-  showShareButton,
 }: TopBarProps) {
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
@@ -108,17 +105,15 @@ function TopBar({
               )}
               {searchPanelEnabled && <SearchIconButton />}
               <SortMenu />
-              {showShareButton && (
-                <PressableIconButton
-                  icon={ShareIcon}
-                  expanded={isAnnotationsPanelOpen}
-                  pressed={isAnnotationsPanelOpen}
-                  onClick={toggleSharePanel}
-                  size="xs"
-                  title="Share annotations on this page"
-                  data-testid="share-icon-button"
-                />
-              )}
+              <PressableIconButton
+                icon={ShareIcon}
+                expanded={isAnnotationsPanelOpen}
+                pressed={isAnnotationsPanelOpen}
+                onClick={toggleSharePanel}
+                size="xs"
+                title="Share annotations on this page"
+                data-testid="share-icon-button"
+              />
             </>
           )}
           <PressableIconButton
