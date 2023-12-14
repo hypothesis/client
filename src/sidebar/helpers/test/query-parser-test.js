@@ -180,6 +180,26 @@ describe('sidebar/helpers/query-parser', () => {
           },
         },
       },
+      // "group:" and "any:" are currently not treated as search fields in
+      // the sidebar filter.
+      {
+        query: 'group:abcd',
+        expectedFilter: {
+          any: {
+            operator: 'and',
+            terms: ['group:abcd'],
+          },
+        },
+      },
+      {
+        query: 'any:foo',
+        expectedFilter: {
+          any: {
+            operator: 'and',
+            terms: ['any:foo'],
+          },
+        },
+      },
     ].forEach(({ query, expectedFilter }) => {
       it('parses a query', () => {
         const filter = parseFilterQuery(query);
@@ -241,21 +261,90 @@ describe('sidebar/helpers/query-parser', () => {
       });
     });
 
-    it('adds additional filters to result', () => {
-      const filter = parseFilterQuery('', {
-        user: 'fakeusername',
-      });
-      // Remove empty facets.
-      Object.keys(filter).forEach(k => {
-        if (filter[k].terms.length === 0) {
-          delete filter[k];
-        }
-      });
-      assert.deepEqual(filter, {
-        user: {
-          operator: 'or',
-          terms: ['fakeusername'],
+    [
+      // Standalone filters
+      {
+        addedFilters: { user: 'fakeusername' },
+        expected: {
+          user: {
+            operator: 'or',
+            terms: ['fakeusername'],
+          },
         },
+      },
+      {
+        addedFilters: { page: '2-4' },
+        expected: {
+          page: {
+            operator: 'or',
+            terms: ['2-4'],
+          },
+        },
+      },
+      {
+        addedFilters: { cfi: '/2/2-/2/6' },
+        expected: {
+          cfi: {
+            operator: 'or',
+            terms: ['/2/2-/2/6'],
+          },
+        },
+      },
+      // Combined filters
+      {
+        addedFilters: { user: 'fakeusername' },
+        query: 'user:otheruser',
+        expected: {
+          user: {
+            operator: 'or',
+            terms: ['fakeusername', 'otheruser'],
+          },
+        },
+      },
+      {
+        addedFilters: { user: 'fakeusername' },
+        query: 'foo',
+        expected: {
+          any: {
+            operator: 'and',
+            terms: ['foo'],
+          },
+          user: {
+            operator: 'or',
+            terms: ['fakeusername'],
+          },
+        },
+      },
+      {
+        addedFilters: { page: '2-4' },
+        query: 'page:6',
+        expected: {
+          page: {
+            operator: 'or',
+            terms: ['2-4', '6'],
+          },
+        },
+      },
+      {
+        addedFilters: { cfi: '/2/2-/2/6' },
+        query: 'cfi:/4/2-/4/4',
+        expected: {
+          cfi: {
+            operator: 'or',
+            terms: ['/2/2-/2/6', '/4/2-/4/4'],
+          },
+        },
+      },
+    ].forEach(({ addedFilters, query, expected }) => {
+      it('adds additional filters to result', () => {
+        const filter = parseFilterQuery(query ?? '', addedFilters);
+        // Remove empty facets.
+        Object.keys(filter).forEach(k => {
+          if (filter[k].terms.length === 0) {
+            delete filter[k];
+          }
+        });
+        assert.deepEqual(filter, expected);
       });
     });
   });
