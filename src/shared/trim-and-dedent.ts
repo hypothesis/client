@@ -19,16 +19,14 @@ function dedentStr(str: string, indent: number) {
  * params verbatim.
  */
 function dedent(strings: string[], ...params: any[]) {
-  // Match the smallest indentation among all strings
-  const indents = strings
-    .map(str => {
-      const match = str.match(/^[ \t]*(?=\S)/gm);
-      return match ? Math.min(...match.map(el => el.length)) : -1;
-    })
-    // Exclude lines where indentation could not be matched
-    .filter(num => num > -1);
-  const smallestIndent = indents.length > 0 ? Math.min(...indents) : 0;
+  // Match the smallest indentation among all lines of the full string before
+  // interpolating params
+  const match = strings.join('').match(/^[ \t]*(?=\S)/gm);
+  const smallestIndent = match ? Math.min(...match.map(el => el.length)) : 0;
 
+  // Dedent every individual string while interpolating params
+  // Those strings which are not the beginning of a line will have zero-indent
+  // and dedenting will have no effect
   let result = '';
   for (const [i, param] of params.entries()) {
     result += dedentStr(strings[i], smallestIndent);
