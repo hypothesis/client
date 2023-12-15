@@ -339,7 +339,7 @@ describe('AnnotationHeader', () => {
           fakeStore.route.returns(route);
           const wrapper = createAnnotationHeader();
           assert.equal(
-            wrapper.find('AnnotationShareInfo').exists(),
+            wrapper.find('AnnotationGroupInfo').exists(),
             groupVisible,
           );
         });
@@ -350,7 +350,7 @@ describe('AnnotationHeader', () => {
         fakeStore.getGroup.returns(undefined);
         const wrapper = createAnnotationHeader();
 
-        assert.isFalse(wrapper.find('AnnotationShareInfo').exists());
+        assert.isFalse(wrapper.find('AnnotationGroupInfo').exists());
       });
     });
 

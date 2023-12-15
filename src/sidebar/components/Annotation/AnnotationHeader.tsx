@@ -22,7 +22,7 @@ import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
 import AnnotationDocumentInfo from './AnnotationDocumentInfo';
-import AnnotationShareInfo from './AnnotationShareInfo';
+import AnnotationGroupInfo from './AnnotationGroupInfo';
 import AnnotationTimestamps from './AnnotationTimestamps';
 import AnnotationUser from './AnnotationUser';
 
@@ -149,12 +149,7 @@ function AnnotationHeader({
           className="flex gap-x-1 items-baseline flex-wrap-reverse"
           data-testid="extended-header-info"
         >
-          {group && (
-            <AnnotationShareInfo
-              group={group}
-              isPrivate={isPrivate(annotation.permissions)}
-            />
-          )}
+          {group && <AnnotationGroupInfo group={group} />}
           {!isEditing && isHighlight(annotation) && (
             <HighlightIcon
               title="This is a highlight. Click 'edit' to add a note or tag."
