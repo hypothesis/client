@@ -36,7 +36,6 @@ describe('AnnotationHeader', () => {
   beforeEach(() => {
     activeFeatures = {
       client_display_names: true,
-      page_numbers: false,
     };
 
     fakeAnnotationAuthorLink = sinon
@@ -331,14 +330,23 @@ describe('AnnotationHeader', () => {
       });
     });
 
-    describe('Annotation share info', () => {
-      it('should render annotation share/group information if group is available', () => {
-        const wrapper = createAnnotationHeader();
-
-        assert.isTrue(wrapper.find('AnnotationShareInfo').exists());
+    describe('Annotation group info', () => {
+      [
+        { route: 'sidebar', groupVisible: false },
+        { route: 'notebook', groupVisible: true },
+      ].forEach(({ route, groupVisible }) => {
+        it('should render group if not in sidebar', () => {
+          fakeStore.route.returns(route);
+          const wrapper = createAnnotationHeader();
+          assert.equal(
+            wrapper.find('AnnotationShareInfo').exists(),
+            groupVisible,
+          );
+        });
       });
 
-      it('should not render annotation share/group information if group is unavailable', () => {
+      it('should not render group if unavailable', () => {
+        fakeStore.route.returns('notebook');
         fakeStore.getGroup.returns(undefined);
         const wrapper = createAnnotationHeader();
 
@@ -452,10 +460,8 @@ describe('AnnotationHeader', () => {
     });
   });
 
-  context('when page_numbers feature is enabled', () => {
+  describe('page numbers', () => {
     beforeEach(() => {
-      activeFeatures.page_numbers = true;
-
       // Un-mock the `pageLabel` function.
       $imports.$restore({
         '../../helpers/annotation-metadata': true,
@@ -479,22 +485,6 @@ describe('AnnotationHeader', () => {
       const pageNumber = wrapper.find('[data-testid="page-number"]');
       assert.isTrue(pageNumber.exists());
       assert.equal(pageNumber.text(), 'p. 11');
-    });
-
-    it('should hide group name in sidebar', () => {
-      fakeStore.route.returns('sidebar');
-      const wrapper = createAnnotationHeader({
-        annotation: fixtures.defaultAnnotation(),
-      });
-      assert.isFalse(wrapper.exists('AnnotationShareInfo'));
-    });
-
-    it('should still show group name outside the sidebar', () => {
-      fakeStore.route.returns('annotation');
-      const wrapper = createAnnotationHeader({
-        annotation: fixtures.defaultAnnotation(),
-      });
-      assert.isTrue(wrapper.exists('AnnotationShareInfo'));
     });
   });
 
