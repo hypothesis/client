@@ -55,7 +55,6 @@ function AnnotationHeader({
   const defaultAuthority = store.defaultAuthority();
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
   const userURL = store.getLink('user', { user: annotation.user });
-  const pageNumbersEnabled = store.isFeatureEnabled('page_numbers');
 
   const authorName = useMemo(
     () =>
@@ -107,10 +106,10 @@ function AnnotationHeader({
   // contexts where it is the same for all cards and is shown elsewhere in the
   // UI (eg. the top bar). This is to reduce visual clutter.
   let group;
-  if (!pageNumbersEnabled || store.route() !== 'sidebar') {
+  if (store.route() !== 'sidebar') {
     group = store.getGroup(annotation.group);
   }
-  const pageNumber = pageNumbersEnabled ? getPageLabel(annotation) : undefined;
+  const pageNumber = getPageLabel(annotation);
 
   return (
     <header>
