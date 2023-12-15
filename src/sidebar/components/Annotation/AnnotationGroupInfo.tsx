@@ -3,19 +3,17 @@ import classnames from 'classnames';
 
 import type { Group } from '../../../types/api';
 
-export type AnnotationShareInfoProps = {
+export type AnnotationGroupInfoProps = {
   /** Group to which the annotation belongs */
   group: Group;
-  isPrivate: boolean;
 };
 
 /**
- * Render information about what group an annotation is in and
- * whether it is private to the current user (only me)
+ * Render information about what group an annotation is in.
  *
- * @param {AnnotationShareInfoProps} props
+ * @param {AnnotationGroupInfoProps} props
  */
-function AnnotationShareInfo({ group, isPrivate }: AnnotationShareInfoProps) {
+function AnnotationGroupInfo({ group }: AnnotationGroupInfoProps) {
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links
   const linkToGroup = group?.links.html;
@@ -44,13 +42,8 @@ function AnnotationShareInfo({ group, isPrivate }: AnnotationShareInfoProps) {
           </div>
         </Link>
       )}
-      {isPrivate && !linkToGroup && (
-        <div className="text-color-text-light" data-testid="private-info">
-          Only me
-        </div>
-      )}
     </>
   );
 }
 
-export default AnnotationShareInfo;
+export default AnnotationGroupInfo;
