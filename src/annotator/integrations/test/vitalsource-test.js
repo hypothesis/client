@@ -331,8 +331,6 @@ describe('annotator/integrations/vitalsource', () => {
     it('delegates to HTMLIntegration for side-by-side mode', () => {
       const integration = createIntegration();
       assert.calledOnce(FakeHTMLIntegration);
-      const htmlOptions = FakeHTMLIntegration.args[0][0];
-      assert.isTrue(htmlOptions.features.flagEnabled('html_side_by_side'));
 
       fakeHTMLIntegration.fitSideBySide.returns(true);
       fakeHTMLIntegration.sideBySideActive.returns(true);

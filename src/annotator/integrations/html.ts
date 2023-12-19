@@ -39,7 +39,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
 
   /** Controls how we resize the document to fit alongside sidebar. */
   private _sideBySideOptions: SideBySideOptions;
-  private _sideBySideFlagEnabled: boolean;
+  private _sideBySideEnabled: boolean;
 
   /**
    * Whether the document is currently being resized to fit alongside an
@@ -69,8 +69,10 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     this._htmlMeta = new HTMLMetadata();
     this._prevURI = this._htmlMeta.uri();
 
-    this._sideBySideFlagEnabled =
-      this.features.flagEnabled('html_side_by_side');
+    // Side-by-side was originally behind a feature flag. This property
+    // remains in case it is useful to turn off for debugging etc.
+    this._sideBySideEnabled = true;
+
     this._sideBySideOptions = sideBySideOptions ?? { mode: 'auto' };
     this._sideBySideActive = false;
     this._lastLayout = null;
@@ -98,16 +100,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     });
 
     this._flagsChanged = () => {
-      const sideBySideEnabled = features.flagEnabled('html_side_by_side');
-      if (sideBySideEnabled !== this._sideBySideFlagEnabled) {
-        this._sideBySideFlagEnabled = sideBySideEnabled;
-
-        // `fitSideBySide` is normally called by Guest when the sidebar layout
-        // changes. When the feature flag changes, we need to re-run the method.
-        if (this._lastLayout) {
-          this.fitSideBySide(this._lastLayout);
-        }
-      }
+      // There are currently no feature flags that the integration responds to.
     };
     this.features.on('flagsChanged', this._flagsChanged);
   }
@@ -163,7 +156,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
 
     const maximumWidthToFit = window.innerWidth - layout.width;
     const active =
-      this._sideBySideFlagEnabled &&
+      this._sideBySideEnabled &&
       this._sideBySideOptions.mode === 'auto' &&
       layout.expanded &&
       maximumWidthToFit >= MIN_HTML_WIDTH;
