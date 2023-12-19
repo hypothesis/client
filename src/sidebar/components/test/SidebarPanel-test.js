@@ -1,3 +1,4 @@
+import { Dialog } from '@hypothesis/frontend-shared';
 import {
   checkAccessibility,
   mockImportedComponents,
@@ -38,7 +39,7 @@ describe('SidebarPanel', () => {
       icon: 'restricted',
     });
 
-    const dialog = wrapper.find('Dialog');
+    const dialog = wrapper.find(Dialog);
 
     assert.equal(dialog.props().icon, 'restricted');
     assert.equal(dialog.props().title, 'My Panel');
@@ -47,7 +48,7 @@ describe('SidebarPanel', () => {
   it('provides an `onClose` handler that closes the panel', () => {
     const wrapper = createSidebarPanel({ panelName: 'flibberty' });
 
-    wrapper.find('Dialog').props().onClose();
+    wrapper.find(Dialog).props().onClose();
 
     assert.calledWith(fakeStore.toggleSidebarPanel, 'flibberty', false);
   });
@@ -61,7 +62,7 @@ describe('SidebarPanel', () => {
   it('hides content if not active', () => {
     fakeStore.isSidebarPanelOpen.returns(false);
     const wrapper = createSidebarPanel();
-    assert.isFalse(wrapper.find('Dialog').exists());
+    assert.isFalse(wrapper.find(Dialog).exists());
   });
 
   context('when panel state changes', () => {
