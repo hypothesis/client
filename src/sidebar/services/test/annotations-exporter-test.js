@@ -58,7 +58,7 @@ describe('AnnotationsExporter', () => {
 
     it('throws error when empty list of annotations is provided', () => {
       assert.throws(
-        () => exporter.buildTextExportContent([]),
+        () => exporter.buildTextExportContent([], {}),
         'No annotations to export',
       );
     });
