@@ -139,7 +139,11 @@ function ExportAnnotations({
         case 'txt': {
           const exportData = annotationsExporter.buildTextExportContent(
             annotationsToExport,
-            group?.name,
+            {
+              groupName: group?.name,
+              defaultAuthority,
+              displayNamesEnabled,
+            },
           );
           downloadTextFile(exportData, filename);
           break;

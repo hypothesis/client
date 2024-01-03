@@ -44,6 +44,18 @@ describe('AnnotationsExporter', () => {
   });
 
   describe('buildTextExportContent', () => {
+    let baseAnnotation;
+
+    beforeEach(() => {
+      baseAnnotation = {
+        ...newAnnotation(),
+        ...publicAnnotation(),
+        created: now.toISOString(),
+      };
+      // Title should actually be an array
+      baseAnnotation.document.title = [baseAnnotation.document.title];
+    });
+
     it('throws error when empty list of annotations is provided', () => {
       assert.throws(
         () => exporter.buildTextExportContent([]),
@@ -52,34 +64,26 @@ describe('AnnotationsExporter', () => {
     });
 
     it('generates text content with provided annotations', () => {
-      const isoDate = now.toISOString();
-      const annotation = {
-        ...newAnnotation(),
-        ...publicAnnotation(),
-        created: isoDate,
-      };
-      // Title should actually be an array
-      annotation.document.title = [annotation.document.title];
+      const isoDate = baseAnnotation.created;
       const annotations = [
-        annotation,
-        annotation,
+        baseAnnotation,
+        baseAnnotation,
         {
-          ...annotation,
+          ...baseAnnotation,
           user: 'acct:jane@localhost',
           tags: ['foo', 'bar'],
         },
         {
-          ...annotation,
+          ...baseAnnotation,
           ...newReply(),
         },
       ];
       const groupName = 'My group';
 
-      const result = exporter.buildTextExportContent(
-        annotations,
+      const result = exporter.buildTextExportContent(annotations, {
         groupName,
         now,
-      );
+      });
 
       assert.equal(
         result,
@@ -117,6 +121,41 @@ Annotation 4:
 ${isoDate}
 Annotation text
 bill
+"null"
+Tags: tag_1, tag_2`,
+      );
+    });
+
+    it('uses display names if `displayNamesEnabled` is set', () => {
+      const annotation = {
+        ...baseAnnotation,
+        user_info: {
+          display_name: 'John Doe',
+        },
+      };
+      const isoDate = annotation.created;
+      const groupName = 'My group';
+
+      const result = exporter.buildTextExportContent([annotation], {
+        displayNamesEnabled: true,
+        groupName,
+        now,
+      });
+      assert.equal(
+        result,
+        `${isoDate}
+A special document
+http://example.com
+Group: ${groupName}
+Total users: 1
+Users: John Doe
+Total annotations: 1
+Total replies: 0
+
+Annotation 1:
+${isoDate}
+Annotation text
+John Doe
 "null"
 Tags: tag_1, tag_2`,
       );
