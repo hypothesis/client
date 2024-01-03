@@ -1,11 +1,11 @@
 import { trimAndDedent } from '../../shared/trim-and-dedent';
 import type { APIAnnotationData } from '../../types/api';
-import { username } from '../helpers/account-id';
 import {
   documentMetadata,
   isReply,
   quote,
 } from '../helpers/annotation-metadata';
+import { annotationDisplayName } from '../helpers/annotation-user';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
 import type { SidebarStore } from '../store';
@@ -15,6 +15,13 @@ export type JSONExportContent = {
   export_userid: string;
   client_version: string;
   annotations: APIAnnotationData[];
+};
+
+export type TextExportOptions = {
+  defaultAuthority?: string;
+  displayNamesEnabled?: boolean;
+  groupName?: string;
+  now?: Date;
 };
 
 /**
@@ -49,21 +56,26 @@ export class AnnotationsExporter {
 
   buildTextExportContent(
     annotations: APIAnnotationData[],
-    groupName = '',
-    /* istanbul ignore next - test seam */
-    now = new Date(),
+    {
+      groupName = '',
+      displayNamesEnabled = false,
+      defaultAuthority = '',
+      /* istanbul ignore next - test seam */
+      now = new Date(),
+    }: TextExportOptions = {},
   ): string {
     const [firstAnnotation] = annotations;
     if (!firstAnnotation) {
       throw new Error('No annotations to export');
     }
 
+    const extractUsername = (annotation: APIAnnotationData) =>
+      annotationDisplayName(annotation, defaultAuthority, displayNamesEnabled);
+
     const { uri, title } = documentMetadata(firstAnnotation);
     const uniqueUsers = [
       ...new Set(
-        annotations
-          .map(annotation => username(annotation.user))
-          .filter(Boolean),
+        annotations.map(anno => extractUsername(anno)).filter(Boolean),
       ),
     ];
 
@@ -74,7 +86,7 @@ export class AnnotationsExporter {
           Annotation ${index + 1}:
           ${annotation.created}
           ${annotation.text}
-          ${username(annotation.user)}
+          ${extractUsername(annotation)}
           "${quote(annotation)}"
           Tags: ${annotation.tags.join(', ')}`,
       )

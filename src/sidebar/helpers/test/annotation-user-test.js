@@ -21,6 +21,10 @@ describe('sidebar/helpers/annotation-user', () => {
     });
   });
 
+  afterEach(() => {
+    $imports.$restore();
+  });
+
   const fakeAnnotations = {
     withDisplayName: {
       user: 'acct:albert@victoriana.com',
