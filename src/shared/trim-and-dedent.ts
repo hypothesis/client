@@ -1,9 +1,5 @@
-function trimLeadingEmptyLines(str: string): string {
-  return str.replace(/^\s*\n/g, '');
-}
-
-function trimTrailingEmptyLines(str: string): string {
-  return str.replace(/\n\s*$/g, '');
+function trimLeadingAndTrailingEmptyLines(str: string): string {
+  return str.replace(/^\s*\n|\n\s*$/g, '');
 }
 
 /**
@@ -71,24 +67,5 @@ export function trimAndDedent(
   strings: TemplateStringsArray,
   ...params: any[]
 ): string {
-  if (strings.length < 2) {
-    // Trim leading and trailing empty lines from first (and only) string
-    const trimmedLines = [
-      trimLeadingEmptyLines(trimTrailingEmptyLines(strings[0])),
-    ];
-    return dedent(trimmedLines, ...params);
-  }
-
-  const firstString = strings[0];
-  const lastString = strings[strings.length - 1];
-  const middle = strings.slice(1, strings.length - 1);
-
-  // Trim empty leading lines from first string, and empty trailing lines from last one
-  const trimmedLines = [
-    trimLeadingEmptyLines(firstString),
-    ...middle,
-    trimTrailingEmptyLines(lastString),
-  ];
-
-  return dedent(trimmedLines, ...params);
+  return trimLeadingAndTrailingEmptyLines(dedent([...strings], ...params));
 }

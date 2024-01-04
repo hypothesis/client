@@ -17,11 +17,13 @@ describe('trimAndDedent', () => {
       
         Hello, Jane!
           Indented line
+
         Goodbye, John!
       
       `,
       `Hello, Jane!
   Indented line
+
 Goodbye, John!`,
     ],
     [
@@ -50,8 +52,7 @@ Goodbye, John!
 
         multiple
 lines
-with no indentation
-        `,
+with no indentation`,
     ],
     [
       () => {
