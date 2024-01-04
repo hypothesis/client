@@ -1,7 +1,11 @@
 {
   "clientConfig": {
     "focus": {
-      "pages": "10-30"
+      "pages": "10-30",
+      "user": {
+        "username": "robertknight",
+        "displayName": "Robert Knight"
+      }
     }
   }
 }
