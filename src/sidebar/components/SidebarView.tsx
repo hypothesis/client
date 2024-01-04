@@ -132,7 +132,11 @@ function SidebarView({
     <div>
       <h2 className="sr-only">Annotations</h2>
       {showFilterStatus && <FilterStatus />}
-      {searchPanelEnabled && <FilterAnnotationsStatus />}
+      {searchPanelEnabled && (
+        <div className="mb-2">
+          <FilterAnnotationsStatus />
+        </div>
+      )}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError
