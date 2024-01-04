@@ -1,4 +1,3 @@
-import { Button, CancelIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
@@ -19,13 +18,11 @@ export default function SearchStatus() {
     [rootThread, forcedVisibleCount],
   );
 
-  const buttonText = 'Clear search';
-
   return (
     <div
       // This container element needs to be present at all times but
       // should only be visible when there are applied filters
-      className={classnames('mb-3 flex items-center justify-center space-x-1', {
+      className={classnames('mb-1 flex items-center justify-center space-x-1', {
         'sr-only': !filterQuery,
       })}
       data-testid="search-status-container"
@@ -53,19 +50,6 @@ export default function SearchStatus() {
           </>
         )}
       </div>
-      {filterQuery && (
-        <Button
-          onClick={() => store.clearSelection()}
-          size="sm"
-          title={buttonText}
-          variant="primary"
-          data-testid="clear-button"
-        >
-          {/** @TODO: Set `icon` prop in `Button` instead when https://github.com/hypothesis/frontend-shared/issues/675 is fixed */}
-          {filterQuery && <CancelIcon />}
-          {buttonText}
-        </Button>
-      )}
     </div>
   );
 }
