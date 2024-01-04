@@ -114,7 +114,7 @@ describe('SidebarView', () => {
       wrapper.setProps({});
 
       assert.calledOnce(fakeStore.clearSelection);
-      assert.calledWith(fakeStore.toggleFocusMode, true);
+      assert.calledWith(fakeStore.toggleFocusMode, { active: true });
     });
 
     it('does not clear selected annotations when group ID is first set on startup', () => {
