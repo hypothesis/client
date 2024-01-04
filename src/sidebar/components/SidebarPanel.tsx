@@ -67,7 +67,7 @@ export default function SidebarPanel({
           initialFocus={initialFocus}
           restoreFocus
           ref={panelElement}
-          classes="mb-4"
+          classes="mb-2"
           title={title}
           icon={icon}
           onClose={closePanel}
