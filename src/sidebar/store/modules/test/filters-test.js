@@ -30,13 +30,13 @@ describe('sidebar/store/modules/filters', () => {
   describe('actions', () => {
     describe('changeFocusModeUser', () => {
       it('sets the focused user and activates focus', () => {
-        store.toggleFocusMode(false);
+        store.toggleFocusMode({ active: false });
         store.changeFocusModeUser({
           username: 'testuser',
           displayName: 'Test User',
         });
         const filterState = getFiltersState();
-        assert.isTrue(filterState.focusActive);
+        assert.deepEqual(filterState.focusActive, new Set(['user']));
         assert.equal(filterState.focusFilters.user.value, 'testuser');
         assert.equal(filterState.focusFilters.user.display, 'Test User');
       });
@@ -57,7 +57,7 @@ describe('sidebar/store/modules/filters', () => {
         });
 
         const firstFilterState = getFiltersState();
-        assert.isTrue(firstFilterState.focusActive);
+        assert.deepEqual(firstFilterState.focusActive, new Set(['user']));
         assert.equal(firstFilterState.focusFilters.user.value, 'testuser');
 
         // Now, emulate the "empty" filter message from the LMS app.
@@ -67,7 +67,7 @@ describe('sidebar/store/modules/filters', () => {
         });
 
         const secondFilterState = getFiltersState();
-        assert.isFalse(secondFilterState.focusActive);
+        assert.deepEqual(secondFilterState.focusActive, new Set());
         assert.isUndefined(secondFilterState.focusFilters.user);
       });
     });
@@ -146,18 +146,35 @@ describe('sidebar/store/modules/filters', () => {
     });
 
     describe('toggleFocusMode', () => {
-      it('toggles the current active state if called without arguments', () => {
-        store.toggleFocusMode(false);
-        store.toggleFocusMode();
-        const filterState = getFiltersState();
-        assert.isTrue(filterState.focusActive);
+      ['user', 'page', 'cfi'].forEach(filterKey => {
+        it('toggles the current active state if `active` is undefined', () => {
+          store.toggleFocusMode({ key: filterKey, active: false });
+          store.toggleFocusMode({ key: filterKey, active: undefined });
+          assert.deepEqual(store.getFocusActive(), new Set([filterKey]));
+        });
+
+        it('toggles the current active state to designated state', () => {
+          store.toggleFocusMode({ key: filterKey, active: true });
+          store.toggleFocusMode({ key: filterKey, active: false });
+          assert.deepEqual(store.getFocusActive(), new Set());
+        });
       });
 
-      it('toggles the current active state to designated state', () => {
-        store.toggleFocusMode(true);
-        store.toggleFocusMode(false);
-        const filterState = getFiltersState();
-        assert.isFalse(filterState.focusActive);
+      it('toggles all configured focus modes if filter key is not provided', () => {
+        store = createStore(
+          [filtersModule],
+          [
+            {
+              focus: { ...pageFocusConfig, ...userFocusConfig },
+            },
+          ],
+        );
+
+        assert.deepEqual(store.getFocusActive(), new Set(['user', 'page']));
+        store.toggleFocusMode();
+        assert.deepEqual(store.getFocusActive(), new Set());
+        store.toggleFocusMode();
+        assert.deepEqual(store.getFocusActive(), new Set(['user', 'page']));
       });
     });
 
@@ -167,15 +184,13 @@ describe('sidebar/store/modules/filters', () => {
           username: 'testuser',
           displayName: 'Test User',
         });
-        store.toggleFocusMode(true);
+        store.toggleFocusMode({ active: true });
 
-        let filterState = getFiltersState();
-        assert.isTrue(filterState.focusActive);
+        assert.deepEqual(store.getFocusActive(), new Set(['user']));
 
         store.clearSelection();
 
-        filterState = getFiltersState();
-        assert.isFalse(filterState.focusActive);
+        assert.deepEqual(store.getFocusActive(), new Set());
       });
     });
   });
@@ -356,6 +371,14 @@ describe('sidebar/store/modules/filters', () => {
     });
 
     describe('hasAppliedFilter', () => {
+      // Mapping of keys in `FocusConfig` configuration to the filters
+      // supported by `filterAnnotations`.
+      const configKeyToFilter = {
+        cfi: 'cfi',
+        pages: 'page',
+        user: 'user',
+      };
+
       it('returns true if there is a search query set', () => {
         store.setFilterQuery('foobar');
 
@@ -370,8 +393,10 @@ describe('sidebar/store/modules/filters', () => {
               [{ focus: { ...focusConfig } }],
             );
 
+            const filterKey = configKeyToFilter[Object.keys(focusConfig)[0]];
+
             assert.isTrue(store.hasAppliedFilter());
-            store.toggleFocusMode(false);
+            store.toggleFocusMode({ key: filterKey, active: false });
             assert.isFalse(store.hasAppliedFilter());
           });
         },

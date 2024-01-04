@@ -13,7 +13,8 @@ export type FilterOption = {
 };
 
 /**
- * Valid/recognized filters
+ * Supported filters. This should be a subset of the filters supported by the
+ * `filterAnnotations` function that filters annotations in the sidebar.
  */
 export type FilterKey = 'cfi' | 'page' | 'user';
 
@@ -59,50 +60,33 @@ export type FocusState = {
  */
 export type State = {
   filters: Filters;
-  focusActive: boolean;
+  focusActive: Set<FilterKey>;
   focusFilters: Filters;
   query: string | null;
 };
 
 function initialState(settings: SidebarSettings): State {
   const focusConfig = settings.focus || {};
+  const focusFilters = focusFiltersFromConfig(focusConfig);
+
   return {
     filters: {},
-
-    // immediately activate focus mode if there is a valid config
-    focusActive: isValidFocusConfig(focusConfig),
-    focusFilters: focusFiltersFromConfig(focusConfig),
-
+    focusActive: new Set(Object.keys(focusFilters) as FilterKey[]),
+    focusFilters,
     query: settings.query || null,
   };
 }
 
 /**
- * Return true if a focus filter configuration is valid.
- */
-function isValidFocusConfig(focusConfig: FocusConfig): boolean {
-  if (focusConfig.user) {
-    return Boolean(focusConfig.user.username || focusConfig.user.userid);
-  }
-  if (focusConfig.cfi?.range || focusConfig.pages) {
-    return true;
-  }
-  return false;
-}
-
-/**
- * Compose an object of keyed `FilterOption`s from the given `focusConfig`.
+ * Map focus filter configuration from settings to `focusFilters` state.
  */
 function focusFiltersFromConfig(focusConfig: FocusConfig): Filters {
-  if (!isValidFocusConfig(focusConfig)) {
-    return {};
-  }
-
   const filters: Filters = {};
 
   const user = focusConfig.user;
-  if (user) {
-    const userFilterValue = user.username || user.userid || '';
+  const userFilterValue = user?.username || user?.userid || '';
+
+  if (user && userFilterValue) {
     filters.user = {
       value: userFilterValue,
       display: user.displayName || userFilterValue,
@@ -129,8 +113,14 @@ function focusFiltersFromConfig(focusConfig: FocusConfig): Filters {
 const reducers = {
   CHANGE_FOCUS_MODE_USER(state: State, action: { user: FocusUserInfo }) {
     const { user } = focusFiltersFromConfig({ user: action.user });
+    const focusActive = new Set(state.focusActive);
+    if (user !== undefined) {
+      focusActive.add('user');
+    } else {
+      focusActive.delete('user');
+    }
     return {
-      focusActive: isValidFocusConfig({ user: action.user }),
+      focusActive,
       focusFilters: {
         ...state.focusFilters,
         user,
@@ -157,10 +147,27 @@ const reducers = {
     return { query: action.query };
   },
 
-  SET_FOCUS_MODE(state: State, action: { active?: boolean }) {
-    const active = action.active ?? !state.focusActive;
+  SET_FOCUS_MODE(state: State, action: { key?: FilterKey; active?: boolean }) {
+    let focusActive = new Set(state.focusActive);
+    if (action.key !== undefined) {
+      // Toggle specific filter.
+      const active = action.active ?? !focusActive.has(action.key);
+      if (active) {
+        focusActive.add(action.key);
+      } else {
+        focusActive.delete(action.key);
+      }
+    } else {
+      // Toggle all configured filters.
+      const active = action.active ?? focusActive.size === 0;
+      if (active) {
+        focusActive = new Set(Object.keys(state.focusFilters) as FilterKey[]);
+      } else {
+        focusActive = new Set();
+      }
+    }
     return {
-      focusActive: active,
+      focusActive,
     };
   },
 
@@ -169,7 +176,7 @@ const reducers = {
   CLEAR_SELECTION() {
     return {
       filters: {},
-      focusActive: false,
+      focusActive: new Set<FilterKey>(),
       query: null,
     };
   },
@@ -192,7 +199,12 @@ function setFilter(filterName: FilterKey, filterOption: FilterOption) {
     // mode to prevent unintended collisions and let the new filter value
     // take precedence.
     if (getState().filters.focusFilters?.[filterName]) {
-      dispatch(makeAction(reducers, 'SET_FOCUS_MODE', { active: false }));
+      dispatch(
+        makeAction(reducers, 'SET_FOCUS_MODE', {
+          active: false,
+          key: filterName,
+        }),
+      );
     }
     dispatch(makeAction(reducers, 'SET_FILTER', { filterName, filterOption }));
   };
@@ -205,14 +217,19 @@ function setFilterQuery(query: string) {
   return makeAction(reducers, 'SET_FILTER_QUERY', { query });
 }
 
+export type ToggleFocusModeArgs = {
+  /** Whether to activate or deactivate the focus mode, or toggle it (if undefined) */
+  active?: boolean;
+
+  /** Which focus filter to toggle. If undefined, all configured focus modes are toggled. */
+  key?: FilterKey;
+};
+
 /**
- * Toggle whether a (user-)focus mode is applied, either inverting the
- * current active state or setting it to a target `active` state, if provided.
- *
- * @param active - Optional `active` state for focus mode
+ * Toggle whether a given focus mode is applied.
  */
-function toggleFocusMode(active?: boolean) {
-  return makeAction(reducers, 'SET_FOCUS_MODE', { active });
+function toggleFocusMode({ active, key }: ToggleFocusModeArgs = {}) {
+  return makeAction(reducers, 'SET_FOCUS_MODE', { active, key });
 }
 
 // Selectors
@@ -229,7 +246,7 @@ const focusState = createSelector(
   (state: State) => state.focusFilters,
   (focusActive, focusFilters): FocusState => {
     return {
-      active: focusActive,
+      active: focusActive.size > 0,
       // Check for filter with non-empty value.
       configured: Object.values(focusFilters ?? {}).some(
         val => typeof val !== 'undefined',
@@ -251,10 +268,23 @@ const getFilters = createSelector(
   (state: State) => state.focusActive,
   (state: State) => state.focusFilters,
   (filters, focusActive, focusFilters) => {
-    if (focusActive) {
-      return { ...focusFilters, ...filters };
+    const mergedFilters: Filters = {};
+
+    // Add focus filters which are configured and active.
+    for (const key of focusActive) {
+      const focusFilter = focusFilters[key];
+
+      // nb. It _should_ always be the case that focus filters marked as active
+      // have a filter configuration in `focusFilters`.
+      if (focusFilter) {
+        mergedFilters[key] = focusFilter;
+      }
     }
-    return { ...filters };
+
+    // Add other filters.
+    Object.assign(mergedFilters, filters);
+
+    return mergedFilters;
   },
 );
 
@@ -272,25 +302,31 @@ function getFilter(state: State, filterName: FilterKey) {
 const getFilterValues = createSelector(
   (state: State) => getFilters(state),
   allFilters => {
-    const filterValues: Record<string, string> = {};
+    const filterValues: Partial<Record<FilterKey, string>> = {};
     for (const [key, options] of Object.entries(allFilters)) {
       if (options) {
-        filterValues[key] = options.value;
+        filterValues[key as FilterKey] = options.value;
       }
     }
     return filterValues;
   },
 );
 
-function getFocusFilters(state: State) {
+function getFocusFilters(state: State): Filters {
   return state.focusFilters;
+}
+
+/** Return the set of active focus filters. */
+function getFocusActive(state: State): Set<FilterKey> {
+  return state.focusActive;
 }
 
 /**
  * Are there currently any active (applied) filters?
  */
 function hasAppliedFilter(state: State) {
-  return !!(state.query || Object.keys(getFilters(state)).length);
+  const filters = getFilters(state);
+  return Boolean(state.query || Object.keys(filters).length);
 }
 
 export const filtersModule = createStoreModule(initialState, {
@@ -308,6 +344,7 @@ export const filtersModule = createStoreModule(initialState, {
     getFilter,
     getFilters,
     getFilterValues,
+    getFocusActive,
     getFocusFilters,
     hasAppliedFilter,
   },
