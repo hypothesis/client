@@ -3,6 +3,7 @@ import type { APIAnnotationData } from '../../types/api';
 import {
   documentMetadata,
   isReply,
+  pageLabel,
   quote,
 } from '../helpers/annotation-metadata';
 import { annotationDisplayName } from '../helpers/annotation-user';
@@ -80,16 +81,17 @@ export class AnnotationsExporter {
     ];
 
     const annotationsText = annotations
-      .map(
-        (annotation, index) =>
-          trimAndDedent`
+      .map((annotation, index) => {
+        const page = pageLabel(annotation);
+        return trimAndDedent`
           Annotation ${index + 1}:
           ${annotation.created}
           ${annotation.text}
           ${extractUsername(annotation)}
           "${quote(annotation)}"
-          Tags: ${annotation.tags.join(', ')}`,
-      )
+          Tags: ${annotation.tags.join(', ')}
+          ${page ? `Page: ${page}` : ''}`;
+      })
       .join('\n\n');
 
     return trimAndDedent`

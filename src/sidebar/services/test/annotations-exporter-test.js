@@ -58,7 +58,7 @@ describe('AnnotationsExporter', () => {
 
     it('throws error when empty list of annotations is provided', () => {
       assert.throws(
-        () => exporter.buildTextExportContent([], {}),
+        () => exporter.buildTextExportContent([]),
         'No annotations to export',
       );
     });
@@ -76,6 +76,16 @@ describe('AnnotationsExporter', () => {
         {
           ...baseAnnotation,
           ...newReply(),
+          target: [
+            {
+              selector: [
+                {
+                  type: 'PageSelector',
+                  label: '23',
+                },
+              ],
+            },
+          ],
         },
       ];
       const groupName = 'My group';
@@ -122,7 +132,8 @@ ${isoDate}
 Annotation text
 bill
 "null"
-Tags: tag_1, tag_2`,
+Tags: tag_1, tag_2
+Page: 23`,
       );
     });
 
