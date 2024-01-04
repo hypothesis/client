@@ -40,8 +40,6 @@ function SidebarView({
   // Store state values
   const store = useSidebarStore();
   const focusedGroupId = store.focusedGroupId();
-  const hasAppliedFilter =
-    store.hasAppliedFilter() || store.hasSelectedAnnotations();
   const isLoading = store.isLoading();
   const isLoggedIn = store.isLoggedIn();
 
@@ -69,7 +67,7 @@ function SidebarView({
 
   const searchPanelEnabled = store.isFeatureEnabled('search_panel');
   const showFilterStatus = !hasContentError && !searchPanelEnabled;
-  const showTabs = !hasContentError && !hasAppliedFilter;
+  const showTabs = !hasContentError;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
