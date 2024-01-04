@@ -65,6 +65,16 @@ describe('AnnotationsExporter', () => {
 
     it('generates text content with provided annotations', () => {
       const isoDate = baseAnnotation.created;
+      const targetWithPageSelector = page => [
+        {
+          selector: [
+            {
+              type: 'PageSelector',
+              label: `${page}`,
+            },
+          ],
+        },
+      ];
       const annotations = [
         baseAnnotation,
         baseAnnotation,
@@ -76,16 +86,12 @@ describe('AnnotationsExporter', () => {
         {
           ...baseAnnotation,
           ...newReply(),
-          target: [
-            {
-              selector: [
-                {
-                  type: 'PageSelector',
-                  label: '23',
-                },
-              ],
-            },
-          ],
+          target: targetWithPageSelector(23),
+        },
+        {
+          ...baseAnnotation,
+          tags: [],
+          target: targetWithPageSelector('iii'),
         },
       ];
       const groupName = 'My group';
@@ -103,7 +109,7 @@ http://example.com
 Group: ${groupName}
 Total users: 2
 Users: bill, jane
-Total annotations: 4
+Total annotations: 5
 Total replies: 1
 
 Annotation 1:
@@ -133,7 +139,14 @@ Annotation text
 bill
 "null"
 Tags: tag_1, tag_2
-Page: 23`,
+Page: 23
+
+Annotation 5:
+${isoDate}
+Annotation text
+bill
+"null"
+Page: iii`,
       );
     });
 

@@ -83,14 +83,20 @@ export class AnnotationsExporter {
     const annotationsText = annotations
       .map((annotation, index) => {
         const page = pageLabel(annotation);
+        const lines = [
+          annotation.created,
+          annotation.text,
+          extractUsername(annotation),
+          `"${quote(annotation)}"`,
+          annotation.tags.length > 0
+            ? `Tags: ${annotation.tags.join(', ')}`
+            : undefined,
+          page ? `Page: ${page}` : undefined,
+        ].filter(Boolean);
+
         return trimAndDedent`
           Annotation ${index + 1}:
-          ${annotation.created}
-          ${annotation.text}
-          ${extractUsername(annotation)}
-          "${quote(annotation)}"
-          Tags: ${annotation.tags.join(', ')}
-          ${page ? `Page: ${page}` : ''}`;
+          ${lines.join('\n')}`;
       })
       .join('\n\n');
 
