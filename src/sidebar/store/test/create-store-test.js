@@ -1,5 +1,5 @@
 /* global process */
-import { createStore, createStoreModule } from '../create-store';
+import { createStore, createStoreModule, makeAction } from '../create-store';
 
 function initialState(value = 0) {
   return { count: value };
@@ -297,4 +297,20 @@ describe('createStore', () => {
       }, /Cannot assign to read only property/);
     });
   }
+});
+
+describe('makeAction', () => {
+  // Dummy reducers map.
+  const reducers = {};
+
+  it('merges type and payload', () => {
+    const action = makeAction(reducers, 'SET_SEARCH', { query: 'foo' });
+    assert.deepEqual(action, { type: 'SET_SEARCH', query: 'foo' });
+  });
+
+  it('does not allow payload to contain a `type` field', () => {
+    assert.throws(() => {
+      makeAction(reducers, 'SET_SEARCH', { query: 'foo', type: 'bar' });
+    }, 'Payload cannot contain a `type` field');
+  });
 });
