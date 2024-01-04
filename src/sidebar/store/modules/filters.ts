@@ -171,16 +171,6 @@ const reducers = {
       focusActive,
     };
   },
-
-  // Actions defined in other modules
-
-  CLEAR_SELECTION() {
-    return {
-      filters: {},
-      focusActive: new Set<FilterKey>(),
-      query: null,
-    };
-  },
 };
 
 // Action creators
