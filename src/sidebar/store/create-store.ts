@@ -216,6 +216,9 @@ export function makeAction<
   Reducers extends ReducerMap<any>,
   Type extends keyof Reducers,
 >(reducers: Reducers, type: Type, payload: Parameters<Reducers[Type]>[1]) {
+  if (payload && 'type' in payload) {
+    throw new Error('`type` field not allowed in action');
+  }
   // nb. `reducers` is not used here. It exists purely for type inference.
   return { type, ...payload };
 }
