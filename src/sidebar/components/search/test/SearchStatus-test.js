@@ -37,14 +37,6 @@ describe('SearchStatus', () => {
     assert.equal(filterText, text);
   }
 
-  function clickClearButton(wrapper) {
-    const button = wrapper.find('Button[data-testid="clear-button"]');
-    assert.equal(button.text(), 'Clear search');
-    assert.isTrue(button.find('CancelIcon').exists());
-    button.props().onClick();
-    assert.calledOnce(fakeStore.clearSelection);
-  }
-
   context('when no search filters are active', () => {
     it('should render hidden but available to screen readers', () => {
       const wrapper = createComponent();
@@ -61,10 +53,6 @@ describe('SearchStatus', () => {
     beforeEach(() => {
       fakeStore.filterQuery.returns('foobar');
       fakeThreadUtil.countVisible.returns(1);
-    });
-
-    it('should provide a "Clear search" button that clears the selection', () => {
-      clickClearButton(createComponent());
     });
 
     it('should show the count of matching results', () => {
@@ -91,10 +79,6 @@ describe('SearchStatus', () => {
 
     it('should show a separate count for results versus forced visible', () => {
       assertFilterText(createComponent(), "Showing 2 results for 'foobar'");
-    });
-
-    it('should provide a "Clear search" button that clears the selection', () => {
-      clickClearButton(createComponent());
     });
   });
 });
