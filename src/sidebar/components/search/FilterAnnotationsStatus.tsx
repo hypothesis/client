@@ -10,8 +10,8 @@ type FilterToggleProps = {
 
 function FilterToggle({ label, active, setActive }: FilterToggleProps) {
   return (
-    <Button onClick={() => setActive(!active)}>
-      {label} {active ? 'On' : 'Off'}
+    <Button onClick={() => setActive(!active)} variant="primary">
+      {label}: {active ? 'On' : 'Off'}
     </Button>
   );
 }
@@ -26,7 +26,7 @@ export default function FilterAnnotationsStatus() {
   const focusFilters = store.getFocusFilters();
 
   return (
-    <div>
+    <div className="flex flex-row gap-x-2 py-2">
       {hasSelection && (
         <FilterToggle
           label="Selection"
