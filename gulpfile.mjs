@@ -13,6 +13,8 @@ import servePackage from './dev-server/serve-package.js';
 import tailwindConfig from './tailwind.config.mjs';
 import annotatorTailwindConfig from './tailwind-annotator.config.mjs';
 import sidebarTailwindConfig from './tailwind-sidebar.config.mjs';
+import { globSync } from 'glob';
+import { mkdirSync, writeFileSync } from 'node:fs';
 
 gulp.task('build-js', () => buildJS('./rollup.config.mjs'));
 gulp.task('watch-js', () => watchJS('./rollup.config.mjs'));
@@ -159,4 +161,30 @@ gulp.task(
       testsPattern: 'src/**/*-test.js',
     })
   )
+);
+
+gulp.task(
+  'test:wtr',
+  gulp.parallel(
+    'build-css',
+    // () => buildJS('./rollup-tests-multi.config.mjs')
+    () => {
+      // Generate an entry file for the test bundle. This imports all the test
+      // modules, filtered by the pattern specified by the `--grep` CLI option.
+      const outputDir = 'build/scripts';
+      const testFiles = [
+        'src/sidebar/test/bootstrap.js',
+        ...globSync('src/**/*-test.js').sort(),
+      ];
+
+      const testSource = testFiles
+        .map(path => `import "../../${path}";`)
+        .join('\n');
+
+      mkdirSync(outputDir, { recursive: true });
+      writeFileSync(`${outputDir}/test-inputs.js`, testSource);
+
+      return buildJS('./rollup-tests.config.mjs');
+    },
+  ),
 );
