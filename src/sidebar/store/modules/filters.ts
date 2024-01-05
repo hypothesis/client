@@ -256,10 +256,17 @@ const getFilters = createSelector(
   (state: State) => state.focusActive,
   (state: State) => state.focusFilters,
   (filters, focusActive, focusFilters) => {
-    if (focusActive.size > 0) {
-      return { ...focusFilters, ...filters };
+    const mergedFilters: Filters = {};
+    for (const key of focusActive) {
+      const focusFilter = focusFilters[key];
+      if (focusFilter) {
+        mergedFilters[key] = focusFilter;
+      }
     }
-    return { ...filters };
+
+    Object.assign(mergedFilters, filters);
+
+    return mergedFilters;
   },
 );
 
