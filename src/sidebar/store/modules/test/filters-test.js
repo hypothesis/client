@@ -138,10 +138,12 @@ describe('sidebar/store/modules/filters', () => {
     });
 
     describe('setFilterQuery', () => {
-      it('sets the filter query', () => {
-        store.setFilterQuery('a-query');
-        assert.equal(getFiltersState().query, 'a-query');
-        assert.equal(store.filterQuery(), 'a-query');
+      ['a-query', '', null].forEach(query => {
+        it('sets the filter query', () => {
+          store.setFilterQuery(query);
+          assert.equal(getFiltersState().query, query);
+          assert.equal(store.filterQuery(), query);
+        });
       });
     });
 
