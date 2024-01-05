@@ -84,7 +84,8 @@ function ExportAnnotations({
   );
 
   // User whose annotations are going to be exported.
-  const currentUser = store.profile().userid;
+  const profile = store.profile();
+  const currentUser = profile.userid;
   const allAnnotationsOption: Omit<UserAnnotations, 'userid'> = useMemo(
     () => ({
       annotations: exportableAnnotations,
@@ -131,8 +132,10 @@ function ExportAnnotations({
 
       switch (format) {
         case 'json': {
-          const exportData =
-            annotationsExporter.buildJSONExportContent(annotationsToExport);
+          const exportData = annotationsExporter.buildJSONExportContent(
+            annotationsToExport,
+            { profile },
+          );
           downloadJSONFile(exportData, filename);
           break;
         }
