@@ -10,8 +10,11 @@ type FilterToggleProps = {
 
 function FilterToggle({ label, active, setActive }: FilterToggleProps) {
   return (
-    <Button onClick={() => setActive(!active)} variant="primary">
-      {label}: {active ? 'On' : 'Off'}
+    <Button
+      onClick={() => setActive(!active)}
+      variant={active ? 'primary' : 'secondary'}
+    >
+      {label}
     </Button>
   );
 }
@@ -36,7 +39,7 @@ export default function FilterAnnotationsStatus() {
       )}
       {focusFilters.user && (
         <FilterToggle
-          label="User focus"
+          label={`Author: ${focusFilters.user.display}`}
           active={focusActive.has('user')}
           setActive={() =>
             store.toggleFocusMode(undefined /* toggle */, 'user')
@@ -45,7 +48,7 @@ export default function FilterAnnotationsStatus() {
       )}
       {focusFilters.page && (
         <FilterToggle
-          label="Page focus"
+          label={`Pages ${focusFilters.page.display}`}
           active={focusActive.has('page')}
           setActive={() =>
             store.toggleFocusMode(undefined /* toggle */, 'page')
