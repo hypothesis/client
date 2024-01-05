@@ -22,7 +22,7 @@ export type JSONExportOptions = {
   now?: Date;
 };
 
-export type TextExportOptions = {
+export type ExportOptions = {
   defaultAuthority?: string;
   displayNamesEnabled?: boolean;
   groupName?: string;
@@ -63,22 +63,13 @@ export class AnnotationsExporter {
       defaultAuthority = '',
       /* istanbul ignore next - test seam */
       now = new Date(),
-    }: TextExportOptions = {},
+    }: ExportOptions = {},
   ): string {
-    const [firstAnnotation] = annotations;
-    if (!firstAnnotation) {
-      throw new Error('No annotations to export');
-    }
-
-    const extractUsername = (annotation: APIAnnotationData) =>
-      annotationDisplayName(annotation, defaultAuthority, displayNamesEnabled);
-
-    const { uri, title } = documentMetadata(firstAnnotation);
-    const uniqueUsers = [
-      ...new Set(
-        annotations.map(anno => extractUsername(anno)).filter(Boolean),
-      ),
-    ];
+    const { uri, title, uniqueUsers, replies, extractUsername } =
+      this._exportCommon(annotations, {
+        displayNamesEnabled,
+        defaultAuthority,
+      });
 
     const annotationsText = annotations
       .map((annotation, index) => {
@@ -108,8 +99,90 @@ export class AnnotationsExporter {
       Total users: ${uniqueUsers.length}
       Users: ${uniqueUsers.join(', ')}
       Total annotations: ${annotations.length}
-      Total replies: ${annotations.filter(isReply).length}
+      Total replies: ${replies.length}
       
       ${annotationsText}`;
+  }
+
+  buildCSVExportContent(
+    annotations: APIAnnotationData[],
+    {
+      groupName = '',
+      defaultAuthority = '',
+      displayNamesEnabled = false,
+    }: Exclude<ExportOptions, 'now'> = {},
+  ): string {
+    const { uri, extractUsername } = this._exportCommon(annotations, {
+      displayNamesEnabled,
+      defaultAuthority,
+    });
+
+    const escapeCSVValue = (value: string): string => {
+      // If the value contains a comma, newline or double quote, then wrap it in
+      // double quotes and escape any existing double quotes.
+      if (/[",\n]/.test(value)) {
+        return `"${value.replace(/"/g, '""')}"`;
+      }
+      return value;
+    };
+    const annotationToRow = (annotation: APIAnnotationData) =>
+      [
+        annotation.created,
+        uri,
+        groupName,
+        isReply(annotation) ? 'Reply' : 'Annotation',
+        quote(annotation) ?? '',
+        extractUsername(annotation),
+        annotation.text,
+        annotation.tags.join(','),
+        pageLabel(annotation) ?? '',
+      ]
+        .map(escapeCSVValue)
+        .join(',');
+
+    const headers = [
+      'Creation Date',
+      'URL',
+      'Group',
+      'Annotation/Reply Type',
+      'Quote',
+      'User',
+      'Body',
+      'Tags',
+      'Page',
+    ].join(',');
+    const annotationsContent = annotations
+      .map(anno => annotationToRow(anno))
+      .join('\n');
+
+    return `${headers}\n${annotationsContent}`;
+  }
+
+  private _exportCommon(
+    annotations: APIAnnotationData[],
+    {
+      displayNamesEnabled,
+      defaultAuthority,
+    }: Required<
+      Pick<ExportOptions, 'displayNamesEnabled' | 'defaultAuthority'>
+    >,
+  ) {
+    const [firstAnnotation] = annotations;
+    if (!firstAnnotation) {
+      throw new Error('No annotations to export');
+    }
+
+    const extractUsername = (annotation: APIAnnotationData) =>
+      annotationDisplayName(annotation, defaultAuthority, displayNamesEnabled);
+
+    const { uri, title } = documentMetadata(firstAnnotation);
+    const uniqueUsers = [
+      ...new Set(
+        annotations.map(anno => extractUsername(anno)).filter(Boolean),
+      ),
+    ];
+    const replies = annotations.filter(anno => isReply(anno));
+
+    return { uri, title, uniqueUsers, replies, extractUsername };
   }
 }
