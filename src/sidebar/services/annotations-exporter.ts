@@ -1,5 +1,5 @@
 import { trimAndDedent } from '../../shared/trim-and-dedent';
-import type { APIAnnotationData } from '../../types/api';
+import type { APIAnnotationData, Profile } from '../../types/api';
 import {
   documentMetadata,
   isReply,
@@ -9,13 +9,17 @@ import {
 import { annotationDisplayName } from '../helpers/annotation-user';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
-import type { SidebarStore } from '../store';
 
 export type JSONExportContent = {
   export_date: string;
   export_userid: string;
   client_version: string;
   annotations: APIAnnotationData[];
+};
+
+export type JSONExportOptions = {
+  profile: Profile;
+  now?: Date;
 };
 
 export type TextExportOptions = {
@@ -31,18 +35,14 @@ export type TextExportOptions = {
  * @inject
  */
 export class AnnotationsExporter {
-  private _store: SidebarStore;
-
-  constructor(store: SidebarStore) {
-    this._store = store;
-  }
-
   buildJSONExportContent(
     annotations: APIAnnotationData[],
-    /* istanbul ignore next - test seam */
-    now = new Date(),
+    {
+      profile,
+      /* istanbul ignore next - test seam */
+      now = new Date(),
+    }: JSONExportOptions,
   ): JSONExportContent {
-    const profile = this._store.profile();
     const versionData = new VersionData(profile, []);
 
     return {

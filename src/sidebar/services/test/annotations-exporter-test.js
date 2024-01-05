@@ -6,40 +6,41 @@ import {
 import { AnnotationsExporter } from '../annotations-exporter';
 
 describe('AnnotationsExporter', () => {
-  let fakeStore;
   let now;
   let exporter;
 
   beforeEach(() => {
-    fakeStore = {
-      profile: sinon.stub().returns({ userid: 'userId' }),
-    };
     now = new Date();
-
-    exporter = new AnnotationsExporter(fakeStore);
+    exporter = new AnnotationsExporter();
   });
 
-  it('generates JSON content with provided annotations', () => {
-    const firstBaseAnnotation = publicAnnotation();
-    const secondBaseAnnotation = publicAnnotation();
-    const annotations = [
-      {
-        ...firstBaseAnnotation,
-        $tag: '',
-      },
-      {
-        ...secondBaseAnnotation,
-        $highlight: true,
-      },
-    ];
+  describe('buildJSONExportContent', () => {
+    it('generates JSON content with provided annotations', () => {
+      const profile = { userid: 'userId' };
+      const firstBaseAnnotation = publicAnnotation();
+      const secondBaseAnnotation = publicAnnotation();
+      const annotations = [
+        {
+          ...firstBaseAnnotation,
+          $tag: '',
+        },
+        {
+          ...secondBaseAnnotation,
+          $highlight: true,
+        },
+      ];
 
-    const result = exporter.buildJSONExportContent(annotations, now);
+      const result = exporter.buildJSONExportContent(annotations, {
+        now,
+        profile,
+      });
 
-    assert.deepEqual(result, {
-      export_date: now.toISOString(),
-      export_userid: 'userId',
-      client_version: '__VERSION__',
-      annotations: [firstBaseAnnotation, secondBaseAnnotation],
+      assert.deepEqual(result, {
+        export_date: now.toISOString(),
+        export_userid: 'userId',
+        client_version: '__VERSION__',
+        annotations: [firstBaseAnnotation, secondBaseAnnotation],
+      });
     });
   });
 
