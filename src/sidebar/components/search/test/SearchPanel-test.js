@@ -8,7 +8,6 @@ describe('SearchPanel', () => {
 
   beforeEach(() => {
     fakeStore = {
-      clearSelection: sinon.stub(),
       setFilterQuery: sinon.stub(),
       filterQuery: sinon.stub().returns(null),
       closeSidebarPanel: sinon.stub(),
@@ -36,7 +35,11 @@ describe('SearchPanel', () => {
 
       wrapper.find('SidebarPanel').props().onActiveChanged(active);
 
-      assert.equal(fakeStore.clearSelection.called, !active);
+      if (!active) {
+        assert.calledWith(fakeStore.setFilterQuery, null);
+      } else {
+        assert.notCalled(fakeStore.setFilterQuery);
+      }
     });
   });
 
