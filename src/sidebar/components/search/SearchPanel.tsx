@@ -19,7 +19,7 @@ export default function SearchPanel() {
       initialFocus={inputRef}
       onActiveChanged={active => {
         if (!active) {
-          store.clearSelection();
+          store.setFilterQuery(null);
         }
       }}
     >
