@@ -43,26 +43,32 @@ export type FocusState = {
 };
 
 /**
- * State pertaining to the filtering of annotations in the UI.
+ * State related to filtering of annotations in the UI.
  *
- * There are a few sources of filtering that gets applied to annotations:
+ * There are several layers of filters:
  *
- * - focusFilters: Filters defined by config/settings. Currently, supports a
- *   user filter. Application of these filters may be toggled on/off by user
- *   interaction (`focusActive`), but the values of these filters are set by
- *   config/settings or RPC (not by user directly). The value(s) of
- *   focusFilters are retained even when focus is inactive such that they might
- *   be re-applied later.
- * - filters: Filters set by faceting/filtering UI. Any filter here is currently
- *   active (applied).
- * - query: String query that is either typed in by the user or provided in
- *   settings. A query string may contain supported facets.
+ * - Filter/search queries entered by the user via the search UI
+ *
+ * - Focus filters which are filters supplied in the Hypothesis configuration.
+ *   This is for contexts where there is some default filter that should be
+ *   applied when the client loads. For example when grading a student's work,
+ *   the client can be configured to start up showing only that user's annotations.
+ *
+ * - Filters/facets set via UI controls other than the search box.
+ *   For example the Notebook has a user selection dropdown.
  */
 export type State = {
+  /** Facet filters (eg. selected user) */
   filters: Filters;
-  focusActive: Set<FilterKey>;
-  focusFilters: Filters;
+
+  /** Active filter/search query. */
   query: string | null;
+
+  /** Configuration for focus filters imported from client configuration. */
+  focusFilters: Filters;
+
+  /** Which filters from `focusFilters` are currently active. */
+  focusActive: Set<FilterKey>;
 };
 
 function initialState(settings: SidebarSettings): State {
