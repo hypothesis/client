@@ -7,10 +7,34 @@ import { AnnotationsExporter } from '../annotations-exporter';
 
 describe('AnnotationsExporter', () => {
   let now;
+  let baseAnnotation;
   let exporter;
+  const groupName = 'My group';
+
+  const pageSelector = page => ({
+    type: 'PageSelector',
+    label: `${page}`,
+  });
+  const quoteSelector = quote => ({
+    type: 'TextQuoteSelector',
+    exact: quote,
+  });
+  const targetWithSelectors = (...selectors) => [
+    {
+      selector: selectors,
+    },
+  ];
 
   beforeEach(() => {
     now = new Date();
+    baseAnnotation = {
+      ...newAnnotation(),
+      ...publicAnnotation(),
+      created: now.toISOString(),
+    };
+    // Title should actually be an array
+    baseAnnotation.document.title = [baseAnnotation.document.title];
+
     exporter = new AnnotationsExporter();
   });
 
@@ -45,18 +69,6 @@ describe('AnnotationsExporter', () => {
   });
 
   describe('buildTextExportContent', () => {
-    let baseAnnotation;
-
-    beforeEach(() => {
-      baseAnnotation = {
-        ...newAnnotation(),
-        ...publicAnnotation(),
-        created: now.toISOString(),
-      };
-      // Title should actually be an array
-      baseAnnotation.document.title = [baseAnnotation.document.title];
-    });
-
     it('throws error when empty list of annotations is provided', () => {
       assert.throws(
         () => exporter.buildTextExportContent([]),
@@ -66,16 +78,6 @@ describe('AnnotationsExporter', () => {
 
     it('generates text content with provided annotations', () => {
       const isoDate = baseAnnotation.created;
-      const targetWithPageSelector = page => [
-        {
-          selector: [
-            {
-              type: 'PageSelector',
-              label: `${page}`,
-            },
-          ],
-        },
-      ];
       const annotations = [
         baseAnnotation,
         baseAnnotation,
@@ -87,15 +89,14 @@ describe('AnnotationsExporter', () => {
         {
           ...baseAnnotation,
           ...newReply(),
-          target: targetWithPageSelector(23),
+          target: targetWithSelectors(pageSelector(23)),
         },
         {
           ...baseAnnotation,
           tags: [],
-          target: targetWithPageSelector('iii'),
+          target: targetWithSelectors(pageSelector('iii')),
         },
       ];
-      const groupName = 'My group';
 
       const result = exporter.buildTextExportContent(annotations, {
         groupName,
@@ -159,13 +160,13 @@ Page: iii`,
         },
       };
       const isoDate = annotation.created;
-      const groupName = 'My group';
 
       const result = exporter.buildTextExportContent([annotation], {
         displayNamesEnabled: true,
         groupName,
         now,
       });
+
       assert.equal(
         result,
         `${isoDate}
@@ -183,6 +184,72 @@ Annotation text
 John Doe
 "null"
 Tags: tag_1, tag_2`,
+      );
+    });
+  });
+
+  describe('buildCSVExportContent', () => {
+    it('throws error when empty list of annotations is provided', () => {
+      assert.throws(
+        () => exporter.buildCSVExportContent([]),
+        'No annotations to export',
+      );
+    });
+
+    it('generates CSV content with expected annotations', () => {
+      const isoDate = baseAnnotation.created;
+      const annotations = [
+        {
+          ...baseAnnotation,
+          user: 'acct:jane@localhost',
+          tags: ['foo', 'bar'],
+        },
+        {
+          ...baseAnnotation,
+          ...newReply(),
+          target: targetWithSelectors(
+            quoteSelector('includes "double quotes", and commas'),
+            pageSelector(23),
+          ),
+        },
+        {
+          ...baseAnnotation,
+          tags: [],
+          target: targetWithSelectors(pageSelector('iii')),
+        },
+      ];
+
+      const result = exporter.buildCSVExportContent(annotations, {
+        groupName,
+      });
+
+      assert.equal(
+        result,
+        `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Body,Tags,Page
+${isoDate},http://example.com,My group,Annotation,,jane,Annotation text,"foo,bar",
+${isoDate},http://example.com,My group,Reply,"includes ""double quotes"", and commas",bill,Annotation text,"tag_1,tag_2",23
+${isoDate},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
+      );
+    });
+
+    it('uses display names if `displayNamesEnabled` is set', () => {
+      const annotation = {
+        ...baseAnnotation,
+        user_info: {
+          display_name: 'John Doe',
+        },
+      };
+      const isoDate = annotation.created;
+
+      const result = exporter.buildCSVExportContent([annotation], {
+        displayNamesEnabled: true,
+        groupName,
+      });
+
+      assert.equal(
+        result,
+        `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Body,Tags,Page
+${isoDate},http://example.com,My group,Annotation,,John Doe,Annotation text,"tag_1,tag_2",`,
       );
     });
   });

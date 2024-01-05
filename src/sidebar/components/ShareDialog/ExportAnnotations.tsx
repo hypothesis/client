@@ -8,6 +8,7 @@ import {
 import { useCallback, useId, useMemo, useState } from 'preact/hooks';
 
 import {
+  downloadCSVFile,
   downloadJSONFile,
   downloadTextFile,
 } from '../../../shared/download-file';
@@ -44,12 +45,12 @@ const exportFormats: ExportFormat[] = [
     value: 'txt',
     name: 'Text',
   },
+  {
+    value: 'csv',
+    name: 'CSV',
+  },
 
   // TODO Enable these formats when implemented
-  // {
-  //   value: 'csv',
-  //   name: 'CSV',
-  // },
   // {
   //   value: 'html',
   //   name: 'HTML',
@@ -149,6 +150,18 @@ function ExportAnnotations({
             },
           );
           downloadTextFile(exportData, filename);
+          break;
+        }
+        case 'csv': {
+          const exportData = annotationsExporter.buildCSVExportContent(
+            annotationsToExport,
+            {
+              groupName: group?.name,
+              defaultAuthority,
+              displayNamesEnabled,
+            },
+          );
+          downloadCSVFile(exportData, filename);
           break;
         }
       }

@@ -16,6 +16,7 @@ describe('ExportAnnotations', () => {
   let fakeToastMessenger;
   let fakeDownloadJSONFile;
   let fakeDownloadTextFile;
+  let fakeDownloadCSVFile;
   let fakeSuggestedFilename;
 
   const fakePrivateGroup = {
@@ -37,12 +38,14 @@ describe('ExportAnnotations', () => {
     fakeAnnotationsExporter = {
       buildJSONExportContent: sinon.stub().returns({}),
       buildTextExportContent: sinon.stub().returns(''),
+      buildCSVExportContent: sinon.stub().returns(''),
     };
     fakeToastMessenger = {
       error: sinon.stub(),
     };
     fakeDownloadJSONFile = sinon.stub();
     fakeDownloadTextFile = sinon.stub();
+    fakeDownloadCSVFile = sinon.stub();
     fakeStore = {
       defaultAuthority: sinon.stub().returns('example.com'),
       isFeatureEnabled: sinon.stub().returns(true),
@@ -65,6 +68,7 @@ describe('ExportAnnotations', () => {
       '../../../shared/download-file': {
         downloadJSONFile: fakeDownloadJSONFile,
         downloadTextFile: fakeDownloadTextFile,
+        downloadCSVFile: fakeDownloadCSVFile,
       },
       '../../helpers/export-annotations': {
         suggestedFilename: fakeSuggestedFilename,
@@ -238,9 +242,10 @@ describe('ExportAnnotations', () => {
     );
     const options = select.find(SelectNext.Option);
 
-    assert.equal(options.length, 2);
+    assert.equal(options.length, 3);
     assert.equal(options.at(0).text(), 'JSON');
     assert.equal(options.at(1).text(), 'Text');
+    assert.equal(options.at(2).text(), 'CSV');
   });
 
   describe('export form submitted', () => {
@@ -265,6 +270,11 @@ describe('ExportAnnotations', () => {
         format: 'txt',
         getExpectedInvokedContentBuilder: () =>
           fakeAnnotationsExporter.buildTextExportContent,
+      },
+      {
+        format: 'csv',
+        getExpectedInvokedContentBuilder: () =>
+          fakeAnnotationsExporter.buildCSVExportContent,
       },
     ].forEach(({ format, getExpectedInvokedContentBuilder }) => {
       it('builds an export file from all non-draft annotations', async () => {
@@ -351,6 +361,10 @@ describe('ExportAnnotations', () => {
       {
         format: 'txt',
         getExpectedInvokedDownloader: () => fakeDownloadTextFile,
+      },
+      {
+        format: 'csv',
+        getExpectedInvokedDownloader: () => fakeDownloadCSVFile,
       },
     ].forEach(({ format, getExpectedInvokedDownloader }) => {
       it('downloads a file using user-entered filename appended with proper extension', async () => {

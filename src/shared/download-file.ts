@@ -39,7 +39,7 @@ export function downloadJSONFile(
 }
 
 /**
- * Download a text file containing data
+ * Download a text file containing text
  */
 export function downloadTextFile(
   text: string,
@@ -48,4 +48,13 @@ export function downloadTextFile(
   _document = document,
 ) {
   downloadFile(text, 'text/plain', filename, _document);
+}
+
+export function downloadCSVFile(
+  text: string,
+  filename: string,
+  /* istanbul ignore next - test seam */
+  _document = document,
+) {
+  downloadFile(text, 'text/csv', filename, _document);
 }
