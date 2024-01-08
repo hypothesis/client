@@ -8,7 +8,7 @@ module.exports = function (config) {
     // Base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: './',
 
-    frameworks: ['mocha', 'chai', 'sinon', 'source-map-support'],
+    frameworks: ['mocha', 'source-map-support'],
 
     files: [
       // Empty HTML file to assist with some tests
