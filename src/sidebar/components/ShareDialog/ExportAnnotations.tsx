@@ -34,26 +34,31 @@ type ExportFormat = {
   /** Unique format identifier used also as file extension */
   value: 'json' | 'csv' | 'txt' | 'html';
   name: string;
+  description: string;
 };
 
 const exportFormats: ExportFormat[] = [
   {
     value: 'json',
     name: 'JSON',
+    description: 'For import into another Hypothesis group or document',
   },
   {
     value: 'txt',
     name: 'Text',
+    description: 'For import into Word or text editors',
   },
   {
     value: 'csv',
     name: 'CSV',
+    description: 'For import into a spreadsheet',
   },
 
   // TODO Enable these formats when implemented
   // {
   //   value: 'html',
   //   name: 'HTML',
+  //   description: '',
   // },
 ];
 
@@ -228,7 +233,14 @@ function ExportAnnotations({
                       key={exportFormat.value}
                       value={exportFormat}
                     >
-                      {exportFormat.name}
+                      <div className="flex-col gap-y-2">
+                        <div className="font-bold" data-testid="format-name">
+                          {exportFormat.name}
+                        </div>
+                        <div data-testid="format-description">
+                          {exportFormat.description}
+                        </div>
+                      </div>
                     </SelectNext.Option>
                   ))}
                 </SelectNext>

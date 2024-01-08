@@ -241,11 +241,22 @@ describe('ExportAnnotations', () => {
       '[data-testid="export-format-select"]',
     );
     const options = select.find(SelectNext.Option);
+    const optionText = (index, type) =>
+      options.at(index).find(`[data-testid="format-${type}"]`).text();
 
     assert.equal(options.length, 3);
-    assert.equal(options.at(0).text(), 'JSON');
-    assert.equal(options.at(1).text(), 'Text');
-    assert.equal(options.at(2).text(), 'CSV');
+    assert.equal(optionText(0, 'name'), 'JSON');
+    assert.equal(
+      optionText(0, 'description'),
+      'For import into another Hypothesis group or document',
+    );
+    assert.equal(optionText(1, 'name'), 'Text');
+    assert.equal(
+      optionText(1, 'description'),
+      'For import into Word or text editors',
+    );
+    assert.equal(optionText(2, 'name'), 'CSV');
+    assert.equal(optionText(2, 'description'), 'For import into a spreadsheet');
   });
 
   describe('export form submitted', () => {
