@@ -4,6 +4,7 @@ import { buildThread } from './build-thread';
 import type { Thread, BuildThreadOptions } from './build-thread';
 import { filterAnnotations } from './filter-annotations';
 import { parseFilterQuery } from './query-parser';
+import type { FilterField } from './query-parser';
 import { shouldShowInTab } from './tabs';
 import { sorters } from './thread-sorters';
 
@@ -13,7 +14,7 @@ export type ThreadState = {
   selection: {
     expanded: Record<string, boolean>;
     filterQuery: string | null;
-    filters: Record<string, string>;
+    filters: Partial<Record<FilterField, string>>;
     forcedVisible: string[];
     selected: string[];
     sortKey: keyof typeof sorters;
