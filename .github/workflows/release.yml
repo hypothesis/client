@@ -90,7 +90,7 @@ jobs:
       run: |
         git fetch --tags --quiet
         LAST_COMMIT_HASH=$(git show HEAD --no-patch --format="%h")
-        STAGING_VERSION=$(git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2)-$LAST_COMMIT_HASH
+        STAGING_VERSION=$(git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2)-stg-$LAST_COMMIT_HASH
         echo "STAGING_VERSION=$STAGING_VERSION" >> $GITHUB_ENV
     - name: Build app
       run: |
