@@ -7857,6 +7857,7 @@ __metadata:
     npm-packlist: ^8.0.0
     postcss: ^8.0.3
     preact: ^10.4.0
+    preact-render-to-string: ^6.3.1
     prettier: 3.1.1
     redux: ^5.0.0
     redux-thunk: ^3.1.0
@@ -11130,6 +11131,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"preact-render-to-string@npm:^6.3.1":
+  version: 6.3.1
+  resolution: "preact-render-to-string@npm:6.3.1"
+  dependencies:
+    pretty-format: ^3.8.0
+  peerDependencies:
+    preact: ">=10"
+  checksum: bb640f3e9045585ac23d64878f02134aa78e83589edce697e350c782e375d64c900210861caf3018a95b696ef4e77a777ae6174f4624c562a6067214a3dfd91e
+  languageName: node
+  linkType: hard
+
 "preact@npm:^10.18.1, preact@npm:^10.4.0":
   version: 10.19.3
   resolution: "preact@npm:10.19.3"
@@ -11150,6 +11162,13 @@ __metadata:
   bin:
     prettier: bin/prettier.cjs
   checksum: e386855e3a1af86a748e16953f168be555ce66d6233f4ba54eb6449b88eb0c6b2ca79441b11eae6d28a7f9a5c96440ce50864b9d5f6356d331d39d6bb66c648e
+  languageName: node
+  linkType: hard
+
+"pretty-format@npm:^3.8.0":
+  version: 3.8.0
+  resolution: "pretty-format@npm:3.8.0"
+  checksum: 21a114d43ef06978f8f7f6212be4649b0b094f05d9b30e14e37550bf35c8ca24d8adbca9e5adc4cc15d9eaf7a1e7a30478a4dc37b30982bfdf0292a5b385484c
   languageName: node
   linkType: hard
 

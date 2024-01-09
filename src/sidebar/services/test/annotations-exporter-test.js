@@ -224,6 +224,7 @@ Tags: tag_1, tag_2`,
 
       const result = exporter.buildCSVExportContent(annotations, {
         groupName,
+        now,
       });
 
       assert.equal(
@@ -246,12 +247,141 @@ ${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,ii
       const result = exporter.buildCSVExportContent([annotation], {
         displayNamesEnabled: true,
         groupName,
+        now,
       });
 
       assert.equal(
         result,
         `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Body,Tags,Page
 ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text,"tag_1,tag_2",`,
+      );
+    });
+  });
+
+  describe('buildHTMLExportContent', () => {
+    it('throws error when empty list of annotations is provided', () => {
+      assert.throws(
+        () => exporter.buildHTMLExportContent([]),
+        'No annotations to export',
+      );
+    });
+
+    it('generates HTML content with expected annotations', () => {
+      const isoDate = now.toISOString();
+      const annotations = [
+        {
+          ...baseAnnotation,
+          user: 'acct:jane@localhost',
+          tags: ['foo', 'bar'],
+        },
+        {
+          ...baseAnnotation,
+          ...newReply(),
+          target: targetWithSelectors(
+            quoteSelector('includes <p>HTML</p> tags'),
+            pageSelector(23),
+          ),
+        },
+        {
+          ...baseAnnotation,
+          tags: [],
+          target: targetWithSelectors(pageSelector('iii')),
+        },
+      ];
+
+      const result = exporter.buildHTMLExportContent(annotations, {
+        groupName,
+        now,
+      });
+
+      // The result uses tabs to indent lines.
+      // We can get rid of that for simplicity and just compare the markup
+      const removeAllIndentation = str => str.replace(/^[ \t]+/gm, '');
+
+      assert.equal(
+        removeAllIndentation(result),
+        removeAllIndentation(`<html lang="en">
+  <head>
+    <title>Annotations export - Hypothesis</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <section>
+      <h1>Summary</h1>
+      <p>
+        <time datetime="${isoDate}">${formattedNow}</time>
+      </p>
+      <p>
+        <strong>A special document</strong>
+      </p>
+      <p>
+        <a
+          href="http://example.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          http://example.com
+        </a>
+      </p>
+      <dl>
+        <dt>Group</dt>
+        <dd>My group</dd>
+        <dt>Total users</dt>
+        <dd>2</dd>
+        <dt>Users</dt>
+        <dd>jane, bill</dd>
+        <dt>Total annotations</dt>
+        <dd>3</dd>
+        <dt>Total replies</dt>
+        <dd>1</dd>
+      </dl>
+    </section>
+    <hr />
+    <section>
+      <h1>Annotations</h1>
+      <article>
+        <h2>Annotation 1:</h2>
+        <p>
+          <time datetime="${isoDate}">${formattedNow}</time>
+        </p>
+        <p>Comment: Annotation text</p>
+        <p>jane</p>
+        <p>
+          Quote: 
+          <blockquote></blockquote>
+        </p>
+        <p>Tags: foo, bar</p>
+      </article>
+      <article>
+        <h2>Annotation 2:</h2>
+        <p>
+          <time datetime="${isoDate}">${formattedNow}</time>
+        </p>
+        <p>Comment: Annotation text</p>
+        <p>bill</p>
+        <p>
+          Quote: 
+          <blockquote>includes &lt;p>HTML&lt;/p> tags</blockquote>
+        </p>
+        <p>Tags: tag_1, tag_2</p>
+        <p>Page: 23</p>
+      </article>
+      <article>
+        <h2>Annotation 3:</h2>
+        <p>
+          <time datetime="${isoDate}">${formattedNow}</time>
+        </p>
+        <p>Comment: Annotation text</p>
+        <p>bill</p>
+        <p>
+          Quote: 
+          <blockquote></blockquote>
+        </p>
+        <p>Page: iii</p>
+      </article>
+    </section>
+  </body>
+</html>`),
       );
     });
   });
