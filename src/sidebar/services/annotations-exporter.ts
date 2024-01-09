@@ -76,9 +76,9 @@ export class AnnotationsExporter {
         const page = pageLabel(annotation);
         const lines = [
           annotation.created,
-          annotation.text,
+          `Comment: ${annotation.text}`,
           extractUsername(annotation),
-          `"${quote(annotation)}"`,
+          `Quote: "${quote(annotation)}"`,
           annotation.tags.length > 0
             ? `Tags: ${annotation.tags.join(', ')}`
             : undefined,

@@ -79,7 +79,10 @@ describe('AnnotationsExporter', () => {
     it('generates text content with provided annotations', () => {
       const isoDate = baseAnnotation.created;
       const annotations = [
-        baseAnnotation,
+        {
+          ...baseAnnotation,
+          target: targetWithSelectors(quoteSelector('this is the quote')),
+        },
         baseAnnotation,
         {
           ...baseAnnotation,
@@ -116,38 +119,38 @@ Total replies: 1
 
 Annotation 1:
 ${isoDate}
-Annotation text
+Comment: Annotation text
 bill
-"null"
+Quote: "this is the quote"
 Tags: tag_1, tag_2
 
 Annotation 2:
 ${isoDate}
-Annotation text
+Comment: Annotation text
 bill
-"null"
+Quote: "null"
 Tags: tag_1, tag_2
 
 Annotation 3:
 ${isoDate}
-Annotation text
+Comment: Annotation text
 jane
-"null"
+Quote: "null"
 Tags: foo, bar
 
 Annotation 4:
 ${isoDate}
-Annotation text
+Comment: Annotation text
 bill
-"null"
+Quote: "null"
 Tags: tag_1, tag_2
 Page: 23
 
 Annotation 5:
 ${isoDate}
-Annotation text
+Comment: Annotation text
 bill
-"null"
+Quote: "null"
 Page: iii`,
       );
     });
@@ -180,9 +183,9 @@ Total replies: 0
 
 Annotation 1:
 ${isoDate}
-Annotation text
+Comment: Annotation text
 John Doe
-"null"
+Quote: "null"
 Tags: tag_1, tag_2`,
       );
     });
