@@ -1,3 +1,5 @@
+import renderToString from 'preact-render-to-string/jsx';
+
 import { escapeCSVValue } from '../../shared/csv';
 import { trimAndDedent } from '../../shared/trim-and-dedent';
 import type { APIAnnotationData, Profile } from '../../types/api';
@@ -73,25 +75,23 @@ export class AnnotationsExporter {
         defaultAuthority,
       });
 
-    const annotationsText = annotations
-      .map((annotation, index) => {
-        const page = pageLabel(annotation);
-        const lines = [
-          formatDateTime(new Date(annotation.created)),
-          `Comment: ${annotation.text}`,
-          extractUsername(annotation),
-          `Quote: "${quote(annotation)}"`,
-          annotation.tags.length > 0
-            ? `Tags: ${annotation.tags.join(', ')}`
-            : undefined,
-          page ? `Page: ${page}` : undefined,
-        ].filter(Boolean);
+    const annotationsAsText = annotations.map((annotation, index) => {
+      const page = pageLabel(annotation);
+      const lines = [
+        formatDateTime(new Date(annotation.created)),
+        `Comment: ${annotation.text}`,
+        extractUsername(annotation),
+        `Quote: "${quote(annotation)}"`,
+        annotation.tags.length > 0
+          ? `Tags: ${annotation.tags.join(', ')}`
+          : undefined,
+        page ? `Page: ${page}` : undefined,
+      ].filter(Boolean);
 
-        return trimAndDedent`
-          Annotation ${index + 1}:
-          ${lines.join('\n')}`;
-      })
-      .join('\n\n');
+      return trimAndDedent`
+        Annotation ${index + 1}:
+        ${lines.join('\n')}`;
+    });
 
     return trimAndDedent`
       ${formatDateTime(now)}
@@ -103,7 +103,7 @@ export class AnnotationsExporter {
       Total annotations: ${annotations.length}
       Total replies: ${replies.length}
       
-      ${annotationsText}`;
+      ${annotationsAsText.join('\n\n')}`;
   }
 
   buildCSVExportContent(
@@ -150,6 +150,89 @@ export class AnnotationsExporter {
       .join('\n');
 
     return `${headers}\n${annotationsContent}`;
+  }
+
+  buildHTMLExportContent(
+    annotations: APIAnnotationData[],
+    {
+      groupName = '',
+      displayNamesEnabled = false,
+      defaultAuthority = '',
+      /* istanbul ignore next - test seam */
+      now = new Date(),
+    }: ExportOptions = {},
+  ): string {
+    const { uri, title, uniqueUsers, replies, extractUsername } =
+      this._exportCommon(annotations, {
+        displayNamesEnabled,
+        defaultAuthority,
+      });
+
+    return renderToString(
+      <html lang="en">
+        <head>
+          <title>Annotations export - Hypothesis</title>
+          <meta charSet="UTF-8" />
+        </head>
+        <body>
+          <section>
+            <h1>Summary</h1>
+            <p>
+              <time dateTime={now.toISOString()}>{formatDateTime(now)}</time>
+            </p>
+            <p>
+              <strong>{title}</strong>
+            </p>
+            <p>
+              <a href={uri} target="_blank" rel="noopener noreferrer">
+                {uri}
+              </a>
+            </p>
+
+            <dl>
+              <dt>Group</dt>
+              <dd>{groupName}</dd>
+              <dt>Total users</dt>
+              <dd>{uniqueUsers.length}</dd>
+              <dt>Users</dt>
+              <dd>{uniqueUsers.join(', ')}</dd>
+              <dt>Total annotations</dt>
+              <dd>{annotations.length}</dd>
+              <dt>Total replies</dt>
+              <dd>{replies.length}</dd>
+            </dl>
+          </section>
+          <hr />
+          <section>
+            <h1>Annotations</h1>
+            {annotations.map((annotation, index) => {
+              const page = pageLabel(annotation);
+              return (
+                <article key={annotation.id}>
+                  <h2>Annotation {index + 1}:</h2>
+                  <p>
+                    <time dateTime={annotation.created}>
+                      {formatDateTime(new Date(annotation.created))}
+                    </time>
+                  </p>
+                  <p>Comment: {annotation.text}</p>
+                  <p>{extractUsername(annotation)}</p>
+                  <p>
+                    Quote: <blockquote>{quote(annotation)}</blockquote>
+                  </p>
+                  {annotation.tags.length > 0 && (
+                    <p>Tags: {annotation.tags.join(', ')}</p>
+                  )}
+                  {page && <p>Page: {page}</p>}
+                </article>
+              );
+            })}
+          </section>
+        </body>
+      </html>,
+      {},
+      { pretty: true },
+    );
   }
 
   private _exportCommon(

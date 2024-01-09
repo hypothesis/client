@@ -17,6 +17,7 @@ describe('ExportAnnotations', () => {
   let fakeDownloadJSONFile;
   let fakeDownloadTextFile;
   let fakeDownloadCSVFile;
+  let fakeDownloadHTMLFile;
   let fakeSuggestedFilename;
 
   const fakePrivateGroup = {
@@ -39,6 +40,7 @@ describe('ExportAnnotations', () => {
       buildJSONExportContent: sinon.stub().returns({}),
       buildTextExportContent: sinon.stub().returns(''),
       buildCSVExportContent: sinon.stub().returns(''),
+      buildHTMLExportContent: sinon.stub().returns(''),
     };
     fakeToastMessenger = {
       error: sinon.stub(),
@@ -46,6 +48,7 @@ describe('ExportAnnotations', () => {
     fakeDownloadJSONFile = sinon.stub();
     fakeDownloadTextFile = sinon.stub();
     fakeDownloadCSVFile = sinon.stub();
+    fakeDownloadHTMLFile = sinon.stub();
     fakeStore = {
       defaultAuthority: sinon.stub().returns('example.com'),
       isFeatureEnabled: sinon.stub().returns(true),
@@ -69,6 +72,7 @@ describe('ExportAnnotations', () => {
         downloadJSONFile: fakeDownloadJSONFile,
         downloadTextFile: fakeDownloadTextFile,
         downloadCSVFile: fakeDownloadCSVFile,
+        downloadHTMLFile: fakeDownloadHTMLFile,
       },
       '../../helpers/export-annotations': {
         suggestedFilename: fakeSuggestedFilename,
@@ -244,7 +248,7 @@ describe('ExportAnnotations', () => {
     const optionText = (index, type) =>
       options.at(index).find(`[data-testid="format-${type}"]`).text();
 
-    assert.equal(options.length, 3);
+    assert.equal(options.length, 4);
     assert.equal(optionText(0, 'name'), 'JSON');
     assert.equal(
       optionText(0, 'description'),
@@ -253,10 +257,15 @@ describe('ExportAnnotations', () => {
     assert.equal(optionText(1, 'name'), 'Text');
     assert.equal(
       optionText(1, 'description'),
-      'For import into Word or text editors',
+      'For import into word processors as plain text',
     );
     assert.equal(optionText(2, 'name'), 'CSV');
     assert.equal(optionText(2, 'description'), 'For import into a spreadsheet');
+    assert.equal(optionText(3, 'name'), 'HTML');
+    assert.equal(
+      optionText(3, 'description'),
+      'For import into word processors as rich text',
+    );
   });
 
   describe('export form submitted', () => {
@@ -286,6 +295,11 @@ describe('ExportAnnotations', () => {
         format: 'csv',
         getExpectedInvokedContentBuilder: () =>
           fakeAnnotationsExporter.buildCSVExportContent,
+      },
+      {
+        format: 'html',
+        getExpectedInvokedContentBuilder: () =>
+          fakeAnnotationsExporter.buildHTMLExportContent,
       },
     ].forEach(({ format, getExpectedInvokedContentBuilder }) => {
       it('builds an export file from all non-draft annotations', async () => {
@@ -376,6 +390,10 @@ describe('ExportAnnotations', () => {
       {
         format: 'csv',
         getExpectedInvokedDownloader: () => fakeDownloadCSVFile,
+      },
+      {
+        format: 'html',
+        getExpectedInvokedDownloader: () => fakeDownloadHTMLFile,
       },
     ].forEach(({ format, getExpectedInvokedDownloader }) => {
       it('downloads a file using user-entered filename appended with proper extension', async () => {

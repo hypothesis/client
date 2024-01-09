@@ -1,5 +1,6 @@
 import {
   downloadCSVFile,
+  downloadHTMLFile,
   downloadJSONFile,
   downloadTextFile,
 } from '../download-file';
@@ -72,5 +73,14 @@ describe('download-file', () => {
     downloadCSVFile(data, filename, fakeDocument);
 
     assertDownloadHappened(filename, data, 'text/csv');
+  });
+
+  it('downloadHTMLFile generates HTML file with provided data', () => {
+    const data = '<p>Hello</p>';
+    const filename = 'my-file.html';
+
+    downloadHTMLFile(data, filename, fakeDocument);
+
+    assertDownloadHappened(filename, data, 'text/html');
   });
 });
