@@ -1,3 +1,4 @@
+import { escapeCSVValue } from '../../shared/csv';
 import { trimAndDedent } from '../../shared/trim-and-dedent';
 import type { APIAnnotationData, Profile } from '../../types/api';
 import {
@@ -117,14 +118,6 @@ export class AnnotationsExporter {
       defaultAuthority,
     });
 
-    const escapeCSVValue = (value: string): string => {
-      // If the value contains a comma, newline or double quote, then wrap it in
-      // double quotes and escape any existing double quotes.
-      if (/[",\n]/.test(value)) {
-        return `"${value.replace(/"/g, '""')}"`;
-      }
-      return value;
-    };
     const annotationToRow = (annotation: APIAnnotationData) =>
       [
         annotation.created,
