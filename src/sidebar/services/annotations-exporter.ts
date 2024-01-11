@@ -10,6 +10,7 @@ import {
 import { annotationDisplayName } from '../helpers/annotation-user';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
+import { formatDateTime } from '../util/time';
 
 export type JSONExportContent = {
   export_date: string;
@@ -76,7 +77,7 @@ export class AnnotationsExporter {
       .map((annotation, index) => {
         const page = pageLabel(annotation);
         const lines = [
-          annotation.created,
+          formatDateTime(new Date(annotation.created)),
           `Comment: ${annotation.text}`,
           extractUsername(annotation),
           `Quote: "${quote(annotation)}"`,
@@ -93,7 +94,7 @@ export class AnnotationsExporter {
       .join('\n\n');
 
     return trimAndDedent`
-      ${now.toISOString()}
+      ${formatDateTime(now)}
       ${title}
       ${uri}
       Group: ${groupName}
@@ -120,7 +121,7 @@ export class AnnotationsExporter {
 
     const annotationToRow = (annotation: APIAnnotationData) =>
       [
-        annotation.created,
+        formatDateTime(new Date(annotation.created)),
         uri,
         groupName,
         isReply(annotation) ? 'Reply' : 'Annotation',

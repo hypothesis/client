@@ -3,10 +3,12 @@ import {
   newReply,
   publicAnnotation,
 } from '../../test/annotation-fixtures';
+import { formatDateTime } from '../../util/time';
 import { AnnotationsExporter } from '../annotations-exporter';
 
 describe('AnnotationsExporter', () => {
   let now;
+  let formattedNow;
   let baseAnnotation;
   let exporter;
   const groupName = 'My group';
@@ -27,6 +29,7 @@ describe('AnnotationsExporter', () => {
 
   beforeEach(() => {
     now = new Date();
+    formattedNow = formatDateTime(now);
     baseAnnotation = {
       ...newAnnotation(),
       ...publicAnnotation(),
@@ -77,7 +80,6 @@ describe('AnnotationsExporter', () => {
     });
 
     it('generates text content with provided annotations', () => {
-      const isoDate = baseAnnotation.created;
       const annotations = [
         {
           ...baseAnnotation,
@@ -108,7 +110,7 @@ describe('AnnotationsExporter', () => {
 
       assert.equal(
         result,
-        `${isoDate}
+        `${formattedNow}
 A special document
 http://example.com
 Group: ${groupName}
@@ -118,28 +120,28 @@ Total annotations: 5
 Total replies: 1
 
 Annotation 1:
-${isoDate}
+${formattedNow}
 Comment: Annotation text
 bill
 Quote: "this is the quote"
 Tags: tag_1, tag_2
 
 Annotation 2:
-${isoDate}
+${formattedNow}
 Comment: Annotation text
 bill
 Quote: "null"
 Tags: tag_1, tag_2
 
 Annotation 3:
-${isoDate}
+${formattedNow}
 Comment: Annotation text
 jane
 Quote: "null"
 Tags: foo, bar
 
 Annotation 4:
-${isoDate}
+${formattedNow}
 Comment: Annotation text
 bill
 Quote: "null"
@@ -147,7 +149,7 @@ Tags: tag_1, tag_2
 Page: 23
 
 Annotation 5:
-${isoDate}
+${formattedNow}
 Comment: Annotation text
 bill
 Quote: "null"
@@ -162,7 +164,6 @@ Page: iii`,
           display_name: 'John Doe',
         },
       };
-      const isoDate = annotation.created;
 
       const result = exporter.buildTextExportContent([annotation], {
         displayNamesEnabled: true,
@@ -172,7 +173,7 @@ Page: iii`,
 
       assert.equal(
         result,
-        `${isoDate}
+        `${formattedNow}
 A special document
 http://example.com
 Group: ${groupName}
@@ -182,7 +183,7 @@ Total annotations: 1
 Total replies: 0
 
 Annotation 1:
-${isoDate}
+${formattedNow}
 Comment: Annotation text
 John Doe
 Quote: "null"
@@ -200,7 +201,6 @@ Tags: tag_1, tag_2`,
     });
 
     it('generates CSV content with expected annotations', () => {
-      const isoDate = baseAnnotation.created;
       const annotations = [
         {
           ...baseAnnotation,
@@ -229,9 +229,9 @@ Tags: tag_1, tag_2`,
       assert.equal(
         result,
         `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Body,Tags,Page
-${isoDate},http://example.com,My group,Annotation,,jane,Annotation text,"foo,bar",
-${isoDate},http://example.com,My group,Reply,"includes ""double quotes"", and commas",bill,Annotation text,"tag_1,tag_2",23
-${isoDate},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
+${formattedNow},http://example.com,My group,Annotation,,jane,Annotation text,"foo,bar",
+${formattedNow},http://example.com,My group,Reply,"includes ""double quotes"", and commas",bill,Annotation text,"tag_1,tag_2",23
+${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
       );
     });
 
@@ -242,7 +242,6 @@ ${isoDate},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
           display_name: 'John Doe',
         },
       };
-      const isoDate = annotation.created;
 
       const result = exporter.buildCSVExportContent([annotation], {
         displayNamesEnabled: true,
@@ -252,7 +251,7 @@ ${isoDate},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
       assert.equal(
         result,
         `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Body,Tags,Page
-${isoDate},http://example.com,My group,Annotation,,John Doe,Annotation text,"tag_1,tag_2",`,
+${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text,"tag_1,tag_2",`,
       );
     });
   });
