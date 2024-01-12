@@ -254,18 +254,35 @@ describe('ExportAnnotations', () => {
       optionText(0, 'description'),
       'For import into another Hypothesis group or document',
     );
-    assert.equal(optionText(1, 'name'), 'Text');
+    assert.equal(optionText(1, 'name'), 'Plain text (TXT)');
     assert.equal(
       optionText(1, 'description'),
       'For import into word processors as plain text',
     );
-    assert.equal(optionText(2, 'name'), 'CSV');
+    assert.equal(optionText(2, 'name'), 'Table (CSV)');
     assert.equal(optionText(2, 'description'), 'For import into a spreadsheet');
-    assert.equal(optionText(3, 'name'), 'HTML');
+    assert.equal(optionText(3, 'name'), 'Rich text (HTML)');
     assert.equal(
       optionText(3, 'description'),
       'For import into word processors as rich text',
     );
+  });
+
+  [
+    [{ shortTitle: 'Short', title: 'Something longer' }, 'Short'],
+    [{ title: 'Something longer' }, 'Something longer'],
+  ].forEach(([format, expectedTitle]) => {
+    it('displays format short title if defined', async () => {
+      const wrapper = createComponent();
+      const getSelect = () =>
+        waitForElement(wrapper, '[data-testid="export-format-select"]');
+
+      const selectBefore = await getSelect();
+      selectBefore.props().onChange(format);
+
+      const selectAfter = await getSelect();
+      assert.equal(selectAfter.prop('buttonContent'), expectedTitle);
+    });
   });
 
   describe('export form submitted', () => {

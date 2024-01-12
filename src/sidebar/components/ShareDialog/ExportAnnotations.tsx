@@ -34,29 +34,40 @@ export type ExportAnnotationsProps = {
 type ExportFormat = {
   /** Unique format identifier used also as file extension */
   value: 'json' | 'csv' | 'txt' | 'html';
-  name: string;
+  /** The title to be displayed in the listbox item */
+  title: string;
+
+  /**
+   * The title to be displayed in the Select button.
+   * Falls back to `title` when not provided.
+   */
+  shortTitle?: string;
+
   description: string;
 };
 
 const exportFormats: ExportFormat[] = [
   {
     value: 'json',
-    name: 'JSON',
+    title: 'JSON',
     description: 'For import into another Hypothesis group or document',
   },
   {
     value: 'txt',
-    name: 'Text',
+    title: 'Plain text (TXT)',
+    shortTitle: 'Text',
     description: 'For import into word processors as plain text',
   },
   {
     value: 'csv',
-    name: 'CSV',
+    title: 'Table (CSV)',
+    shortTitle: 'CSV',
     description: 'For import into a spreadsheet',
   },
   {
     value: 'html',
-    name: 'HTML',
+    title: 'Rich text (HTML)',
+    shortTitle: 'HTML',
     description: 'For import into word processors as rich text',
   },
 ];
@@ -235,7 +246,7 @@ function ExportAnnotations({
                 <SelectNext
                   value={exportFormat}
                   onChange={setExportFormat}
-                  buttonContent={exportFormat.name}
+                  buttonContent={exportFormat.shortTitle ?? exportFormat.title}
                   data-testid="export-format-select"
                   right
                 >
@@ -246,7 +257,7 @@ function ExportAnnotations({
                     >
                       <div className="flex-col gap-y-2">
                         <div className="font-bold" data-testid="format-name">
-                          {exportFormat.name}
+                          {exportFormat.title}
                         </div>
                         <div data-testid="format-description">
                           {exportFormat.description}
