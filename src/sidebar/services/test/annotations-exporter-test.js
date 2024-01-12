@@ -229,7 +229,7 @@ Tags: tag_1, tag_2`,
 
       assert.equal(
         result,
-        `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Body,Tags,Page
+        `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
 ${formattedNow},http://example.com,My group,Annotation,,jane,Annotation text,"foo,bar",
 ${formattedNow},http://example.com,My group,Reply,"includes ""double quotes"", and commas",bill,Annotation text,"tag_1,tag_2",23
 ${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
@@ -252,7 +252,7 @@ ${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,ii
 
       assert.equal(
         result,
-        `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Body,Tags,Page
+        `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
 ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text,"tag_1,tag_2",`,
       );
     });
