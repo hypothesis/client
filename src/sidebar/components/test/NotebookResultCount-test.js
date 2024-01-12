@@ -21,7 +21,7 @@ describe('NotebookResultCount', () => {
 
   beforeEach(() => {
     fakeCountVisible = sinon.stub().returns(0);
-    fakeUseRootThread = sinon.stub().returns({ children: [] });
+    fakeUseRootThread = sinon.stub().returns({ rootThread: { children: [] } });
 
     $imports.$mock({
       './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
@@ -35,16 +35,12 @@ describe('NotebookResultCount', () => {
 
   context('when there are no results', () => {
     it('should show "No Results" if no filters are applied', () => {
-      fakeUseRootThread.returns({ children: [] });
-
       const wrapper = createComponent({ isFiltered: false });
 
       assert.equal(wrapper.text(), 'No results');
     });
 
     it('should show "No Results" if filters are applied', () => {
-      fakeUseRootThread.returns({ children: [] });
-
       const wrapper = createComponent({ isFiltered: true });
 
       assert.equal(wrapper.text(), 'No results');
@@ -71,7 +67,7 @@ describe('NotebookResultCount', () => {
     ].forEach(test => {
       it('should render a count of threads and annotations', () => {
         fakeCountVisible.returns(test.visibleCount);
-        fakeUseRootThread.returns(test.thread);
+        fakeUseRootThread.returns({ rootThread: test.thread });
 
         const wrapper = createComponent();
 
@@ -102,7 +98,7 @@ describe('NotebookResultCount', () => {
       },
     ].forEach(test => {
       it('should render a count of results', () => {
-        fakeUseRootThread.returns(test.thread);
+        fakeUseRootThread.returns({ rootThread: test.thread });
         fakeCountVisible.returns(test.visibleCount);
 
         const wrapper = createComponent({
@@ -122,7 +118,7 @@ describe('NotebookResultCount', () => {
     });
 
     it('shows annotation count if there are any matching annotations being fetched', () => {
-      fakeUseRootThread.returns({ children: [1, 2] });
+      fakeUseRootThread.returns({ rootThread: { children: [1, 2] } });
       // Setting countVisible to something different to demonstrate that
       // resultCount is used while loading
       fakeCountVisible.returns(5);
@@ -144,7 +140,7 @@ describe('NotebookResultCount', () => {
         name: 'with results',
         content: () => {
           fakeCountVisible.returns(2);
-          fakeUseRootThread.returns({ children: [1, 2] });
+          fakeUseRootThread.returns({ rootThread: { children: [1, 2] } });
           return createComponent();
         },
       },
@@ -152,7 +148,7 @@ describe('NotebookResultCount', () => {
         name: 'with results and filters applied',
         content: () => {
           fakeCountVisible.returns(3);
-          fakeUseRootThread.returns({ children: [1] });
+          fakeUseRootThread.returns({ rootThread: { children: [1] } });
           return createComponent({ forcedVisibleCount: 1, isFiltered: true });
         },
       },

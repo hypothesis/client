@@ -1,16 +1,17 @@
 import type { Annotation } from '../../types/api';
 import { memoize } from '../util/memoize';
+import { isWaitingToAnchor } from './annotation-metadata';
 import { buildThread } from './build-thread';
 import type { Thread, BuildThreadOptions } from './build-thread';
 import { filterAnnotations } from './filter-annotations';
 import { parseFilterQuery } from './query-parser';
 import type { FilterField } from './query-parser';
-import { shouldShowInTab } from './tabs';
+import { tabForAnnotation } from './tabs';
 import { sorters } from './thread-sorters';
 
 export type ThreadState = {
   annotations: Annotation[];
-  route: string | null;
+  showTabs: boolean;
   selection: {
     expanded: Record<string, boolean>;
     filterQuery: string | null;
@@ -22,11 +23,32 @@ export type ThreadState = {
   };
 };
 
+export type ThreadAnnotationsResult = {
+  /**
+   * Count of annotations for each tab.
+   *
+   * These are only computed if {@link ThreadState.showTabs} is true.
+   */
+  tabCounts: {
+    annotation: number;
+    note: number;
+    orphan: number;
+  };
+
+  /**
+   * Root thread containing all annotation threads that match the current
+   * filters and selected tab.
+   */
+  rootThread: Thread;
+};
+
 /**
  * Cobble together the right set of options and filters based on current
  * `threadState` to build the root thread.
  */
-function buildRootThread(threadState: ThreadState): Thread {
+function threadAnnotationsImpl(
+  threadState: ThreadState,
+): ThreadAnnotationsResult {
   const selection = threadState.selection;
   const options: BuildThreadOptions = {
     expanded: selection.expanded,
@@ -48,21 +70,30 @@ function buildRootThread(threadState: ThreadState): Thread {
     options.filterFn = ann => filterAnnotations([ann], filters).length > 0;
   }
 
-  // If annotations aren't filtered, should we filter out tab-irrelevant
-  // annotations (e.g. we should only show notes in the `Notes` tab)
-  // in the sidebar?
-  const threadFiltered =
-    !annotationsFiltered && threadState.route === 'sidebar';
+  const rootThread = buildThread(threadState.annotations, options);
 
-  if (threadFiltered) {
-    options.threadFilterFn = thread => {
-      if (!thread.annotation) {
+  const tabCounts = {
+    annotation: 0,
+    note: 0,
+    orphan: 0,
+  };
+
+  if (threadState.showTabs) {
+    rootThread.children = rootThread.children.filter(thread => {
+      if (thread.annotation && isWaitingToAnchor(thread.annotation)) {
+        // Until this annotation anchors or fails to anchor, we do not know which
+        // tab it should be displayed in.
         return false;
       }
-      return shouldShowInTab(thread.annotation, selection.selectedTab);
-    };
+      const tab = thread.annotation
+        ? tabForAnnotation(thread.annotation)
+        : 'annotation';
+      tabCounts[tab] += 1;
+      return tab === selection.selectedTab;
+    });
   }
-  return buildThread(threadState.annotations, options);
+
+  return { tabCounts, rootThread };
 }
 
-export const threadAnnotations = memoize(buildRootThread);
+export const threadAnnotations = memoize(threadAnnotationsImpl);

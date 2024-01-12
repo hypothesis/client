@@ -35,7 +35,7 @@ function SidebarView({
   loadAnnotationsService,
   streamer,
 }: SidebarViewProps) {
-  const rootThread = useRootThread();
+  const { rootThread, tabCounts } = useRootThread();
 
   // Store state values
   const store = useSidebarStore();
@@ -146,7 +146,9 @@ function SidebarView({
       {hasDirectLinkedGroupError && (
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
-      {showTabs && <SelectionTabs isLoading={isLoading} />}
+      {showTabs && (
+        <SelectionTabs isLoading={isLoading} tabCounts={tabCounts} />
+      )}
       <ThreadList threads={rootThread.children} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>

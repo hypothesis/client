@@ -136,7 +136,7 @@ function FilterStatusMessage({
  */
 export default function FilterStatus() {
   const store = useSidebarStore();
-  const rootThread = useRootThread();
+  const { rootThread } = useRootThread();
 
   const annotationCount = store.annotationCount();
   const directLinkedId = store.directLinkedAnnotationId();

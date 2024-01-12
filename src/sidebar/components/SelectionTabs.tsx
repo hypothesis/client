@@ -86,6 +86,13 @@ export type SelectionTabProps = {
   /** Are we waiting on any annotations from the server? */
   isLoading: boolean;
 
+  /** Counts of threads in each tab, to be displayed next to the tab title. */
+  tabCounts: {
+    annotation: number;
+    note: number;
+    orphan: number;
+  };
+
   // injected
   settings: SidebarSettings;
   annotationsService: AnnotationsService;
@@ -98,12 +105,13 @@ function SelectionTabs({
   annotationsService,
   isLoading,
   settings,
+  tabCounts,
 }: SelectionTabProps) {
   const store = useSidebarStore();
   const selectedTab = store.selectedTab();
-  const noteCount = store.noteCount();
-  const annotationCount = store.annotationCount();
-  const orphanCount = store.orphanCount();
+  const noteCount = tabCounts.note;
+  const annotationCount = tabCounts.annotation;
+  const orphanCount = tabCounts.orphan;
   const isWaitingToAnchorAnnotations = store.isWaitingToAnchorAnnotations();
 
   const selectTab = (tabId: TabName) => {
