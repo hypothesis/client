@@ -141,7 +141,7 @@ export class AnnotationsExporter {
       'Annotation/Reply Type',
       'Quote',
       'User',
-      'Body',
+      'Comment',
       'Tags',
       'Page',
     ].join(',');
