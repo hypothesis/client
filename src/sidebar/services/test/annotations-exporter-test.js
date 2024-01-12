@@ -302,7 +302,9 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
         removeAllIndentation(result),
         removeAllIndentation(`<html lang="en">
   <head>
-    <title>Annotations export - Hypothesis</title>
+    <title>
+      Annotations on &quot;A special document&quot;
+    </title>
     <meta charset="UTF-8" />
   </head>
   <body>

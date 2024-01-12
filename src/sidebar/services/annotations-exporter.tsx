@@ -171,7 +171,7 @@ export class AnnotationsExporter {
     return renderToString(
       <html lang="en">
         <head>
-          <title>Annotations export - Hypothesis</title>
+          <title>{`Annotations on "${title}"`}</title>
           <meta charSet="UTF-8" />
         </head>
         <body>
