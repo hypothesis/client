@@ -79,13 +79,13 @@ export class AnnotationsExporter {
       const page = pageLabel(annotation);
       const lines = [
         `Created at: ${formatDateTime(new Date(annotation.created))}`,
-        `Comment: ${annotation.text}`,
-        extractUsername(annotation),
+        `Author: ${extractUsername(annotation)}`,
+        page ? `Page: ${page}` : undefined,
         `Quote: "${quote(annotation)}"`,
+        `Comment: ${annotation.text}`,
         annotation.tags.length > 0
           ? `Tags: ${annotation.tags.join(', ')}`
           : undefined,
-        page ? `Page: ${page}` : undefined,
       ].filter(Boolean);
 
       return trimAndDedent`
@@ -122,28 +122,28 @@ export class AnnotationsExporter {
     const annotationToRow = (annotation: APIAnnotationData) =>
       [
         formatDateTime(new Date(annotation.created)),
+        extractUsername(annotation),
+        pageLabel(annotation) ?? '',
         uri,
         groupName,
         isReply(annotation) ? 'Reply' : 'Annotation',
         quote(annotation) ?? '',
-        extractUsername(annotation),
         annotation.text,
         annotation.tags.join(','),
-        pageLabel(annotation) ?? '',
       ]
         .map(escapeCSVValue)
         .join(',');
 
     const headers = [
       'Created at',
+      'Author',
+      'Page',
       'URL',
       'Group',
       'Annotation/Reply Type',
       'Quote',
-      'User',
       'Comment',
       'Tags',
-      'Page',
     ].join(',');
     const annotationsContent = annotations
       .map(anno => annotationToRow(anno))
@@ -228,15 +228,15 @@ export class AnnotationsExporter {
                       {formatDateTime(new Date(annotation.created))}
                     </time>
                   </p>
-                  <p>Comment: {annotation.text}</p>
-                  <p>{extractUsername(annotation)}</p>
+                  <p>Author: {extractUsername(annotation)}</p>
+                  {page && <p>Page: {page}</p>}
                   <p>
                     Quote: <blockquote>{quote(annotation)}</blockquote>
                   </p>
+                  <p>Comment: {annotation.text}</p>
                   {annotation.tags.length > 0 && (
                     <p>Tags: {annotation.tags.join(', ')}</p>
                   )}
-                  {page && <p>Page: {page}</p>}
                 </article>
               );
             })}
