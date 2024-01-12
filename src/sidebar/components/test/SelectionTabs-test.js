@@ -40,7 +40,6 @@ describe('SelectionTabs', () => {
       enableExperimentalNewNoteButton: false,
     };
     fakeStore = {
-      clearSelection: sinon.stub(),
       selectTab: sinon.stub(),
       isWaitingToAnchorAnnotations: sinon.stub().returns(false),
       selectedTab: sinon.stub().returns('annotation'),
@@ -295,7 +294,6 @@ describe('SelectionTabs', () => {
 
       findButton(wrapper, label).simulate('click');
 
-      assert.calledOnce(fakeStore.clearSelection);
       assert.calledWith(fakeStore.selectTab, tab);
     });
   });
@@ -306,7 +304,6 @@ describe('SelectionTabs', () => {
 
     findButton(wrapper, 'Page Notes').simulate('click');
 
-    assert.notCalled(fakeStore.clearSelection);
     assert.notCalled(fakeStore.selectTab);
   });
 
