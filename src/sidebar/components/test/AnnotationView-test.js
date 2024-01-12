@@ -25,7 +25,9 @@ describe('AnnotationView', () => {
     fakeOnLogin = sinon.stub();
 
     fakeUseRootThread = sinon.stub().returns({
-      children: [],
+      rootThread: {
+        children: [],
+      },
     });
 
     $imports.$mock(mockImportedComponents());

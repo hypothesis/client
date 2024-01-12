@@ -133,7 +133,7 @@ function FilterStatusMessage({
  */
 export default function FilterAnnotationsStatus() {
   const store = useSidebarStore();
-  const rootThread = useRootThread();
+  const { rootThread } = useRootThread();
 
   const annotationCount = store.annotationCount();
   const directLinkedId = store.directLinkedAnnotationId();

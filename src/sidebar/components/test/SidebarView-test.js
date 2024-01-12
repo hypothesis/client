@@ -35,7 +35,14 @@ describe('SidebarView', () => {
       load: sinon.stub(),
     };
     fakeUseRootThread = sinon.stub().returns({
-      children: [],
+      rootThread: {
+        children: [],
+      },
+      tabCounts: {
+        annotation: 1,
+        note: 2,
+        orphan: 0,
+      },
     });
     fakeStreamer = {
       connect: sinon.stub(),

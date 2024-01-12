@@ -24,7 +24,7 @@ describe('sidebar/helpers/thread-annotations', () => {
   beforeEach(() => {
     fakeThreadState = {
       annotations: [],
-      route: 'sidebar',
+      showTabs: true,
       selection: {
         expanded: {},
         forcedVisible: [],
@@ -36,7 +36,9 @@ describe('sidebar/helpers/thread-annotations', () => {
       },
     };
 
-    fakeBuildThread = sinon.stub().returns(fixtures.emptyThread);
+    fakeBuildThread = sinon
+      .stub()
+      .callsFake(() => structuredClone(fixtures.emptyThread));
     fakeFilterAnnotations = sinon.stub();
     fakeQueryParser = {
       parseFilterQuery: sinon.stub(),
@@ -55,12 +57,15 @@ describe('sidebar/helpers/thread-annotations', () => {
 
   describe('threadAnnotations', () => {
     it('returns the result of buildThread', () => {
-      assert.equal(threadAnnotations(fakeThreadState), fixtures.emptyThread);
+      assert.deepEqual(
+        threadAnnotations(fakeThreadState).rootThread,
+        fixtures.emptyThread,
+      );
     });
 
     it('memoizes on `threadState`', () => {
-      fakeBuildThread.onCall(0).returns({ brisket: 'fingers' });
-      fakeBuildThread.onCall(1).returns({ brisket: 'bananas' });
+      fakeBuildThread.onCall(0).returns({ children: [] });
+      fakeBuildThread.onCall(1).returns({ children: [] });
 
       const thread1 = threadAnnotations(fakeThreadState);
       const thread2 = threadAnnotations(fakeThreadState);
@@ -113,39 +118,115 @@ describe('sidebar/helpers/thread-annotations', () => {
     });
 
     describe('annotation and thread filtering', () => {
-      context('sidebar route', () => {
+      context('when `showTabs` is true', () => {
+        function annotationForTab(tab) {
+          switch (tab) {
+            case 'annotation':
+              return {
+                ...annotationFixtures.defaultAnnotation(),
+                $orphan: false,
+              };
+            case 'note':
+              return annotationFixtures.oldPageNote();
+            case 'orphan':
+              return {
+                ...annotationFixtures.defaultAnnotation(),
+                $orphan: true,
+              };
+            default:
+              throw new Error('Invalid tab');
+          }
+        }
+
+        [
+          // Tabs enabled, annotations in each tab.
+          {
+            annotations: [
+              annotationForTab('annotation'),
+              annotationForTab('annotation'),
+              annotationForTab('annotation'),
+              annotationForTab('note'),
+              annotationForTab('note'),
+              annotationForTab('orphan'),
+            ],
+            showTabs: true,
+            expectedCounts: {
+              annotation: 3,
+              note: 2,
+              orphan: 1,
+            },
+          },
+          // Tabs enabled, no annotations
+          {
+            annotations: [],
+            showTabs: true,
+            expectedCounts: {
+              annotation: 0,
+              note: 0,
+              orphan: 0,
+            },
+          },
+          // Tabs disabled
+          {
+            annotations: [
+              annotationForTab('annotation'),
+              annotationForTab('note'),
+              annotationForTab('orphan'),
+            ],
+            showTabs: false,
+            expectedCounts: {
+              annotation: 0,
+              note: 0,
+              orphan: 0,
+            },
+          },
+        ].forEach(({ annotations, showTabs, expectedCounts }) => {
+          it('returns thread count for each tab', () => {
+            fakeThreadState.annotations = annotations;
+            fakeBuildThread.returns({
+              children: fakeThreadState.annotations.map(annotation => ({
+                annotation,
+              })),
+            });
+            fakeThreadState.showTabs = showTabs;
+            fakeThreadState.selection.selectedTab = 'annotation';
+
+            const { tabCounts } = threadAnnotations(fakeThreadState);
+
+            assert.deepEqual(tabCounts, expectedCounts);
+          });
+        });
+
         ['note', 'annotation', 'orphan'].forEach(selectedTab => {
           it(`should filter the thread for the tab '${selectedTab}'`, () => {
-            const annotations = {
-              ['annotation']: {
+            fakeThreadState.annotations = [
+              {
                 ...annotationFixtures.defaultAnnotation(),
                 $orphan: false,
               },
-              ['note']: annotationFixtures.oldPageNote(),
-              ['orphan']: {
+              annotationFixtures.oldPageNote(),
+              {
                 ...annotationFixtures.defaultAnnotation(),
                 $orphan: true,
               },
-            };
-            const fakeThreads = [
-              {},
-              { annotation: annotations.annotation },
-              { annotation: annotations.note },
-              { annotation: annotations.orphan },
             ];
+            fakeBuildThread.returns({
+              children: fakeThreadState.annotations.map(annotation => ({
+                annotation,
+              })),
+            });
+            fakeThreadState.showTabs = true;
             fakeThreadState.selection.selectedTab = selectedTab;
 
-            threadAnnotations(fakeThreadState);
-
-            const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
-            const filteredThreads = fakeThreads.filter(thread =>
-              threadFilterFn(thread),
-            );
+            const { rootThread } = threadAnnotations(fakeThreadState);
+            const filteredThreads = rootThread.children;
 
             assert.lengthOf(filteredThreads, 1);
             assert.equal(
-              filteredThreads[0].annotation,
-              annotations[selectedTab],
+              fakeThreadState.annotations.indexOf(
+                filteredThreads[0].annotation,
+              ),
+              ['annotation', 'note', 'orphan'].indexOf(selectedTab),
             );
           });
         });

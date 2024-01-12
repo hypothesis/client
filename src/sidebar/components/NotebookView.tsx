@@ -33,7 +33,7 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
   const isLoading = store.isLoading();
   const resultCount = store.annotationResultCount();
 
-  const rootThread = useRootThread();
+  const { rootThread } = useRootThread();
 
   const groupName = focusedGroup?.name ?? '…';
 

@@ -7,7 +7,7 @@ import { useRootThread } from '../hooks/use-root-thread';
 
 export default function SearchStatus() {
   const store = useSidebarStore();
-  const rootThread = useRootThread();
+  const { rootThread } = useRootThread();
 
   const filterQuery = store.filterQuery();
   const forcedVisibleCount = store.forcedVisibleThreads().length;

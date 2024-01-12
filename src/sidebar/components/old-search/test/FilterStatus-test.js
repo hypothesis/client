@@ -36,7 +36,9 @@ describe('FilterStatus', () => {
       toggleFocusMode: sinon.stub(),
     };
 
-    fakeUseRootThread = sinon.stub().returns({});
+    fakeUseRootThread = sinon.stub().returns({
+      rootThread: { children: [] },
+    });
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
@@ -44,6 +46,10 @@ describe('FilterStatus', () => {
       '../../store': { useSidebarStore: () => fakeStore },
       '../../helpers/thread': fakeThreadUtil,
     });
+  });
+
+  afterEach(() => {
+    $imports.$restore();
   });
 
   function assertFilterText(wrapper, text) {
@@ -155,23 +161,25 @@ describe('FilterStatus', () => {
       // the selectedCount from the count of all visible top-level threads
       // (children/replies are ignored in this count)
       fakeUseRootThread.returns({
-        id: '__default__',
-        children: [
-          { id: '1', annotation: { $tag: '1' }, visible: true, children: [] },
-          {
-            id: '2',
-            annotation: { $tag: '2' },
-            visible: true,
-            children: [
-              {
-                id: '2a',
-                annotation: { $tag: '2a' },
-                visible: true,
-                children: [],
-              },
-            ],
-          },
-        ],
+        rootThread: {
+          id: '__default__',
+          children: [
+            { id: '1', annotation: { $tag: '1' }, visible: true, children: [] },
+            {
+              id: '2',
+              annotation: { $tag: '2' },
+              visible: true,
+              children: [
+                {
+                  id: '2a',
+                  annotation: { $tag: '2a' },
+                  visible: true,
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
       });
       assertFilterText(createComponent(), 'Showing 1 annotation (and 1 more)');
     });
