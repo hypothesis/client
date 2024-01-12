@@ -189,18 +189,30 @@ export class AnnotationsExporter {
               </a>
             </p>
 
-            <dl>
-              <dt>Group</dt>
-              <dd>{groupName}</dd>
-              <dt>Total users</dt>
-              <dd>{uniqueUsers.length}</dd>
-              <dt>Users</dt>
-              <dd>{uniqueUsers.join(', ')}</dd>
-              <dt>Total annotations</dt>
-              <dd>{annotations.length}</dd>
-              <dt>Total replies</dt>
-              <dd>{replies.length}</dd>
-            </dl>
+            <table>
+              <tbody>
+                <tr>
+                  <td>Group:</td>
+                  <td>{groupName}</td>
+                </tr>
+                <tr>
+                  <td>Total users:</td>
+                  <td>{uniqueUsers.length}</td>
+                </tr>
+                <tr>
+                  <td>Users:</td>
+                  <td>{uniqueUsers.join(', ')}</td>
+                </tr>
+                <tr>
+                  <td>Total annotations:</td>
+                  <td>{annotations.length}</td>
+                </tr>
+                <tr>
+                  <td>Total replies:</td>
+                  <td>{replies.length}</td>
+                </tr>
+              </tbody>
+            </table>
           </section>
           <hr />
           <section>
