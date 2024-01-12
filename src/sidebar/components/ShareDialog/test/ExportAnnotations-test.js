@@ -19,6 +19,8 @@ describe('ExportAnnotations', () => {
   let fakeDownloadCSVFile;
   let fakeDownloadHTMLFile;
   let fakeSuggestedFilename;
+  let fakeCopyPlainText;
+  let fakeCopyHTML;
 
   const fakePrivateGroup = {
     type: 'private',
@@ -44,6 +46,7 @@ describe('ExportAnnotations', () => {
     };
     fakeToastMessenger = {
       error: sinon.stub(),
+      success: sinon.stub(),
     };
     fakeDownloadJSONFile = sinon.stub();
     fakeDownloadTextFile = sinon.stub();
@@ -64,6 +67,8 @@ describe('ExportAnnotations', () => {
         .returns([fixtures.oldAnnotation(), fixtures.oldAnnotation()]),
     };
     fakeSuggestedFilename = sinon.stub().returns('suggested-filename');
+    fakeCopyPlainText = sinon.stub().resolves(undefined);
+    fakeCopyHTML = sinon.stub().resolves(undefined);
 
     $imports.$mock(mockImportedComponents());
 
@@ -78,6 +83,10 @@ describe('ExportAnnotations', () => {
         suggestedFilename: fakeSuggestedFilename,
       },
       '../../store': { useSidebarStore: () => fakeStore },
+      '../../util/copy-to-clipboard': {
+        copyPlainText: fakeCopyPlainText,
+        copyHTML: fakeCopyHTML,
+      },
     });
 
     $imports.$restore({
@@ -95,6 +104,15 @@ describe('ExportAnnotations', () => {
 
   const waitForTestId = async (wrapper, testId) =>
     waitForElement(wrapper, `[data-testid="${testId}"]`);
+
+  const selectExportFormat = async (wrapper, format) => {
+    const select = await waitForElement(
+      wrapper,
+      '[data-testid="export-format-select"]',
+    );
+    select.props().onChange({ value: format });
+    wrapper.update();
+  };
 
   context('export annotations not ready (loading)', () => {
     it('renders a loading spinner if there is no focused group', () => {
@@ -288,14 +306,6 @@ describe('ExportAnnotations', () => {
   describe('export form submitted', () => {
     const submitExportForm = wrapper =>
       wrapper.find('[data-testid="export-form"]').simulate('submit');
-    const selectExportFormat = async (wrapper, format) => {
-      const select = await waitForElement(
-        wrapper,
-        '[data-testid="export-format-select"]',
-      );
-      select.props().onChange({ value: format });
-      wrapper.update();
-    };
 
     [
       {
@@ -453,6 +463,70 @@ describe('ExportAnnotations', () => {
           'Exporting annotations failed',
         );
       });
+    });
+  });
+
+  context('when copying annotations export to clipboard', () => {
+    [true, false].forEach(exportFormatsEnabled => {
+      it('displays copy button if `export_formats` FF is enabled', () => {
+        fakeStore.isFeatureEnabled.callsFake(
+          ff => exportFormatsEnabled || ff !== 'export_formats',
+        );
+
+        const wrapper = createComponent();
+        assert.equal(
+          wrapper.exists('[data-testid="copy-button"]'),
+          exportFormatsEnabled,
+        );
+      });
+    });
+
+    [
+      {
+        format: 'json',
+        getExpectedInvokedCallback: () => fakeCopyPlainText,
+      },
+      {
+        format: 'txt',
+        getExpectedInvokedCallback: () => fakeCopyPlainText,
+      },
+      {
+        format: 'csv',
+        getExpectedInvokedCallback: () => fakeCopyPlainText,
+      },
+      {
+        format: 'html',
+        getExpectedInvokedCallback: () => fakeCopyHTML,
+      },
+    ].forEach(({ format, getExpectedInvokedCallback }) => {
+      it('copies export content as rich or plain text depending on format', async () => {
+        fakeStore.isFeatureEnabled.callsFake(ff => ff === 'export_formats');
+
+        const wrapper = createComponent();
+        const copyButton = wrapper.find('button[data-testid="copy-button"]');
+
+        await selectExportFormat(wrapper, format);
+        await act(() => {
+          copyButton.simulate('click');
+        });
+
+        assert.called(getExpectedInvokedCallback());
+        assert.calledWith(fakeToastMessenger.success, 'Annotations copied');
+      });
+    });
+
+    it('adds error toast message when copying annotations fails', async () => {
+      fakeStore.isFeatureEnabled.callsFake(ff => ff === 'export_formats');
+      fakeCopyPlainText.rejects(new Error('Something failed'));
+
+      const wrapper = createComponent();
+      const copyButton = wrapper.find('button[data-testid="copy-button"]');
+
+      await act(() => {
+        copyButton.simulate('click');
+      });
+
+      assert.calledWith(fakeToastMessenger.error, 'Copying annotations failed');
     });
   });
 

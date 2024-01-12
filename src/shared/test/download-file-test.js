@@ -48,13 +48,12 @@ describe('download-file', () => {
   }
 
   it('downloadJSONFile generates JSON file with provided data', () => {
-    const data = { foo: ['bar', 'baz'] };
+    const data = JSON.stringify({ foo: ['bar', 'baz'] }, null, 2);
     const filename = 'my-file.json';
 
-    const fileContent = downloadJSONFile(data, filename, fakeDocument);
+    downloadJSONFile(data, filename, fakeDocument);
 
-    assert.equal(fileContent, JSON.stringify(data, null, 2));
-    assertDownloadHappened(filename, fileContent, 'application/json');
+    assertDownloadHappened(filename, data, 'application/json');
   });
 
   it('downloadTextFile generates text file with provided data', () => {

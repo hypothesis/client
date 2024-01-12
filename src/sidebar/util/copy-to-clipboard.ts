@@ -7,6 +7,8 @@
  * @throws {Error}
  *   This function may throw an exception if the browser rejects the attempt
  *   to copy text.
+ *
+ * @deprecated Use copyPlainText instead
  */
 export function copyText(text: string) {
   const temp = document.createElement('textarea'); // use textarea instead of input to preserve line breaks
@@ -28,5 +30,37 @@ export function copyText(text: string) {
     document.execCommand('copy');
   } finally {
     temp.remove();
+  }
+}
+
+/**
+ * Copy the string `text` to the clipboard verbatim.
+ *
+ * @throws {Error}
+ *   This function may throw an error if the `clipboard-write` permission was
+ *   not allowed.
+ */
+export async function copyPlainText(text: string, navigator_ = navigator) {
+  await navigator_.clipboard.writeText(text);
+}
+
+/**
+ * Copy the string `text` to the clipboard, rendering HTML if any, instead of
+ * raw markup.
+ *
+ * If the browser does not support this, it will fall back to copy the string
+ * as plain text.
+ *
+ * @throws {Error}
+ *   This function may throw an error if the `clipboard-write` permission was
+ *   not allowed.
+ */
+export async function copyHTML(text: string, navigator_ = navigator) {
+  if (!navigator_.clipboard.write) {
+    await copyPlainText(text, navigator_);
+  } else {
+    const type = 'text/html';
+    const blob = new Blob([text], { type });
+    await navigator_.clipboard.write([new ClipboardItem({ [type]: blob })]);
   }
 }

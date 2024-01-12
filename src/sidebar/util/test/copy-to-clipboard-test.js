@@ -1,15 +1,22 @@
-import { copyText } from '../copy-to-clipboard';
+import { copyPlainText, copyHTML, copyText } from '../copy-to-clipboard';
 
 describe('copy-to-clipboard', () => {
-  beforeEach(() => {
-    sinon.stub(document, 'execCommand');
-  });
-
-  afterEach(() => {
-    document.execCommand.restore();
+  const createFakeNavigator = ({ supportsWrite = true } = {}) => ({
+    clipboard: {
+      writeText: sinon.stub(),
+      write: supportsWrite ? sinon.stub() : undefined,
+    },
   });
 
   describe('copyText', () => {
+    beforeEach(() => {
+      sinon.stub(document, 'execCommand');
+    });
+
+    afterEach(() => {
+      document.execCommand.restore();
+    });
+
     /**
      * Returns the temporary element used to hold text being copied.
      */
@@ -49,6 +56,39 @@ describe('copy-to-clipboard', () => {
         assert.equal(e.message, 'No clipboard access for you!');
       }
       assert.isNull(tempSpan());
+    });
+  });
+
+  describe('copyPlainText', () => {
+    it('writes provided text to clipboard', async () => {
+      const text = 'Lorem ipsum dolor sit amet';
+      const navigator = createFakeNavigator();
+
+      await copyPlainText(text, navigator);
+
+      assert.calledWith(navigator.clipboard.writeText, text);
+      assert.notCalled(navigator.clipboard.write);
+    });
+  });
+
+  describe('copyHTML', () => {
+    it('writes provided text to clipboard', async () => {
+      const text = 'Lorem ipsum dolor sit amet';
+      const navigator = createFakeNavigator();
+
+      await copyHTML(text, navigator);
+
+      assert.called(navigator.clipboard.write);
+      assert.notCalled(navigator.clipboard.writeText);
+    });
+
+    it('falls back to plain text if rich text is not supported', async () => {
+      const text = 'Lorem ipsum dolor sit amet';
+      const navigator = createFakeNavigator({ supportsWrite: false });
+
+      await copyHTML(text, navigator);
+
+      assert.calledWith(navigator.clipboard.writeText, text);
     });
   });
 });

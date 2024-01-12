@@ -85,6 +85,7 @@ function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
   sidebarFrame.src = sidebarAppSrc;
   sidebarFrame.title = 'Hypothesis annotation viewer';
   sidebarFrame.className = 'sidebar-frame';
+  sidebarFrame.allow = 'clipboard-write';
 
   return sidebarFrame;
 }
