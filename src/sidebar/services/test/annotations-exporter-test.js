@@ -120,28 +120,28 @@ Total annotations: 5
 Total replies: 1
 
 Annotation 1:
-${formattedNow}
+Created at: ${formattedNow}
 Comment: Annotation text
 bill
 Quote: "this is the quote"
 Tags: tag_1, tag_2
 
 Annotation 2:
-${formattedNow}
+Created at: ${formattedNow}
 Comment: Annotation text
 bill
 Quote: "null"
 Tags: tag_1, tag_2
 
 Annotation 3:
-${formattedNow}
+Created at: ${formattedNow}
 Comment: Annotation text
 jane
 Quote: "null"
 Tags: foo, bar
 
 Annotation 4:
-${formattedNow}
+Created at: ${formattedNow}
 Comment: Annotation text
 bill
 Quote: "null"
@@ -149,7 +149,7 @@ Tags: tag_1, tag_2
 Page: 23
 
 Annotation 5:
-${formattedNow}
+Created at: ${formattedNow}
 Comment: Annotation text
 bill
 Quote: "null"
@@ -183,7 +183,7 @@ Total annotations: 1
 Total replies: 0
 
 Annotation 1:
-${formattedNow}
+Created at: ${formattedNow}
 Comment: Annotation text
 John Doe
 Quote: "null"
@@ -229,7 +229,7 @@ Tags: tag_1, tag_2`,
 
       assert.equal(
         result,
-        `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
+        `Created at,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
 ${formattedNow},http://example.com,My group,Annotation,,jane,Annotation text,"foo,bar",
 ${formattedNow},http://example.com,My group,Reply,"includes ""double quotes"", and commas",bill,Annotation text,"tag_1,tag_2",23
 ${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
@@ -252,7 +252,7 @@ ${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,ii
 
       assert.equal(
         result,
-        `Creation Date,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
+        `Created at,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
 ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text,"tag_1,tag_2",`,
       );
     });
@@ -356,6 +356,7 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
       <article>
         <h2>Annotation 1:</h2>
         <p>
+          Created at:
           <time datetime="${isoDate}">${formattedNow}</time>
         </p>
         <p>Comment: Annotation text</p>
@@ -369,6 +370,7 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
       <article>
         <h2>Annotation 2:</h2>
         <p>
+          Created at:
           <time datetime="${isoDate}">${formattedNow}</time>
         </p>
         <p>Comment: Annotation text</p>
@@ -383,6 +385,7 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
       <article>
         <h2>Annotation 3:</h2>
         <p>
+          Created at:
           <time datetime="${isoDate}">${formattedNow}</time>
         </p>
         <p>Comment: Annotation text</p>
