@@ -78,7 +78,7 @@ export class AnnotationsExporter {
     const annotationsAsText = annotations.map((annotation, index) => {
       const page = pageLabel(annotation);
       const lines = [
-        formatDateTime(new Date(annotation.created)),
+        `Created at: ${formatDateTime(new Date(annotation.created))}`,
         `Comment: ${annotation.text}`,
         extractUsername(annotation),
         `Quote: "${quote(annotation)}"`,
@@ -135,7 +135,7 @@ export class AnnotationsExporter {
         .join(',');
 
     const headers = [
-      'Creation Date',
+      'Created at',
       'URL',
       'Group',
       'Annotation/Reply Type',
@@ -223,6 +223,7 @@ export class AnnotationsExporter {
                 <article key={annotation.id}>
                   <h2>Annotation {index + 1}:</h2>
                   <p>
+                    Created at:
                     <time dateTime={annotation.created}>
                       {formatDateTime(new Date(annotation.created))}
                     </time>
