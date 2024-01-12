@@ -19,25 +19,6 @@ function downloadFile(
   URL.revokeObjectURL(url);
 }
 
-/**
- * Download a file containing JSON-serialized `object` as `filename`
- *
- * @param data - JSON-serializable object
- * @return The contents of the downloaded file
- * @throws {Error} If provided data cannot be JSON-serialized
- */
-export function downloadJSONFile(
-  data: object,
-  filename: string,
-  /* istanbul ignore next - test seam */
-  _document = document,
-): string {
-  const fileContent = JSON.stringify(data, null, 2);
-  downloadFile(fileContent, 'application/json', filename, _document);
-
-  return fileContent;
-}
-
 function buildTextFileDownloader(type: string) {
   return (
     text: string,
@@ -46,6 +27,8 @@ function buildTextFileDownloader(type: string) {
     _document = document,
   ) => downloadFile(text, type, filename, _document);
 }
+
+export const downloadJSONFile = buildTextFileDownloader('application/json');
 
 export const downloadTextFile = buildTextFileDownloader('text/plain');
 

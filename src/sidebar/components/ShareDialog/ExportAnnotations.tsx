@@ -4,6 +4,7 @@ import {
   Link,
   Input,
   SelectNext,
+  CopyIcon,
 } from '@hypothesis/frontend-shared';
 import { useCallback, useId, useMemo, useState } from 'preact/hooks';
 
@@ -22,6 +23,7 @@ import { withServices } from '../../service-context';
 import type { AnnotationsExporter } from '../../services/annotations-exporter';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
+import { copyPlainText, copyHTML } from '../../util/copy-to-clipboard';
 import LoadingSpinner from './LoadingSpinner';
 import { UserAnnotationsListItem } from './UserAnnotationsListItem';
 
@@ -133,30 +135,20 @@ function ExportAnnotations({
   );
   const [customFilename, setCustomFilename] = useState<string>();
 
-  if (!exportReady) {
-    return <LoadingSpinner />;
-  }
-
-  const exportAnnotations = (e: Event) => {
-    e.preventDefault();
-
-    try {
-      const format = exportFormat.value;
+  const buildExportContent = useCallback(
+    (format: ExportFormat['value']): string => {
       const annotationsToExport =
         selectedUser?.annotations ?? exportableAnnotations;
-      const filename = `${customFilename ?? defaultFilename}.${format}`;
-
       switch (format) {
         case 'json': {
-          const exportData = annotationsExporter.buildJSONExportContent(
+          const data = annotationsExporter.buildJSONExportContent(
             annotationsToExport,
             { profile },
           );
-          downloadJSONFile(exportData, filename);
-          break;
+          return JSON.stringify(data, null, 2);
         }
         case 'txt': {
-          const exportData = annotationsExporter.buildTextExportContent(
+          return annotationsExporter.buildTextExportContent(
             annotationsToExport,
             {
               groupName: group?.name,
@@ -164,11 +156,9 @@ function ExportAnnotations({
               displayNamesEnabled,
             },
           );
-          downloadTextFile(exportData, filename);
-          break;
         }
         case 'csv': {
-          const exportData = annotationsExporter.buildCSVExportContent(
+          return annotationsExporter.buildCSVExportContent(
             annotationsToExport,
             {
               groupName: group?.name,
@@ -176,11 +166,9 @@ function ExportAnnotations({
               displayNamesEnabled,
             },
           );
-          downloadCSVFile(exportData, filename);
-          break;
         }
         case 'html': {
-          const exportData = annotationsExporter.buildHTMLExportContent(
+          return annotationsExporter.buildHTMLExportContent(
             annotationsToExport,
             {
               groupName: group?.name,
@@ -188,14 +176,81 @@ function ExportAnnotations({
               displayNamesEnabled,
             },
           );
-          downloadHTMLFile(exportData, filename);
-          break;
         }
+        /* istanbul ignore next - This should never happen */
+        default:
+          throw new Error(`Invalid format: ${format}`);
       }
+    },
+    [
+      annotationsExporter,
+      defaultAuthority,
+      displayNamesEnabled,
+      exportableAnnotations,
+      group?.name,
+      profile,
+      selectedUser?.annotations,
+    ],
+  );
+  const exportAnnotations = useCallback(
+    (e: Event) => {
+      e.preventDefault();
+
+      try {
+        const format = exportFormat.value;
+        const filename = `${customFilename ?? defaultFilename}.${format}`;
+        const exportData = buildExportContent(format);
+
+        switch (format) {
+          case 'json': {
+            downloadJSONFile(exportData, filename);
+            break;
+          }
+          case 'txt': {
+            downloadTextFile(exportData, filename);
+            break;
+          }
+          case 'csv': {
+            downloadCSVFile(exportData, filename);
+            break;
+          }
+          case 'html': {
+            downloadHTMLFile(exportData, filename);
+            break;
+          }
+        }
+      } catch (e) {
+        toastMessenger.error('Exporting annotations failed');
+      }
+    },
+    [
+      buildExportContent,
+      customFilename,
+      defaultFilename,
+      exportFormat.value,
+      toastMessenger,
+    ],
+  );
+  const copyAnnotationsExport = useCallback(async () => {
+    const format = exportFormat.value;
+    const exportData = buildExportContent(format);
+
+    try {
+      if (format === 'html') {
+        await copyHTML(exportData);
+      } else {
+        await copyPlainText(exportData);
+      }
+
+      toastMessenger.success('Annotations copied');
     } catch (e) {
-      toastMessenger.error('Exporting annotations failed');
+      toastMessenger.error('Copying annotations failed');
     }
-  };
+  }, [buildExportContent, exportFormat.value, toastMessenger]);
+
+  if (!exportReady) {
+    return <LoadingSpinner />;
+  }
 
   // Naive simple English pluralization
   const pluralize = (count: number, singular: string, plural: string) => {
@@ -310,6 +365,16 @@ function ExportAnnotations({
         </p>
       )}
       <CardActions>
+        {exportFormatsEnabled && (
+          <Button
+            data-testid="copy-button"
+            icon={CopyIcon}
+            onClick={copyAnnotationsExport}
+            disabled={exportableAnnotations.length === 0}
+          >
+            Copy to clipboard
+          </Button>
+        )}
         <Button
           data-testid="export-button"
           variant="primary"
