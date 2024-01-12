@@ -115,7 +115,6 @@ function SelectionTabs({
   const isWaitingToAnchorAnnotations = store.isWaitingToAnchorAnnotations();
 
   const selectTab = (tabId: TabName) => {
-    store.clearSelection();
     store.selectTab(tabId);
   };
 
