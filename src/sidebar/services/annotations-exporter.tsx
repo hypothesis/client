@@ -222,21 +222,46 @@ export class AnnotationsExporter {
               return (
                 <article key={annotation.id}>
                   <h2>Annotation {index + 1}:</h2>
-                  <p>
-                    Created at:
-                    <time dateTime={annotation.created}>
-                      {formatDateTime(new Date(annotation.created))}
-                    </time>
-                  </p>
-                  <p>Author: {extractUsername(annotation)}</p>
-                  {page && <p>Page: {page}</p>}
-                  <p>
-                    Quote: <blockquote>{quote(annotation)}</blockquote>
-                  </p>
-                  <p>Comment: {annotation.text}</p>
-                  {annotation.tags.length > 0 && (
-                    <p>Tags: {annotation.tags.join(', ')}</p>
-                  )}
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>Created at:</td>
+                        <td>
+                          <time dateTime={annotation.created}>
+                            {formatDateTime(new Date(annotation.created))}
+                          </time>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Author:</td>
+                        <td>{extractUsername(annotation)}</td>
+                      </tr>
+                      {page && (
+                        <tr>
+                          <td>Page:</td>
+                          <td>{page}</td>
+                        </tr>
+                      )}
+                      <tr>
+                        <td>Quote:</td>
+                        <td>
+                          <blockquote style={{ margin: 0 }}>
+                            {quote(annotation)}
+                          </blockquote>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Comment:</td>
+                        <td>{annotation.text}</td>
+                      </tr>
+                      {annotation.tags.length > 0 && (
+                        <tr>
+                          <td>Tags:</td>
+                          <td>{annotation.tags.join(', ')}</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </article>
               );
             })}

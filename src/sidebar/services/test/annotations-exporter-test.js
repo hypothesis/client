@@ -355,46 +355,100 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       <h1>Annotations</h1>
       <article>
         <h2>Annotation 1:</h2>
-        <p>
-          Created at:
-          <time datetime="${isoDate}">${formattedNow}</time>
-        </p>
-        <p>Author: jane</p>
-        <p>
-          Quote: 
-          <blockquote></blockquote>
-        </p>
-        <p>Comment: Annotation text</p>
-        <p>Tags: foo, bar</p>
+        <table>
+          <tbody>
+            <tr>
+              <td>Created at:</td>
+              <td>
+                <time datetime="${isoDate}">${formattedNow}</time>
+              </td>
+            </tr>
+            <tr>
+              <td>Author:</td>
+              <td>jane</td>
+            </tr>
+            <tr>
+              <td>Quote:</td>
+              <td>
+                <blockquote style="margin:0px;"></blockquote>
+              </td>
+            </tr>
+            <tr>
+              <td>Comment:</td>
+              <td>Annotation text</td>
+            </tr>
+            <tr>
+              <td>Tags:</td>
+              <td>foo, bar</td>
+            </tr>
+          </tbody>
+        </table>
       </article>
       <article>
         <h2>Annotation 2:</h2>
-        <p>
-          Created at:
-          <time datetime="${isoDate}">${formattedNow}</time>
-        </p>
-        <p>Author: bill</p>
-        <p>Page: 23</p>
-        <p>
-          Quote: 
-          <blockquote>includes &lt;p>HTML&lt;/p> tags</blockquote>
-        </p>
-        <p>Comment: Annotation text</p>
-        <p>Tags: tag_1, tag_2</p>
+        <table>
+          <tbody>
+            <tr>
+              <td>Created at:</td>
+              <td>
+                <time datetime="${isoDate}">${formattedNow}</time>
+              </td>
+            </tr>
+            <tr>
+              <td>Author:</td>
+              <td>bill</td>
+            </tr>
+            <tr>
+              <td>Page:</td>
+              <td>23</td>
+            </tr>
+            <tr>
+              <td>Quote:</td>
+              <td>
+                <blockquote style="margin:0px;">includes &lt;p>HTML&lt;/p> tags</blockquote>
+              </td>
+            </tr>
+            <tr>
+              <td>Comment:</td>
+              <td>Annotation text</td>
+            </tr>
+            <tr>
+              <td>Tags:</td>
+              <td>tag_1, tag_2</td>
+            </tr>
+          </tbody>
+        </table>
       </article>
       <article>
         <h2>Annotation 3:</h2>
-        <p>
-          Created at:
-          <time datetime="${isoDate}">${formattedNow}</time>
-        </p>
-        <p>Author: bill</p>
-        <p>Page: iii</p>
-        <p>
-          Quote: 
-          <blockquote></blockquote>
-        </p>
-        <p>Comment: Annotation text</p>
+        <table>
+          <tbody>
+            <tr>
+              <td>Created at:</td>
+              <td>
+                <time datetime="${isoDate}">${formattedNow}</time>
+              </td>
+            </tr>
+            <tr>
+              <td>Author:</td>
+              <td>bill</td>
+            </tr>
+            <tr>
+              <td>Page:</td>
+              <td>iii</td>
+            </tr>
+            <tr>
+              <td>Quote:</td>
+              <td>
+                <blockquote style="margin:0px;"></blockquote>
+              </td>
+            </tr>
+            <tr>
+              <td>Comment:</td>
+              <td>Annotation text</td>
+            </tr>
+          </tbody>
+        </table>
       </article>
     </section>
   </body>
