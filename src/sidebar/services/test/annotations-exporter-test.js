@@ -121,39 +121,39 @@ Total replies: 1
 
 Annotation 1:
 Created at: ${formattedNow}
-Comment: Annotation text
-bill
+Author: bill
 Quote: "this is the quote"
+Comment: Annotation text
 Tags: tag_1, tag_2
 
 Annotation 2:
 Created at: ${formattedNow}
-Comment: Annotation text
-bill
+Author: bill
 Quote: "null"
+Comment: Annotation text
 Tags: tag_1, tag_2
 
 Annotation 3:
 Created at: ${formattedNow}
-Comment: Annotation text
-jane
+Author: jane
 Quote: "null"
+Comment: Annotation text
 Tags: foo, bar
 
 Annotation 4:
 Created at: ${formattedNow}
-Comment: Annotation text
-bill
-Quote: "null"
-Tags: tag_1, tag_2
+Author: bill
 Page: 23
+Quote: "null"
+Comment: Annotation text
+Tags: tag_1, tag_2
 
 Annotation 5:
 Created at: ${formattedNow}
-Comment: Annotation text
-bill
+Author: bill
+Page: iii
 Quote: "null"
-Page: iii`,
+Comment: Annotation text`,
       );
     });
 
@@ -184,9 +184,9 @@ Total replies: 0
 
 Annotation 1:
 Created at: ${formattedNow}
-Comment: Annotation text
-John Doe
+Author: John Doe
 Quote: "null"
+Comment: Annotation text
 Tags: tag_1, tag_2`,
       );
     });
@@ -229,10 +229,10 @@ Tags: tag_1, tag_2`,
 
       assert.equal(
         result,
-        `Created at,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
-${formattedNow},http://example.com,My group,Annotation,,jane,Annotation text,"foo,bar",
-${formattedNow},http://example.com,My group,Reply,"includes ""double quotes"", and commas",bill,Annotation text,"tag_1,tag_2",23
-${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
+        `Created at,Author,Page,URL,Group,Annotation/Reply Type,Quote,Comment,Tags
+${formattedNow},jane,,http://example.com,My group,Annotation,,Annotation text,"foo,bar"
+${formattedNow},bill,23,http://example.com,My group,Reply,"includes ""double quotes"", and commas",Annotation text,"tag_1,tag_2"
+${formattedNow},bill,iii,http://example.com,My group,Annotation,,Annotation text,`,
       );
     });
 
@@ -252,8 +252,8 @@ ${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,ii
 
       assert.equal(
         result,
-        `Created at,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
-${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text,"tag_1,tag_2",`,
+        `Created at,Author,Page,URL,Group,Annotation/Reply Type,Quote,Comment,Tags
+${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation text,"tag_1,tag_2"`,
       );
     });
   });
@@ -359,12 +359,12 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
           Created at:
           <time datetime="${isoDate}">${formattedNow}</time>
         </p>
-        <p>Comment: Annotation text</p>
-        <p>jane</p>
+        <p>Author: jane</p>
         <p>
           Quote: 
           <blockquote></blockquote>
         </p>
+        <p>Comment: Annotation text</p>
         <p>Tags: foo, bar</p>
       </article>
       <article>
@@ -373,14 +373,14 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
           Created at:
           <time datetime="${isoDate}">${formattedNow}</time>
         </p>
-        <p>Comment: Annotation text</p>
-        <p>bill</p>
+        <p>Author: bill</p>
+        <p>Page: 23</p>
         <p>
           Quote: 
           <blockquote>includes &lt;p>HTML&lt;/p> tags</blockquote>
         </p>
+        <p>Comment: Annotation text</p>
         <p>Tags: tag_1, tag_2</p>
-        <p>Page: 23</p>
       </article>
       <article>
         <h2>Annotation 3:</h2>
@@ -388,13 +388,13 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
           Created at:
           <time datetime="${isoDate}">${formattedNow}</time>
         </p>
-        <p>Comment: Annotation text</p>
-        <p>bill</p>
+        <p>Author: bill</p>
+        <p>Page: iii</p>
         <p>
           Quote: 
           <blockquote></blockquote>
         </p>
-        <p>Page: iii</p>
+        <p>Comment: Annotation text</p>
       </article>
     </section>
   </body>
