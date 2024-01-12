@@ -323,18 +323,30 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
           http://example.com
         </a>
       </p>
-      <dl>
-        <dt>Group</dt>
-        <dd>My group</dd>
-        <dt>Total users</dt>
-        <dd>2</dd>
-        <dt>Users</dt>
-        <dd>jane, bill</dd>
-        <dt>Total annotations</dt>
-        <dd>3</dd>
-        <dt>Total replies</dt>
-        <dd>1</dd>
-      </dl>
+      <table>
+        <tbody>
+          <tr>
+            <td>Group:</td>
+            <td>My group</td>
+          </tr>
+          <tr>
+            <td>Total users:</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td>Users:</td>
+            <td>jane, bill</td>
+          </tr>
+          <tr>
+            <td>Total annotations:</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td>Total replies:</td>
+            <td>1</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
     <hr />
     <section>
