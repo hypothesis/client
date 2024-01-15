@@ -148,6 +148,12 @@ describe('sidebar/helpers/thread-annotations', () => {
               annotationForTab('note'),
               annotationForTab('note'),
               annotationForTab('orphan'),
+
+              // Annotation waiting to anchor
+              {
+                ...annotationFixtures.defaultAnnotation(),
+                $orphan: undefined,
+              },
             ],
             showTabs: true,
             expectedCounts: {
@@ -229,6 +235,12 @@ describe('sidebar/helpers/thread-annotations', () => {
               {
                 ...annotationFixtures.defaultAnnotation(),
                 $orphan: true,
+              },
+              // Annotation that is still anchoring. This should not appear on
+              // any tab.
+              {
+                ...annotationFixtures.defaultAnnotation(),
+                $orphan: undefined,
               },
             ];
             fakeBuildThread.returns({
