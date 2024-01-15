@@ -44,14 +44,10 @@ type Module<
  *
  * `StoreFromModule<firstModule> & StoreFromModule<secondModule>`
  */
-type StoreFromModule<T> = T extends Module<
-  any,
-  infer Actions,
-  infer Selectors,
-  infer RootSelectors
->
-  ? Store<Actions, Selectors, RootSelectors>
-  : never;
+type StoreFromModule<T> =
+  T extends Module<any, infer Actions, infer Selectors, infer RootSelectors>
+    ? Store<Actions, Selectors, RootSelectors>
+    : never;
 
 /**
  * Redux store augmented with selector methods to query specific state and
