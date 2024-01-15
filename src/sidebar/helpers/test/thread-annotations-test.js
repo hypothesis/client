@@ -197,6 +197,27 @@ describe('sidebar/helpers/thread-annotations', () => {
           });
         });
 
+        it('filters threads where the root annotation does not exist', () => {
+          fakeBuildThread.returns({
+            children: [
+              {
+                annotation: null,
+                children: [annotationFixtures.oldReply()],
+              },
+            ],
+          });
+          fakeThreadState.showTabs = true;
+          fakeThreadState.selection.selectedTab = 'annotation';
+
+          const { tabCounts, rootThread } = threadAnnotations(fakeThreadState);
+          assert.deepEqual(tabCounts, {
+            annotation: 0,
+            note: 0,
+            orphan: 0,
+          });
+          assert.equal(rootThread.children.length, 0);
+        });
+
         ['note', 'annotation', 'orphan'].forEach(selectedTab => {
           it(`should filter the thread for the tab '${selectedTab}'`, () => {
             fakeThreadState.annotations = [
