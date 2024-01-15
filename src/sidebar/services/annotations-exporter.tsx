@@ -77,11 +77,12 @@ export class AnnotationsExporter {
 
     const annotationsAsText = annotations.map((annotation, index) => {
       const page = pageLabel(annotation);
+      const annotationQuote = quote(annotation);
       const lines = [
         `Created at: ${formatDateTime(new Date(annotation.created))}`,
         `Author: ${extractUsername(annotation)}`,
         page ? `Page: ${page}` : undefined,
-        `Quote: "${quote(annotation)}"`,
+        annotationQuote ? `Quote: "${annotationQuote}"` : undefined,
         `Comment: ${annotation.text}`,
         annotation.tags.length > 0
           ? `Tags: ${annotation.tags.join(', ')}`
@@ -219,6 +220,8 @@ export class AnnotationsExporter {
             <h1>Annotations</h1>
             {annotations.map((annotation, index) => {
               const page = pageLabel(annotation);
+              const annotationQuote = quote(annotation);
+
               return (
                 <article key={annotation.id}>
                   <h2>Annotation {index + 1}:</h2>
@@ -242,14 +245,16 @@ export class AnnotationsExporter {
                           <td>{page}</td>
                         </tr>
                       )}
-                      <tr>
-                        <td>Quote:</td>
-                        <td>
-                          <blockquote style={{ margin: 0 }}>
-                            {quote(annotation)}
-                          </blockquote>
-                        </td>
-                      </tr>
+                      {annotationQuote && (
+                        <tr>
+                          <td>Quote:</td>
+                          <td>
+                            <blockquote style={{ margin: 0 }}>
+                              {annotationQuote}
+                            </blockquote>
+                          </td>
+                        </tr>
+                      )}
                       <tr>
                         <td>Comment:</td>
                         <td>{annotation.text}</td>

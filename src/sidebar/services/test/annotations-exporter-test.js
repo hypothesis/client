@@ -90,6 +90,7 @@ describe('AnnotationsExporter', () => {
           ...baseAnnotation,
           user: 'acct:jane@localhost',
           tags: ['foo', 'bar'],
+          target: targetWithSelectors(quoteSelector('The quote')),
         },
         {
           ...baseAnnotation,
@@ -129,14 +130,13 @@ Tags: tag_1, tag_2
 Annotation 2:
 Created at: ${formattedNow}
 Author: bill
-Quote: "null"
 Comment: Annotation text
 Tags: tag_1, tag_2
 
 Annotation 3:
 Created at: ${formattedNow}
 Author: jane
-Quote: "null"
+Quote: "The quote"
 Comment: Annotation text
 Tags: foo, bar
 
@@ -144,7 +144,6 @@ Annotation 4:
 Created at: ${formattedNow}
 Author: bill
 Page: 23
-Quote: "null"
 Comment: Annotation text
 Tags: tag_1, tag_2
 
@@ -152,7 +151,6 @@ Annotation 5:
 Created at: ${formattedNow}
 Author: bill
 Page: iii
-Quote: "null"
 Comment: Annotation text`,
       );
     });
@@ -185,7 +183,6 @@ Total replies: 0
 Annotation 1:
 Created at: ${formattedNow}
 Author: John Doe
-Quote: "null"
 Comment: Annotation text
 Tags: tag_1, tag_2`,
       );
@@ -273,10 +270,10 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
           ...baseAnnotation,
           user: 'acct:jane@localhost',
           tags: ['foo', 'bar'],
+          target: targetWithSelectors(quoteSelector('The quote')),
         },
         {
           ...baseAnnotation,
-          ...newReply(),
           target: targetWithSelectors(
             quoteSelector('includes <p>HTML</p> tags'),
             pageSelector(23),
@@ -284,6 +281,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
         },
         {
           ...baseAnnotation,
+          ...newReply(),
           tags: [],
           target: targetWithSelectors(pageSelector('iii')),
         },
@@ -370,7 +368,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
             <tr>
               <td>Quote:</td>
               <td>
-                <blockquote style="margin:0px;"></blockquote>
+                <blockquote style="margin:0px;">The quote</blockquote>
               </td>
             </tr>
             <tr>
@@ -436,12 +434,6 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
             <tr>
               <td>Page:</td>
               <td>iii</td>
-            </tr>
-            <tr>
-              <td>Quote:</td>
-              <td>
-                <blockquote style="margin:0px;"></blockquote>
-              </td>
             </tr>
             <tr>
               <td>Comment:</td>
