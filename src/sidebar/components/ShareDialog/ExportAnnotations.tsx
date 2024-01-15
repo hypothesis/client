@@ -210,7 +210,7 @@ function ExportAnnotations({
     >
       {exportableAnnotations.length > 0 ? (
         <>
-          <p className="text-color-text-light mb-3">
+          <p className="text-color-text-light">
             <Link
               variant="text-light"
               underline="always"
@@ -221,75 +221,81 @@ function ExportAnnotations({
             </Link>{' '}
             about copying and exporting annotations.
           </p>
-          <label
-            data-testid="export-count"
-            htmlFor={fileInputId}
-            className="font-medium"
-          >
-            Name of export file:
-          </label>
-          <div className="flex">
-            <Input
-              classes="grow"
-              data-testid="export-filename"
-              id={fileInputId}
-              defaultValue={defaultFilename}
-              value={customFilename}
-              onChange={e =>
-                setCustomFilename((e.target as HTMLInputElement).value)
+          <div className="flex flex-col gap-y-3">
+            <label htmlFor={userSelectId} className="font-medium">
+              Select which user{"'"}s annotations to export:
+            </label>
+            <SelectNext
+              value={selectedUser}
+              onChange={setSelectedUser}
+              buttonId={userSelectId}
+              buttonContent={
+                <UserAnnotationsListItem userAnnotations={selectedUser} />
               }
-              required
-              maxLength={250}
-            />
-            {exportFormatsEnabled && (
-              <div className="grow-0 ml-2 min-w-[5rem]">
-                <SelectNext
-                  value={exportFormat}
-                  onChange={setExportFormat}
-                  buttonContent={exportFormat.shortTitle ?? exportFormat.title}
-                  data-testid="export-format-select"
-                  right
-                >
-                  {exportFormats.map(exportFormat => (
-                    <SelectNext.Option
-                      key={exportFormat.value}
-                      value={exportFormat}
-                    >
-                      <div className="flex-col gap-y-2">
-                        <div className="font-bold" data-testid="format-name">
-                          {exportFormat.title}
-                        </div>
-                        <div data-testid="format-description">
-                          {exportFormat.description}
-                        </div>
-                      </div>
-                    </SelectNext.Option>
-                  ))}
-                </SelectNext>
-              </div>
-            )}
-          </div>
-          <label htmlFor={userSelectId} className="block font-medium">
-            Select which user{"'"}s annotations to export:
-          </label>
-          <SelectNext
-            value={selectedUser}
-            onChange={setSelectedUser}
-            buttonId={userSelectId}
-            buttonContent={
-              <UserAnnotationsListItem userAnnotations={selectedUser} />
-            }
-            data-testid="user-select"
-          >
-            <SelectNext.Option value={allAnnotationsOption}>
-              <UserAnnotationsListItem userAnnotations={allAnnotationsOption} />
-            </SelectNext.Option>
-            {userList.map(userInfo => (
-              <SelectNext.Option key={userInfo.userid} value={userInfo}>
-                <UserAnnotationsListItem userAnnotations={userInfo} />
+              data-testid="user-select"
+            >
+              <SelectNext.Option value={allAnnotationsOption}>
+                <UserAnnotationsListItem
+                  userAnnotations={allAnnotationsOption}
+                />
               </SelectNext.Option>
-            ))}
-          </SelectNext>
+              {userList.map(userInfo => (
+                <SelectNext.Option key={userInfo.userid} value={userInfo}>
+                  <UserAnnotationsListItem userAnnotations={userInfo} />
+                </SelectNext.Option>
+              ))}
+            </SelectNext>
+            <label
+              data-testid="export-count"
+              htmlFor={fileInputId}
+              className="font-medium"
+            >
+              Name of export file:
+            </label>
+            <div className="flex">
+              <Input
+                classes="grow"
+                data-testid="export-filename"
+                id={fileInputId}
+                defaultValue={defaultFilename}
+                value={customFilename}
+                onChange={e =>
+                  setCustomFilename((e.target as HTMLInputElement).value)
+                }
+                required
+                maxLength={250}
+              />
+              {exportFormatsEnabled && (
+                <div className="grow-0 ml-2 min-w-[5rem]">
+                  <SelectNext
+                    value={exportFormat}
+                    onChange={setExportFormat}
+                    buttonContent={
+                      exportFormat.shortTitle ?? exportFormat.title
+                    }
+                    data-testid="export-format-select"
+                    right
+                  >
+                    {exportFormats.map(exportFormat => (
+                      <SelectNext.Option
+                        key={exportFormat.value}
+                        value={exportFormat}
+                      >
+                        <div className="flex-col gap-y-2">
+                          <div className="font-bold" data-testid="format-name">
+                            {exportFormat.title}
+                          </div>
+                          <div data-testid="format-description">
+                            {exportFormat.description}
+                          </div>
+                        </div>
+                      </SelectNext.Option>
+                    ))}
+                  </SelectNext>
+                </div>
+              )}
+            </div>
+          </div>
         </>
       ) : (
         <p data-testid="no-annotations-message">
