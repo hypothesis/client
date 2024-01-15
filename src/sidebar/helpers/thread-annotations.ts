@@ -80,14 +80,19 @@ function threadAnnotationsImpl(
 
   if (threadState.showTabs) {
     rootThread.children = rootThread.children.filter(thread => {
-      if (thread.annotation && isWaitingToAnchor(thread.annotation)) {
-        // Until this annotation anchors or fails to anchor, we do not know which
-        // tab it should be displayed in.
+      // If the root annotation in this thread has been deleted, we don't know
+      // which tab it used to be in.
+      if (!thread.annotation) {
         return false;
       }
-      const tab = thread.annotation
-        ? tabForAnnotation(thread.annotation)
-        : 'annotation';
+
+      // If this annotation is still anchoring, we do not know whether it should
+      // appear in the "Annotations" or "Orphans" tab.
+      if (isWaitingToAnchor(thread.annotation)) {
+        return false;
+      }
+
+      const tab = tabForAnnotation(thread.annotation);
       tabCounts[tab] += 1;
       return tab === selection.selectedTab;
     });
