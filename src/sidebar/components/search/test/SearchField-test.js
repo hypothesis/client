@@ -23,6 +23,10 @@ describe('SearchField', () => {
     input.simulate('input');
   }
 
+  function getClearButton(wrapper) {
+    return wrapper.find('button[data-testid="clear-button"]');
+  }
+
   beforeEach(() => {
     wrappers = [];
     container = document.createElement('div');
@@ -121,6 +125,27 @@ describe('SearchField', () => {
     );
 
     assert.equal(document.activeElement, searchInputEl);
+  });
+
+  it('displays clear button when there is a pending query', () => {
+    const wrapper = createSearchField();
+    assert.isFalse(getClearButton(wrapper).exists());
+
+    typeQuery(wrapper, 'some query');
+    assert.isTrue(getClearButton(wrapper).exists());
+
+    typeQuery(wrapper, '');
+    assert.isFalse(getClearButton(wrapper).exists());
+  });
+
+  it('clears search when clear button is clicked', () => {
+    const onClearSearch = sinon.stub();
+    const wrapper = createSearchField({ onClearSearch });
+
+    typeQuery(wrapper, 'some query');
+    getClearButton(wrapper).simulate('click');
+
+    assert.calledOnce(onClearSearch);
   });
 
   it(

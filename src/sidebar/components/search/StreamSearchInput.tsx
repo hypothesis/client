@@ -24,7 +24,11 @@ function StreamSearchInput({ router }: StreamSearchInputProps) {
   };
 
   return searchPanelEnabled ? (
-    <SearchField query={q ?? ''} onSearch={setQuery} />
+    <SearchField
+      query={q ?? ''}
+      onSearch={setQuery}
+      onClearSearch={() => setQuery('')}
+    />
   ) : (
     <SearchInput query={q ?? ''} onSearch={setQuery} alwaysExpanded />
   );

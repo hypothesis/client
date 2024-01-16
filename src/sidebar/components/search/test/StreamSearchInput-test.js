@@ -52,4 +52,13 @@ describe('StreamSearchInput', () => {
     assert.isFalse(wrapper.exists('SearchInput'));
     assert.isTrue(wrapper.exists('SearchField'));
   });
+
+  it('clears filter when clear button is clicked', () => {
+    fakeStore.isFeatureEnabled.returns(true);
+    const wrapper = createSearchInput();
+    act(() => {
+      wrapper.find('SearchField').props().onClearSearch();
+    });
+    assert.calledWith(fakeRouter.navigate, 'stream', { q: '' });
+  });
 });
