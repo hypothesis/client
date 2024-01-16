@@ -275,7 +275,10 @@ export class AnnotationsExporter {
       </html>,
       {},
       { pretty: true },
-    );
+      // `renderToString` indents lines with tabs when using `pretty: true`.
+      // Replacing them with double spaces we avoid side effects when pasting
+      // the result in a web app.
+    ).replace(/\t/g, '  ');
   }
 
   private _exportCommon(
