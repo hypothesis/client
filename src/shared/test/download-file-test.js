@@ -1,9 +1,4 @@
-import {
-  downloadCSVFile,
-  downloadHTMLFile,
-  downloadJSONFile,
-  downloadTextFile,
-} from '../download-file';
+import { downloadFile } from '../download-file';
 
 describe('download-file', () => {
   let fakeLink;
@@ -47,39 +42,14 @@ describe('download-file', () => {
     assert.equal('hidden', fakeLink.style.visibility);
   }
 
-  it('downloadJSONFile generates JSON file with provided data', () => {
-    const data = JSON.stringify({ foo: ['bar', 'baz'] }, null, 2);
-    const filename = 'my-file.json';
+  ['application/json', 'text/plain', 'text/csv', 'text/html'].forEach(type => {
+    it('downloadTextFile generates text file with provided data', () => {
+      const data = 'The content of the file';
+      const filename = 'my-file.txt';
 
-    downloadJSONFile(data, filename, fakeDocument);
+      downloadFile(data, type, filename, fakeDocument);
 
-    assertDownloadHappened(filename, data, 'application/json');
-  });
-
-  it('downloadTextFile generates text file with provided data', () => {
-    const data = 'The content of the file';
-    const filename = 'my-file.txt';
-
-    downloadTextFile(data, filename, fakeDocument);
-
-    assertDownloadHappened(filename, data, 'text/plain');
-  });
-
-  it('downloadCSVFile generates csv file with provided data', () => {
-    const data = 'foo,bar,baz';
-    const filename = 'my-file.csv';
-
-    downloadCSVFile(data, filename, fakeDocument);
-
-    assertDownloadHappened(filename, data, 'text/csv');
-  });
-
-  it('downloadHTMLFile generates HTML file with provided data', () => {
-    const data = '<p>Hello</p>';
-    const filename = 'my-file.html';
-
-    downloadHTMLFile(data, filename, fakeDocument);
-
-    assertDownloadHappened(filename, data, 'text/html');
+      assertDownloadHappened(filename, data, type);
+    });
   });
 });
