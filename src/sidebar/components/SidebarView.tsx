@@ -13,7 +13,6 @@ import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
 import { useRootThread } from './hooks/use-root-thread';
 import FilterStatus from './old-search/FilterStatus';
-import FilterAnnotationsStatus from './search/FilterAnnotationsStatus';
 
 export type SidebarViewProps = {
   onLogin: () => void;
@@ -135,7 +134,6 @@ function SidebarView({
     <div>
       <h2 className="sr-only">Annotations</h2>
       {showFilterStatus && <FilterStatus />}
-      {searchPanelEnabled && <FilterAnnotationsStatus />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError

@@ -248,20 +248,9 @@ describe('SidebarView', () => {
   });
 
   context('user-focus mode', () => {
-    it('shows old filter status when focus mode configured', () => {
+    it('shows old FilterStatus component when `search_panel` feature is disabled', () => {
       const wrapper = createComponent();
-
       assert.isTrue(wrapper.find('FilterStatus').exists());
-      assert.isFalse(wrapper.find('FilterAnnotationsStatus').exists());
-    });
-
-    it('shows filter status when focus mode configured', () => {
-      fakeStore.isFeatureEnabled.returns(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('FilterStatus').exists());
-      assert.isTrue(wrapper.find('FilterAnnotationsStatus').exists());
     });
   });
 

@@ -61,17 +61,4 @@ describe('SearchPanel', () => {
 
     assert.calledWith(fakeStore.setFilterQuery, 'foo');
   });
-
-  [
-    { query: null, searchStatusIsRendered: false },
-    { query: '', searchStatusIsRendered: false },
-    { query: 'foo', searchStatusIsRendered: true },
-  ].forEach(({ query, searchStatusIsRendered }) => {
-    it("renders SearchStatus only when there's an active query", () => {
-      fakeStore.filterQuery.returns(query);
-      const wrapper = createSearchPanel();
-
-      assert.equal(wrapper.exists('SearchStatus'), searchStatusIsRendered);
-    });
-  });
 });

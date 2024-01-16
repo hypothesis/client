@@ -1,4 +1,5 @@
 import {
+  CancelIcon,
   IconButton,
   Input,
   InputGroup,
@@ -15,6 +16,8 @@ import { useSidebarStore } from '../../store';
 export type SearchFieldProps = {
   /** The currently-active filter query */
   query: string | null;
+
+  onClearSearch: () => void;
 
   /** Callback for when the current filter query changes */
   onSearch: (value: string) => void;
@@ -34,11 +37,12 @@ export type SearchFieldProps = {
  * or searches annotations (in the stream/single annotation view).
  */
 export default function SearchField({
-  query,
-  onSearch,
-  inputRef,
   classes,
+  inputRef,
+  onClearSearch,
   onKeyDown,
+  onSearch,
+  query,
 }: SearchFieldProps) {
   const store = useSidebarStore();
   const isLoading = store.isLoading();
@@ -80,6 +84,7 @@ export default function SearchField({
       className={classnames('space-y-3', classes)}
     >
       <InputGroup>
+        <IconButton icon={SearchIcon} title="Search" type="submit" />
         <Input
           aria-label="Search annotations"
           classes={classnames(
@@ -98,12 +103,14 @@ export default function SearchField({
           }
           onKeyDown={onKeyDown}
         />
-        <IconButton
-          icon={SearchIcon}
-          title="Search"
-          type="submit"
-          variant="dark"
-        />
+        {pendingQuery && (
+          <IconButton
+            icon={CancelIcon}
+            data-testid="clear-button"
+            title="Clear search"
+            onClick={onClearSearch}
+          />
+        )}
       </InputGroup>
     </form>
   );
