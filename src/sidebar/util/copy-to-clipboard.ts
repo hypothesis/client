@@ -47,19 +47,35 @@ export async function copyPlainText(text: string, navigator_ = navigator) {
 /**
  * Copy the string `text` to the clipboard with an HTML media type.
  *
- * If the browser does not support this, it will fall back to copy the string
- * as plain text.
- *
  * @throws {Error}
  *   This function may throw an error if the `clipboard-write` permission was
  *   not allowed.
  */
-export async function copyHTML(text: string, navigator_ = navigator) {
-  if (!navigator_.clipboard.write) {
-    await copyPlainText(text, navigator_);
-  } else {
+export async function copyHTML(
+  text: string,
+  /* istanbul ignore next - test seam */
+  navigator_ = navigator,
+  /* istanbul ignore next - test seam */
+  document_ = document,
+) {
+  if (navigator_.clipboard.write) {
     const type = 'text/html';
     const blob = new Blob([text], { type });
     await navigator_.clipboard.write([new ClipboardItem({ [type]: blob })]);
+  } else {
+    // Fallback to deprecated document.execCommand('copy') on the assumptions
+    // that all browsers will implement the new clipboard API before removing
+    // the deprecated one.
+    const copyHandler = (e: ClipboardEvent) => {
+      e.clipboardData?.setData('text/html', text);
+      e.preventDefault();
+    };
+
+    document_.addEventListener('copy', copyHandler);
+    try {
+      document_.execCommand('copy');
+    } finally {
+      document_.removeEventListener('copy', copyHandler);
+    }
   }
 }
