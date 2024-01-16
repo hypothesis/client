@@ -469,8 +469,8 @@ describe('ExportAnnotations', () => {
   context('when copying annotations export to clipboard', () => {
     [true, false].forEach(exportFormatsEnabled => {
       it('displays copy button if `export_formats` FF is enabled', () => {
-        fakeStore.isFeatureEnabled.callsFake(
-          ff => exportFormatsEnabled || ff !== 'export_formats',
+        fakeStore.isFeatureEnabled.callsFake(ff =>
+          ff === 'export_formats' ? exportFormatsEnabled : true,
         );
 
         const wrapper = createComponent();

@@ -45,8 +45,7 @@ export async function copyPlainText(text: string, navigator_ = navigator) {
 }
 
 /**
- * Copy the string `text` to the clipboard, rendering HTML if any, instead of
- * raw markup.
+ * Copy the string `text` to the clipboard with an HTML media type.
  *
  * If the browser does not support this, it will fall back to copy the string
  * as plain text.

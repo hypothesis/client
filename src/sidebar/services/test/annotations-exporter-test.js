@@ -292,13 +292,9 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
         now,
       });
 
-      // The result uses tabs to indent lines.
-      // We can get rid of that for simplicity and just compare the markup
-      const removeAllIndentation = str => str.replace(/^[ \t]+/gm, '');
-
       assert.equal(
-        removeAllIndentation(result),
-        removeAllIndentation(`<html lang="en">
+        result,
+        `<html lang="en">
   <head>
     <title>
       Annotations on &quot;A special document&quot;
@@ -444,7 +440,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       </article>
     </section>
   </body>
-</html>`),
+</html>`,
       );
     });
   });
