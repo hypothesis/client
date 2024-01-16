@@ -1,12 +1,7 @@
 import { copyPlainText, copyHTML, copyText } from '../copy-to-clipboard';
 
 describe('copy-to-clipboard', () => {
-  const createFakeNavigator = ({ supportsWrite = true } = {}) => ({
-    clipboard: {
-      writeText: sinon.stub(),
-      write: supportsWrite ? sinon.stub() : undefined,
-    },
-  });
+  const createFakeNavigator = clipboard => ({ clipboard });
 
   describe('copyText', () => {
     beforeEach(() => {
@@ -62,33 +57,41 @@ describe('copy-to-clipboard', () => {
   describe('copyPlainText', () => {
     it('writes provided text to clipboard', async () => {
       const text = 'Lorem ipsum dolor sit amet';
-      const navigator = createFakeNavigator();
+      const writeText = sinon.stub();
 
-      await copyPlainText(text, navigator);
+      await copyPlainText(text, createFakeNavigator({ writeText }));
 
-      assert.calledWith(navigator.clipboard.writeText, text);
-      assert.notCalled(navigator.clipboard.write);
+      assert.calledWith(writeText, text);
     });
   });
 
   describe('copyHTML', () => {
     it('writes provided text to clipboard', async () => {
       const text = 'Lorem ipsum dolor sit amet';
-      const navigator = createFakeNavigator();
+      const write = sinon.stub();
 
-      await copyHTML(text, navigator);
+      await copyHTML(text, createFakeNavigator({ write }));
 
-      assert.called(navigator.clipboard.write);
-      assert.notCalled(navigator.clipboard.writeText);
+      assert.called(write);
     });
 
-    it('falls back to plain text if rich text is not supported', async () => {
+    it('falls back to execCommand if clipboard API is not supported', async () => {
       const text = 'Lorem ipsum dolor sit amet';
-      const navigator = createFakeNavigator({ supportsWrite: false });
+      const clipboardData = new DataTransfer();
+      const document = Object.assign(new EventTarget(), {
+        execCommand: sinon.stub().callsFake(command => {
+          if (command === 'copy') {
+            document.dispatchEvent(
+              new ClipboardEvent('copy', { clipboardData }),
+            );
+          }
+        }),
+      });
 
-      await copyHTML(text, navigator);
+      await copyHTML(text, createFakeNavigator({}), document);
 
-      assert.calledWith(navigator.clipboard.writeText, text);
+      assert.calledWith(document.execCommand, 'copy');
+      assert.equal(clipboardData.getData('text/html'), text);
     });
   });
 });
