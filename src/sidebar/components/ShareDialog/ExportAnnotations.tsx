@@ -8,12 +8,7 @@ import {
 } from '@hypothesis/frontend-shared';
 import { useCallback, useId, useMemo, useState } from 'preact/hooks';
 
-import {
-  downloadCSVFile,
-  downloadHTMLFile,
-  downloadJSONFile,
-  downloadTextFile,
-} from '../../../shared/download-file';
+import { downloadFile } from '../../../shared/download-file';
 import type { APIAnnotationData } from '../../../types/api';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import type { UserAnnotations } from '../../helpers/annotations-by-user';
@@ -73,6 +68,16 @@ const exportFormats: ExportFormat[] = [
     description: 'For import into word processors as rich text',
   },
 ];
+
+function formatToMimeType(format: ExportFormat['value']): string {
+  const typeForFormat: Record<ExportFormat['value'], string> = {
+    json: 'application/json',
+    txt: 'text/plain',
+    csv: 'text/csv',
+    html: 'text/html',
+  };
+  return typeForFormat[format];
+}
 
 /**
  * Render content for "export" tab panel: allow user to export annotations
@@ -200,25 +205,9 @@ function ExportAnnotations({
         const format = exportFormat.value;
         const filename = `${customFilename ?? defaultFilename}.${format}`;
         const exportData = buildExportContent(format);
+        const mimeType = formatToMimeType(format);
 
-        switch (format) {
-          case 'json': {
-            downloadJSONFile(exportData, filename);
-            break;
-          }
-          case 'txt': {
-            downloadTextFile(exportData, filename);
-            break;
-          }
-          case 'csv': {
-            downloadCSVFile(exportData, filename);
-            break;
-          }
-          case 'html': {
-            downloadHTMLFile(exportData, filename);
-            break;
-          }
-        }
+        downloadFile(exportData, mimeType, filename);
       } catch (e) {
         toastMessenger.error('Exporting annotations failed');
       }

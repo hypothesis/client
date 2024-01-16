@@ -1,37 +1,21 @@
-function downloadFile(
+export function downloadFile(
   content: string,
   type: string,
   filename: string,
-  document: Document,
+  /* istanbul ignore next - test seam */
+  document_ = document,
 ): void {
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
 
-  const link = document.createElement('a');
+  const link = document_.createElement('a');
   link.setAttribute('href', url);
   link.setAttribute('download', filename);
   link.style.visibility = 'hidden';
 
-  document.body.appendChild(link);
+  document_.body.appendChild(link);
   link.click();
-  document.body.removeChild(link);
+  document_.body.removeChild(link);
 
   URL.revokeObjectURL(url);
 }
-
-function buildTextFileDownloader(type: string) {
-  return (
-    text: string,
-    filename: string,
-    /* istanbul ignore next - test seam */
-    _document = document,
-  ) => downloadFile(text, type, filename, _document);
-}
-
-export const downloadJSONFile = buildTextFileDownloader('application/json');
-
-export const downloadTextFile = buildTextFileDownloader('text/plain');
-
-export const downloadCSVFile = buildTextFileDownloader('text/csv');
-
-export const downloadHTMLFile = buildTextFileDownloader('text/html');

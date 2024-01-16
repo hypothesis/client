@@ -14,10 +14,7 @@ describe('ExportAnnotations', () => {
   let fakeStore;
   let fakeAnnotationsExporter;
   let fakeToastMessenger;
-  let fakeDownloadJSONFile;
-  let fakeDownloadTextFile;
-  let fakeDownloadCSVFile;
-  let fakeDownloadHTMLFile;
+  let fakeDownloadFile;
   let fakeSuggestedFilename;
   let fakeCopyPlainText;
   let fakeCopyHTML;
@@ -48,10 +45,7 @@ describe('ExportAnnotations', () => {
       error: sinon.stub(),
       success: sinon.stub(),
     };
-    fakeDownloadJSONFile = sinon.stub();
-    fakeDownloadTextFile = sinon.stub();
-    fakeDownloadCSVFile = sinon.stub();
-    fakeDownloadHTMLFile = sinon.stub();
+    fakeDownloadFile = sinon.stub();
     fakeStore = {
       defaultAuthority: sinon.stub().returns('example.com'),
       isFeatureEnabled: sinon.stub().returns(true),
@@ -74,10 +68,7 @@ describe('ExportAnnotations', () => {
 
     $imports.$mock({
       '../../../shared/download-file': {
-        downloadJSONFile: fakeDownloadJSONFile,
-        downloadTextFile: fakeDownloadTextFile,
-        downloadCSVFile: fakeDownloadCSVFile,
-        downloadHTMLFile: fakeDownloadHTMLFile,
+        downloadFile: fakeDownloadFile,
       },
       '../../helpers/export-annotations': {
         suggestedFilename: fakeSuggestedFilename,
@@ -408,21 +399,21 @@ describe('ExportAnnotations', () => {
     [
       {
         format: 'json',
-        getExpectedInvokedDownloader: () => fakeDownloadJSONFile,
+        expectedMimeType: 'application/json',
       },
       {
         format: 'txt',
-        getExpectedInvokedDownloader: () => fakeDownloadTextFile,
+        expectedMimeType: 'text/plain',
       },
       {
         format: 'csv',
-        getExpectedInvokedDownloader: () => fakeDownloadCSVFile,
+        expectedMimeType: 'text/csv',
       },
       {
         format: 'html',
-        getExpectedInvokedDownloader: () => fakeDownloadHTMLFile,
+        expectedMimeType: 'text/html',
       },
-    ].forEach(({ format, getExpectedInvokedDownloader }) => {
+    ].forEach(({ format, expectedMimeType }) => {
       it('downloads a file using user-entered filename appended with proper extension', async () => {
         const wrapper = createComponent();
         const filenameInput = wrapper.find(
@@ -436,11 +427,11 @@ describe('ExportAnnotations', () => {
 
         submitExportForm(wrapper);
 
-        const invokedDownloader = getExpectedInvokedDownloader();
-        assert.calledOnce(invokedDownloader);
+        assert.calledOnce(fakeDownloadFile);
         assert.calledWith(
-          invokedDownloader,
+          fakeDownloadFile,
           sinon.match.any,
+          expectedMimeType,
           `my-filename.${format}`,
         );
       });
@@ -456,7 +447,7 @@ describe('ExportAnnotations', () => {
 
         submitExportForm(wrapper);
 
-        assert.notCalled(fakeDownloadJSONFile);
+        assert.notCalled(fakeDownloadFile);
         assert.calledOnce(fakeAnnotationsExporter.buildJSONExportContent);
         assert.calledWith(
           fakeToastMessenger.error,
