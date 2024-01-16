@@ -46,7 +46,7 @@ function isValidProvider(provider: unknown): provider is Provider {
  * If the provider is a factory function or constructor it may have dependencies
  * which are indicated by a `$inject` property on the function/class which
  * is a list of the names of the dependencies. The `$inject` property can be
- * added manually or by a compiler plugin (eg. `babel-plugin-angularjs-annotate`).
+ * added manually or by a compiler plugin (eg. `babel-plugin-inject-args`).
  *
  * To construct an object, call the `register` method with the name and provider
  * for the object and each of its dependencies, and then call
