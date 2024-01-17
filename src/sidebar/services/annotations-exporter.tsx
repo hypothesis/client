@@ -4,6 +4,7 @@ import { escapeCSVValue } from '../../shared/csv';
 import { trimAndDedent } from '../../shared/trim-and-dedent';
 import type { APIAnnotationData, Profile } from '../../types/api';
 import {
+  annotationRole,
   documentMetadata,
   isReply,
   pageLabel,
@@ -82,6 +83,7 @@ export class AnnotationsExporter {
         `Created at: ${formatDateTime(new Date(annotation.created))}`,
         `Author: ${extractUsername(annotation)}`,
         page ? `Page: ${page}` : undefined,
+        `Type: ${annotationRole(annotation)}`,
         annotationQuote ? `Quote: "${annotationQuote}"` : undefined,
         `Comment: ${annotation.text}`,
         annotation.tags.length > 0
@@ -127,7 +129,7 @@ export class AnnotationsExporter {
         pageLabel(annotation) ?? '',
         uri,
         groupName,
-        isReply(annotation) ? 'Reply' : 'Annotation',
+        annotationRole(annotation),
         quote(annotation) ?? '',
         annotation.text,
         annotation.tags.join(','),
@@ -141,7 +143,7 @@ export class AnnotationsExporter {
       'Page',
       'URL',
       'Group',
-      'Annotation/Reply Type',
+      'Type',
       'Quote',
       'Comment',
       'Tags',
@@ -245,6 +247,10 @@ export class AnnotationsExporter {
                           <td>{page}</td>
                         </tr>
                       )}
+                      <tr>
+                        <td>Type:</td>
+                        <td>{annotationRole(annotation)}</td>
+                      </tr>
                       {annotationQuote && (
                         <tr>
                           <td>Quote:</td>

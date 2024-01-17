@@ -142,7 +142,7 @@ export function isSaved(annotation: Annotation): annotation is SavedAnnotation {
  *
  * @deprecated - Use {@link isSaved} instead
  */
-export function isNew(annotation: Annotation): boolean {
+export function isNew(annotation: APIAnnotationData): boolean {
   return !annotation.id;
 }
 
@@ -173,7 +173,7 @@ export function isPublic(annotation: Annotation): boolean {
  * as opposed to a Page Note which refers to the whole document or a reply,
  * which refers to another annotation.
  */
-function hasSelector(annotation: Annotation): boolean {
+function hasSelector(annotation: APIAnnotationData): boolean {
   return !!(
     annotation.target &&
     annotation.target.length > 0 &&
@@ -208,12 +208,14 @@ export function isHidden(annotation: Annotation): boolean {
  * Highlights are generally identifiable by having no text content AND no tags,
  * but there is some nuance.
  */
-export function isHighlight(annotation: Annotation): boolean {
+export function isHighlight(
+  annotation: Annotation | APIAnnotationData,
+): boolean {
   // `$highlight` is an ephemeral attribute set by the `annotator` on new
   // annotation objects (created by clicking the "highlight" button).
   // It is not persisted and cannot be relied upon, but if it IS present,
   // this is definitely a highlight (one which is not yet saved).
-  if (annotation.$highlight) {
+  if ('$highlight' in annotation && annotation.$highlight) {
     return true;
   }
 
@@ -246,7 +248,7 @@ export function isOrphan(annotation: Annotation): boolean {
 /**
  * Return `true` if the given annotation is a page note.
  */
-export function isPageNote(annotation: Annotation): boolean {
+export function isPageNote(annotation: APIAnnotationData): boolean {
   return !hasSelector(annotation) && !isReply(annotation);
 }
 
@@ -260,7 +262,7 @@ export function isAnnotation(annotation: Annotation): boolean {
 /**
  * Return a human-readable string describing the annotation's role.
  */
-export function annotationRole(annotation: Annotation): string {
+export function annotationRole(annotation: APIAnnotationData): string {
   if (isReply(annotation)) {
     return 'Reply';
   } else if (isHighlight(annotation)) {
