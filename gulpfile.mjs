@@ -67,9 +67,8 @@ gulp.task(
       [
         'node_modules/katex/dist/katex.min.css',
         'src/styles/**/*.scss',
-        'src/sidebar/components/**/*.js',
-        'src/annotator/components/**/*.js',
-        'dev-server/ui-playground/components/**/*.js',
+        'src/**/*.tsx',
+        'dev-server/ui-playground/**/*.tsx',
       ],
       gulp.task('build-css')
     );
