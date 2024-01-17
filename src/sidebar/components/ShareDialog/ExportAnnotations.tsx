@@ -116,10 +116,17 @@ function ExportAnnotations({
     }),
     [exportableAnnotations],
   );
-  const [selectedUser, setSelectedUser] = useState(
-    // Try to preselect current user
-    userList.find(userInfo => userInfo.userid === currentUser) ??
+
+  // Try to preselect current user
+  const [selectedUserId, setSelectedUserId] = useState(currentUser);
+  // Re-compute selectedUserAnnotations if:
+  //  - `userList` changes: This means annotations where created/deleted/updated
+  //  - `selectedUserId` changes: This means user was manually changed
+  const selectedUserAnnotations = useMemo(
+    () =>
+      userList.find(user => user.userid === selectedUserId) ??
       allAnnotationsOption,
+    [allAnnotationsOption, selectedUserId, userList],
   );
 
   const exportFormatsEnabled = store.isFeatureEnabled('export_formats');
@@ -143,7 +150,7 @@ function ExportAnnotations({
   const buildExportContent = useCallback(
     (format: ExportFormat['value']): string => {
       const annotationsToExport =
-        selectedUser?.annotations ?? exportableAnnotations;
+        selectedUserAnnotations?.annotations ?? exportableAnnotations;
       switch (format) {
         case 'json': {
           const data = annotationsExporter.buildJSONExportContent(
@@ -194,7 +201,7 @@ function ExportAnnotations({
       exportableAnnotations,
       group?.name,
       profile,
-      selectedUser?.annotations,
+      selectedUserAnnotations?.annotations,
     ],
   );
   const exportAnnotations = useCallback(
@@ -270,21 +277,26 @@ function ExportAnnotations({
               Select which user{"'"}s annotations to export:
             </label>
             <SelectNext
-              value={selectedUser}
-              onChange={setSelectedUser}
+              value={selectedUserId}
+              onChange={setSelectedUserId}
               buttonId={userSelectId}
               buttonContent={
-                <UserAnnotationsListItem userAnnotations={selectedUser} />
+                <UserAnnotationsListItem
+                  userAnnotations={selectedUserAnnotations}
+                />
               }
               data-testid="user-select"
             >
-              <SelectNext.Option value={allAnnotationsOption}>
+              <SelectNext.Option value={undefined}>
                 <UserAnnotationsListItem
                   userAnnotations={allAnnotationsOption}
                 />
               </SelectNext.Option>
               {userList.map(userInfo => (
-                <SelectNext.Option key={userInfo.userid} value={userInfo}>
+                <SelectNext.Option
+                  key={userInfo.userid}
+                  value={userInfo.userid}
+                >
                   <UserAnnotationsListItem userAnnotations={userInfo} />
                 </SelectNext.Option>
               ))}

@@ -210,11 +210,12 @@ describe('ExportAnnotations', () => {
       assert.equal(users.length, userEntries.length);
 
       for (const [i, entry] of userEntries.entries()) {
-        const value = users.at(i).prop('value');
+        const user = users.at(i);
+        const value = user.prop('value');
+        const text = user.text();
 
-        assert.equal(value.userid, entry.userid);
-        assert.equal(value.displayName, entry.displayName);
-        assert.equal(value.annotations.length, entry.annotationsCount);
+        assert.equal(value, entry.userid);
+        assert.equal(text, `${entry.displayName}${entry.annotationsCount}`);
       }
     });
   });
@@ -376,14 +377,8 @@ describe('ExportAnnotations', () => {
 
       // Select the user whose annotations we want to export
       const userList = await waitForTestId(wrapper, 'user-select');
-      const option = userList
-        .find(SelectNext.Option)
-        .filterWhere(
-          option => option.prop('value').userid === 'acct:john@example.com',
-        )
-        .first();
       act(() => {
-        userList.prop('onChange')(option.prop('value'));
+        userList.prop('onChange')('acct:john@example.com');
       });
       wrapper.update();
 
