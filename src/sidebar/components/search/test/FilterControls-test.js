@@ -46,7 +46,7 @@ describe('FilterControls', () => {
 
     /** Return true if button is rendered in the active state. */
     isActive() {
-      return this.button.prop('variant') === 'primary';
+      return this.button.prop('pressed');
     }
 
     click() {
