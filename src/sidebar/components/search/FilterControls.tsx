@@ -1,10 +1,24 @@
-import { Button } from '@hypothesis/frontend-shared';
+import {
+  Button,
+  FileGenericIcon,
+  PlusIcon,
+  ProfileIcon,
+} from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 
 import { useSidebarStore } from '../../store';
+
+type IconComponent = typeof FileGenericIcon;
 
 type FilterToggleProps = {
   /** A short description of what the filter matches (eg. "Pages 10-20") */
   label: string;
+
+  /**
+   * Icon representation of the filter controlled by this toggle, displayed
+   * alongside the label.
+   */
+  icon?: IconComponent;
 
   /**
    * A longer description of what the filter matches (eg. "Show annotations
@@ -26,6 +40,7 @@ type FilterToggleProps = {
  */
 function FilterToggle({
   label,
+  icon: IconComponent,
   description,
   active,
   setActive,
@@ -34,11 +49,35 @@ function FilterToggle({
   return (
     <Button
       data-testid={testId}
+      classes={classnames({
+        // Compared to our regular buttons, these have less vertical padding,
+        // stronger rounding and slightly thinner text.
+        'font-medium rounded-lg py-1': true,
+        'text-grey-7 bg-grey-2': !active,
+        'text-grey-1 bg-grey-7': active,
+      })}
       onClick={() => setActive(!active)}
-      variant={active ? 'primary' : 'secondary'}
+      pressed={active}
+      variant="custom"
       title={description}
     >
+      {IconComponent && <IconComponent className="w-em h-em" />}
       {label}
+      <div
+        // Vertical divider line between label and active/inactive state.
+        // This should fill the button vertically.
+        className={classnames({
+          'h-[2em] w-[1.5px] -mt-1 -mb-1': true,
+          'bg-grey-3': !active,
+          'bg-grey-5': active,
+        })}
+      />
+      {active ? (
+        // This should be a "-" icon, but we don't have one in our icon set yet.
+        <PlusIcon className="w-em h-em" />
+      ) : (
+        <PlusIcon className="w-em h-em" />
+      )}
     </Button>
   );
 }
@@ -92,6 +131,7 @@ export default function FilterControls() {
       )}
       {focusFilters.user && (
         <FilterToggle
+          icon={ProfileIcon}
           label={`By ${focusFilters.user.display}`}
           description={`Show annotations by ${focusFilters.user.display}`}
           active={focusActive.has('user')}
@@ -101,6 +141,7 @@ export default function FilterControls() {
       )}
       {focusFilters.page && (
         <FilterToggle
+          icon={FileGenericIcon}
           label={`Pages ${focusFilters.page.display}`}
           description={`Show annotations on pages ${focusFilters.page.display}`}
           active={focusActive.has('page')}
@@ -110,6 +151,7 @@ export default function FilterControls() {
       )}
       {focusFilters.cfi && (
         <FilterToggle
+          icon={FileGenericIcon}
           label="Selected chapter"
           description="Show annotations on selected book chapter(s)"
           active={focusActive.has('cfi')}
