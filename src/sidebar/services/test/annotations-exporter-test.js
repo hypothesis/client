@@ -1,5 +1,6 @@
 import {
   newAnnotation,
+  newHighlight,
   newReply,
   publicAnnotation,
 } from '../../test/annotation-fixtures';
@@ -123,6 +124,7 @@ Total replies: 1
 Annotation 1:
 Created at: ${formattedNow}
 Author: bill
+Type: Annotation
 Quote: "this is the quote"
 Comment: Annotation text
 Tags: tag_1, tag_2
@@ -130,12 +132,14 @@ Tags: tag_1, tag_2
 Annotation 2:
 Created at: ${formattedNow}
 Author: bill
+Type: Annotation
 Comment: Annotation text
 Tags: tag_1, tag_2
 
 Annotation 3:
 Created at: ${formattedNow}
 Author: jane
+Type: Annotation
 Quote: "The quote"
 Comment: Annotation text
 Tags: foo, bar
@@ -144,6 +148,7 @@ Annotation 4:
 Created at: ${formattedNow}
 Author: bill
 Page: 23
+Type: Reply
 Comment: Annotation text
 Tags: tag_1, tag_2
 
@@ -151,6 +156,7 @@ Annotation 5:
 Created at: ${formattedNow}
 Author: bill
 Page: iii
+Type: Annotation
 Comment: Annotation text`,
       );
     });
@@ -183,6 +189,7 @@ Total replies: 0
 Annotation 1:
 Created at: ${formattedNow}
 Author: John Doe
+Type: Annotation
 Comment: Annotation text
 Tags: tag_1, tag_2`,
       );
@@ -214,6 +221,7 @@ Tags: tag_1, tag_2`,
         },
         {
           ...baseAnnotation,
+          ...newHighlight(),
           tags: [],
           target: targetWithSelectors(pageSelector('iii')),
         },
@@ -226,10 +234,10 @@ Tags: tag_1, tag_2`,
 
       assert.equal(
         result,
-        `Created at,Author,Page,URL,Group,Annotation/Reply Type,Quote,Comment,Tags
+        `Created at,Author,Page,URL,Group,Type,Quote,Comment,Tags
 ${formattedNow},jane,,http://example.com,My group,Annotation,,Annotation text,"foo,bar"
 ${formattedNow},bill,23,http://example.com,My group,Reply,"includes ""double quotes"", and commas",Annotation text,"tag_1,tag_2"
-${formattedNow},bill,iii,http://example.com,My group,Annotation,,Annotation text,`,
+${formattedNow},bill,iii,http://example.com,My group,Highlight,,Annotation text,`,
       );
     });
 
@@ -249,7 +257,7 @@ ${formattedNow},bill,iii,http://example.com,My group,Annotation,,Annotation text
 
       assert.equal(
         result,
-        `Created at,Author,Page,URL,Group,Annotation/Reply Type,Quote,Comment,Tags
+        `Created at,Author,Page,URL,Group,Type,Quote,Comment,Tags
 ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation text,"tag_1,tag_2"`,
       );
     });
@@ -362,6 +370,10 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
               <td>jane</td>
             </tr>
             <tr>
+              <td>Type:</td>
+              <td>Annotation</td>
+            </tr>
+            <tr>
               <td>Quote:</td>
               <td>
                 <blockquote style="margin:0px;">The quote</blockquote>
@@ -397,6 +409,10 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
               <td>23</td>
             </tr>
             <tr>
+              <td>Type:</td>
+              <td>Annotation</td>
+            </tr>
+            <tr>
               <td>Quote:</td>
               <td>
                 <blockquote style="margin:0px;">includes &lt;p>HTML&lt;/p> tags</blockquote>
@@ -430,6 +446,10 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
             <tr>
               <td>Page:</td>
               <td>iii</td>
+            </tr>
+            <tr>
+              <td>Type:</td>
+              <td>Reply</td>
             </tr>
             <tr>
               <td>Comment:</td>
