@@ -66,6 +66,7 @@ describe('SidebarView', () => {
       hasSidebarOpened: sinon.stub(),
       isLoading: sinon.stub().returns(false),
       isLoggedIn: sinon.stub(),
+      isSidebarPanelOpen: sinon.stub().returns(false),
       profile: sinon.stub().returns({ userid: null }),
       searchUris: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
@@ -247,10 +248,36 @@ describe('SidebarView', () => {
     });
   });
 
-  context('user-focus mode', () => {
-    it('shows old FilterStatus component when `search_panel` feature is disabled', () => {
+  describe('filter controls', () => {
+    it('renders old filter controls when `search_panel` feature is disabled', () => {
+      fakeStore.isFeatureEnabled.withArgs('search_panel').returns(false);
+
       const wrapper = createComponent();
-      assert.isTrue(wrapper.find('FilterStatus').exists());
+      assert.isTrue(wrapper.exists('FilterStatus'));
+      assert.isFalse(wrapper.exists('FilterControls'));
+    });
+
+    [
+      {
+        searchPanelOpen: false,
+        showControls: true,
+      },
+      {
+        searchPanelOpen: true,
+        showControls: false,
+      },
+    ].forEach(({ searchPanelOpen, showControls }) => {
+      it(`renders new filter controls when "search_panel" is enabled and search panel is not open`, () => {
+        fakeStore.isFeatureEnabled.withArgs('search_panel').returns(true);
+        fakeStore.isSidebarPanelOpen
+          .withArgs('searchAnnotations')
+          .returns(searchPanelOpen);
+
+        const wrapper = createComponent();
+
+        assert.isFalse(wrapper.exists('FilterStatus'));
+        assert.equal(wrapper.exists('FilterControls'), showControls);
+      });
     });
   });
 

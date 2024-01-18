@@ -13,6 +13,7 @@ import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
 import { useRootThread } from './hooks/use-root-thread';
 import FilterStatus from './old-search/FilterStatus';
+import FilterControls from './search/FilterControls';
 
 export type SidebarViewProps = {
   onLogin: () => void;
@@ -39,8 +40,8 @@ function SidebarView({
   // Store state values
   const store = useSidebarStore();
   const focusedGroupId = store.focusedGroupId();
-  const hasAppliedFilter =
-    store.hasAppliedFilter() || store.hasSelectedAnnotations();
+  const hasSelection = store.hasSelectedAnnotations();
+  const hasAppliedFilter = store.hasAppliedFilter() || hasSelection;
   const isLoading = store.isLoading();
   const isLoggedIn = store.isLoggedIn();
 
@@ -67,9 +68,18 @@ function SidebarView({
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
   const searchPanelEnabled = store.isFeatureEnabled('search_panel');
-  const showFilterStatus = !hasContentError && !searchPanelEnabled;
   const showTabs =
     !hasContentError && (searchPanelEnabled || !hasAppliedFilter);
+
+  // Whether to render the old filter status UI. If no filter is active, this
+  // will render nothing.
+  const showFilterStatus = !hasContentError && !searchPanelEnabled;
+
+  // Whether to render the new filter UI. Note that when the search panel is
+  // open, filter controls are integrated into it. The UI may render nothing
+  // if no filters are configured or selection is active.
+  const isSearchPanelOpen = store.isSidebarPanelOpen('searchAnnotations');
+  const showFilterControls = searchPanelEnabled && !isSearchPanelOpen;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
@@ -134,6 +144,7 @@ function SidebarView({
     <div>
       <h2 className="sr-only">Annotations</h2>
       {showFilterStatus && <FilterStatus />}
+      {showFilterControls && <FilterControls withCardContainer />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError
