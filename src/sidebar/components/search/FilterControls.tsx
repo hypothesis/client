@@ -1,4 +1,6 @@
 import {
+  Card,
+  CardContent,
   Button,
   FileGenericIcon,
   MinusIcon,
@@ -6,6 +8,8 @@ import {
   ProfileIcon,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
+import { Fragment } from 'preact';
+import type { ComponentChildren } from 'preact';
 
 import { useSidebarStore } from '../../store';
 
@@ -83,6 +87,31 @@ function FilterToggle({
 }
 
 /**
+ * Container for the filter controls when it is rendered standalone, outside
+ * the search panel.
+ */
+function CardContainer({ children }: { children: ComponentChildren }) {
+  return (
+    <div className="mb-3">
+      <Card>
+        <CardContent>{children}</CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export type FilterControlsProps = {
+  /**
+   * Whether to render the controls in a card container.
+   *
+   * The container is rendered by `FilterControls` rather than the parent,
+   * because `FilterControls` can conditionally render nothing if no filter is
+   * configured.
+   */
+  withCardContainer?: boolean;
+};
+
+/**
  * Displays the state of various filters and allows the user to toggle them.
  *
  * This includes:
@@ -94,7 +123,9 @@ function FilterToggle({
  * This doesn't include the state of other layers of filters which have their
  * own UI controls such as search or the annotation type tabs.
  */
-export default function FilterControls() {
+export default function FilterControls({
+  withCardContainer = false,
+}: FilterControlsProps) {
   const store = useSidebarStore();
 
   const selectedCount = store.selectedAnnotations().length;
@@ -114,51 +145,55 @@ export default function FilterControls() {
     return null;
   }
 
+  const Container = withCardContainer ? CardContainer : Fragment;
+
   return (
-    <div
-      className="flex flex-row gap-x-2 items-center"
-      data-testid="filter-controls"
-    >
-      <b>Filters</b>
-      {hasSelection && (
-        <FilterToggle
-          label={`${selectedCount} selected`}
-          description={`Show ${selectedCount} selected annotations`}
-          active={true}
-          setActive={() => store.clearSelection()}
-          testId="selection-toggle"
-        />
-      )}
-      {focusFilters.user && (
-        <FilterToggle
-          icon={ProfileIcon}
-          label={`By ${focusFilters.user.display}`}
-          description={`Show annotations by ${focusFilters.user.display}`}
-          active={focusActive.has('user')}
-          setActive={() => store.toggleFocusMode({ key: 'user' })}
-          testId="user-focus-toggle"
-        />
-      )}
-      {focusFilters.page && (
-        <FilterToggle
-          icon={FileGenericIcon}
-          label={`Pages ${focusFilters.page.display}`}
-          description={`Show annotations on pages ${focusFilters.page.display}`}
-          active={focusActive.has('page')}
-          setActive={() => store.toggleFocusMode({ key: 'page' })}
-          testId="page-focus-toggle"
-        />
-      )}
-      {focusFilters.cfi && (
-        <FilterToggle
-          icon={FileGenericIcon}
-          label="Selected chapter"
-          description="Show annotations on selected book chapter(s)"
-          active={focusActive.has('cfi')}
-          setActive={() => store.toggleFocusMode({ key: 'cfi' })}
-          testId="cfi-focus-toggle"
-        />
-      )}
-    </div>
+    <Container>
+      <div
+        className="flex flex-row gap-x-2 items-center"
+        data-testid="filter-controls"
+      >
+        <b>Filters</b>
+        {hasSelection && (
+          <FilterToggle
+            label={`${selectedCount} selected`}
+            description={`Show ${selectedCount} selected annotations`}
+            active={true}
+            setActive={() => store.clearSelection()}
+            testId="selection-toggle"
+          />
+        )}
+        {focusFilters.user && (
+          <FilterToggle
+            icon={ProfileIcon}
+            label={`By ${focusFilters.user.display}`}
+            description={`Show annotations by ${focusFilters.user.display}`}
+            active={focusActive.has('user')}
+            setActive={() => store.toggleFocusMode({ key: 'user' })}
+            testId="user-focus-toggle"
+          />
+        )}
+        {focusFilters.page && (
+          <FilterToggle
+            icon={FileGenericIcon}
+            label={`Pages ${focusFilters.page.display}`}
+            description={`Show annotations on pages ${focusFilters.page.display}`}
+            active={focusActive.has('page')}
+            setActive={() => store.toggleFocusMode({ key: 'page' })}
+            testId="page-focus-toggle"
+          />
+        )}
+        {focusFilters.cfi && (
+          <FilterToggle
+            icon={FileGenericIcon}
+            label="Selected chapter"
+            description="Show annotations on selected book chapter(s)"
+            active={focusActive.has('cfi')}
+            setActive={() => store.toggleFocusMode({ key: 'cfi' })}
+            testId="cfi-focus-toggle"
+          />
+        )}
+      </div>
+    </Container>
   );
 }

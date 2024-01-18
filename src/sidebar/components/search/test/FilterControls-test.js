@@ -5,8 +5,8 @@ import FilterControls, { $imports } from '../FilterControls';
 describe('FilterControls', () => {
   let fakeStore;
 
-  const createComponent = () => {
-    return mount(<FilterControls />);
+  const createComponent = (props = {}) => {
+    return mount(<FilterControls {...props} />);
   };
 
   beforeEach(() => {
@@ -59,9 +59,11 @@ describe('FilterControls', () => {
     }
   }
 
-  it('returns nothing if there are no filters', () => {
-    const wrapper = createComponent();
-    assert.equal(wrapper.html(), '');
+  [true, false].forEach(withCardContainer => {
+    it('returns nothing if there are no filters', () => {
+      const wrapper = createComponent({ withCardContainer });
+      assert.equal(wrapper.html(), '');
+    });
   });
 
   it('displays selection toggle if there is a selection', () => {
@@ -74,6 +76,17 @@ describe('FilterControls', () => {
     toggle.click();
 
     assert.calledOnce(fakeStore.clearSelection);
+  });
+
+  it('renders card container if requested', () => {
+    fakeStore.selectedAnnotations.returns([{ id: 'abc' }]);
+    const wrapper = createComponent({ withCardContainer: true });
+
+    // The main controls of the component should be present, with an additional
+    // container.
+    assert.isTrue(wrapper.exists('Card'));
+    const toggle = new ToggleButtonWrapper(wrapper, 'selection-toggle');
+    assert.isTrue(toggle.exists());
   });
 
   [
