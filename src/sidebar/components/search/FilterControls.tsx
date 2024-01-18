@@ -1,6 +1,7 @@
 import {
   Button,
   FileGenericIcon,
+  MinusIcon,
   PlusIcon,
   ProfileIcon,
 } from '@hypothesis/frontend-shared';
@@ -73,8 +74,7 @@ function FilterToggle({
         })}
       />
       {active ? (
-        // This should be a "-" icon, but we don't have one in our icon set yet.
-        <PlusIcon className="w-em h-em" />
+        <MinusIcon className="w-em h-em" />
       ) : (
         <PlusIcon className="w-em h-em" />
       )}
