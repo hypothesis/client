@@ -302,23 +302,28 @@ describe('ExportAnnotations', () => {
     [
       {
         format: 'json',
-        getExpectedInvokedContentBuilder: () =>
+        getExpectedInvokedContentBuilder: () => [
           fakeAnnotationsExporter.buildJSONExportContent,
+        ],
       },
       {
         format: 'txt',
-        getExpectedInvokedContentBuilder: () =>
+        getExpectedInvokedContentBuilder: () => [
           fakeAnnotationsExporter.buildTextExportContent,
+        ],
       },
       {
         format: 'csv',
-        getExpectedInvokedContentBuilder: () =>
+        getExpectedInvokedContentBuilder: () => [
           fakeAnnotationsExporter.buildCSVExportContent,
+          sinon.match({ separator: ',' }),
+        ],
       },
       {
         format: 'html',
-        getExpectedInvokedContentBuilder: () =>
+        getExpectedInvokedContentBuilder: () => [
           fakeAnnotationsExporter.buildHTMLExportContent,
+        ],
       },
     ].forEach(({ format, getExpectedInvokedContentBuilder }) => {
       it('builds an export file from all non-draft annotations', async () => {
@@ -333,9 +338,14 @@ describe('ExportAnnotations', () => {
 
         submitExportForm(wrapper);
 
-        const invokedContentBuilder = getExpectedInvokedContentBuilder();
+        const [invokedContentBuilder, contentBuilderOptions] =
+          getExpectedInvokedContentBuilder();
         assert.calledOnce(invokedContentBuilder);
-        assert.calledWith(invokedContentBuilder, annotationsToExport);
+        assert.calledWith(
+          invokedContentBuilder,
+          annotationsToExport,
+          contentBuilderOptions ?? sinon.match.any,
+        );
         assert.notCalled(fakeToastMessenger.error);
       });
     });
@@ -472,35 +482,63 @@ describe('ExportAnnotations', () => {
       {
         format: 'json',
         getExpectedInvokedCallback: () => fakeCopyPlainText,
+        getExpectedInvokedContentBuilder: () => [
+          fakeAnnotationsExporter.buildJSONExportContent,
+        ],
       },
       {
         format: 'txt',
         getExpectedInvokedCallback: () => fakeCopyPlainText,
+        getExpectedInvokedContentBuilder: () => [
+          fakeAnnotationsExporter.buildTextExportContent,
+        ],
       },
       {
         format: 'csv',
         getExpectedInvokedCallback: () => fakeCopyPlainText,
+        getExpectedInvokedContentBuilder: () => [
+          fakeAnnotationsExporter.buildCSVExportContent,
+          sinon.match({ separator: '\t' }),
+        ],
       },
       {
         format: 'html',
         getExpectedInvokedCallback: () => fakeCopyHTML,
+        getExpectedInvokedContentBuilder: () => [
+          fakeAnnotationsExporter.buildHTMLExportContent,
+        ],
       },
-    ].forEach(({ format, getExpectedInvokedCallback }) => {
-      it('copies export content as rich or plain text depending on format', async () => {
-        fakeStore.isFeatureEnabled.callsFake(ff => ff === 'export_formats');
+    ].forEach(
+      ({
+        format,
+        getExpectedInvokedCallback,
+        getExpectedInvokedContentBuilder,
+      }) => {
+        it('copies export content as rich or plain text depending on format', async () => {
+          fakeStore.isFeatureEnabled.callsFake(ff => ff === 'export_formats');
 
-        const wrapper = createComponent();
-        const copyButton = wrapper.find('button[data-testid="copy-button"]');
+          const wrapper = createComponent();
+          const copyButton = wrapper.find('button[data-testid="copy-button"]');
 
-        await selectExportFormat(wrapper, format);
-        await act(() => {
-          copyButton.simulate('click');
+          await selectExportFormat(wrapper, format);
+          await act(() => {
+            copyButton.simulate('click');
+          });
+
+          assert.called(getExpectedInvokedCallback());
+          assert.calledWith(fakeToastMessenger.success, 'Annotations copied');
+
+          const [invokedContentBuilder, contentBuilderOptions] =
+            getExpectedInvokedContentBuilder();
+          assert.calledOnce(invokedContentBuilder);
+          assert.calledWith(
+            invokedContentBuilder,
+            sinon.match.any,
+            contentBuilderOptions ?? sinon.match.any,
+          );
         });
-
-        assert.called(getExpectedInvokedCallback());
-        assert.calledWith(fakeToastMessenger.success, 'Annotations copied');
-      });
-    });
+      },
+    );
 
     it('adds error toast message when copying annotations fails', async () => {
       fakeStore.isFeatureEnabled.callsFake(ff => ff === 'export_formats');
