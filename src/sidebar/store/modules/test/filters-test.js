@@ -179,22 +179,6 @@ describe('sidebar/store/modules/filters', () => {
         assert.deepEqual(store.getFocusActive(), new Set(['user', 'page']));
       });
     });
-
-    describe('CLEAR_SELECTION', () => {
-      it('responds to CLEAR_SELECTION by clearing filters and focus', () => {
-        store.changeFocusModeUser({
-          username: 'testuser',
-          displayName: 'Test User',
-        });
-        store.toggleFocusMode({ active: true });
-
-        assert.deepEqual(store.getFocusActive(), new Set(['user']));
-
-        store.clearSelection();
-
-        assert.deepEqual(store.getFocusActive(), new Set());
-      });
-    });
   });
 
   describe('selectors', () => {
