@@ -148,6 +148,22 @@ describe('SearchField', () => {
     assert.calledOnce(onClearSearch);
   });
 
+  [true, false].forEach(disabled => {
+    it('disables controls if `disabled` prop is true', () => {
+      // Set a non-empty query so that clear button is shown.
+      const query = 'some query';
+      const wrapper = createSearchField({ disabled, query });
+
+      assert.equal(wrapper.find('input').prop('disabled'), disabled);
+
+      // Both clear and search buttons should be disabled.
+      assert.deepEqual(
+        wrapper.find('button').map(btn => btn.prop('disabled')),
+        [disabled, disabled],
+      );
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

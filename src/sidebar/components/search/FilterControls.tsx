@@ -38,6 +38,8 @@ type FilterToggleProps = {
   setActive: (active: boolean) => void;
 
   testId?: string;
+
+  disabled?: boolean;
 };
 
 /**
@@ -48,6 +50,7 @@ function FilterToggle({
   icon: IconComponent,
   description,
   active,
+  disabled = false,
   setActive,
   testId,
 }: FilterToggleProps) {
@@ -60,7 +63,9 @@ function FilterToggle({
         'font-medium rounded-lg py-1': true,
         'text-grey-7 bg-grey-2': !active,
         'text-grey-1 bg-grey-7': active,
+        'opacity-50': disabled,
       })}
+      disabled={disabled}
       onClick={() => setActive(!active)}
       pressed={active}
       variant="custom"
@@ -169,6 +174,8 @@ export default function FilterControls({
             label={`By ${focusFilters.user.display}`}
             description={`Show annotations by ${focusFilters.user.display}`}
             active={focusActive.has('user')}
+            // When a selection exists, it replaces other filters.
+            disabled={hasSelection}
             setActive={() => store.toggleFocusMode({ key: 'user' })}
             testId="user-focus-toggle"
           />
@@ -179,6 +186,7 @@ export default function FilterControls({
             label={`Pages ${focusFilters.page.display}`}
             description={`Show annotations on pages ${focusFilters.page.display}`}
             active={focusActive.has('page')}
+            disabled={hasSelection}
             setActive={() => store.toggleFocusMode({ key: 'page' })}
             testId="page-focus-toggle"
           />
@@ -189,6 +197,7 @@ export default function FilterControls({
             label="Selected chapter"
             description="Show annotations on selected book chapter(s)"
             active={focusActive.has('cfi')}
+            disabled={hasSelection}
             setActive={() => store.toggleFocusMode({ key: 'cfi' })}
             testId="cfi-focus-toggle"
           />

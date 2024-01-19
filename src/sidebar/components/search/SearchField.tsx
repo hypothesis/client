@@ -19,6 +19,9 @@ export type SearchFieldProps = {
 
   onClearSearch: () => void;
 
+  /** Disable input editing or submitting the search field. */
+  disabled?: boolean;
+
   /** Callback for when the current filter query changes */
   onSearch: (value: string) => void;
 
@@ -38,6 +41,7 @@ export type SearchFieldProps = {
  */
 export default function SearchField({
   classes,
+  disabled = false,
   inputRef,
   onClearSearch,
   onKeyDown,
@@ -84,18 +88,24 @@ export default function SearchField({
       className={classnames('space-y-3', classes)}
     >
       <InputGroup>
-        <IconButton icon={SearchIcon} title="Search" type="submit" />
+        <IconButton
+          icon={SearchIcon}
+          title="Search"
+          type="submit"
+          disabled={disabled}
+        />
         <Input
           aria-label="Search annotations"
           classes={classnames(
-            'text-base p-1.5',
+            'p-1.5',
             'transition-[max-width] duration-300 ease-out',
+            'disabled:text-grey-6',
           )}
           data-testid="search-input"
           dir="auto"
           name="query"
           placeholder={(isLoading && 'Loading…') || 'Search annotations…'}
-          disabled={isLoading}
+          disabled={disabled || isLoading}
           elementRef={input}
           value={pendingQuery || ''}
           onInput={(e: Event) =>
@@ -109,6 +119,7 @@ export default function SearchField({
             data-testid="clear-button"
             title="Clear search"
             onClick={onClearSearch}
+            disabled={disabled}
           />
         )}
       </InputGroup>

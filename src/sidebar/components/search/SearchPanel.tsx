@@ -10,6 +10,7 @@ export default function SearchPanel() {
   const store = useSidebarStore();
   const filterQuery = store.filterQuery();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const hasSelection = store.hasSelectedAnnotations();
 
   const clearSearch = () => {
     store.closeSidebarPanel('searchAnnotations');
@@ -33,6 +34,9 @@ export default function SearchPanel() {
             <SearchField
               inputRef={inputRef}
               classes="grow"
+              // Disable the input when there is a selection, as the selection
+              // replaces any other filters.
+              disabled={hasSelection}
               query={filterQuery || null}
               onClearSearch={clearSearch}
               onSearch={store.setFilterQuery}

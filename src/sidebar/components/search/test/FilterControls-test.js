@@ -36,6 +36,10 @@ describe('FilterControls', () => {
       this.update();
     }
 
+    disabled() {
+      return this.button.exists() && this.button.prop('disabled');
+    }
+
     exists() {
       return this.button.exists();
     }
@@ -143,5 +147,37 @@ describe('FilterControls', () => {
       toggle.update();
       assert.isFalse(toggle.isActive());
     });
+  });
+
+  it('disables focus filter controls if there is a selection', () => {
+    // Enable all the focus toggles.
+    fakeStore.getFocusFilters.returns({
+      user: {
+        display: 'John Smith',
+      },
+      cfi: {
+        display: 'Chapter 1',
+      },
+      page: {
+        display: '10-30',
+      },
+    });
+    const toggles = ['cfi', 'page', 'user'];
+    fakeStore.getFocusActive.returns(new Set(toggles));
+
+    // Add a selection. The focus controls should be disabled.
+    fakeStore.selectedAnnotations.returns([{ id: '123' }]);
+    const wrapper = createComponent();
+
+    const toggleButtons = toggles.map(
+      name => new ToggleButtonWrapper(wrapper, `${name}-focus-toggle`),
+    );
+    assert.isTrue(toggleButtons.every(button => button.disabled()));
+
+    // Clear the selection, the focus toggles should be enabled.
+    fakeStore.selectedAnnotations.returns([]);
+    wrapper.setProps({});
+    toggleButtons.forEach(tb => tb.update());
+    assert.isFalse(toggleButtons.some(button => button.disabled()));
   });
 });
