@@ -1,5 +1,6 @@
 import renderToString from 'preact-render-to-string/jsx';
 
+import type { CSVSeparator } from '../../shared/csv';
 import { escapeCSVValue } from '../../shared/csv';
 import { trimAndDedent } from '../../shared/trim-and-dedent';
 import type { APIAnnotationData, Profile } from '../../types/api';
@@ -27,12 +28,21 @@ export type JSONExportOptions = {
   now?: Date;
 };
 
-export type ExportOptions = {
+type CommonExportOptions = {
   defaultAuthority?: string;
   displayNamesEnabled?: boolean;
   groupName?: string;
+};
+
+export type TextExportOptions = CommonExportOptions & {
   now?: Date;
 };
+
+export type CSVExportOptions = CommonExportOptions & {
+  separator?: CSVSeparator;
+};
+
+export type HTMLExportOptions = TextExportOptions;
 
 /**
  * Generates annotations exports
@@ -68,7 +78,7 @@ export class AnnotationsExporter {
       defaultAuthority = '',
       /* istanbul ignore next - test seam */
       now = new Date(),
-    }: ExportOptions = {},
+    }: TextExportOptions = {},
   ): string {
     const { uri, title, uniqueUsers, replies, extractUsername } =
       this._exportCommon(annotations, {
@@ -115,13 +125,13 @@ export class AnnotationsExporter {
       groupName = '',
       defaultAuthority = '',
       displayNamesEnabled = false,
-    }: Exclude<ExportOptions, 'now'> = {},
+      separator = ',',
+    }: CSVExportOptions = {},
   ): string {
     const { uri, extractUsername } = this._exportCommon(annotations, {
       displayNamesEnabled,
       defaultAuthority,
     });
-
     const annotationToRow = (annotation: APIAnnotationData) =>
       [
         formatDateTime(new Date(annotation.created)),
@@ -134,8 +144,8 @@ export class AnnotationsExporter {
         annotation.text,
         annotation.tags.join(','),
       ]
-        .map(escapeCSVValue)
-        .join(',');
+        .map(value => escapeCSVValue(value, separator))
+        .join(separator);
 
     const headers = [
       'Created at',
@@ -147,7 +157,7 @@ export class AnnotationsExporter {
       'Quote',
       'Comment',
       'Tags',
-    ].join(',');
+    ].join(separator);
     const annotationsContent = annotations
       .map(anno => annotationToRow(anno))
       .join('\n');
@@ -163,7 +173,7 @@ export class AnnotationsExporter {
       defaultAuthority = '',
       /* istanbul ignore next - test seam */
       now = new Date(),
-    }: ExportOptions = {},
+    }: HTMLExportOptions = {},
   ): string {
     const { uri, title, uniqueUsers, replies, extractUsername } =
       this._exportCommon(annotations, {
@@ -292,9 +302,7 @@ export class AnnotationsExporter {
     {
       displayNamesEnabled,
       defaultAuthority,
-    }: Required<
-      Pick<ExportOptions, 'displayNamesEnabled' | 'defaultAuthority'>
-    >,
+    }: Required<Omit<CommonExportOptions, 'groupName'>>,
   ) {
     const [firstAnnotation] = annotations;
     if (!firstAnnotation) {

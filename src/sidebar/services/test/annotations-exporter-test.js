@@ -204,41 +204,56 @@ Tags: tag_1, tag_2`,
       );
     });
 
-    it('generates CSV content with expected annotations', () => {
-      const annotations = [
-        {
-          ...baseAnnotation,
-          user: 'acct:jane@localhost',
-          tags: ['foo', 'bar'],
-        },
-        {
-          ...baseAnnotation,
-          ...newReply(),
-          target: targetWithSelectors(
-            quoteSelector('includes "double quotes", and commas'),
-            pageSelector(23),
-          ),
-        },
-        {
-          ...baseAnnotation,
-          ...newHighlight(),
-          tags: [],
-          target: targetWithSelectors(pageSelector('iii')),
-        },
-      ];
+    [
+      {
+        separator: ',',
+        buildExpectedContent:
+          date => `Created at,Author,Page,URL,Group,Type,Quote,Comment,Tags
+${date},jane,,http://example.com,My group,Annotation,includes \t tabs,Annotation text,"foo,bar"
+${date},bill,23,http://example.com,My group,Reply,"includes ""double quotes"", and commas",Annotation text,"tag_1,tag_2"
+${date},bill,iii,http://example.com,My group,Highlight,,Annotation text,`,
+      },
+      {
+        separator: '\t',
+        buildExpectedContent:
+          date => `Created at\tAuthor\tPage\tURL\tGroup\tType\tQuote\tComment\tTags
+${date}\tjane\t\thttp://example.com\tMy group\tAnnotation\t"includes \t tabs"\tAnnotation text\tfoo,bar
+${date}\tbill\t23\thttp://example.com\tMy group\tReply\t"includes ""double quotes"", and commas"\tAnnotation text\ttag_1,tag_2
+${date}\tbill\tiii\thttp://example.com\tMy group\tHighlight\t\tAnnotation text\t`,
+      },
+    ].forEach(({ separator, buildExpectedContent }) => {
+      it('generates CSV content with expected annotations and separator', () => {
+        const annotations = [
+          {
+            ...baseAnnotation,
+            user: 'acct:jane@localhost',
+            tags: ['foo', 'bar'],
+            target: targetWithSelectors(quoteSelector('includes \t tabs')),
+          },
+          {
+            ...baseAnnotation,
+            ...newReply(),
+            target: targetWithSelectors(
+              quoteSelector('includes "double quotes", and commas'),
+              pageSelector(23),
+            ),
+          },
+          {
+            ...baseAnnotation,
+            ...newHighlight(),
+            tags: [],
+            target: targetWithSelectors(pageSelector('iii')),
+          },
+        ];
 
-      const result = exporter.buildCSVExportContent(annotations, {
-        groupName,
-        now,
+        const result = exporter.buildCSVExportContent(annotations, {
+          groupName,
+          now,
+          separator,
+        });
+
+        assert.equal(result, buildExpectedContent(formattedNow));
       });
-
-      assert.equal(
-        result,
-        `Created at,Author,Page,URL,Group,Type,Quote,Comment,Tags
-${formattedNow},jane,,http://example.com,My group,Annotation,,Annotation text,"foo,bar"
-${formattedNow},bill,23,http://example.com,My group,Reply,"includes ""double quotes"", and commas",Annotation text,"tag_1,tag_2"
-${formattedNow},bill,iii,http://example.com,My group,Highlight,,Annotation text,`,
-      );
     });
 
     it('uses display names if `displayNamesEnabled` is set', () => {

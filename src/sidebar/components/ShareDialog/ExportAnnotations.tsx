@@ -148,7 +148,7 @@ function ExportAnnotations({
   const [customFilename, setCustomFilename] = useState<string>();
 
   const buildExportContent = useCallback(
-    (format: ExportFormat['value']): string => {
+    (format: ExportFormat['value'], context: 'file' | 'clipboard'): string => {
       const annotationsToExport =
         selectedUserAnnotations?.annotations ?? exportableAnnotations;
       switch (format) {
@@ -173,6 +173,10 @@ function ExportAnnotations({
           return annotationsExporter.buildCSVExportContent(
             annotationsToExport,
             {
+              // We want to use tabs when copying to clipboard, so that it's
+              // possible to paste in apps like Google Sheets or OneDrive Excel.
+              // They do not properly populate a grid for comma-based CSV.
+              separator: context === 'file' ? ',' : '\t',
               groupName: group?.name,
               defaultAuthority,
               displayNamesEnabled,
@@ -211,7 +215,7 @@ function ExportAnnotations({
       try {
         const format = exportFormat.value;
         const filename = `${customFilename ?? defaultFilename}.${format}`;
-        const exportData = buildExportContent(format);
+        const exportData = buildExportContent(format, 'file');
         const mimeType = formatToMimeType(format);
 
         downloadFile(exportData, mimeType, filename);
@@ -231,7 +235,7 @@ function ExportAnnotations({
   );
   const copyAnnotationsExport = useCallback(async () => {
     const format = exportFormat.value;
-    const exportData = buildExportContent(format);
+    const exportData = buildExportContent(format, 'clipboard');
 
     try {
       if (format === 'html') {
