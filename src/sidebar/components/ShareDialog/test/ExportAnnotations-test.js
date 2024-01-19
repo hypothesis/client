@@ -446,7 +446,8 @@ describe('ExportAnnotations', () => {
         assert.calledOnce(fakeAnnotationsExporter.buildJSONExportContent);
         assert.calledWith(
           fakeToastMessenger.error,
-          'Exporting annotations failed',
+          'Exporting annotations failed: Error exporting',
+          { autoDismiss: false },
         );
       });
     });
@@ -512,7 +513,11 @@ describe('ExportAnnotations', () => {
         copyButton.simulate('click');
       });
 
-      assert.calledWith(fakeToastMessenger.error, 'Copying annotations failed');
+      assert.calledWith(
+        fakeToastMessenger.error,
+        'Copying annotations failed: Something failed',
+        { autoDismiss: false },
+      );
     });
   });
 
