@@ -68,7 +68,7 @@ describe('sidebar/store/modules/filters', () => {
 
         const secondFilterState = getFiltersState();
         assert.deepEqual(secondFilterState.focusActive, new Set());
-        assert.isUndefined(secondFilterState.focusFilters.user);
+        assert.notProperty(secondFilterState.focusFilters, 'user');
       });
     });
 

@@ -118,19 +118,21 @@ function focusFiltersFromConfig(focusConfig: FocusConfig): Filters {
 
 const reducers = {
   CHANGE_FOCUS_MODE_USER(state: State, action: { user: FocusUserInfo }) {
+    const focusFilters = { ...state.focusFilters };
     const { user } = focusFiltersFromConfig({ user: action.user });
+
     const focusActive = new Set(state.focusActive);
     if (user !== undefined) {
       focusActive.add('user');
+      focusFilters.user = user;
     } else {
       focusActive.delete('user');
+      delete focusFilters.user;
     }
+
     return {
       focusActive,
-      focusFilters: {
-        ...state.focusFilters,
-        user,
-      },
+      focusFilters,
     };
   },
 
