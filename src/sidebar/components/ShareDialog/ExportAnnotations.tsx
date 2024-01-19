@@ -216,7 +216,9 @@ function ExportAnnotations({
 
         downloadFile(exportData, mimeType, filename);
       } catch (e) {
-        toastMessenger.error('Exporting annotations failed');
+        toastMessenger.error(`Exporting annotations failed: ${e.message}`, {
+          autoDismiss: false,
+        });
       }
     },
     [
@@ -240,7 +242,9 @@ function ExportAnnotations({
 
       toastMessenger.success('Annotations copied');
     } catch (e) {
-      toastMessenger.error('Copying annotations failed');
+      toastMessenger.error(`Copying annotations failed: ${e.message}`, {
+        autoDismiss: false,
+      });
     }
   }, [buildExportContent, exportFormat.value, toastMessenger]);
 
