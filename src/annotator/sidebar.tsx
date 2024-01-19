@@ -70,7 +70,7 @@ export type SidebarContainerConfig = {
 /**
  * Create the iframe that will load the sidebar application.
  */
-function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
+export function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
   const sidebarURL = config.sidebarAppUrl;
   const sidebarAppSrc = addConfigFragment(
     sidebarURL,
@@ -79,15 +79,20 @@ function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
 
   const sidebarFrame = document.createElement('iframe');
 
-  // Enable media in annotations to be shown fullscreen
-  sidebarFrame.setAttribute('allowfullscreen', '');
-
   sidebarFrame.src = sidebarAppSrc;
   sidebarFrame.title = 'Hypothesis annotation viewer';
   sidebarFrame.className = 'sidebar-frame';
-  sidebarFrame.allow = 'clipboard-write';
 
-  return sidebarFrame;
+  // Enable media in annotations to be shown fullscreen, and allow copying to
+  // the clipboard.
+  sidebarFrame.allow = 'fullscreen; clipboard-write';
+
+  // In viahtml, pywb uses wombat.js, which monkey-patches some JS methods.
+  // One of those causes the `allow` attribute to be overwritten, so we want to
+  // make it non-writable to preserve the permissions we set above.
+  return Object.defineProperty(sidebarFrame, 'allow', {
+    writable: false,
+  });
 }
 
 type GestureState = {
