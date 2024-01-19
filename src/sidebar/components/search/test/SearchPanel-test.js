@@ -8,9 +8,10 @@ describe('SearchPanel', () => {
 
   beforeEach(() => {
     fakeStore = {
-      setFilterQuery: sinon.stub(),
-      filterQuery: sinon.stub().returns(null),
       closeSidebarPanel: sinon.stub(),
+      filterQuery: sinon.stub().returns(null),
+      hasSelectedAnnotations: sinon.stub().returns(false),
+      setFilterQuery: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -60,5 +61,13 @@ describe('SearchPanel', () => {
     wrapper.find('SearchField').props().onSearch('foo');
 
     assert.calledWith(fakeStore.setFilterQuery, 'foo');
+  });
+
+  [true, false].forEach(hasSelection => {
+    it('disables search field when there is a selection', () => {
+      fakeStore.hasSelectedAnnotations.returns(hasSelection);
+      const wrapper = createSearchPanel();
+      assert.equal(wrapper.find('SearchField').prop('disabled'), hasSelection);
+    });
   });
 });
