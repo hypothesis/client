@@ -307,6 +307,49 @@ describe('SelectionTabs', () => {
     assert.notCalled(fakeStore.selectTab);
   });
 
+  [
+    {
+      tabCounts: {
+        annotation: 2,
+        note: 0,
+        orphan: 0,
+      },
+      message: '2 annotations',
+    },
+    {
+      tabCounts: {
+        annotation: 0,
+        note: 3,
+        orphan: 0,
+      },
+      message: '3 notes',
+    },
+    {
+      tabCounts: {
+        annotation: 0,
+        note: 0,
+        orphan: 4,
+      },
+      message: '4 orphans',
+    },
+    {
+      tabCounts: {
+        annotation: 2,
+        note: 3,
+        orphan: 4,
+      },
+      message: '2 annotations, 3 notes, 4 orphans',
+    },
+  ].forEach(({ tabCounts, message }) => {
+    it('reports annotation count to screen readers', () => {
+      const wrapper = createComponent({
+        tabCounts,
+      });
+      const status = wrapper.find('[role="status"]');
+      assert.equal(status.text(), message);
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility({
