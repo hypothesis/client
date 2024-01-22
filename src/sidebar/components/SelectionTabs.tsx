@@ -125,6 +125,18 @@ function SelectionTabs({
 
   const showNotesUnavailableMessage = selectedTab === 'note' && noteCount === 0;
 
+  const tabCountsSummaryPieces = [];
+  if (annotationCount > 0) {
+    tabCountsSummaryPieces.push(`${annotationCount} annotations`);
+  }
+  if (noteCount > 0) {
+    tabCountsSummaryPieces.push(`${noteCount} notes`);
+  }
+  if (orphanCount > 0) {
+    tabCountsSummaryPieces.push(`${orphanCount} orphans`);
+  }
+  const tabCountsSummary = tabCountsSummaryPieces.join(', ');
+
   return (
     <div
       className={classnames(
@@ -132,6 +144,9 @@ function SelectionTabs({
         'space-y-3 pb-[9px]',
       )}
     >
+      <div aria-live="polite" role="status" className="sr-only">
+        {tabCountsSummary}
+      </div>
       <div className="flex gap-x-6 theme-clean:ml-[15px]" role="tablist">
         <Tab
           count={annotationCount}
