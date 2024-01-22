@@ -340,6 +340,14 @@ describe('SelectionTabs', () => {
       },
       message: '2 annotations, 3 notes, 4 orphans',
     },
+    {
+      tabCounts: {
+        annotation: 1,
+        note: 1,
+        orphan: 1,
+      },
+      message: '1 annotation, 1 note, 1 orphan',
+    },
   ].forEach(({ tabCounts, message }) => {
     it('reports annotation count to screen readers', () => {
       const wrapper = createComponent({

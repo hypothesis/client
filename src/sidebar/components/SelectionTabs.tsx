@@ -125,15 +125,23 @@ function SelectionTabs({
 
   const showNotesUnavailableMessage = selectedTab === 'note' && noteCount === 0;
 
+  // Naive simple English pluralization
+  const pluralize = (count: number, singular: string, plural: string) => {
+    return count === 1 ? singular : plural;
+  };
+
   const tabCountsSummaryPieces = [];
   if (annotationCount > 0) {
-    tabCountsSummaryPieces.push(`${annotationCount} annotations`);
+    const term = pluralize(annotationCount, 'annotation', 'annotations');
+    tabCountsSummaryPieces.push(`${annotationCount} ${term}`);
   }
   if (noteCount > 0) {
-    tabCountsSummaryPieces.push(`${noteCount} notes`);
+    const term = pluralize(noteCount, 'note', 'notes');
+    tabCountsSummaryPieces.push(`${noteCount} ${term}`);
   }
   if (orphanCount > 0) {
-    tabCountsSummaryPieces.push(`${orphanCount} orphans`);
+    const term = pluralize(noteCount, 'orphan', 'orphans');
+    tabCountsSummaryPieces.push(`${orphanCount} ${term}`);
   }
   const tabCountsSummary = tabCountsSummaryPieces.join(', ');
 
