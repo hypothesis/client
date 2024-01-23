@@ -2,7 +2,6 @@ import {
   CancelIcon,
   IconButton,
   Input,
-  InputGroup,
   SearchIcon,
   useSyncedRef,
 } from '@hypothesis/frontend-shared';
@@ -87,9 +86,13 @@ export default function SearchField({
       onSubmit={onSubmit}
       className={classnames('space-y-3', classes)}
     >
-      <InputGroup>
+      <div className="relative">
         <IconButton
+          // Vertically center icon on left side of input. Increase the text
+          // size to make the icon the same size as the top bar icons.
+          classes="absolute left-1 text-[16px] top-[50%] translate-y-[-50%]"
           icon={SearchIcon}
+          size="lg"
           title="Search"
           type="submit"
           disabled={disabled}
@@ -97,9 +100,8 @@ export default function SearchField({
         <Input
           aria-label="Search annotations"
           classes={classnames(
-            'p-1.5',
-            'transition-[max-width] duration-300 ease-out',
-            'disabled:text-grey-6',
+            'pl-9 pr-9', // Add padding so input does not overlap search/clear buttons.
+            'disabled:text-grey-6', // Dim text when input is disabled
           )}
           data-testid="search-input"
           dir="auto"
@@ -115,6 +117,8 @@ export default function SearchField({
         />
         {pendingQuery && (
           <IconButton
+            classes="absolute right-1 text-[16px] top-[50%] translate-y-[-50%]"
+            size="lg"
             icon={CancelIcon}
             data-testid="clear-button"
             title="Clear search"
@@ -122,7 +126,7 @@ export default function SearchField({
             disabled={disabled}
           />
         )}
-      </InputGroup>
+      </div>
     </form>
   );
 }
