@@ -291,6 +291,12 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       const annotations = [
         {
           ...baseAnnotation,
+          text: `This includes markdown
+
+1. First item
+2. Second item
+
+**bold text** and [a link](https://example.com)`,
           user: 'acct:jane@localhost',
           tags: ['foo', 'bar'],
           target: targetWithSelectors(quoteSelector('The quote')),
@@ -343,7 +349,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
         </a>
       </p>
       <table>
-        <tbody>
+        <tbody style="vertical-align:top;">
           <tr>
             <td>Group:</td>
             <td>My group</td>
@@ -373,7 +379,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       <article>
         <h2>Annotation 1:</h2>
         <table>
-          <tbody>
+          <tbody style="vertical-align:top;">
             <tr>
               <td>Created at:</td>
               <td>
@@ -396,7 +402,14 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
             </tr>
             <tr>
               <td>Comment:</td>
-              <td>Annotation text</td>
+              <td>
+                <p>This includes markdown</p>
+                <ol>
+                <li>First item</li>
+                <li>Second item</li>
+                </ol>
+                <p><strong>bold text</strong> and <a href="https://example.com" target="_blank">a link</a></p>
+              </td>
             </tr>
             <tr>
               <td>Tags:</td>
@@ -408,7 +421,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       <article>
         <h2>Annotation 2:</h2>
         <table>
-          <tbody>
+          <tbody style="vertical-align:top;">
             <tr>
               <td>Created at:</td>
               <td>
@@ -447,7 +460,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       <article>
         <h2>Annotation 3:</h2>
         <table>
-          <tbody>
+          <tbody style="vertical-align:top;">
             <tr>
               <td>Created at:</td>
               <td>

@@ -14,6 +14,7 @@ import {
 import { annotationDisplayName } from '../helpers/annotation-user';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
+import { renderMathAndMarkdown } from '../render-markdown';
 import { formatDateTime } from '../util/time';
 
 export type JSONExportContent = {
@@ -203,7 +204,7 @@ export class AnnotationsExporter {
             </p>
 
             <table>
-              <tbody>
+              <tbody style={{ verticalAlign: 'top' }}>
                 <tr>
                   <td>Group:</td>
                   <td>{groupName}</td>
@@ -233,12 +234,21 @@ export class AnnotationsExporter {
             {annotations.map((annotation, index) => {
               const page = pageLabel(annotation);
               const annotationQuote = quote(annotation);
+              const renderedComment = renderMathAndMarkdown(annotation.text);
+
+              // When the result of rendering the text's markdown is just a
+              // single paragraph, we fall back to the annotation text, to
+              // avoid extra margins added by some editors, like Google Docs
+              const comment =
+                renderedComment === `<p>${annotation.text}</p>`
+                  ? annotation.text
+                  : renderedComment;
 
               return (
                 <article key={annotation.id}>
                   <h2>Annotation {index + 1}:</h2>
                   <table>
-                    <tbody>
+                    <tbody style={{ verticalAlign: 'top' }}>
                       <tr>
                         <td>Created at:</td>
                         <td>
@@ -273,7 +283,11 @@ export class AnnotationsExporter {
                       )}
                       <tr>
                         <td>Comment:</td>
-                        <td>{annotation.text}</td>
+                        <td
+                          dangerouslySetInnerHTML={{
+                            __html: comment,
+                          }}
+                        />
                       </tr>
                       {annotation.tags.length > 0 && (
                         <tr>
