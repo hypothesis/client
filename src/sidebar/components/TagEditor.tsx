@@ -1,5 +1,6 @@
 import { useElementShouldClose } from '@hypothesis/frontend-shared';
 import { Input } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 import { useRef, useState } from 'preact/hooks';
 
 import { withServices } from '../service-context';
@@ -277,6 +278,10 @@ function TagEditor({
           aria-label="Add tags"
           dir="auto"
           role="combobox"
+          classes={classnames(
+            // Larger font on touch devices
+            'text-base touch:text-touch-base',
+          )}
         />
         <AutocompleteList
           id={`${tagEditorId}-AutocompleteList`}
