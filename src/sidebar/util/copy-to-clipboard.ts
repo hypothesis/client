@@ -58,16 +58,23 @@ export async function copyHTML(
   /* istanbul ignore next - test seam */
   document_ = document,
 ) {
+  // We want to copy the `text` both with plain and html media types, to make
+  // sure it is possible to paste in both rich text and plain text contexts.
+  // For the second one, the raw HTML markup will be pasted.
+  const types = ['text/html', 'text/plain'];
+
   if (navigator_.clipboard.write) {
-    const type = 'text/html';
-    const blob = new Blob([text], { type });
-    await navigator_.clipboard.write([new ClipboardItem({ [type]: blob })]);
+    const blobs = types.reduce<Record<string, Blob>>((acc, type) => {
+      acc[type] = new Blob([text], { type });
+      return acc;
+    }, {});
+    await navigator_.clipboard.write([new ClipboardItem(blobs)]);
   } else {
     // Fallback to deprecated document.execCommand('copy') on the assumptions
     // that all browsers will implement the new clipboard API before removing
     // the deprecated one.
     const copyHandler = (e: ClipboardEvent) => {
-      e.clipboardData?.setData('text/html', text);
+      types.forEach(type => e.clipboardData?.setData(type, text));
       e.preventDefault();
     };
 

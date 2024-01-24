@@ -72,7 +72,17 @@ describe('copy-to-clipboard', () => {
 
       await copyHTML(text, createFakeNavigator({ write }));
 
-      assert.called(write);
+      assert.calledOnce(write);
+
+      const [clipboardItem] = write.lastCall.args[0];
+      const getTextForType = async type => {
+        const blob = await clipboardItem.getType(type);
+        return blob.text();
+      };
+
+      assert.deepEqual(clipboardItem.types, ['text/html', 'text/plain']);
+      assert.equal(await getTextForType('text/html'), text);
+      assert.equal(await getTextForType('text/plain'), text);
     });
 
     it('falls back to execCommand if clipboard API is not supported', async () => {
@@ -92,6 +102,7 @@ describe('copy-to-clipboard', () => {
 
       assert.calledWith(document.execCommand, 'copy');
       assert.equal(clipboardData.getData('text/html'), text);
+      assert.equal(clipboardData.getData('text/plain'), text);
     });
   });
 });
