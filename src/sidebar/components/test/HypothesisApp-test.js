@@ -54,7 +54,6 @@ describe('HypothesisApp', () => {
       route: sinon.stub().returns('sidebar'),
 
       getLink: sinon.stub(),
-      isFeatureEnabled: sinon.stub().returns(true),
     };
 
     fakeAuth = {};
@@ -405,18 +404,6 @@ describe('HypothesisApp', () => {
       const container = wrapper.find(appSelector);
 
       assert.isFalse(container.hasClass('theme-clean'));
-    });
-  });
-
-  describe('search panel', () => {
-    [true, false].forEach(searchPanelEnabled => {
-      it('renders SearchPanel when feature is enabled', () => {
-        fakeStore.isFeatureEnabled.returns(searchPanelEnabled);
-
-        const wrapper = createComponent();
-
-        assert.equal(wrapper.exists('SearchPanel'), searchPanelEnabled);
-      });
     });
   });
 });

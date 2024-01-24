@@ -66,8 +66,6 @@ function HypothesisApp({
 
   const isThirdParty = isThirdPartyService(settings);
 
-  const searchPanelEnabled = store.isFeatureEnabled('search_panel');
-
   const login = async () => {
     if (serviceConfig(settings)) {
       // Let the host page handle the login request
@@ -166,7 +164,7 @@ function HypothesisApp({
       <div className="container">
         <ToastMessages />
         <HelpPanel />
-        {searchPanelEnabled && <SearchPanel />}
+        <SearchPanel />
         <ShareDialog shareTab={!isThirdParty} />
 
         {route && (

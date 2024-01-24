@@ -12,7 +12,6 @@ import PendingUpdatesButton from './PendingUpdatesButton';
 import PressableIconButton from './PressableIconButton';
 import SortMenu from './SortMenu';
 import UserMenu from './UserMenu';
-import SearchInput from './old-search/SearchInput';
 import SearchIconButton from './search/SearchIconButton';
 import StreamSearchInput from './search/StreamSearchInput';
 
@@ -49,10 +48,8 @@ function TopBar({
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
   const store = useSidebarStore();
-  const filterQuery = store.filterQuery();
   const isLoggedIn = store.isLoggedIn();
   const hasFetchedProfile = store.hasFetchedProfile();
-  const searchPanelEnabled = store.isFeatureEnabled('search_panel');
 
   const toggleSharePanel = () => {
     store.toggleSidebarPanel('shareGroupAnnotations');
@@ -97,13 +94,7 @@ function TopBar({
           {isSidebar && (
             <>
               <PendingUpdatesButton />
-              {!searchPanelEnabled && (
-                <SearchInput
-                  query={filterQuery || null}
-                  onSearch={store.setFilterQuery}
-                />
-              )}
-              {searchPanelEnabled && <SearchIconButton />}
+              <SearchIconButton />
               <SortMenu />
               <PressableIconButton
                 icon={ShareIcon}
