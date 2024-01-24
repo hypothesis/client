@@ -102,6 +102,7 @@ export default function SearchField({
           classes={classnames(
             'pl-8 pr-8', // Add padding so input does not overlap search/clear buttons.
             'disabled:text-grey-6', // Dim text when input is disabled
+            'text-base touch:text-touch-base', // Larger font on touch devices
           )}
           data-testid="search-input"
           dir="auto"
