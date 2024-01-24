@@ -64,42 +64,4 @@ describe('sidebar/components/hooks/use-root-thread', () => {
       assert.equal(threadState.showTabs, showTabs);
     });
   });
-
-  [
-    // When using search UI, always filter by tab.
-    { newSearchUI: true, hasFilter: true, hasSelection: false, showTabs: true },
-
-    // When using old search UI, only filter by tab if no selection or filter
-    // is active.
-    {
-      newSearchUI: false,
-      hasFilter: true,
-      hasSelection: false,
-      showTabs: false,
-    },
-    {
-      newSearchUI: false,
-      hasFilter: false,
-      hasSelection: true,
-      showTabs: false,
-    },
-    {
-      newSearchUI: false,
-      hasFilter: false,
-      hasSelection: false,
-      showTabs: true,
-    },
-  ].forEach(({ newSearchUI, hasFilter, hasSelection, showTabs }) => {
-    it('if `search_panel` is disabled, does not filter by tab if there is a filter active', () => {
-      fakeStore.route.returns('sidebar');
-      fakeStore.isFeatureEnabled.withArgs('search_panel').returns(newSearchUI);
-      fakeStore.hasAppliedFilter.returns(hasFilter);
-      fakeStore.hasSelectedAnnotations.returns(hasSelection);
-
-      mount(<DummyComponent />);
-      const threadState = fakeThreadAnnotations.getCall(0).args[0];
-
-      assert.equal(threadState.showTabs, showTabs);
-    });
-  });
 });

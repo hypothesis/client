@@ -18,14 +18,7 @@ export function useRootThread(): ThreadAnnotationsResult {
   const route = store.route();
   const selectionState = store.selectionState();
   const filters = store.getFilterValues();
-
-  // This logic mirrors code in `SidebarView`. It can be simplified once
-  // the "search_panel" feature is turned on everywhere.
-  const searchPanelEnabled = store.isFeatureEnabled('search_panel');
-  const hasAppliedFilter =
-    store.hasAppliedFilter() || store.hasSelectedAnnotations();
-  const showTabs =
-    route === 'sidebar' && (searchPanelEnabled || !hasAppliedFilter);
+  const showTabs = route === 'sidebar';
 
   const threadState = useMemo((): ThreadState => {
     const selection = { ...selectionState, filterQuery: query, filters };

@@ -70,7 +70,6 @@ describe('SidebarView', () => {
       profile: sinon.stub().returns({ userid: null }),
       searchUris: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
-      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     fakeTabsUtil = {
@@ -215,7 +214,7 @@ describe('SidebarView', () => {
 
       it('does not render filter status', () => {
         const wrapper = createComponent();
-        assert.isFalse(wrapper.find('FilterStatus').exists());
+        assert.isFalse(wrapper.find('FilterControls').exists());
       });
     });
   });
@@ -244,19 +243,11 @@ describe('SidebarView', () => {
 
     it('does not render filter status', () => {
       const wrapper = createComponent();
-      assert.isFalse(wrapper.find('FilterStatus').exists());
+      assert.isFalse(wrapper.find('FilterControls').exists());
     });
   });
 
   describe('filter controls', () => {
-    it('renders old filter controls when `search_panel` feature is disabled', () => {
-      fakeStore.isFeatureEnabled.withArgs('search_panel').returns(false);
-
-      const wrapper = createComponent();
-      assert.isTrue(wrapper.exists('FilterStatus'));
-      assert.isFalse(wrapper.exists('FilterControls'));
-    });
-
     [
       {
         searchPanelOpen: false,
@@ -267,15 +258,13 @@ describe('SidebarView', () => {
         showControls: false,
       },
     ].forEach(({ searchPanelOpen, showControls }) => {
-      it(`renders new filter controls when "search_panel" is enabled and search panel is not open`, () => {
-        fakeStore.isFeatureEnabled.withArgs('search_panel').returns(true);
+      it(`renders filter controls when search panel is not open`, () => {
         fakeStore.isSidebarPanelOpen
           .withArgs('searchAnnotations')
           .returns(searchPanelOpen);
 
         const wrapper = createComponent();
 
-        assert.isFalse(wrapper.exists('FilterStatus'));
         assert.equal(wrapper.exists('FilterControls'), showControls);
       });
     });
@@ -296,30 +285,6 @@ describe('SidebarView', () => {
       fakeStore.isLoggedIn.returns(true);
       wrapper.setProps({});
       assert.calledOnce(fakeStreamer.connect);
-    });
-  });
-
-  describe('selection tabs', () => {
-    it('renders tabs', () => {
-      const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('SelectionTabs').exists());
-    });
-
-    it('does not render tabs if there is an applied filter', () => {
-      fakeStore.hasAppliedFilter.returns(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('SelectionTabs').exists());
-    });
-
-    it('does not render tabs if there are selected annotations', () => {
-      fakeStore.hasSelectedAnnotations.returns(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('SelectionTabs').exists());
     });
   });
 
