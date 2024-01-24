@@ -343,7 +343,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
         </a>
       </p>
       <table>
-        <tbody>
+        <tbody style="vertical-align:top;">
           <tr>
             <td>Group:</td>
             <td>My group</td>
@@ -373,7 +373,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       <article>
         <h2>Annotation 1:</h2>
         <table>
-          <tbody>
+          <tbody style="vertical-align:top;">
             <tr>
               <td>Created at:</td>
               <td>
@@ -396,7 +396,9 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
             </tr>
             <tr>
               <td>Comment:</td>
-              <td>Annotation text</td>
+              <td>
+                <p>Annotation text</p>
+              </td>
             </tr>
             <tr>
               <td>Tags:</td>
@@ -408,7 +410,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       <article>
         <h2>Annotation 2:</h2>
         <table>
-          <tbody>
+          <tbody style="vertical-align:top;">
             <tr>
               <td>Created at:</td>
               <td>
@@ -435,7 +437,9 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
             </tr>
             <tr>
               <td>Comment:</td>
-              <td>Annotation text</td>
+              <td>
+                <p>Annotation text</p>
+              </td>
             </tr>
             <tr>
               <td>Tags:</td>
@@ -447,7 +451,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
       <article>
         <h2>Annotation 3:</h2>
         <table>
-          <tbody>
+          <tbody style="vertical-align:top;">
             <tr>
               <td>Created at:</td>
               <td>
@@ -468,7 +472,9 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
             </tr>
             <tr>
               <td>Comment:</td>
-              <td>Annotation text</td>
+              <td>
+                <p>Annotation text</p>
+              </td>
             </tr>
           </tbody>
         </table>

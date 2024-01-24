@@ -14,6 +14,7 @@ import {
 import { annotationDisplayName } from '../helpers/annotation-user';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
+import { renderMathAndMarkdown } from '../render-markdown';
 import { formatDateTime } from '../util/time';
 
 export type JSONExportContent = {
@@ -203,7 +204,7 @@ export class AnnotationsExporter {
             </p>
 
             <table>
-              <tbody>
+              <tbody style={{ verticalAlign: 'top' }}>
                 <tr>
                   <td>Group:</td>
                   <td>{groupName}</td>
@@ -238,7 +239,7 @@ export class AnnotationsExporter {
                 <article key={annotation.id}>
                   <h2>Annotation {index + 1}:</h2>
                   <table>
-                    <tbody>
+                    <tbody style={{ verticalAlign: 'top' }}>
                       <tr>
                         <td>Created at:</td>
                         <td>
@@ -273,7 +274,11 @@ export class AnnotationsExporter {
                       )}
                       <tr>
                         <td>Comment:</td>
-                        <td>{annotation.text}</td>
+                        <td
+                          dangerouslySetInnerHTML={{
+                            __html: renderMathAndMarkdown(annotation.text),
+                          }}
+                        />
                       </tr>
                       {annotation.tags.length > 0 && (
                         <tr>
