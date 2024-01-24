@@ -95,12 +95,22 @@ function TagEditor({
    * Invokes callback to add tag. If the tag was added, close the suggestions
    * list, clear the field content and maintain focus.
    */
-  const addTag = (newTag: string) => {
+  const addTag = (tag: string) => {
+    // Split using first comma, if present
+    const [newTag, nextTag] = tag.split(",", 2);
+
     if (onAddTag(newTag)) {
       setSuggestionsListOpen(false);
       setActiveItem(-1);
-
-      clearPendingTag();
+      
+      // If there is a comma separator, do not delete the next tag
+      if (nextTag) {
+        console.log(pendingTag())
+        inputEl.current!.value = nextTag;
+        onTagInput?.(nextTag);
+      } else {
+        clearPendingTag();
+      }
       inputEl.current!.focus();
     }
   };
@@ -172,11 +182,30 @@ function TagEditor({
         e.preventDefault();
         break;
       case 'Enter':
+        // Commit a tag
+        if (activeItem === -1) {
+          if (hasPendingTag()) {
+            // nothing selected, just add the typed text unless a comma is part of the input
+            addTag(pendingTag());
+          }
+        } else {
+          // Add the selected tag
+          addTag(suggestions[activeItem]);
+        }
+        e.preventDefault();
+        break;
       case ',':
         // Commit a tag
         if (activeItem === -1) {
-          // nothing selected, just add the typed text
-          addTag(pendingTag());
+          if (hasPendingTag()) {
+            const currentInput = pendingTag();
+            const caretPos = inputEl.current!.selectionStart;
+            // Add back comma input that was captured
+            inputEl.current!.value = currentInput.slice(0, caretPos!) + ',' + currentInput.slice(caretPos!);
+            // Move cursor forward one, past comma
+            inputEl.current!.selectionStart = inputEl.current!.selectionEnd = caretPos! + 1;
+            addTag(pendingTag());
+          }
         } else {
           // Add the selected tag
           addTag(suggestions[activeItem]);
