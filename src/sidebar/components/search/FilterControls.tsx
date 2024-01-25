@@ -155,7 +155,7 @@ export default function FilterControls({
   return (
     <Container>
       <div
-        className="flex flex-row flex-wrap gap-x-2 gap-y-2 items-center"
+        className="flex flex-row flex-wrap gap-2 items-center"
         data-testid="filter-controls"
       >
         <b>Filters</b>
