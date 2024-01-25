@@ -23,6 +23,12 @@ export default function TabHeader({
           // font size
           'text-[16px]',
           'text-grey-6 hover:text-grey-7 hover:bg-grey-3/50',
+
+          // Keep the close button the same height on touch devices.
+          //
+          // This is needed so that the close button remains the same height as
+          // the `Tab` components rendered inside the `TabList`. See issue #6131.
+          'touch:!min-h-0',
         )}
         title="Close"
         variant="custom"
