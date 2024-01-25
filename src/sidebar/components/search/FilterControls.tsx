@@ -72,7 +72,7 @@ function FilterToggle({
       title={description}
     >
       {IconComponent && <IconComponent className="w-em h-em" />}
-      {label}
+      <span className="max-w-36 truncate">{label}</span>
       <div
         // Vertical divider line between label and active/inactive state.
         // This should fill the button vertically.
@@ -155,7 +155,7 @@ export default function FilterControls({
   return (
     <Container>
       <div
-        className="flex flex-row gap-x-2 items-center"
+        className="flex flex-row flex-wrap gap-x-2 gap-y-2 items-center"
         data-testid="filter-controls"
       >
         <b>Filters</b>
