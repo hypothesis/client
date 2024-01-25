@@ -40,6 +40,7 @@ describe('ExportAnnotations', () => {
       buildTextExportContent: sinon.stub().returns(''),
       buildCSVExportContent: sinon.stub().returns(''),
       buildHTMLExportContent: sinon.stub().returns(''),
+      buildMarkdownExportContent: sinon.stub().returns(''),
     };
     fakeToastMessenger = {
       error: sinon.stub(),
@@ -258,7 +259,7 @@ describe('ExportAnnotations', () => {
     const optionText = (index, type) =>
       options.at(index).find(`[data-testid="format-${type}"]`).text();
 
-    assert.equal(options.length, 4);
+    assert.equal(options.length, 5);
     assert.equal(optionText(0, 'name'), 'JSON');
     assert.equal(
       optionText(0, 'description'),
@@ -275,6 +276,11 @@ describe('ExportAnnotations', () => {
     assert.equal(
       optionText(3, 'description'),
       'For import into word processors as rich text',
+    );
+    assert.equal(optionText(4, 'name'), 'Markdown (MD)');
+    assert.equal(
+      optionText(4, 'description'),
+      'For import into markdown based editors',
     );
   });
 
@@ -323,6 +329,12 @@ describe('ExportAnnotations', () => {
         format: 'html',
         getExpectedInvokedContentBuilder: () => [
           fakeAnnotationsExporter.buildHTMLExportContent,
+        ],
+      },
+      {
+        format: 'md',
+        getExpectedInvokedContentBuilder: () => [
+          fakeAnnotationsExporter.buildMarkdownExportContent,
         ],
       },
     ].forEach(({ format, getExpectedInvokedContentBuilder }) => {
@@ -418,6 +430,10 @@ describe('ExportAnnotations', () => {
         format: 'html',
         expectedMimeType: 'text/html',
       },
+      {
+        format: 'md',
+        expectedMimeType: 'text/markdown',
+      },
     ].forEach(({ format, expectedMimeType }) => {
       it('downloads a file using user-entered filename appended with proper extension', async () => {
         const wrapper = createComponent();
@@ -506,6 +522,13 @@ describe('ExportAnnotations', () => {
         getExpectedInvokedCallback: () => fakeCopyHTML,
         getExpectedInvokedContentBuilder: () => [
           fakeAnnotationsExporter.buildHTMLExportContent,
+        ],
+      },
+      {
+        format: 'md',
+        getExpectedInvokedCallback: () => fakeCopyPlainText,
+        getExpectedInvokedContentBuilder: () => [
+          fakeAnnotationsExporter.buildMarkdownExportContent,
         ],
       },
     ].forEach(

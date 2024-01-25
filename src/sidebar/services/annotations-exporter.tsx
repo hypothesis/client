@@ -93,13 +93,11 @@ export class AnnotationsExporter {
       const lines = [
         `Created at: ${formatDateTime(new Date(annotation.created))}`,
         `Author: ${extractUsername(annotation)}`,
-        page ? `Page: ${page}` : undefined,
+        page && `Page: ${page}`,
         `Type: ${annotationRole(annotation)}`,
-        annotationQuote ? `Quote: "${annotationQuote}"` : undefined,
+        annotationQuote && `Quote: "${annotationQuote}"`,
         `Comment: ${annotation.text}`,
-        annotation.tags.length > 0
-          ? `Tags: ${annotation.tags.join(', ')}`
-          : undefined,
+        annotation.tags.length > 0 && `Tags: ${annotation.tags.join(', ')}`,
       ].filter(Boolean);
 
       return trimAndDedent`
@@ -309,6 +307,83 @@ export class AnnotationsExporter {
       // Replacing them with double spaces we avoid side effects when pasting
       // the result in a web app.
     ).replace(/\t/g, '  ');
+  }
+
+  buildMarkdownExportContent(
+    annotations: APIAnnotationData[],
+    {
+      groupName = '',
+      displayNamesEnabled = false,
+      defaultAuthority = '',
+      /* istanbul ignore next - test seam */
+      now = new Date(),
+    }: HTMLExportOptions = {},
+  ): string {
+    const { uri, title, uniqueUsers, replies, extractUsername } =
+      this._exportCommon(annotations, {
+        displayNamesEnabled,
+        defaultAuthority,
+      });
+
+    const quoteToMarkdown = (quote: string): string => trimAndDedent`
+      * Quote:
+      ${quote
+        .split('\n')
+        .map(quoteLine => `  > ${quoteLine.trim()}`)
+        .join('\n')}
+      `;
+    // Since annotations text is already markdown, we want to wrap it in a pre
+    // to avoid it to be rendered by markdown parsers
+    const textToMarkdown = (text: string): string => trimAndDedent`
+      * Comment:
+        \`\`\`
+      ${text
+        .split('\n')
+        .map(textLine => `  ${textLine.trim()}`)
+        .join('\n')}
+        \`\`\`
+    `;
+
+    return trimAndDedent`
+      # Annotations on "${title}"
+      
+      ${formatDateTime(now)}
+      
+      [${uri}](${uri})
+      
+      * Group: ${groupName}
+      * Total users: ${uniqueUsers.length}
+      * Users: ${uniqueUsers.join(', ')}
+      * Total annotations: ${annotations.length}
+      * Total replies: ${replies.length}
+      
+      * * *
+      
+      # Annotations
+      
+      ${annotations
+        .map((annotation, index) => {
+          const page = pageLabel(annotation);
+          const annotationQuote = quote(annotation);
+
+          const lines = [
+            `* Created at: ${formatDateTime(new Date(annotation.created))}`,
+            `* Author: ${extractUsername(annotation)}`,
+            page && `* Page: ${page}`,
+            `* Type: ${annotationRole(annotation)}`,
+            annotationQuote && quoteToMarkdown(annotationQuote),
+            textToMarkdown(annotation.text),
+            annotation.tags.length > 0 &&
+              `* Tags: ${annotation.tags.join(', ')}`,
+          ].filter(Boolean);
+
+          return trimAndDedent`
+            ## Annotation ${index + 1}:
+            
+            ${lines.join('\n')}`;
+        })
+        .join('\n\n')}
+    `;
   }
 
   private _exportCommon(

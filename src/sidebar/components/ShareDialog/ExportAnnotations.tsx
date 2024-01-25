@@ -30,7 +30,7 @@ export type ExportAnnotationsProps = {
 
 type ExportFormat = {
   /** Unique format identifier used also as file extension */
-  value: 'json' | 'csv' | 'txt' | 'html';
+  value: 'json' | 'csv' | 'txt' | 'html' | 'md';
   /** The title to be displayed in the listbox item */
   title: string;
 
@@ -67,6 +67,12 @@ const exportFormats: ExportFormat[] = [
     shortTitle: 'HTML',
     description: 'For import into word processors as rich text',
   },
+  {
+    value: 'md',
+    title: 'Markdown (MD)',
+    shortTitle: 'MD',
+    description: 'For import into markdown based editors',
+  },
 ];
 
 function formatToMimeType(format: ExportFormat['value']): string {
@@ -75,6 +81,7 @@ function formatToMimeType(format: ExportFormat['value']): string {
     txt: 'text/plain',
     csv: 'text/csv',
     html: 'text/html',
+    md: 'text/markdown',
   };
   return typeForFormat[format];
 }
@@ -193,6 +200,15 @@ function ExportAnnotations({
             },
           );
         }
+        case 'md':
+          return annotationsExporter.buildMarkdownExportContent(
+            annotationsToExport,
+            {
+              groupName: group?.name,
+              defaultAuthority,
+              displayNamesEnabled,
+            },
+          );
         /* istanbul ignore next - This should never happen */
         default:
           throw new Error(`Invalid format: ${format}`);
