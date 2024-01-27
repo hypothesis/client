@@ -105,7 +105,6 @@ function TagEditor({
       
       // If there is a comma separator, do not delete the next tag
       if (nextTag) {
-        console.log(pendingTag())
         inputEl.current!.value = nextTag;
         onTagInput?.(nextTag);
       } else {
