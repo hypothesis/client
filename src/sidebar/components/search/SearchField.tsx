@@ -1,7 +1,7 @@
 import {
+  CancelIcon,
   IconButton,
   Input,
-  InputGroup,
   SearchIcon,
   useSyncedRef,
 } from '@hypothesis/frontend-shared';
@@ -15,6 +15,11 @@ import { useSidebarStore } from '../../store';
 export type SearchFieldProps = {
   /** The currently-active filter query */
   query: string | null;
+
+  onClearSearch: () => void;
+
+  /** Disable input editing or submitting the search field. */
+  disabled?: boolean;
 
   /** Callback for when the current filter query changes */
   onSearch: (value: string) => void;
@@ -34,11 +39,13 @@ export type SearchFieldProps = {
  * or searches annotations (in the stream/single annotation view).
  */
 export default function SearchField({
-  query,
-  onSearch,
-  inputRef,
   classes,
+  disabled = false,
+  inputRef,
+  onClearSearch,
   onKeyDown,
+  onSearch,
+  query,
 }: SearchFieldProps) {
   const store = useSidebarStore();
   const isLoading = store.isLoading();
@@ -79,18 +86,29 @@ export default function SearchField({
       onSubmit={onSubmit}
       className={classnames('space-y-3', classes)}
     >
-      <InputGroup>
+      <div className="relative">
+        <IconButton
+          // Vertically center icon on left side of input. Increase the text
+          // size to make the icon the same size as the top bar icons.
+          classes="absolute left-0 text-[16px] top-[50%] translate-y-[-50%]"
+          icon={SearchIcon}
+          size="lg"
+          title="Search"
+          type="submit"
+          disabled={disabled}
+        />
         <Input
           aria-label="Search annotations"
           classes={classnames(
-            'text-base p-1.5',
-            'transition-[max-width] duration-300 ease-out',
+            'pl-8 pr-8', // Add padding so input does not overlap search/clear buttons.
+            'disabled:text-grey-6', // Dim text when input is disabled
+            'text-base touch:text-touch-base', // Larger font on touch devices
           )}
           data-testid="search-input"
           dir="auto"
           name="query"
           placeholder={(isLoading && 'Loading…') || 'Search annotations…'}
-          disabled={isLoading}
+          disabled={disabled || isLoading}
           elementRef={input}
           value={pendingQuery || ''}
           onInput={(e: Event) =>
@@ -98,13 +116,18 @@ export default function SearchField({
           }
           onKeyDown={onKeyDown}
         />
-        <IconButton
-          icon={SearchIcon}
-          title="Search"
-          type="submit"
-          variant="dark"
-        />
-      </InputGroup>
+        {pendingQuery && (
+          <IconButton
+            classes="absolute right-0 text-[16px] top-[50%] translate-y-[-50%]"
+            size="lg"
+            icon={CancelIcon}
+            data-testid="clear-button"
+            title="Clear search"
+            onClick={onClearSearch}
+            disabled={disabled}
+          />
+        )}
+      </div>
     </form>
   );
 }

@@ -91,25 +91,25 @@ describe('ToastMessengerService', () => {
       assert.notCalled(fakeStore.addToastMessage);
     });
 
-    it('adds a new error toast message to the store', () => {
-      fakeStore.hasToastMessage.returns(false);
+    [
+      { autoDismiss: undefined, expectedAutoDismiss: true },
+      { autoDismiss: true, expectedAutoDismiss: true },
+      { autoDismiss: false, expectedAutoDismiss: false },
+    ].forEach(({ autoDismiss, expectedAutoDismiss }) => {
+      it('adds a new error toast message to the store', () => {
+        fakeStore.hasToastMessage.returns(false);
 
-      service.error('boo');
+        service.error('boo', { autoDismiss });
 
-      assert.calledWith(
-        fakeStore.addToastMessage,
-        sinon.match({ type: 'error', message: 'boo' }),
-      );
-    });
-
-    it('does not dismiss the message if `autoDismiss` is false', () => {
-      fakeStore.hasToastMessage.returns(false);
-      fakeStore.getToastMessage.returns(undefined);
-
-      service.error('boo', { autoDismiss: false });
-
-      assert.notCalled(fakeStore.getToastMessage);
-      assert.notCalled(fakeStore.removeToastMessage);
+        assert.calledWith(
+          fakeStore.addToastMessage,
+          sinon.match({
+            type: 'error',
+            message: 'boo',
+            autoDismiss: expectedAutoDismiss,
+          }),
+        );
+      });
     });
   });
 

@@ -23,7 +23,7 @@ function AnnotationView({
 }: AnnotationViewProps) {
   const store = useSidebarStore();
   const annotationId = store.routeParams().id ?? '';
-  const rootThread = useRootThread();
+  const { rootThread } = useRootThread();
   const userid = store.profile().userid;
 
   const [fetchError, setFetchError] = useState(false);

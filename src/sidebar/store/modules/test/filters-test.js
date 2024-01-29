@@ -68,7 +68,7 @@ describe('sidebar/store/modules/filters', () => {
 
         const secondFilterState = getFiltersState();
         assert.deepEqual(secondFilterState.focusActive, new Set());
-        assert.isUndefined(secondFilterState.focusFilters.user);
+        assert.notProperty(secondFilterState.focusFilters, 'user');
       });
     });
 
@@ -138,10 +138,12 @@ describe('sidebar/store/modules/filters', () => {
     });
 
     describe('setFilterQuery', () => {
-      it('sets the filter query', () => {
-        store.setFilterQuery('a-query');
-        assert.equal(getFiltersState().query, 'a-query');
-        assert.equal(store.filterQuery(), 'a-query');
+      ['a-query', '', null].forEach(query => {
+        it('sets the filter query', () => {
+          store.setFilterQuery(query);
+          assert.equal(getFiltersState().query, query);
+          assert.equal(store.filterQuery(), query);
+        });
       });
     });
 
@@ -175,22 +177,6 @@ describe('sidebar/store/modules/filters', () => {
         assert.deepEqual(store.getFocusActive(), new Set());
         store.toggleFocusMode();
         assert.deepEqual(store.getFocusActive(), new Set(['user', 'page']));
-      });
-    });
-
-    describe('CLEAR_SELECTION', () => {
-      it('responds to CLEAR_SELECTION by clearing filters and focus', () => {
-        store.changeFocusModeUser({
-          username: 'testuser',
-          displayName: 'Test User',
-        });
-        store.toggleFocusMode({ active: true });
-
-        assert.deepEqual(store.getFocusActive(), new Set(['user']));
-
-        store.clearSelection();
-
-        assert.deepEqual(store.getFocusActive(), new Set());
       });
     });
   });

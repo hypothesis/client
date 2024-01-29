@@ -1,7 +1,7 @@
 import { TinyEmitter } from 'tiny-emitter';
 
 import { addConfigFragment } from '../../shared/config-fragment';
-import { Sidebar, MIN_RESIZE, $imports } from '../sidebar';
+import { Sidebar, MIN_RESIZE, $imports, createSidebarIframe } from '../sidebar';
 import { Emitter } from '../util/emitter';
 
 const DEFAULT_WIDTH = 350;
@@ -1136,6 +1136,16 @@ describe('Sidebar', () => {
       onSelectAnnotations(tags, toggle);
 
       assert.calledWith(guestRPC().call, 'selectAnnotations', tags, true);
+    });
+  });
+
+  describe('createSidebarIframe', () => {
+    it('does not let `allow` attribute to be overwritten', () => {
+      const iframe = createSidebarIframe({ sidebarAppUrl: 'https://foo.com' });
+
+      assert.throws(() => {
+        iframe.allow = 'something else';
+      }, "Cannot assign to read only property 'allow' of object '#<HTMLIFrameElement>'");
     });
   });
 });

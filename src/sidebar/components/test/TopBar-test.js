@@ -15,13 +15,10 @@ describe('TopBar', () => {
 
   beforeEach(() => {
     fakeStore = {
-      filterQuery: sinon.stub().returns(null),
       hasFetchedProfile: sinon.stub().returns(false),
       isLoggedIn: sinon.stub().returns(false),
       isSidebarPanelOpen: sinon.stub().returns(false),
-      setFilterQuery: sinon.stub(),
       toggleSidebarPanel: sinon.stub(),
-      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     fakeFrameSync = {
@@ -177,41 +174,22 @@ describe('TopBar', () => {
     assert.isTrue(shareButton.prop('expanded'));
   });
 
-  it('displays search input in the sidebar', () => {
-    fakeStore.filterQuery.returns('test-query');
-    const wrapper = createTopBar();
-    assert.equal(wrapper.find('SearchInput').prop('query'), 'test-query');
-  });
-
-  it('updates current filter when changing search query in the sidebar', () => {
-    const wrapper = createTopBar();
-    wrapper.find('SearchInput').prop('onSearch')('new-query');
-    assert.calledWith(fakeStore.setFilterQuery, 'new-query');
-  });
-
   it('displays search input in the single annotation view / stream', () => {
     const wrapper = createTopBar({ isSidebar: false });
     const searchInput = wrapper.find('StreamSearchInput');
     assert.ok(searchInput.exists());
   });
 
-  context('in the stream and single annotation pages', () => {
-    it('does not render the group list, sort menu or share menu', () => {
-      const wrapper = createTopBar({ isSidebar: false });
-      assert.isFalse(wrapper.exists('GroupList'));
-      assert.isFalse(wrapper.exists('SortMenu'));
-      assert.isFalse(wrapper.exists('button[title="Share this page"]'));
-    });
-  });
-
-  context('when sidebar panel feature is enabled', () => {
-    it('displays search input in the sidebar', () => {
-      fakeStore.isFeatureEnabled.returns(true);
-
-      const wrapper = createTopBar();
-
-      assert.isFalse(wrapper.exists('SearchInput'));
-      assert.isTrue(wrapper.exists('SearchIconButton'));
+  [true, false].forEach(isSidebar => {
+    it('renders certain controls only in the sidebar', () => {
+      const wrapper = createTopBar({ isSidebar });
+      assert.equal(wrapper.exists('GroupList'), isSidebar);
+      assert.equal(wrapper.exists('SortMenu'), isSidebar);
+      assert.equal(wrapper.exists('SearchIconButton'), isSidebar);
+      assert.equal(
+        wrapper.exists('button[data-testid="share-icon-button"]'),
+        isSidebar,
+      );
     });
   });
 

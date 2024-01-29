@@ -35,7 +35,14 @@ describe('SidebarView', () => {
       load: sinon.stub(),
     };
     fakeUseRootThread = sinon.stub().returns({
-      children: [],
+      rootThread: {
+        children: [],
+      },
+      tabCounts: {
+        annotation: 1,
+        note: 2,
+        orphan: 0,
+      },
     });
     fakeStreamer = {
       connect: sinon.stub(),
@@ -59,10 +66,10 @@ describe('SidebarView', () => {
       hasSidebarOpened: sinon.stub(),
       isLoading: sinon.stub().returns(false),
       isLoggedIn: sinon.stub(),
+      isSidebarPanelOpen: sinon.stub().returns(false),
       profile: sinon.stub().returns({ userid: null }),
       searchUris: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
-      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     fakeTabsUtil = {
@@ -207,7 +214,7 @@ describe('SidebarView', () => {
 
       it('does not render filter status', () => {
         const wrapper = createComponent();
-        assert.isFalse(wrapper.find('FilterStatus').exists());
+        assert.isFalse(wrapper.find('FilterControls').exists());
       });
     });
   });
@@ -236,25 +243,30 @@ describe('SidebarView', () => {
 
     it('does not render filter status', () => {
       const wrapper = createComponent();
-      assert.isFalse(wrapper.find('FilterStatus').exists());
+      assert.isFalse(wrapper.find('FilterControls').exists());
     });
   });
 
-  context('user-focus mode', () => {
-    it('shows old filter status when focus mode configured', () => {
-      const wrapper = createComponent();
+  describe('filter controls', () => {
+    [
+      {
+        searchPanelOpen: false,
+        showControls: true,
+      },
+      {
+        searchPanelOpen: true,
+        showControls: false,
+      },
+    ].forEach(({ searchPanelOpen, showControls }) => {
+      it(`renders filter controls when search panel is not open`, () => {
+        fakeStore.isSidebarPanelOpen
+          .withArgs('searchAnnotations')
+          .returns(searchPanelOpen);
 
-      assert.isTrue(wrapper.find('FilterStatus').exists());
-      assert.isFalse(wrapper.find('FilterAnnotationsStatus').exists());
-    });
+        const wrapper = createComponent();
 
-    it('shows filter status when focus mode configured', () => {
-      fakeStore.isFeatureEnabled.returns(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('FilterStatus').exists());
-      assert.isTrue(wrapper.find('FilterAnnotationsStatus').exists());
+        assert.equal(wrapper.exists('FilterControls'), showControls);
+      });
     });
   });
 
@@ -273,30 +285,6 @@ describe('SidebarView', () => {
       fakeStore.isLoggedIn.returns(true);
       wrapper.setProps({});
       assert.calledOnce(fakeStreamer.connect);
-    });
-  });
-
-  describe('selection tabs', () => {
-    it('renders tabs', () => {
-      const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('SelectionTabs').exists());
-    });
-
-    it('does not render tabs if there is an applied filter', () => {
-      fakeStore.hasAppliedFilter.returns(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('SelectionTabs').exists());
-    });
-
-    it('does not render tabs if there are selected annotations', () => {
-      fakeStore.hasSelectedAnnotations.returns(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('SelectionTabs').exists());
     });
   });
 

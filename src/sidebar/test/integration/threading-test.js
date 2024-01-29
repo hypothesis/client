@@ -62,7 +62,7 @@ describe('integration: annotation threading', () => {
     // Do things that cause `useRootThread` to recalculate in the store and
     // test them (hint: use `act`)
     function DummyComponent() {
-      lastRootThread = useRootThread();
+      lastRootThread = useRootThread().rootThread;
       [, forceUpdate] = useReducer(x => x + 1, 0);
     }
 

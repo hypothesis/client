@@ -578,15 +578,12 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       },
     );
 
-    this._sidebarRPC.on(
-      'showContentInfo',
-      (info: ContentInfoConfig) => this._integration.showContentInfo?.(info),
+    this._sidebarRPC.on('showContentInfo', (info: ContentInfoConfig) =>
+      this._integration.showContentInfo?.(info),
     );
 
-    this._sidebarRPC.on(
-      'navigateToSegment',
-      (annotation: AnnotationData) =>
-        this._integration.navigateToSegment?.(annotation),
+    this._sidebarRPC.on('navigateToSegment', (annotation: AnnotationData) =>
+      this._integration.navigateToSegment?.(annotation),
     );
 
     // Connect to sidebar and send document info/URIs to it.

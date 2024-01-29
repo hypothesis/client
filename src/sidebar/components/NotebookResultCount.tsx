@@ -32,7 +32,7 @@ function NotebookResultCount({
   isLoading,
   resultCount,
 }: NotebookResultCountProps) {
-  const rootThread = useRootThread();
+  const { rootThread } = useRootThread();
   const visibleCount = isLoading ? resultCount : countVisible(rootThread);
 
   const hasResults = rootThread.children.length > 0;

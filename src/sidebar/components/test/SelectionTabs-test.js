@@ -12,9 +12,13 @@ describe('SelectionTabs', () => {
   let fakeSettings;
   let fakeStore;
 
-  // default props
   const defaultProps = {
     isLoading: false,
+    tabCounts: {
+      annotation: 123,
+      note: 456,
+      orphan: 0,
+    },
   };
 
   function createComponent(props) {
@@ -36,11 +40,7 @@ describe('SelectionTabs', () => {
       enableExperimentalNewNoteButton: false,
     };
     fakeStore = {
-      clearSelection: sinon.stub(),
       selectTab: sinon.stub(),
-      annotationCount: sinon.stub().returns(123),
-      noteCount: sinon.stub().returns(456),
-      orphanCount: sinon.stub().returns(0),
       isWaitingToAnchorAnnotations: sinon.stub().returns(false),
       selectedTab: sinon.stub().returns('annotation'),
     };
@@ -155,9 +155,12 @@ describe('SelectionTabs', () => {
 
   describe('orphans tab', () => {
     it('should display orphans tab if there is 1 or more orphans', () => {
-      fakeStore.orphanCount.returns(1);
-
-      const wrapper = createComponent();
+      const wrapper = createComponent({
+        tabCounts: {
+          ...defaultProps.tabCounts,
+          orphan: 1,
+        },
+      });
 
       const orphanTab = wrapper.find('Tab[label="Orphans"]');
       assert.isTrue(orphanTab.exists());
@@ -165,17 +168,14 @@ describe('SelectionTabs', () => {
 
     it('should display orphans tab as selected when it is active', () => {
       fakeStore.selectedTab.returns('orphan');
-      fakeStore.orphanCount.returns(1);
 
-      const wrapper = createComponent();
+      const wrapper = createComponent({ tabCounts: { orphan: 1 } });
 
       const orphanTab = wrapper.find('Tab[label="Orphans"]');
       assert.isTrue(orphanTab.find('LinkButton').prop('pressed'));
     });
 
     it('should not display orphans tab if there are 0 orphans', () => {
-      fakeStore.orphanCount.returns(0);
-
       const wrapper = createComponent();
 
       const orphanTab = wrapper.find('Tab[label="Orphans"]');
@@ -186,9 +186,12 @@ describe('SelectionTabs', () => {
 
   describe('tab display and counts', () => {
     it('should not render count if there are no page notes', () => {
-      fakeStore.noteCount.returns(0);
-
-      const wrapper = createComponent({});
+      const wrapper = createComponent({
+        tabCounts: {
+          ...defaultProps.tabCounts,
+          note: 0,
+        },
+      });
 
       const noteTab = wrapper.find('Tab[label="Page notes"]');
 
@@ -196,9 +199,12 @@ describe('SelectionTabs', () => {
     });
 
     it('should not display a message when its loading annotation count is 0', () => {
-      fakeStore.annotationCount.returns(0);
       const wrapper = createComponent({
         isLoading: true,
+        tabCounts: {
+          ...defaultProps.tabCounts,
+          annotation: 0,
+        },
       });
       assert.isFalse(
         wrapper.exists('[data-testid="annotations-unavailable-message"]'),
@@ -207,9 +213,12 @@ describe('SelectionTabs', () => {
 
     it('should not display a message when its loading notes count is 0', () => {
       fakeStore.selectedTab.returns('note');
-      fakeStore.noteCount.returns(0);
       const wrapper = createComponent({
         isLoading: true,
+        tabCounts: {
+          ...defaultProps.tabCounts,
+          note: 0,
+        },
       });
       assert.isFalse(
         wrapper.exists('[data-testid="notes-unavailable-message"]'),
@@ -217,10 +226,13 @@ describe('SelectionTabs', () => {
     });
 
     it('should not display the longer version of the no annotations message when there are no annotations and isWaitingToAnchorAnnotations is true', () => {
-      fakeStore.annotationCount.returns(0);
       fakeStore.isWaitingToAnchorAnnotations.returns(true);
       const wrapper = createComponent({
         isLoading: false,
+        tabCounts: {
+          ...defaultProps.tabCounts,
+          annotationn: 0,
+        },
       });
       assert.isFalse(
         wrapper.exists('[data-testid="annotations-unavailable-message"]'),
@@ -229,8 +241,12 @@ describe('SelectionTabs', () => {
 
     it('should display the longer version of the no notes message when there are no notes', () => {
       fakeStore.selectedTab.returns('note');
-      fakeStore.noteCount.returns(0);
-      const wrapper = createComponent({});
+      const wrapper = createComponent({
+        tabCounts: {
+          ...defaultProps.tabCounts,
+          note: 0,
+        },
+      });
 
       assert.include(
         wrapper.find('Card[data-testid="notes-unavailable-message"]').text(),
@@ -239,8 +255,12 @@ describe('SelectionTabs', () => {
     });
 
     it('should display the longer version of the no annotations message when there are no annotations', () => {
-      fakeStore.annotationCount.returns(0);
-      const wrapper = createComponent({});
+      const wrapper = createComponent({
+        tabCounts: {
+          ...defaultProps.tabCounts,
+          annotation: 0,
+        },
+      });
       assert.include(
         wrapper
           .find('Card[data-testid="annotations-unavailable-message"]')
@@ -264,13 +284,16 @@ describe('SelectionTabs', () => {
       // Pre-select a different tab than the one we are about to click.
       fakeStore.selectedTab.returns('other-tab');
 
-      // Make the "Orphans" tab appear.
-      fakeStore.orphanCount.returns(1);
-      const wrapper = createComponent({});
+      const wrapper = createComponent({
+        // Make the "Orphans" tab appear.
+        tabCounts: {
+          ...defaultProps.tabCounts,
+          orphan: 1,
+        },
+      });
 
       findButton(wrapper, label).simulate('click');
 
-      assert.calledOnce(fakeStore.clearSelection);
       assert.calledWith(fakeStore.selectTab, tab);
     });
   });
@@ -281,18 +304,71 @@ describe('SelectionTabs', () => {
 
     findButton(wrapper, 'Page Notes').simulate('click');
 
-    assert.notCalled(fakeStore.clearSelection);
     assert.notCalled(fakeStore.selectTab);
+  });
+
+  [
+    {
+      tabCounts: {
+        annotation: 2,
+        note: 0,
+        orphan: 0,
+      },
+      message: '2 annotations',
+    },
+    {
+      tabCounts: {
+        annotation: 0,
+        note: 3,
+        orphan: 0,
+      },
+      message: '3 notes',
+    },
+    {
+      tabCounts: {
+        annotation: 0,
+        note: 0,
+        orphan: 4,
+      },
+      message: '4 orphans',
+    },
+    {
+      tabCounts: {
+        annotation: 2,
+        note: 3,
+        orphan: 4,
+      },
+      message: '2 annotations, 3 notes, 4 orphans',
+    },
+    {
+      tabCounts: {
+        annotation: 1,
+        note: 1,
+        orphan: 1,
+      },
+      message: '1 annotation, 1 note, 1 orphan',
+    },
+  ].forEach(({ tabCounts, message }) => {
+    it('reports annotation count to screen readers', () => {
+      const wrapper = createComponent({
+        tabCounts,
+      });
+      const status = wrapper.find('[role="status"]');
+      assert.equal(status.text(), message);
+    });
   });
 
   it(
     'should pass a11y checks',
     checkAccessibility({
       content: () => {
-        fakeStore.annotationCount.returns(1);
-        fakeStore.noteCount.returns(2);
-        fakeStore.orphanCount.returns(3);
-        return createComponent({});
+        return createComponent({
+          tabCounts: {
+            annotation: 1,
+            note: 2,
+            orphan: 3,
+          },
+        });
       },
     }),
   );

@@ -413,16 +413,27 @@ describe('sidebar/helpers/build-thread', () => {
 
     context('when there is a selection', () => {
       it('shows only selected annotations', () => {
-        const thread = createThread(SIMPLE_FIXTURE, {
-          selected: ['1'],
-        });
+        const thread = createThread(
+          SIMPLE_FIXTURE,
+          {
+            selected: ['1'],
+
+            // Other thread and annotation-level filters should be ignored
+            // when there is a selection.
+            threadFilterFn: () => false,
+            filterFn: () => false,
+          },
+          ['visible'],
+        );
         assert.deepEqual(thread, [
           {
             annotation: SIMPLE_FIXTURE[0],
+            visible: true,
             children: [
               {
                 annotation: SIMPLE_FIXTURE[2],
                 children: [],
+                visible: true,
               },
             ],
           },

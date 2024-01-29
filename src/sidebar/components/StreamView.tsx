@@ -58,7 +58,7 @@ function StreamView({ api, toastMessenger }: StreamViewProps) {
     });
   }, [currentQuery, loadAnnotations, store, toastMessenger]);
 
-  const rootThread = useRootThread();
+  const { rootThread } = useRootThread();
 
   return <ThreadList threads={rootThread.children} />;
 }

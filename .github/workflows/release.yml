@@ -22,54 +22,11 @@ jobs:
     uses: ./.github/workflows/continuous-integration.yml
     name: continuous integration
 
-  release-qa:
-    needs: continuous-integration
-    runs-on: ubuntu-latest
-    environment: qa
-    env:
-      NOTEBOOK_APP_URL: https://qa.hypothes.is/notebook
-      PROFILE_APP_URL: https://qa.hypothes.is/user-profile
-      SIDEBAR_APP_URL: https://qa.hypothes.is/app.html
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    - name: Cache the node_modules dir
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-    - name: Install
-      run: yarn install --immutable
-    - name: Get version
-      run: |
-        git fetch --tags --quiet
-        LAST_COMMIT_HASH=$(git show HEAD --no-patch --format="%h")
-        QA_VERSION=$(git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2)-$LAST_COMMIT_HASH
-        echo "QA_VERSION=$QA_VERSION" >> $GITHUB_ENV
-    - name: Build app
-      run: |
-        yarn version "$QA_VERSION"
-        make clean build
-    - name: Upload files to Sentry
-      env:
-        SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
-      run: |
-        SENTRY_CMD="yarn run sentry-cli releases --org hypothesis --project client"
-        $SENTRY_CMD new $QA_VERSION
-        $SENTRY_CMD files $QA_VERSION upload-sourcemaps --url-prefix $CDN_URL/$QA_VERSION/build/scripts/ build/scripts
-        $SENTRY_CMD finalize $QA_VERSION
-    - name: Deploy to S3
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
-      run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }} --tag qa --no-cache-entry
-
   release-staging:
     needs: continuous-integration
     runs-on: ubuntu-latest
-    # This presently uses the same AWS / Sentry auth as QA. We should eventually
-    # rename that environment or create a new one.
+    # This presently uses the AWS / Sentry auth from the old "QA" environment.
+    # We should eventually rename that environment or create a new one.
     environment: qa
     env:
       NOTEBOOK_APP_URL: https://staging.hypothes.is/notebook
@@ -112,7 +69,7 @@ jobs:
 
   release-prod:
     if: github.ref_name == 'main'
-    needs: release-qa
+    needs: release-staging
     runs-on: ubuntu-latest
     environment: production
     env:
