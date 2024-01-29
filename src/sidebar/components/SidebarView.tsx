@@ -12,8 +12,7 @@ import SelectionTabs from './SelectionTabs';
 import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
 import { useRootThread } from './hooks/use-root-thread';
-import FilterStatus from './old-search/FilterStatus';
-import FilterAnnotationsStatus from './search/FilterAnnotationsStatus';
+import FilterControls from './search/FilterControls';
 
 export type SidebarViewProps = {
   onLogin: () => void;
@@ -35,13 +34,11 @@ function SidebarView({
   loadAnnotationsService,
   streamer,
 }: SidebarViewProps) {
-  const rootThread = useRootThread();
+  const { rootThread, tabCounts } = useRootThread();
 
   // Store state values
   const store = useSidebarStore();
   const focusedGroupId = store.focusedGroupId();
-  const hasAppliedFilter =
-    store.hasAppliedFilter() || store.hasSelectedAnnotations();
   const isLoading = store.isLoading();
   const isLoggedIn = store.isLoggedIn();
 
@@ -67,9 +64,13 @@ function SidebarView({
   const hasContentError =
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
-  const searchPanelEnabled = store.isFeatureEnabled('search_panel');
-  const showFilterStatus = !hasContentError && !searchPanelEnabled;
-  const showTabs = !hasContentError && !hasAppliedFilter;
+  const showTabs = !hasContentError;
+
+  // Whether to render the new filter UI. Note that when the search panel is
+  // open, filter controls are integrated into it. The UI may render nothing
+  // if no filters are configured or selection is active.
+  const isSearchPanelOpen = store.isSidebarPanelOpen('searchAnnotations');
+  const showFilterControls = !hasContentError && !isSearchPanelOpen;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
@@ -133,8 +134,7 @@ function SidebarView({
   return (
     <div>
       <h2 className="sr-only">Annotations</h2>
-      {showFilterStatus && <FilterStatus />}
-      {searchPanelEnabled && <FilterAnnotationsStatus />}
+      {showFilterControls && <FilterControls withCardContainer />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError
@@ -146,7 +146,9 @@ function SidebarView({
       {hasDirectLinkedGroupError && (
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
-      {showTabs && <SelectionTabs isLoading={isLoading} />}
+      {showTabs && (
+        <SelectionTabs isLoading={isLoading} tabCounts={tabCounts} />
+      )}
       <ThreadList threads={rootThread.children} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>

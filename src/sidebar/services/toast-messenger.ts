@@ -114,6 +114,7 @@ export class ToastMessengerService extends TinyEmitter {
       id,
       message: messageText,
       visuallyHidden,
+      autoDismiss,
     };
 
     this._store.addToastMessage(message);

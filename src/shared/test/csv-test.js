@@ -4,6 +4,7 @@ describe('escapeCSVValue', () => {
   [
     { value: 'foo', expected: 'foo' },
     { value: 'foo,bar', expected: '"foo,bar"' },
+    { value: 'foo,bar', expected: 'foo,bar', separator: '\t' },
     { value: 'with \r carriage return', expected: '"with \r carriage return"' },
     {
       value: `multiple
@@ -12,9 +13,11 @@ describe('escapeCSVValue', () => {
     lines"`,
     },
     { value: 'with "quotes"', expected: '"with ""quotes"""' },
-  ].forEach(({ value, expected }) => {
+    { value: 'foo\tbar', expected: 'foo\tbar' },
+    { value: 'foo\tbar', expected: '"foo\tbar"', separator: '\t' },
+  ].forEach(({ value, expected, separator = ',' }) => {
     it('escapes values', () => {
-      assert.equal(escapeCSVValue(value), expected);
+      assert.equal(escapeCSVValue(value, separator), expected);
     });
   });
 });

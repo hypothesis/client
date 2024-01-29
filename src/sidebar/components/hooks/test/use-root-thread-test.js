@@ -11,11 +11,18 @@ describe('sidebar/components/hooks/use-root-thread', () => {
     fakeStore = {
       allAnnotations: sinon.stub().returns(['1', '2']),
       filterQuery: sinon.stub().returns('itchy'),
-      route: sinon.stub().returns('66'),
+      hasAppliedFilter: sinon.stub().returns(false),
+      hasSelectedAnnotations: sinon.stub().returns(false),
+      isFeatureEnabled: sinon.stub().returns(true),
+      route: sinon.stub().returns('sidebar'),
       selectionState: sinon.stub().returns({ hi: 'there' }),
       getFilterValues: sinon.stub().returns({ user: 'hotspur' }),
     };
-    fakeThreadAnnotations = sinon.stub().returns('fakeThreadAnnotations');
+    fakeThreadAnnotations = sinon.stub().returns({
+      rootThread: {
+        children: [],
+      },
+    });
 
     $imports.$mock({
       '../../store': { useSidebarStore: () => fakeStore },
@@ -23,28 +30,38 @@ describe('sidebar/components/hooks/use-root-thread', () => {
         threadAnnotations: fakeThreadAnnotations,
       },
     });
-
-    // Mount a dummy component to be able to use the `useRootThread` hook
-    // Do things that cause `useRootThread` to recalculate in the store and
-    // test them (hint: use `act`)
-    function DummyComponent() {
-      lastRootThread = useRootThread();
-    }
-    mount(<DummyComponent />);
   });
 
   afterEach(() => {
     $imports.$restore();
   });
 
-  it('should return results of `threadAnnotations` with current thread state', () => {
-    const threadState = fakeThreadAnnotations.getCall(0).args[0];
+  function DummyComponent() {
+    lastRootThread = useRootThread();
+  }
 
+  it('should return results of `threadAnnotations` with current thread state', () => {
+    mount(<DummyComponent />);
+
+    const threadState = fakeThreadAnnotations.getCall(0).args[0];
     assert.deepEqual(threadState.annotations, ['1', '2']);
     assert.equal(threadState.selection.filterQuery, 'itchy');
-    assert.equal(threadState.route, '66');
+    assert.equal(threadState.showTabs, true);
     assert.equal(threadState.selection.filters.user, 'hotspur');
+    assert.equal(lastRootThread, fakeThreadAnnotations());
+  });
 
-    assert.equal(lastRootThread, 'fakeThreadAnnotations');
+  [
+    { route: 'sidebar', showTabs: true },
+    { route: 'notebook', showTabs: false },
+  ].forEach(({ route, showTabs }) => {
+    it('filters by tab in the sidebar only', () => {
+      fakeStore.route.returns(route);
+
+      mount(<DummyComponent />);
+      const threadState = fakeThreadAnnotations.getCall(0).args[0];
+
+      assert.equal(threadState.showTabs, showTabs);
+    });
   });
 });

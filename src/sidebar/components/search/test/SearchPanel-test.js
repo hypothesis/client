@@ -8,10 +8,10 @@ describe('SearchPanel', () => {
 
   beforeEach(() => {
     fakeStore = {
-      clearSelection: sinon.stub(),
-      setFilterQuery: sinon.stub(),
-      filterQuery: sinon.stub().returns(null),
       closeSidebarPanel: sinon.stub(),
+      filterQuery: sinon.stub().returns(null),
+      hasSelectedAnnotations: sinon.stub().returns(false),
+      setFilterQuery: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -36,7 +36,11 @@ describe('SearchPanel', () => {
 
       wrapper.find('SidebarPanel').props().onActiveChanged(active);
 
-      assert.equal(fakeStore.clearSelection.called, !active);
+      if (!active) {
+        assert.calledWith(fakeStore.setFilterQuery, null);
+      } else {
+        assert.notCalled(fakeStore.setFilterQuery);
+      }
     });
   });
 
@@ -59,16 +63,11 @@ describe('SearchPanel', () => {
     assert.calledWith(fakeStore.setFilterQuery, 'foo');
   });
 
-  [
-    { query: null, searchStatusIsRendered: false },
-    { query: '', searchStatusIsRendered: false },
-    { query: 'foo', searchStatusIsRendered: true },
-  ].forEach(({ query, searchStatusIsRendered }) => {
-    it("renders SearchStatus only when there's an active query", () => {
-      fakeStore.filterQuery.returns(query);
+  [true, false].forEach(hasSelection => {
+    it('disables search field when there is a selection', () => {
+      fakeStore.hasSelectedAnnotations.returns(hasSelection);
       const wrapper = createSearchPanel();
-
-      assert.equal(wrapper.exists('SearchStatus'), searchStatusIsRendered);
+      assert.equal(wrapper.find('SearchField').prop('disabled'), hasSelection);
     });
   });
 });

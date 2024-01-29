@@ -1,5 +1,6 @@
 import {
   newAnnotation,
+  newHighlight,
   newReply,
   publicAnnotation,
 } from '../../test/annotation-fixtures';
@@ -90,6 +91,7 @@ describe('AnnotationsExporter', () => {
           ...baseAnnotation,
           user: 'acct:jane@localhost',
           tags: ['foo', 'bar'],
+          target: targetWithSelectors(quoteSelector('The quote')),
         },
         {
           ...baseAnnotation,
@@ -121,39 +123,41 @@ Total replies: 1
 
 Annotation 1:
 Created at: ${formattedNow}
-Comment: Annotation text
-bill
+Author: bill
+Type: Annotation
 Quote: "this is the quote"
+Comment: Annotation text
 Tags: tag_1, tag_2
 
 Annotation 2:
 Created at: ${formattedNow}
+Author: bill
+Type: Annotation
 Comment: Annotation text
-bill
-Quote: "null"
 Tags: tag_1, tag_2
 
 Annotation 3:
 Created at: ${formattedNow}
+Author: jane
+Type: Annotation
+Quote: "The quote"
 Comment: Annotation text
-jane
-Quote: "null"
 Tags: foo, bar
 
 Annotation 4:
 Created at: ${formattedNow}
-Comment: Annotation text
-bill
-Quote: "null"
-Tags: tag_1, tag_2
+Author: bill
 Page: 23
+Type: Reply
+Comment: Annotation text
+Tags: tag_1, tag_2
 
 Annotation 5:
 Created at: ${formattedNow}
-Comment: Annotation text
-bill
-Quote: "null"
-Page: iii`,
+Author: bill
+Page: iii
+Type: Annotation
+Comment: Annotation text`,
       );
     });
 
@@ -184,9 +188,9 @@ Total replies: 0
 
 Annotation 1:
 Created at: ${formattedNow}
+Author: John Doe
+Type: Annotation
 Comment: Annotation text
-John Doe
-Quote: "null"
 Tags: tag_1, tag_2`,
       );
     });
@@ -200,40 +204,56 @@ Tags: tag_1, tag_2`,
       );
     });
 
-    it('generates CSV content with expected annotations', () => {
-      const annotations = [
-        {
-          ...baseAnnotation,
-          user: 'acct:jane@localhost',
-          tags: ['foo', 'bar'],
-        },
-        {
-          ...baseAnnotation,
-          ...newReply(),
-          target: targetWithSelectors(
-            quoteSelector('includes "double quotes", and commas'),
-            pageSelector(23),
-          ),
-        },
-        {
-          ...baseAnnotation,
-          tags: [],
-          target: targetWithSelectors(pageSelector('iii')),
-        },
-      ];
+    [
+      {
+        separator: ',',
+        buildExpectedContent:
+          date => `Created at,Author,Page,URL,Group,Type,Quote,Comment,Tags
+${date},jane,,http://example.com,My group,Annotation,includes \t tabs,Annotation text,"foo,bar"
+${date},bill,23,http://example.com,My group,Reply,"includes ""double quotes"", and commas",Annotation text,"tag_1,tag_2"
+${date},bill,iii,http://example.com,My group,Highlight,,Annotation text,`,
+      },
+      {
+        separator: '\t',
+        buildExpectedContent:
+          date => `Created at\tAuthor\tPage\tURL\tGroup\tType\tQuote\tComment\tTags
+${date}\tjane\t\thttp://example.com\tMy group\tAnnotation\t"includes \t tabs"\tAnnotation text\tfoo,bar
+${date}\tbill\t23\thttp://example.com\tMy group\tReply\t"includes ""double quotes"", and commas"\tAnnotation text\ttag_1,tag_2
+${date}\tbill\tiii\thttp://example.com\tMy group\tHighlight\t\tAnnotation text\t`,
+      },
+    ].forEach(({ separator, buildExpectedContent }) => {
+      it('generates CSV content with expected annotations and separator', () => {
+        const annotations = [
+          {
+            ...baseAnnotation,
+            user: 'acct:jane@localhost',
+            tags: ['foo', 'bar'],
+            target: targetWithSelectors(quoteSelector('includes \t tabs')),
+          },
+          {
+            ...baseAnnotation,
+            ...newReply(),
+            target: targetWithSelectors(
+              quoteSelector('includes "double quotes", and commas'),
+              pageSelector(23),
+            ),
+          },
+          {
+            ...baseAnnotation,
+            ...newHighlight(),
+            tags: [],
+            target: targetWithSelectors(pageSelector('iii')),
+          },
+        ];
 
-      const result = exporter.buildCSVExportContent(annotations, {
-        groupName,
-        now,
+        const result = exporter.buildCSVExportContent(annotations, {
+          groupName,
+          now,
+          separator,
+        });
+
+        assert.equal(result, buildExpectedContent(formattedNow));
       });
-
-      assert.equal(
-        result,
-        `Created at,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
-${formattedNow},http://example.com,My group,Annotation,,jane,Annotation text,"foo,bar",
-${formattedNow},http://example.com,My group,Reply,"includes ""double quotes"", and commas",bill,Annotation text,"tag_1,tag_2",23
-${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,iii`,
-      );
     });
 
     it('uses display names if `displayNamesEnabled` is set', () => {
@@ -252,8 +272,8 @@ ${formattedNow},http://example.com,My group,Annotation,,bill,Annotation text,,ii
 
       assert.equal(
         result,
-        `Created at,URL,Group,Annotation/Reply Type,Quote,User,Comment,Tags,Page
-${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text,"tag_1,tag_2",`,
+        `Created at,Author,Page,URL,Group,Type,Quote,Comment,Tags
+${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation text,"tag_1,tag_2"`,
       );
     });
   });
@@ -271,12 +291,18 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
       const annotations = [
         {
           ...baseAnnotation,
+          text: `This includes markdown
+
+1. First item
+2. Second item
+
+**bold text** and [a link](https://example.com)`,
           user: 'acct:jane@localhost',
           tags: ['foo', 'bar'],
+          target: targetWithSelectors(quoteSelector('The quote')),
         },
         {
           ...baseAnnotation,
-          ...newReply(),
           target: targetWithSelectors(
             quoteSelector('includes <p>HTML</p> tags'),
             pageSelector(23),
@@ -284,6 +310,7 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
         },
         {
           ...baseAnnotation,
+          ...newReply(),
           tags: [],
           target: targetWithSelectors(pageSelector('iii')),
         },
@@ -294,13 +321,9 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
         now,
       });
 
-      // The result uses tabs to indent lines.
-      // We can get rid of that for simplicity and just compare the markup
-      const removeAllIndentation = str => str.replace(/^[ \t]+/gm, '');
-
       assert.equal(
-        removeAllIndentation(result),
-        removeAllIndentation(`<html lang="en">
+        result,
+        `<html lang="en">
   <head>
     <title>
       Annotations on &quot;A special document&quot;
@@ -326,7 +349,7 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
         </a>
       </p>
       <table>
-        <tbody>
+        <tbody style="vertical-align:top;">
           <tr>
             <td>Group:</td>
             <td>My group</td>
@@ -355,50 +378,117 @@ ${formattedNow},http://example.com,My group,Annotation,,John Doe,Annotation text
       <h1>Annotations</h1>
       <article>
         <h2>Annotation 1:</h2>
-        <p>
-          Created at:
-          <time datetime="${isoDate}">${formattedNow}</time>
-        </p>
-        <p>Comment: Annotation text</p>
-        <p>jane</p>
-        <p>
-          Quote: 
-          <blockquote></blockquote>
-        </p>
-        <p>Tags: foo, bar</p>
+        <table>
+          <tbody style="vertical-align:top;">
+            <tr>
+              <td>Created at:</td>
+              <td>
+                <time datetime="${isoDate}">${formattedNow}</time>
+              </td>
+            </tr>
+            <tr>
+              <td>Author:</td>
+              <td>jane</td>
+            </tr>
+            <tr>
+              <td>Type:</td>
+              <td>Annotation</td>
+            </tr>
+            <tr>
+              <td>Quote:</td>
+              <td>
+                <blockquote style="margin:0px;">The quote</blockquote>
+              </td>
+            </tr>
+            <tr>
+              <td>Comment:</td>
+              <td>
+                <p>This includes markdown</p>
+                <ol>
+                <li>First item</li>
+                <li>Second item</li>
+                </ol>
+                <p><strong>bold text</strong> and <a href="https://example.com" target="_blank">a link</a></p>
+              </td>
+            </tr>
+            <tr>
+              <td>Tags:</td>
+              <td>foo, bar</td>
+            </tr>
+          </tbody>
+        </table>
       </article>
       <article>
         <h2>Annotation 2:</h2>
-        <p>
-          Created at:
-          <time datetime="${isoDate}">${formattedNow}</time>
-        </p>
-        <p>Comment: Annotation text</p>
-        <p>bill</p>
-        <p>
-          Quote: 
-          <blockquote>includes &lt;p>HTML&lt;/p> tags</blockquote>
-        </p>
-        <p>Tags: tag_1, tag_2</p>
-        <p>Page: 23</p>
+        <table>
+          <tbody style="vertical-align:top;">
+            <tr>
+              <td>Created at:</td>
+              <td>
+                <time datetime="${isoDate}">${formattedNow}</time>
+              </td>
+            </tr>
+            <tr>
+              <td>Author:</td>
+              <td>bill</td>
+            </tr>
+            <tr>
+              <td>Page:</td>
+              <td>23</td>
+            </tr>
+            <tr>
+              <td>Type:</td>
+              <td>Annotation</td>
+            </tr>
+            <tr>
+              <td>Quote:</td>
+              <td>
+                <blockquote style="margin:0px;">includes &lt;p>HTML&lt;/p> tags</blockquote>
+              </td>
+            </tr>
+            <tr>
+              <td>Comment:</td>
+              <td>Annotation text</td>
+            </tr>
+            <tr>
+              <td>Tags:</td>
+              <td>tag_1, tag_2</td>
+            </tr>
+          </tbody>
+        </table>
       </article>
       <article>
         <h2>Annotation 3:</h2>
-        <p>
-          Created at:
-          <time datetime="${isoDate}">${formattedNow}</time>
-        </p>
-        <p>Comment: Annotation text</p>
-        <p>bill</p>
-        <p>
-          Quote: 
-          <blockquote></blockquote>
-        </p>
-        <p>Page: iii</p>
+        <table>
+          <tbody style="vertical-align:top;">
+            <tr>
+              <td>Created at:</td>
+              <td>
+                <time datetime="${isoDate}">${formattedNow}</time>
+              </td>
+            </tr>
+            <tr>
+              <td>Author:</td>
+              <td>bill</td>
+            </tr>
+            <tr>
+              <td>Page:</td>
+              <td>iii</td>
+            </tr>
+            <tr>
+              <td>Type:</td>
+              <td>Reply</td>
+            </tr>
+            <tr>
+              <td>Comment:</td>
+              <td>Annotation text</td>
+            </tr>
+          </tbody>
+        </table>
       </article>
     </section>
   </body>
-</html>`),
+</html>`,
       );
     });
   });

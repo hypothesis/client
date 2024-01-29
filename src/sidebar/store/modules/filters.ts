@@ -118,19 +118,21 @@ function focusFiltersFromConfig(focusConfig: FocusConfig): Filters {
 
 const reducers = {
   CHANGE_FOCUS_MODE_USER(state: State, action: { user: FocusUserInfo }) {
+    const focusFilters = { ...state.focusFilters };
     const { user } = focusFiltersFromConfig({ user: action.user });
+
     const focusActive = new Set(state.focusActive);
     if (user !== undefined) {
       focusActive.add('user');
+      focusFilters.user = user;
     } else {
       focusActive.delete('user');
+      delete focusFilters.user;
     }
+
     return {
       focusActive,
-      focusFilters: {
-        ...state.focusFilters,
-        user,
-      },
+      focusFilters,
     };
   },
 
@@ -149,7 +151,7 @@ const reducers = {
     return { filters: updatedFilters };
   },
 
-  SET_FILTER_QUERY(state: State, action: { query: string }) {
+  SET_FILTER_QUERY(state: State, action: { query: string | null }) {
     return { query: action.query };
   },
 
@@ -174,16 +176,6 @@ const reducers = {
     }
     return {
       focusActive,
-    };
-  },
-
-  // Actions defined in other modules
-
-  CLEAR_SELECTION() {
-    return {
-      filters: {},
-      focusActive: new Set<FilterKey>(),
-      query: null,
     };
   },
 };
@@ -217,9 +209,10 @@ function setFilter(filterName: FilterKey, filterOption: FilterOption) {
 }
 
 /**
- * Set the query used to filter displayed annotations.
+ * Set the query used to filter displayed annotations or `null` to clear the
+ * filter.
  */
-function setFilterQuery(query: string) {
+function setFilterQuery(query: string | null) {
   return makeAction(reducers, 'SET_FILTER_QUERY', { query });
 }
 

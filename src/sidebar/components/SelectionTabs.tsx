@@ -86,6 +86,13 @@ export type SelectionTabProps = {
   /** Are we waiting on any annotations from the server? */
   isLoading: boolean;
 
+  /** Counts of threads in each tab, to be displayed next to the tab title. */
+  tabCounts: {
+    annotation: number;
+    note: number;
+    orphan: number;
+  };
+
   // injected
   settings: SidebarSettings;
   annotationsService: AnnotationsService;
@@ -98,16 +105,16 @@ function SelectionTabs({
   annotationsService,
   isLoading,
   settings,
+  tabCounts,
 }: SelectionTabProps) {
   const store = useSidebarStore();
   const selectedTab = store.selectedTab();
-  const noteCount = store.noteCount();
-  const annotationCount = store.annotationCount();
-  const orphanCount = store.orphanCount();
+  const noteCount = tabCounts.note;
+  const annotationCount = tabCounts.annotation;
+  const orphanCount = tabCounts.orphan;
   const isWaitingToAnchorAnnotations = store.isWaitingToAnchorAnnotations();
 
   const selectTab = (tabId: TabName) => {
-    store.clearSelection();
     store.selectTab(tabId);
   };
 
@@ -118,84 +125,109 @@ function SelectionTabs({
 
   const showNotesUnavailableMessage = selectedTab === 'note' && noteCount === 0;
 
+  // Naive simple English pluralization
+  const pluralize = (count: number, singular: string, plural: string) => {
+    return count === 1 ? singular : plural;
+  };
+
+  const tabCountsSummaryPieces = [];
+  if (annotationCount > 0) {
+    const term = pluralize(annotationCount, 'annotation', 'annotations');
+    tabCountsSummaryPieces.push(`${annotationCount} ${term}`);
+  }
+  if (noteCount > 0) {
+    const term = pluralize(noteCount, 'note', 'notes');
+    tabCountsSummaryPieces.push(`${noteCount} ${term}`);
+  }
+  if (orphanCount > 0) {
+    const term = pluralize(noteCount, 'orphan', 'orphans');
+    tabCountsSummaryPieces.push(`${orphanCount} ${term}`);
+  }
+  const tabCountsSummary = tabCountsSummaryPieces.join(', ');
+
   return (
-    <div
-      className={classnames(
-        // 9px balances out the space above the tabs
-        'space-y-3 pb-[9px]',
-      )}
-    >
-      <div className="flex gap-x-6 theme-clean:ml-[15px]" role="tablist">
-        <Tab
-          count={annotationCount}
-          isWaitingToAnchor={isWaitingToAnchorAnnotations}
-          isSelected={selectedTab === 'annotation'}
-          label="Annotations"
-          onSelect={() => selectTab('annotation')}
-        >
-          Annotations
-        </Tab>
-        <Tab
-          count={noteCount}
-          isWaitingToAnchor={isWaitingToAnchorAnnotations}
-          isSelected={selectedTab === 'note'}
-          label="Page notes"
-          onSelect={() => selectTab('note')}
-        >
-          Page Notes
-        </Tab>
-        {orphanCount > 0 && (
+    <>
+      <div aria-live="polite" role="status" className="sr-only">
+        {tabCountsSummary}
+      </div>
+      <div
+        className={classnames(
+          // 9px balances out the space above the tabs
+          'space-y-3 pb-[9px]',
+        )}
+      >
+        <div className="flex gap-x-6 theme-clean:ml-[15px]" role="tablist">
           <Tab
-            count={orphanCount}
+            count={annotationCount}
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
-            isSelected={selectedTab === 'orphan'}
-            label="Orphans"
-            onSelect={() => selectTab('orphan')}
+            isSelected={selectedTab === 'annotation'}
+            label="Annotations"
+            onSelect={() => selectTab('annotation')}
           >
-            Orphans
+            Annotations
           </Tab>
+          <Tab
+            count={noteCount}
+            isWaitingToAnchor={isWaitingToAnchorAnnotations}
+            isSelected={selectedTab === 'note'}
+            label="Page notes"
+            onSelect={() => selectTab('note')}
+          >
+            Page Notes
+          </Tab>
+          {orphanCount > 0 && (
+            <Tab
+              count={orphanCount}
+              isWaitingToAnchor={isWaitingToAnchorAnnotations}
+              isSelected={selectedTab === 'orphan'}
+              label="Orphans"
+              onSelect={() => selectTab('orphan')}
+            >
+              Orphans
+            </Tab>
+          )}
+        </div>
+        {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
+          <div className="flex justify-end">
+            <Button
+              data-testid="new-note-button"
+              onClick={() => annotationsService.createPageNote()}
+              variant="primary"
+              style={applyTheme(['ctaBackgroundColor'], settings)}
+            >
+              <PlusIcon />
+              New note
+            </Button>
+          </div>
+        )}
+        {!isLoading && showNotesUnavailableMessage && (
+          <Card data-testid="notes-unavailable-message" variant="flat">
+            <CardContent classes="text-center">
+              There are no page notes in this group.
+            </CardContent>
+          </Card>
+        )}
+        {!isLoading && showAnnotationsUnavailableMessage && (
+          <Card data-testid="annotations-unavailable-message" variant="flat">
+            <CardContent
+              // TODO: Remove !important spacing class after
+              // https://github.com/hypothesis/frontend-shared/issues/676 is addressed
+              classes="text-center !space-y-1"
+            >
+              <p>There are no annotations in this group.</p>
+              <p>
+                Create one by selecting some text and clicking the{' '}
+                <AnnotateIcon
+                  className="w-em h-em inline m-0.5 -mt-0.5"
+                  title="Annotate"
+                />{' '}
+                button.
+              </p>
+            </CardContent>
+          </Card>
         )}
       </div>
-      {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
-        <div className="flex justify-end">
-          <Button
-            data-testid="new-note-button"
-            onClick={() => annotationsService.createPageNote()}
-            variant="primary"
-            style={applyTheme(['ctaBackgroundColor'], settings)}
-          >
-            <PlusIcon />
-            New note
-          </Button>
-        </div>
-      )}
-      {!isLoading && showNotesUnavailableMessage && (
-        <Card data-testid="notes-unavailable-message" variant="flat">
-          <CardContent classes="text-center">
-            There are no page notes in this group.
-          </CardContent>
-        </Card>
-      )}
-      {!isLoading && showAnnotationsUnavailableMessage && (
-        <Card data-testid="annotations-unavailable-message" variant="flat">
-          <CardContent
-            // TODO: Remove !important spacing class after
-            // https://github.com/hypothesis/frontend-shared/issues/676 is addressed
-            classes="text-center !space-y-1"
-          >
-            <p>There are no annotations in this group.</p>
-            <p>
-              Create one by selecting some text and clicking the{' '}
-              <AnnotateIcon
-                className="w-em h-em inline m-0.5 -mt-0.5"
-                title="Annotate"
-              />{' '}
-              button.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+    </>
   );
 }
 

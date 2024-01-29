@@ -20,7 +20,9 @@ describe('NotebookView', () => {
       load: sinon.stub(),
     };
 
-    fakeUseRootThread = sinon.stub().returns({});
+    fakeUseRootThread = sinon.stub().returns({
+      rootThread: { children: [] },
+    });
 
     fakeScrollIntoView = sinon.stub();
 

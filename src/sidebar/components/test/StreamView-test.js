@@ -16,7 +16,9 @@ describe('StreamView', () => {
     };
 
     fakeUseRootThread = sinon.stub().returns({
-      children: [],
+      rootThread: {
+        children: [],
+      },
     });
 
     fakeQueryParser = {
