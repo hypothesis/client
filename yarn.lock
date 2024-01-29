@@ -4000,8 +4000,8 @@ __metadata:
   linkType: hard
 
 "aws-sdk@npm:^2.345.0":
-  version: 2.1540.0
-  resolution: "aws-sdk@npm:2.1540.0"
+  version: 2.1545.0
+  resolution: "aws-sdk@npm:2.1545.0"
   dependencies:
     buffer: 4.9.2
     events: 1.1.1
@@ -4012,8 +4012,8 @@ __metadata:
     url: 0.10.3
     util: ^0.12.4
     uuid: 8.0.0
-    xml2js: 0.5.0
-  checksum: b8d239020f83666abbc066e29ad9286ef0a40d80f74ecd716681272dac40a259f2c45244483ce2047dc1cab681e7ab94b7e0095e3fcc2d05291f40da55cdf105
+    xml2js: 0.6.2
+  checksum: 9686d97046898834c902ca832da48ef85996254799ebf79249d1386f958227b06093edceea2124162e94c480b35f8200ed89247c05c1fc1d8fbf2958240aba8f
   languageName: node
   linkType: hard
 
@@ -14082,13 +14082,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xml2js@npm:0.5.0":
-  version: 0.5.0
-  resolution: "xml2js@npm:0.5.0"
+"xml2js@npm:0.6.2":
+  version: 0.6.2
+  resolution: "xml2js@npm:0.6.2"
   dependencies:
     sax: ">=0.6.0"
     xmlbuilder: ~11.0.0
-  checksum: 1aa71d62e5bc2d89138e3929b9ea46459157727759cbc62ef99484b778641c0cd21fb637696c052d901a22f82d092a3e740a16b4ce218e81ac59b933535124ea
+  checksum: 458a83806193008edff44562c0bdb982801d61ee7867ae58fd35fab781e69e17f40dfeb8fc05391a4648c9c54012066d3955fe5d993ffbe4dc63399023f32ac2
   languageName: node
   linkType: hard
 
