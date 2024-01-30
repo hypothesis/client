@@ -56,16 +56,16 @@ const exportFormats: ExportFormat[] = [
     description: 'For import into word processors as plain text',
   },
   {
-    value: 'csv',
-    title: 'Table (CSV)',
-    shortTitle: 'CSV',
-    description: 'For import into a spreadsheet',
-  },
-  {
     value: 'html',
     title: 'Rich text (HTML)',
     shortTitle: 'HTML',
     description: 'For import into word processors as rich text',
+  },
+  {
+    value: 'csv',
+    title: 'Table (CSV)',
+    shortTitle: 'CSV',
+    description: 'For import into a spreadsheet',
   },
 ];
 

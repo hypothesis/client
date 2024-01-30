@@ -269,13 +269,13 @@ describe('ExportAnnotations', () => {
       optionText(1, 'description'),
       'For import into word processors as plain text',
     );
-    assert.equal(optionText(2, 'name'), 'Table (CSV)');
-    assert.equal(optionText(2, 'description'), 'For import into a spreadsheet');
-    assert.equal(optionText(3, 'name'), 'Rich text (HTML)');
+    assert.equal(optionText(2, 'name'), 'Rich text (HTML)');
     assert.equal(
-      optionText(3, 'description'),
+      optionText(2, 'description'),
       'For import into word processors as rich text',
     );
+    assert.equal(optionText(3, 'name'), 'Table (CSV)');
+    assert.equal(optionText(3, 'description'), 'For import into a spreadsheet');
   });
 
   [
