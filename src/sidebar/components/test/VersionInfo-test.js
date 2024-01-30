@@ -31,7 +31,7 @@ describe('VersionInfo', () => {
 
   beforeEach(() => {
     fakeCopyToClipboard = {
-      copyText: sinon.stub(),
+      copyPlainText: sinon.stub(),
     };
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
@@ -82,13 +82,13 @@ describe('VersionInfo', () => {
 
       wrapper.find('Button').props().onClick();
 
-      assert.calledWith(fakeCopyToClipboard.copyText, 'fakeString');
+      assert.calledWith(fakeCopyToClipboard.copyPlainText, 'fakeString');
     });
 
-    it('confirms info copy when successful', () => {
+    it('confirms info copy when successful', async () => {
       const wrapper = createComponent();
 
-      wrapper.find('Button').props().onClick();
+      await wrapper.find('Button').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.success,
@@ -97,7 +97,7 @@ describe('VersionInfo', () => {
     });
 
     it('flashes an error if info copying unsuccessful', () => {
-      fakeCopyToClipboard.copyText.throws();
+      fakeCopyToClipboard.copyPlainText.throws();
       const wrapper = createComponent();
 
       wrapper.find('Button').props().onClick();

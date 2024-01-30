@@ -17,7 +17,7 @@ import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
-import { copyText } from '../../util/copy-to-clipboard';
+import { copyPlainText } from '../../util/copy-to-clipboard';
 import MenuArrow from '../MenuArrow';
 import ShareLinks from '../ShareLinks';
 
@@ -94,9 +94,9 @@ function AnnotationShareControl({
   //   bears further discussion.
   const showShareLinks = inContextAvailable;
 
-  const copyShareLink = () => {
+  const copyShareLink = async () => {
     try {
-      copyText(shareUri);
+      await copyPlainText(shareUri);
       toastMessenger.success('Copied share link to clipboard');
     } catch (err) {
       toastMessenger.error('Unable to copy link');
