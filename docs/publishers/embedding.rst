@@ -44,3 +44,28 @@ document and have the same origin.
 
 The client will watch for new iframes being added to the document and will
 automatically enable annotation for them.
+
+
+Clipboard permissions when loaded in an iframe
+----------------------------------------------
+
+There are a few places in the sidebar where the user can copy content to the
+clipboard, such as exporting or copying links to annotations.
+
+This functionality uses the browser's
+`Clipboard API <https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API>`_,
+which requires allowing the ``clipboard-write`` permission in Chrome (but not
+Safari or Firefox).
+
+When loading the sidebar in the top-level document, this will work automatically
+but if you load Hypothesis inside an iframe, you will need to add an ``allow``
+attribute with the right permissions.
+
+.. code-block:: html
+
+   <iframe allow="clipboard-write">
+     <!-- Hypothesis is loaded here -->
+   </iframe>
+
+If these permissions are not available, the corresponding functionality in
+Hypothesis will either be unavailable or will fail with an error when used.
