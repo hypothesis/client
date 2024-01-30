@@ -1,21 +1,21 @@
 /**
- * This module defines the events that are sent between frames with different
- * roles in the client (guest, host, sidebar).
+ * This module defines the messages that are sent between frames with different
+ * roles in the client (guest, host, sidebar). Some messages are events in the
+ * source frame (eg. the active feature flags changed, text was selected)
+ * others are commands for the target frame (eg. "close the sidebar").
  */
 
 /**
- * Events that the guest sends to the host
+ * Events that guests send to the host.
  */
 export type GuestToHostEvent =
-  /** The guest informs the host that text has been unselected. */
+  /** Text has been deselected in the guest frame. */
   | 'textUnselected'
 
-  /** The guest informs the host that text has been selected. */
+  /** Text has been selected in the guest frame. */
   | 'textSelected'
 
-  /**
-   * The guest informs the host that the anchors have been changed in the main annotatable frame.
-   */
+  /** Anchors have changed in the guest frame. */
   | 'anchorsChanged'
 
   /**
@@ -26,17 +26,15 @@ export type GuestToHostEvent =
   | 'highlightsVisibleChanged';
 
 /**
- * Events that the guest sends to the sidebar
+ * Events that guests send to the sidebar.
  */
 export type GuestToSidebarEvent =
   /**
-   * The guest is asking the sidebar to create an annotation.
+   * A new annotation was created in the guest frame via the Annotate/Highlight controls.
    */
   | 'createAnnotation'
 
-  /**
-   * The guest is asking the sidebar to relay the message to the host to close the sidebar.
-   */
+  /** Request to close the sidebar. */
   | 'closeSidebar'
 
   /**
@@ -45,37 +43,35 @@ export type GuestToSidebarEvent =
    */
   | 'hoverAnnotations'
 
-  /**
-   * The guest is asking the sidebar to relay the message to the host to open the sidebar.
-   */
+  /** Request to open the sidebar. */
   | 'openSidebar'
 
-  /** The guest is notifying the sidebar of the current document metadata and URIs. */
+  /** The URIs or metadata of the document in the guest frame changed. */
   | 'documentInfoChanged'
 
-  /**
-   * The guest is asking the sidebar to display some annotations.
-   */
+  /** Set the selected annotations. Emitted when the user clicks highlights in the guest frame. */
   | 'showAnnotations'
 
-  /**
-   * The guest informs the sidebar whether annotations were successfully anchored
-   */
+  /** The anchoring status of annotations changed. */
   | 'syncAnchoringStatus'
 
-  /**
-   * The guest is asking the sidebar to toggle some annotations.
-   */
+  /** Toggle whether annotations are selected. */
   | 'toggleAnnotationSelection';
 
 /**
- * Events that the host sends to the guest
+ * Events that the host sends to guests.
  */
 export type HostToGuestEvent =
-  /** The host requests a guest to create an annotation. */
+  /**
+   * The host requests that the guest frame create a new annotation.
+   *
+   * This is used for the toolbar button that creates a new annotation or
+   * page note for the main guest frame, depending on whether there is a
+   * selection.
+   */
   | 'createAnnotation'
 
-  /** The host informs guests that text should be unselected. */
+  /** Clear the selection in the guest frame. */
   | 'clearSelection'
 
   /**
@@ -85,22 +81,21 @@ export type HostToGuestEvent =
   | 'hoverAnnotations'
 
   /**
-   * The host informs guests to select/toggle on a set of annotations
+   * Select annotations in the guest frame.
+   *
+   * This is used to select annotations when the corresponding items in the
+   * bucket bar are clicked.
    */
   | 'selectAnnotations'
 
-  /**
-   * The host informs guests that the sidebar layout has been changed.
-   */
+  /** The layout (width, open/closed state) of the sidebar changed. */
   | 'sidebarLayoutChanged'
 
-  /**
-   * Scroll to an annotation given its tag.
-   */
+  /** Scroll a highlight into view. */
   | 'scrollToAnnotation';
 
 /**
- * Events that the host sends to the sidebar
+ * Events that the host sends to the sidebar.
  */
 export type HostToSidebarEvent =
   /**
@@ -108,24 +103,20 @@ export type HostToSidebarEvent =
    */
   | 'setHighlightsVisible'
 
-  /**
-   * The host informs the sidebar that the sidebar has been opened.
-   */
+  /** Notify the sidebar iframe that it has become visible. */
   | 'sidebarOpened'
 
-  /**
-   * The host informs the sidebar that the sidebar has been closed.
-   */
+  /** Notify the sidebar iframe that it has become hidden. */
   | 'sidebarClosed';
 
 /**
- * Events that the sidebar sends to the guest(s)
+ * Events that the sidebar sends to guests.
  */
 export type SidebarToGuestEvent =
-  /**
-   * The sidebar is asking the guest(s) to delete an annotation.
-   */
+  /** Remove an annotation from the guest frame. */
   | 'deleteAnnotation'
+
+  /** The active feature flags changed. */
   | 'featureFlagsUpdated'
 
   /**
@@ -134,22 +125,14 @@ export type SidebarToGuestEvent =
    */
   | 'hoverAnnotations'
 
-  /**
-   * The sidebar is asking the guest(s) to load annotations.
-   */
+  /** Load new annotations into the guest frame. */
   | 'loadAnnotations'
 
   /** Navigate to the segment of a book associated with an annotation. */
   | 'navigateToSegment'
 
-  /**
-   * The sidebar is asking the guest(s) to scroll to certain annotation.
-   */
+  /** Scroll an annotation into view. */
   | 'scrollToAnnotation'
-
-  /**
-   * The sidebar relays to the guest(s) to set the annotation highlights on/off.
-   */
   | 'setHighlightsVisible'
 
   /**
@@ -162,82 +145,86 @@ export type SidebarToGuestEvent =
  */
 export type SidebarToHostEvent =
   /**
-   * The sidebar relays to the host to close the sidebar.
+   * Request from the sidebar iframe to close (ie. hide/move offscreen) its
+   * container in the host frame.
    */
   | 'closeSidebar'
 
-  /**
-   * The sidebar informs the host to update the Hypothesis configuration to enable/disable additional features
-   */
+  /** The active feature flags changed. */
   | 'featureFlagsUpdated'
 
   /**
-   * The sidebar is asking the host to open the partner site help page.
-   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onhelprequest
+   * Open the partner site help page.
+   *
+   * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onhelprequest
    */
   | 'helpRequested'
 
   /**
-   * The sidebar is asking the host to do a partner site log in
-   * (for example pop up a log in window). This is used when the client is
-   * embedded in a partner site and a log in button in the client is clicked.
-   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onloginrequest
+   * Initiate a login.
+   *
+   * This is used when the client is embedded in a partner site where a custom
+   * Hypothesis login method is used (aka. a third-party authority) and the
+   * login button in the client is clicked.
+   *
+   * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onloginrequest
    */
   | 'loginRequested'
 
   /**
-   * The sidebar is asking the host to do a partner site log out.
-   * This is used when the client is embedded in a partner site and a log out
-   * button in the client is clicked.
-   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onlogoutrequest
+   * Log the user out.
+   *
+   * This is used when the client is embedded in a partner site where a custom
+   * Hypothesis login method is used (aka. a third-party authority) and the
+   * logout button in the client is clicked.
+   *
+   * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onlogoutrequest
    */
   | 'logoutRequested'
 
-  /**
-   * The sidebar is asking the host to open the notebook.
-   */
+  /** Open the notebook dialog. */
   | 'openNotebook'
 
-  /**
-   * The sidebar is asking the host to open the user profile.
-   */
+  /** Open the account settings dialog. */
   | 'openProfile'
 
-  /**
-   * The sidebar is asking the host to open the sidebar (side-effect of creating
-   * an annotation).
-   */
+  /** Open the sidebar container. */
   | 'openSidebar'
 
-  /**
-   * The sidebar requests the host to enable the "Show highlights" control.
-   */
+  /** Make highlights visible in guest frames. */
   | 'showHighlights'
 
   /**
-   * The sidebar is asking the host to open the partner site profile page.
-   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onprofilerequest
+   * Open the profile page for the current user.
+   *
+   * This is used when the client is embedded in a partner site where a custom
+   * Hypothesis login method is used (aka. a third-party authority) and the
+   * profile menu item in the client is clicked.
+   *
+   * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onprofilerequest
    */
   | 'profileRequested'
 
   /**
-   * The sidebar informs the host to update the annotation counter in the partner site.
-   * https://h.readthedocs.io/projects/client/en/latest/publishers/host-page-integration/#cmdoption-arg-data-hypothesis-annotation-count
+   * The count of public annotations on the current page changed.
+   *
+   * See https://h.readthedocs.io/projects/client/en/latest/publishers/host-page-integration/#cmdoption-arg-data-hypothesis-annotation-count
    */
   | 'publicAnnotationCountChanged'
 
   /**
-   * The sidebar is asking the host to do a partner site sign-up.
-   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onsignuprequest
+   * Initiate an account sign-up.
+   *
+   * This is used when the client is embedded in a partner site where a custom
+   * Hypothesis login method is used (aka. a third-party authority) and the
+   * sign-up link in the client is clicked.
+   *
+   * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onsignuprequest
    */
   | 'signupRequested'
 
-  /**
-   * The sidebar is asking the host to toast a message
-   */
+  /** Display a toast message in the host frame. */
   | 'toastMessageAdded'
 
-  /**
-   * The sidebar is asking the host to dismiss a toast message
-   */
+  /** Dismiss a toast message in the host frame. */
   | 'toastMessageDismissed';
