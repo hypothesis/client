@@ -26,7 +26,7 @@ describe('ShareAnnotations', () => {
   beforeEach(() => {
     fakeBouncerLink = 'http://hyp.is/go?url=http%3A%2F%2Fwww.example.com';
     fakeCopyToClipboard = {
-      copyText: sinon.stub(),
+      copyPlainText: sinon.stub(),
     };
 
     fakePageSharingLink = sinon.stub().returns(fakeBouncerLink);
@@ -148,13 +148,13 @@ describe('ShareAnnotations', () => {
 
         wrapper.find('IconButton').props().onClick();
 
-        assert.calledWith(fakeCopyToClipboard.copyText, fakeBouncerLink);
+        assert.calledWith(fakeCopyToClipboard.copyPlainText, fakeBouncerLink);
       });
 
-      it('confirms link copy when successful', () => {
+      it('confirms link copy when successful', async () => {
         const wrapper = createComponent();
 
-        wrapper.find('IconButton').props().onClick();
+        await wrapper.find('IconButton').props().onClick();
 
         assert.calledWith(
           fakeToastMessenger.success,
@@ -163,7 +163,7 @@ describe('ShareAnnotations', () => {
       });
 
       it('flashes an error if link copying unsuccessful', () => {
-        fakeCopyToClipboard.copyText.throws();
+        fakeCopyToClipboard.copyPlainText.throws();
         const wrapper = createComponent();
 
         wrapper.find('IconButton').props().onClick();
