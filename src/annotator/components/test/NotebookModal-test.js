@@ -14,12 +14,13 @@ describe('NotebookModal', () => {
 
   const outerSelector = '[data-testid="notebook-outer"]';
 
-  const createComponent = config => {
+  const createComponent = ({ attachTo, ...config } = {}) => {
     const component = mount(
       <NotebookModal
         eventBus={eventBus}
         config={{ notebookAppUrl: notebookURL, ...config }}
       />,
+      { attachTo },
     );
     components.push(component);
     return component;
@@ -104,6 +105,26 @@ describe('NotebookModal', () => {
       addConfigFragment(notebookURL, { group: '2' }),
     );
     assert.notEqual(iframe1.getDOMNode(), iframe3.getDOMNode());
+  });
+
+  it('focuses iframe when the notebook is opened', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    try {
+      const wrapper = createComponent({ attachTo: container });
+
+      // The body is initially focused
+      assert.equal(document.activeElement, document.body);
+
+      emitter.publish('openNotebook', '1');
+      wrapper.update();
+
+      // Once notebook is opened, focus transitions to iframe
+      assert.equal(document.activeElement, wrapper.find('iframe').getDOMNode());
+    } finally {
+      container.remove();
+    }
   });
 
   it('makes the document unscrollable on "openNotebook" event', () => {

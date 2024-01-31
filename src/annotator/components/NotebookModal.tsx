@@ -1,6 +1,11 @@
-import { IconButton, CancelIcon } from '@hypothesis/frontend-shared';
+import {
+  IconButton,
+  CancelIcon,
+  ModalDialog,
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import type { Ref } from 'preact';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 
 import { addConfigFragment } from '../../shared/config-fragment';
 import { createAppConfig } from '../config/app';
@@ -19,15 +24,16 @@ export type NotebookConfig = {
 type NotebookIframeProps = {
   config: NotebookConfig;
   groupId: string;
+  iframeRef: Ref<HTMLIFrameElement>;
 };
 /**
  * Create the iframe that will load the notebook application.
  */
-function NotebookIframe({ config, groupId }: NotebookIframeProps) {
+function NotebookIframe({ config, groupId, iframeRef }: NotebookIframeProps) {
   const notebookAppSrc = addConfigFragment(config.notebookAppUrl, {
     ...createAppConfig(config.notebookAppUrl, config),
 
-    // Explicity set the "focused" group
+    // Explicitly set the "focused" group
     group: groupId,
   });
 
@@ -37,9 +43,11 @@ function NotebookIframe({ config, groupId }: NotebookIframeProps) {
       className="h-full w-full border-0"
       allow="fullscreen; clipboard-write"
       src={notebookAppSrc}
+      ref={iframeRef}
     />
   );
 }
+
 export type NotebookModalProps = {
   eventBus: EventBus;
   config: NotebookConfig;
@@ -61,6 +69,7 @@ export default function NotebookModal({
   const [groupId, setGroupId] = useState<string | null>(null);
   const originalDocumentOverflowStyle = useRef('');
   const emitterRef = useRef<Emitter | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   // Stores the original overflow CSS property of document.body and reset it
   // when the component is destroyed
@@ -96,6 +105,17 @@ export default function NotebookModal({
     };
   }, [eventBus]);
 
+  useLayoutEffect(() => {
+    if (!isHidden) {
+      // When the notebook is shown, focus the iframe so that the next element
+      // in the tab sequence is an element inside of it.
+      // We can't use ModalDialog's initialFocus prop because it assumes the
+      // modal is destroyed when closed, and would cause the iframe to focus
+      // only the first time it's opened.
+      iframeRef.current?.focus();
+    }
+  }, [isHidden]);
+
   const onClose = () => {
     setIsHidden(true);
     emitterRef.current?.publish('closeNotebook');
@@ -107,14 +127,16 @@ export default function NotebookModal({
 
   return (
     <div
-      className={classnames(
-        'fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50',
-        { hidden: isHidden },
-      )}
+      className={classnames({ hidden: isHidden })}
       data-testid="notebook-outer"
     >
-      <div className="relative w-full h-full" data-testid="notebook-inner">
-        <div className="absolute right-0 m-3">
+      <ModalDialog
+        variant="custom"
+        size="custom"
+        classes="p-3 relative w-full h-full"
+        initialFocus="manual"
+      >
+        <div className="absolute right-6 top-6">
           <IconButton
             title="Close the Notebook"
             onClick={onClose}
@@ -130,8 +152,13 @@ export default function NotebookModal({
             <CancelIcon className="w-4 h-4" />
           </IconButton>
         </div>
-        <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
-      </div>
+        <NotebookIframe
+          key={iframeKey}
+          config={config}
+          groupId={groupId}
+          iframeRef={iframeRef}
+        />
+      </ModalDialog>
     </div>
   );
 }
