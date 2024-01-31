@@ -243,7 +243,7 @@ describe('PortRPC', () => {
 
   it('should send "close" event when window is unloaded', async () => {
     const { port1, port2 } = new MessageChannel();
-    const sender = new PortRPC();
+    const sender = new PortRPC({ forceUnloadListener: true });
     const receiver = new PortRPC();
     const closeHandler = sinon.stub();
 
@@ -255,6 +255,26 @@ describe('PortRPC', () => {
     assert.notCalled(closeHandler);
     window.dispatchEvent(new Event('unload'));
     await waitForMessage(port2, 'close');
+
+    assert.calledOnce(closeHandler);
+    assert.calledWith(closeHandler);
+  });
+
+  it('should send "close" event when MessagePort emits "close" event', async () => {
+    const { port1, port2 } = new MessageChannel();
+    const sender = new PortRPC();
+    const receiver = new PortRPC();
+    const closeHandler = sinon.stub();
+
+    receiver.on('close', closeHandler);
+    receiver.connect(port2);
+    sender.connect(port1);
+    await waitForMessageDelivery();
+
+    assert.notCalled(closeHandler);
+    const closed = waitForMessage(port2, 'close');
+    port2.dispatchEvent(new Event('close'));
+    await closed;
 
     assert.calledOnce(closeHandler);
     assert.calledWith(closeHandler);
@@ -322,6 +342,7 @@ describe('PortRPC', () => {
       const sender = new PortRPC({
         userAgent: safariUserAgent,
         currentWindow: childFrame.contentWindow,
+        forceUnloadListener: true,
       });
       const receiver = new PortRPC();
       const closeHandler = sinon.stub();
