@@ -23,9 +23,25 @@
       Gutenberg EPUB</a>.
     </p>
 
+    <p>
+      A CFI-based <i>focus filter</i> is configured. This is used in assignments
+      to direct students to annotate a particular region of a document.
+    </p>
+
     <button class="js-toggle-client">Unload client</button>
 
     <mosaic-book book="little-women"></mosaic-book>
+
+    <script type="application/json" class="js-hypothesis-config">
+      {
+        "focus": {
+          "cfi": {
+            "range": "/2-/4",
+            "display": "Chapter one"
+          }
+        }
+      }
+    </script>
 
     <script type="module">
       import { MosaicBookElement } from '/scripts/vitalsource-mosaic-book-element.js';
