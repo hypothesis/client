@@ -35,12 +35,7 @@ function NotebookIframe({ config, groupId }: NotebookIframeProps) {
     <iframe
       title={'Hypothesis annotation notebook'}
       className="h-full w-full border-0"
-      // Enable media in annotations to be shown fullscreen.
-      // TODO: Use `allow="fullscreen" once `allow` attribute available for
-      // iframe elements in all supported browsers
-      // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-allow
-      // eslint-disable-next-line react/no-unknown-property
-      allowFullScreen
+      allow="fullscreen; clipboard-write"
       src={notebookAppSrc}
     />
   );
