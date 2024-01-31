@@ -50,6 +50,20 @@ type ResponseMessage = {
 
 type Message = RequestMessage | ResponseMessage;
 
+function makeRequestMessage(
+  method: string,
+  args: unknown[] = [],
+  sequence = -1,
+): RequestMessage {
+  return {
+    protocol: PROTOCOL,
+    version: VERSION,
+    arguments: args,
+    method,
+    sequence,
+  };
+}
+
 /**
  * Send a PortRPC method call.
  *
@@ -61,13 +75,7 @@ function sendCall(
   args: unknown[] = [],
   sequence = -1,
 ) {
-  port.postMessage({
-    protocol: PROTOCOL,
-    version: VERSION,
-    arguments: args,
-    method,
-    sequence,
-  } satisfies RequestMessage);
+  port.postMessage(makeRequestMessage(method, args, sequence));
 }
 
 /**
@@ -187,34 +195,49 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
   constructor({
     userAgent = navigator.userAgent,
     currentWindow = window,
-  }: { userAgent?: string; currentWindow?: Window } = {}) {
+    forceUnloadListener = false,
+  }: {
+    userAgent?: string;
+    currentWindow?: Window;
+
+    // Test seam. Force the use of a Window "unload" listener even if the
+    // browser supports "close" events for MessagePort.
+    forceUnloadListener?: boolean;
+  } = {}) {
     this._port = null;
     this._methods = new Map();
     this._sequence = 1;
     this._callbacks = new Map();
 
     this._listeners = new ListenerCollection();
-    this._listeners.add(currentWindow, 'unload', () => {
-      if (this._port) {
-        // Send "close" notification directly. This works in Chrome, Firefox and
-        // Safari >= 16.
-        sendCall(this._port, 'close');
 
-        // To work around a bug in Safari <= 15 which prevents sending messages
-        // while a window is unloading, try transferring the port to the parent frame
-        // and re-sending the "close" event from there.
-        if (
-          currentWindow !== currentWindow.parent &&
-          shouldUseSafariWorkaround(userAgent)
-        ) {
-          currentWindow.parent.postMessage(
-            { type: 'hypothesisPortClosed' },
-            '*',
-            [this._port],
-          );
+    // In browsers that emit a "close" event when the other end of a MessagePort
+    // goes away, we can listen for that directly. In other browsers, we have to
+    // send the "close" event through the message channel when the window
+    // containing the sending port is unloaded.
+    if (!('onclose' in MessagePort.prototype) || forceUnloadListener) {
+      this._listeners.add(currentWindow, 'unload', () => {
+        if (this._port) {
+          // Send "close" notification directly. This works in Chrome, Firefox and
+          // Safari >= 16.
+          sendCall(this._port, 'close');
+
+          // To work around a bug in Safari <= 15 which prevents sending messages
+          // while a window is unloading, try transferring the port to the parent frame
+          // and re-sending the "close" event from there.
+          if (
+            currentWindow !== currentWindow.parent &&
+            shouldUseSafariWorkaround(userAgent)
+          ) {
+            currentWindow.parent.postMessage(
+              { type: 'hypothesisPortClosed' },
+              '*',
+              [this._port],
+            );
+          }
         }
-      }
-    });
+      });
+    }
 
     this._pendingCalls = [];
 
@@ -249,6 +272,19 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
   connect(port: MessagePort) {
     this._port = port;
     this._listeners.add(port, 'message', event => this._handle(event));
+
+    // For browsers that support a `close` event for MessagePort, we use that
+    // to identify when the other end disconnects. This is translated into a
+    // message event that is similar to what we receive in older browsers
+    // which use a Window unload handler instead.
+    this._listeners.add(port, 'close', () => {
+      port.dispatchEvent(
+        new MessageEvent('message', {
+          data: makeRequestMessage('close'),
+        }),
+      );
+    });
+
     port.start();
     sendCall(port, 'connect');
 
