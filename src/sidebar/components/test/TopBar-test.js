@@ -38,9 +38,9 @@ describe('TopBar', () => {
       '../config/service-config': { serviceConfig: fakeServiceConfig },
     });
     $imports.$restore({
-      // `PressableIconButton` is a presentation-only component. Not mocking it
+      // `TopBarToggleButton` is a presentation-only component. Not mocking it
       // allows to get it covered.
-      './PressableIconButton': true,
+      './TopBarToggleButton': true,
     });
   });
 
@@ -51,7 +51,7 @@ describe('TopBar', () => {
   // Helper to retrieve an `Button` by test ID, for convenience
   function getButton(wrapper, testId) {
     return wrapper
-      .find('PressableIconButton')
+      .find('TopBarToggleButton')
       .filterWhere(n => n.find(`[data-testid="${testId}"]`).exists());
   }
 

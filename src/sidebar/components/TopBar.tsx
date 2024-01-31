@@ -1,4 +1,3 @@
-import type { IconButtonProps } from '@hypothesis/frontend-shared';
 import { LinkButton, HelpIcon, ShareIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
@@ -10,8 +9,8 @@ import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
 import PendingUpdatesButton from './PendingUpdatesButton';
-import PressableIconButton from './PressableIconButton';
 import SortMenu from './SortMenu';
+import TopBarToggleButton from './TopBarToggleButton';
 import UserMenu from './UserMenu';
 import SearchIconButton from './search/SearchIconButton';
 import StreamSearchInput from './search/StreamSearchInput';
@@ -33,26 +32,6 @@ export type TopBarProps = {
   frameSync: FrameSyncService;
   settings: SidebarSettings;
 };
-
-/**
- * Toggle button for the top bar, with a background to indicate its "pressed"
- * state.
- */
-export function TopBarToggleButton(buttonProps: IconButtonProps) {
-  return (
-    <PressableIconButton
-      // The containing form has a white background. The top bar is only
-      // 40px high. If we allow standard touch-minimum height here (44px),
-      // the visible white background exceeds the height of the top bar in
-      // touch contexts. Disable touch sizing via `size="custom"`, then
-      // add back the width rule and padding to keep horizontal spacing
-      // consistent.
-      size="custom"
-      classes="touch:min-w-touch-minimum p-1"
-      {...buttonProps}
-    />
-  );
-}
 
 /**
  * The toolbar which appears at the top of the sidebar providing actions

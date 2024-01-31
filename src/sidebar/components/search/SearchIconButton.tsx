@@ -5,7 +5,7 @@ import { useShortcut } from '../../../shared/shortcut';
 import { isMacOS } from '../../../shared/user-agent';
 import type { SidebarStore } from '../../store';
 import { useSidebarStore } from '../../store';
-import { TopBarToggleButton } from '../TopBar';
+import TopBarToggleButton from '../TopBarToggleButton';
 
 /**
  * Respond to keydown events on the document (shortcut keys):
