@@ -1,5 +1,4 @@
 import debounce from 'lodash.debounce';
-import { render } from 'preact';
 import { TinyEmitter } from 'tiny-emitter';
 
 import { ListenerCollection } from '../../shared/listener-collection';
@@ -8,6 +7,7 @@ import type {
   AnnotationData,
   Annotator,
   ContentInfoConfig,
+  Destroyable,
   Integration,
   SidebarLayout,
 } from '../../types/annotator';
@@ -25,8 +25,8 @@ import { TextRange } from '../anchoring/text-range';
 import Banners from '../components/Banners';
 import ContentInfoBanner from '../components/ContentInfoBanner';
 import WarningBanner from '../components/WarningBanner';
+import { PreactContainer } from '../util/preact-container';
 import { offsetRelativeTo, scrollElement } from '../util/scroll';
-import { createShadowRoot } from '../util/shadow-root';
 import { PDFMetadata } from './pdf-metadata';
 
 /**
@@ -61,20 +61,101 @@ export function isPDF() {
 }
 
 /**
+ * Controller for the `<hypothesis-banner>` UI element that contains various
+ * notices related to the PDF (eg. warning if PDF has no selectable text,
+ * showing info about where the PDF came from).
+ *
+ * This element is created lazily when there is content to show.
+ */
+class BannerController implements Destroyable {
+  /** Top-level DOM element associated with the PDF.js viewer. */
+  private _pdfjsContainer: HTMLElement;
+  private _container: PreactContainer | null;
+  private _contentInfo: ContentInfoConfig | null;
+
+  /** Warning that the current PDF does not have selectable text. */
+  private _noTextWarning: boolean;
+
+  constructor() {
+    this._pdfjsContainer = document.querySelector(
+      '#outerContainer',
+    ) as HTMLElement;
+
+    this._contentInfo = null;
+    this._noTextWarning = false;
+    this._container = null;
+  }
+
+  /**
+   * Show a banner with information about the provider of the PDF.
+   *
+   * This is a contractual requirement for some LMS content providers.
+   */
+  setContentInfo(info: ContentInfoConfig) {
+    this._contentInfo = info;
+    this._update();
+  }
+
+  /**
+   * Set whether the "PDF has no selectable text" notice is shown.
+   */
+  showNoTextWarning(show: boolean) {
+    this._noTextWarning = show;
+    this._update();
+  }
+
+  destroy() {
+    this._container?.destroy();
+  }
+
+  private _update() {
+    const show = this._noTextWarning || this._contentInfo;
+    if (!show) {
+      this._container?.destroy();
+      this._container = null;
+
+      // Undo inline styles applied when the banner is shown. The banner will
+      // then gets its normal 100% height set by PDF.js's CSS.
+      this._pdfjsContainer.style.height = '';
+
+      return;
+    }
+
+    if (!this._container) {
+      this._container = new PreactContainer('banner', () => this._render());
+      document.body.prepend(this._container.element);
+    }
+
+    this._container.render();
+
+    // The `#outerContainer` element normally has height set to 100% of the body.
+    //
+    // Reduce this by the height of the banner so that it doesn't extend beyond
+    // the bottom of the viewport.
+    //
+    // We don't currently handle the height of the banner changing here.
+    const bannerHeight = this._container.element.getBoundingClientRect().height;
+    this._pdfjsContainer.style.height = `calc(100% - ${bannerHeight}px)`;
+  }
+
+  private _render() {
+    return (
+      <Banners>
+        {this._contentInfo && <ContentInfoBanner info={this._contentInfo} />}
+        {this._noTextWarning && <WarningBanner />}
+      </Banners>
+    );
+  }
+}
+
+/**
  * Integration that works with PDF.js
  */
 export class PDFIntegration extends TinyEmitter implements Integration {
   private _annotator: Annotator;
 
   /** Banners shown at the top of the PDF viewer. */
-  private _banner: HTMLElement | null;
-
-  /** State indicating which banners to show above the PDF viewer. */
-  private _bannerState: {
-    contentInfo: ContentInfoConfig | null;
-    /** Warning that the current PDF does not have selectable text. */
-    noTextWarning: boolean;
-  };
+  private _banner: BannerController;
 
   /**
    * A flag that indicates whether `destroy` has been called. Used to handle
@@ -133,12 +214,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     });
 
     this._reanchoringMaxWait = options.reanchoringMaxWait ?? 3000;
-    this._banner = null;
-    this._bannerState = {
-      contentInfo: null,
-      noTextWarning: false,
-    };
-    this._updateBannerState(this._bannerState);
+    this._banner = new BannerController();
     this._checkForSelectableText();
     this._sideBySideActive = false;
 
@@ -178,7 +254,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     this._listeners.removeAll();
     this._pdfViewer.viewer.classList.remove('has-transparent-text-layer');
     this._observer.disconnect();
-    this._banner?.remove();
+    this._banner.destroy();
     this._destroyed = true;
   }
 
@@ -200,8 +276,8 @@ export class PDFIntegration extends TinyEmitter implements Integration {
    * Display a banner at the top of the PDF viewer showing information about the
    * current document.
    */
-  showContentInfo(contentInfo: ContentInfoConfig) {
-    this._updateBannerState({ contentInfo });
+  showContentInfo(info: ContentInfoConfig) {
+    this._banner.setContentInfo(info);
   }
 
   /**
@@ -265,66 +341,11 @@ export class PDFIntegration extends TinyEmitter implements Integration {
 
     try {
       const hasText = await documentHasText();
-      this._updateBannerState({ noTextWarning: !hasText });
+      this._banner.showNoTextWarning(!hasText);
     } catch (err) {
       /* istanbul ignore next */
       console.warn('Unable to check for text in PDF:', err);
     }
-  }
-
-  /**
-   * Update banners shown above the PDF viewer.
-   */
-  _updateBannerState(
-    state: Partial<typeof PDFIntegration.prototype._bannerState>,
-  ) {
-    this._bannerState = { ...this._bannerState, ...state };
-
-    // Get a reference to the top-level DOM element associated with the PDF.js
-    // viewer.
-    const outerContainer = document.querySelector(
-      '#outerContainer',
-    ) as HTMLElement;
-
-    const showBanner =
-      this._bannerState.contentInfo || this._bannerState.noTextWarning;
-
-    if (!showBanner) {
-      this._banner?.remove();
-      this._banner = null;
-
-      // Undo inline styles applied when the banner is shown. The banner will
-      // then gets its normal 100% height set by PDF.js's CSS.
-      outerContainer.style.height = '';
-
-      return;
-    }
-
-    if (!this._banner) {
-      this._banner = document.createElement('hypothesis-banner');
-      document.body.prepend(this._banner);
-      createShadowRoot(this._banner);
-    }
-
-    render(
-      <Banners>
-        {this._bannerState.contentInfo && (
-          <ContentInfoBanner info={this._bannerState.contentInfo} />
-        )}
-        {this._bannerState.noTextWarning && <WarningBanner />}
-      </Banners>,
-      this._banner.shadowRoot!,
-    );
-
-    const bannerHeight = this._banner.getBoundingClientRect().height;
-
-    // The `#outerContainer` element normally has height set to 100% of the body.
-    //
-    // Reduce this by the height of the banner so that it doesn't extend beyond
-    // the bottom of the viewport.
-    //
-    // We don't currently handle the height of the banner changing here.
-    outerContainer.style.height = `calc(100% - ${bannerHeight}px)`;
   }
 
   // This method (re-)anchors annotations when pages are rendered and destroyed.
