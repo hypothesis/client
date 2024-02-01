@@ -174,6 +174,7 @@ export class Sidebar implements Destroyable {
       this.iframeContainer = document.createElement('div');
       this.iframeContainer.style.display = 'none';
       this.iframeContainer.className = 'sidebar-container';
+      this.iframeContainer.id = 'sidebar-container';
 
       if (config.theme === 'clean') {
         this.iframeContainer.classList.add('theme-clean');
@@ -260,6 +261,7 @@ export class Sidebar implements Destroyable {
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
+      sidebarContainerId: this.iframeContainer?.id,
       createAnnotation: () => {
         if (this._guestRPC.length === 0) {
           return;

@@ -73,6 +73,12 @@ export type ToolbarProps = {
   isSidebarOpen: boolean;
 
   /**
+   * The id attribute for the sidebar container to reference from the sidebar
+   * toggle's aria-controls attribute
+   */
+  sidebarContainerId?: string;
+
+  /**
    * Informs which icon to show on the "Create annotation" button and what type
    * of annotation should be created by the `createAnnotation` callback. The
    * type of annotation depends on whether there is a text selection in the
@@ -117,6 +123,7 @@ export default function Toolbar({
   closeSidebar,
   createAnnotation,
   isSidebarOpen,
+  sidebarContainerId,
   newAnnotationType,
   showHighlights,
   toggleHighlights,
@@ -171,7 +178,7 @@ export default function Toolbar({
             elementRef={toggleSidebarRef}
             title="Annotation sidebar"
             expanded={isSidebarOpen}
-            pressed={isSidebarOpen}
+            aria-controls={sidebarContainerId}
             onClick={toggleSidebar}
             unstyled
           >
