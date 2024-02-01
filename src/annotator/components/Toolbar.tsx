@@ -181,7 +181,7 @@ export default function Toolbar({
             <ToolbarButton
               title="Show highlights"
               icon={showHighlights ? ShowIcon : HideIcon}
-              selected={showHighlights}
+              pressed={showHighlights}
               onClick={toggleHighlights}
             />
             <ToolbarButton

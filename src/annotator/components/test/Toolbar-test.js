@@ -91,6 +91,15 @@ describe('Toolbar', () => {
     assert.equal(statusEl.text(), 'Highlights visible');
   });
 
+  [true, false].forEach(showHighlights => {
+    it('sets props in highlights toggle', () => {
+      const wrapper = createToolbar({ showHighlights });
+      const highlightsButton = findButton(wrapper, 'Show highlights');
+
+      assert.equal(highlightsButton.prop('aria-pressed'), showHighlights);
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([
