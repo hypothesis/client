@@ -47,7 +47,7 @@ describe('Profile', () => {
     it('creates the container', () => {
       assert.isFalse(container.hasChildNodes());
       const profile = createProfile();
-      const shadowRoot = profile._outerContainer.shadowRoot;
+      const shadowRoot = profile._container.element.shadowRoot;
       assert.isNotNull(shadowRoot);
       assert.isNotNull(shadowRoot.querySelector('#profile-modal'));
     });

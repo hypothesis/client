@@ -47,7 +47,7 @@ describe('Notebook', () => {
     it('creates the container', () => {
       assert.isFalse(container.hasChildNodes());
       const notebook = createNotebook();
-      const shadowRoot = notebook._outerContainer.shadowRoot;
+      const shadowRoot = notebook._container.element.shadowRoot;
       assert.isNotNull(shadowRoot);
       assert.isNotNull(shadowRoot.querySelector('#notebook-modal'));
     });
