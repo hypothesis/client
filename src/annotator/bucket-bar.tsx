@@ -1,9 +1,7 @@
-import { render } from 'preact';
-
 import type { AnchorPosition, Destroyable } from '../types/annotator';
 import Buckets from './components/Buckets';
 import { computeBuckets } from './util/buckets';
-import { createShadowRoot } from './util/shadow-root';
+import { PreactContainer } from './util/preact-container';
 
 export type BucketBarOptions = {
   onFocusAnnotations: (tags: string[]) => void;
@@ -18,7 +16,8 @@ export type BucketBarOptions = {
  * rendered elsewhere for certain content viewers.
  */
 export class BucketBar implements Destroyable {
-  private _bucketsContainer: HTMLElement;
+  private _container: PreactContainer;
+  private _positions: AnchorPosition[];
   private _onFocusAnnotations: BucketBarOptions['onFocusAnnotations'];
   private _onScrollToAnnotation: BucketBarOptions['onScrollToAnnotation'];
   private _onSelectAnnotations: BucketBarOptions['onSelectAnnotations'];
@@ -31,8 +30,9 @@ export class BucketBar implements Destroyable {
       onSelectAnnotations,
     }: BucketBarOptions,
   ) {
-    this._bucketsContainer = document.createElement('hypothesis-bucket-bar');
-    Object.assign(this._bucketsContainer.style, {
+    this._positions = [];
+    this._container = new PreactContainer('bucket-bar', () => this._render());
+    Object.assign(this._container.element.style, {
       display: 'block',
       flexGrow: '1',
 
@@ -43,25 +43,27 @@ export class BucketBar implements Destroyable {
       width: '100%',
     });
 
-    createShadowRoot(this._bucketsContainer);
-    container.appendChild(this._bucketsContainer);
-
+    container.appendChild(this._container.element);
     this._onFocusAnnotations = onFocusAnnotations;
     this._onScrollToAnnotation = onScrollToAnnotation;
     this._onSelectAnnotations = onSelectAnnotations;
 
-    // Immediately render the bucket bar
-    this.update([]);
+    this._container.render();
   }
 
   destroy() {
-    render(null, this._bucketsContainer);
-    this._bucketsContainer.remove();
+    this._container.destroy();
   }
 
+  /** Update the set of anchors from which buckets are generated. */
   update(positions: AnchorPosition[]) {
-    const buckets = computeBuckets(positions, this._bucketsContainer);
-    render(
+    this._positions = positions;
+    this._container.render();
+  }
+
+  private _render() {
+    const buckets = computeBuckets(this._positions, this._container.element);
+    return (
       <Buckets
         above={buckets.above}
         below={buckets.below}
@@ -71,8 +73,7 @@ export class BucketBar implements Destroyable {
         onSelectAnnotations={(tags, toogle) =>
           this._onSelectAnnotations(tags, toogle)
         }
-      />,
-      this._bucketsContainer.shadowRoot!,
+      />
     );
   }
 }

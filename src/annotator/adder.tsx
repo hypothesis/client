@@ -1,10 +1,8 @@
-import { render } from 'preact';
-
 import { isTouchDevice } from '../shared/user-agent';
 import type { Destroyable } from '../types/annotator';
 import AdderToolbar from './components/AdderToolbar';
 import type { Command } from './components/AdderToolbar';
-import { createShadowRoot } from './util/shadow-root';
+import { PreactContainer } from './util/preact-container';
 
 export enum ArrowDirection {
   DOWN = 1,
@@ -64,8 +62,7 @@ type AdderOptions = {
  * component which actually renders the toolbar.
  */
 export class Adder implements Destroyable {
-  private _outerContainer: HTMLElement;
-  private _shadowRoot: ShadowRoot;
+  private _container: PreactContainer;
   private _view: Window;
   private _isVisible: boolean;
   private _arrowDirection: 'up' | 'down';
@@ -85,18 +82,6 @@ export class Adder implements Destroyable {
    *        event handlers.
    */
   constructor(element: HTMLElement, options: AdderOptions) {
-    this._outerContainer = document.createElement('hypothesis-adder');
-    element.appendChild(this._outerContainer);
-    this._shadowRoot = createShadowRoot(this._outerContainer);
-
-    // Set initial style
-    Object.assign(this._outerContainer.style, {
-      // take position out of layout flow initially
-      position: 'absolute',
-      top: 0,
-      left: 0,
-    });
-
     this._view = element.ownerDocument.defaultView!;
     this._isVisible = false;
     this._arrowDirection = 'up';
@@ -106,7 +91,16 @@ export class Adder implements Destroyable {
     this._onHighlight = options.onHighlight;
     this._onShowAnnotations = options.onShowAnnotations;
 
-    this._render();
+    this._container = new PreactContainer('adder', () => this._render());
+    element.appendChild(this._container.element);
+
+    // Take position out of layout flow initially
+    Object.assign(this._container.element.style, {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+    });
+    this._container.render();
   }
 
   get annotationsForSelection() {
@@ -122,24 +116,24 @@ export class Adder implements Destroyable {
    */
   set annotationsForSelection(ids) {
     this._annotationsForSelection = ids;
-    this._render();
+    this._container.render();
   }
 
   /** Hide the adder */
   hide() {
     this._isVisible = false;
-    this._render();
-    // Reposition the outerContainer because it affects the responsiveness of host page
+    this._container.render();
+
+    // Reposition the container because it affects the responsiveness of host page
     // https://github.com/hypothesis/client/issues/3193
-    Object.assign(this._outerContainer.style, {
+    Object.assign(this._container.element.style, {
       top: 0,
       left: 0,
     });
   }
 
   destroy() {
-    render(null, this._shadowRoot); // First, unload the Preact component
-    this._outerContainer.remove();
+    this._container.destroy();
   }
 
   /**
@@ -160,18 +154,19 @@ export class Adder implements Destroyable {
 
     this._isVisible = true;
     this._arrowDirection = arrowDirection === ArrowDirection.UP ? 'up' : 'down';
+    this._container.render();
+  }
 
-    this._render();
+  private _firstChild(): Element {
+    return this._container.element.shadowRoot!.firstChild as Element;
   }
 
   private _width(): number {
-    const firstChild = this._shadowRoot.firstChild as Element;
-    return firstChild.getBoundingClientRect().width;
+    return this._firstChild().getBoundingClientRect().width;
   }
 
   private _height(): number {
-    const firstChild = this._shadowRoot.firstChild as Element;
-    return firstChild.getBoundingClientRect().height;
+    return this._firstChild().getBoundingClientRect().height;
   }
 
   /**
@@ -310,12 +305,14 @@ export class Adder implements Destroyable {
     // Typically, the adder is a child of the `<body>` and the NPA is the root
     // `<html>` element. However, page styling may make the `<body>` positioned.
     // See https://github.com/hypothesis/client/issues/487.
-    const positionedAncestor = nearestPositionedAncestor(this._outerContainer);
+    const positionedAncestor = nearestPositionedAncestor(
+      this._container.element,
+    );
     const parentRect = positionedAncestor.getBoundingClientRect();
 
     const zIndex = this._findZindex(left, top);
 
-    Object.assign(this._outerContainer.style, {
+    Object.assign(this._container.element.style, {
       left: toPx(left - parentRect.left),
       top: toPx(top - parentRect.top),
       zIndex,
@@ -342,14 +339,13 @@ export class Adder implements Destroyable {
       }
     };
 
-    render(
+    return (
       <AdderToolbar
         isVisible={this._isVisible}
         arrowDirection={this._arrowDirection}
         onCommand={handleCommand}
         annotationCount={this.annotationsForSelection.length}
-      />,
-      this._shadowRoot,
+      />
     );
   }
 }

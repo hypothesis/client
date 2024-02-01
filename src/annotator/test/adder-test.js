@@ -57,7 +57,7 @@ describe('Adder', () => {
   }
 
   function getContent() {
-    return adder._shadowRoot;
+    return adder._container.element.shadowRoot;
   }
 
   function adderRect() {
@@ -255,7 +255,7 @@ describe('Adder', () => {
   describe('adder Z index', () => {
     function getAdderZIndex(left, top) {
       adder._showAt(left, top);
-      return parseInt(adder._outerContainer.style.zIndex);
+      return parseInt(adder._container.element.style.zIndex);
     }
 
     it('returns hard coded value if `document.elementsFromPoint` is not available', () => {
