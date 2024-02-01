@@ -1,28 +1,21 @@
-import { render } from 'preact';
-
 import type { Destroyable } from '../types/annotator';
 import type { ProfileConfig } from './components/ProfileModal';
 import ProfileModal from './components/ProfileModal';
 import type { EventBus } from './util/emitter';
-import { createShadowRoot } from './util/shadow-root';
+import { PreactContainer } from './util/preact-container';
 
 export class Profile implements Destroyable {
-  private _outerContainer: HTMLElement;
-  public shadowRoot: ShadowRoot;
+  private _container: PreactContainer;
 
   constructor(element: HTMLElement, eventBus: EventBus, config: ProfileConfig) {
-    this._outerContainer = document.createElement('hypothesis-profile');
-    element.appendChild(this._outerContainer);
-    this.shadowRoot = createShadowRoot(this._outerContainer);
-
-    render(
-      <ProfileModal eventBus={eventBus} config={config} />,
-      this.shadowRoot,
-    );
+    this._container = new PreactContainer('profile', () => (
+      <ProfileModal eventBus={eventBus} config={config} />
+    ));
+    element.append(this._container.element);
+    this._container.render();
   }
 
   destroy(): void {
-    render(null, this.shadowRoot);
-    this._outerContainer.remove();
+    this._container.destroy();
   }
 }
