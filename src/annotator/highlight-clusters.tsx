@@ -1,5 +1,3 @@
-import { render } from 'preact';
-
 import type {
   Destroyable,
   FeatureFlags as IFeatureFlags,
@@ -7,7 +5,7 @@ import type {
 import type { HighlightCluster } from '../types/shared';
 import ClusterToolbar from './components/ClusterToolbar';
 import { updateClusters } from './highlighter';
-import { createShadowRoot } from './util/shadow-root';
+import { PreactContainer } from './util/preact-container';
 
 export type HighlightStyle = {
   color: string;
@@ -67,24 +65,22 @@ export const defaultClusterStyles: AppliedStyles = {
 
 export class HighlightClusterController implements Destroyable {
   appliedStyles: AppliedStyles;
+  private _container: PreactContainer;
   private _element: HTMLElement;
   private _features: IFeatureFlags;
-  private _outerContainer: HTMLElement;
-  private _shadowRoot: ShadowRoot;
   private _updateTimeout?: number;
 
   constructor(element: HTMLElement, options: { features: IFeatureFlags }) {
     this._element = element;
     this._features = options.features;
 
-    this._outerContainer = document.createElement(
-      'hypothesis-highlight-cluster-toolbar',
+    this._container = new PreactContainer('highlight-cluster-toolbar', () =>
+      this._render(),
     );
-    this._element.appendChild(this._outerContainer);
-    this._shadowRoot = createShadowRoot(this._outerContainer);
+    this._element.appendChild(this._container.element);
 
     // For now, the controls are fixed at top-left of screen. This is temporary.
-    Object.assign(this._outerContainer.style, {
+    Object.assign(this._container.element.style, {
       position: 'fixed',
       top: `${this._element.offsetTop + 4}px`,
       left: '4px',
@@ -98,14 +94,13 @@ export class HighlightClusterController implements Destroyable {
       this._activate(this._isActive());
     });
 
-    this._render();
+    this._container.render();
   }
 
   destroy() {
     clearTimeout(this._updateTimeout);
-    render(null, this._shadowRoot); // unload the Preact component
     this._activate(false); // De-activate cluster styling
-    this._outerContainer.remove();
+    this._container.destroy();
   }
 
   /**
@@ -149,7 +144,7 @@ export class HighlightClusterController implements Destroyable {
    */
   _activate(active: boolean) {
     this._element.classList.toggle('hypothesis-highlights-clustered', active);
-    this._render();
+    this._container.render();
   }
 
   /**
@@ -188,11 +183,11 @@ export class HighlightClusterController implements Destroyable {
   ) {
     this.appliedStyles[cluster] = styleName;
     this._setClusterStyles(cluster, styleName);
-    this._render();
+    this._container.render();
   }
 
   _render() {
-    render(
+    return (
       <ClusterToolbar
         active={this._isActive()}
         availableStyles={highlightStyles}
@@ -200,8 +195,7 @@ export class HighlightClusterController implements Destroyable {
         onStyleChange={(cluster, styleName) =>
           this._onChangeClusterStyle(cluster, styleName)
         }
-      />,
-      this._shadowRoot,
+      />
     );
   }
 }
