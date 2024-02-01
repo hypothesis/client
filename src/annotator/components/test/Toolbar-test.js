@@ -100,6 +100,15 @@ describe('Toolbar', () => {
     });
   });
 
+  it('sets aria-controls in sidebar toggle button', () => {
+    const wrapper = createToolbar({ sidebarContainerId: 'foo' });
+
+    assert.equal(
+      findButton(wrapper, 'Annotation sidebar').prop('aria-controls'),
+      'foo',
+    );
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

@@ -7,6 +7,7 @@ export type ToolbarOptions = {
   createAnnotation: () => void;
   setSidebarOpen: (open: boolean) => void;
   setHighlightsVisible: (visible: boolean) => void;
+  sidebarContainerId?: string;
 };
 
 /**
@@ -21,6 +22,7 @@ export class ToolbarController {
   private _useMinimalControls: boolean;
   private _highlightsVisible: boolean;
   private _sidebarOpen: boolean;
+  private _sidebarContainerId?: string;
   private _closeSidebar: () => void;
   private _toggleSidebar: () => void;
   private _toggleHighlights: () => void;
@@ -38,6 +40,7 @@ export class ToolbarController {
     this._newAnnotationType = 'note';
     this._highlightsVisible = false;
     this._sidebarOpen = false;
+    this._sidebarContainerId = options.sidebarContainerId;
 
     this._closeSidebar = () => setSidebarOpen(false);
     this._toggleSidebar = () => setSidebarOpen(!this._sidebarOpen);
@@ -124,6 +127,7 @@ export class ToolbarController {
         createAnnotation={this._createAnnotation}
         newAnnotationType={this._newAnnotationType}
         isSidebarOpen={this._sidebarOpen}
+        sidebarContainerId={this._sidebarContainerId}
         showHighlights={this._highlightsVisible}
         toggleHighlights={this._toggleHighlights}
         toggleSidebar={this._toggleSidebar}
