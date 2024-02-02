@@ -9,13 +9,13 @@ import {
   LinkIcon,
   ListOrderedIcon,
   ListUnorderedIcon,
+  useArrowKeyNavigation,
 } from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 import type { Ref, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
-import { useArrowKeyNavigation } from '../../shared/keyboard-navigation';
 import { isMacOS } from '../../shared/user-agent';
 import {
   LinkType,
