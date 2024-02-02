@@ -37,6 +37,7 @@ import {
   setHighlightsVisible,
 } from './highlighter';
 import { createIntegration } from './integrations';
+import { OutsideAssignmentNoticeController } from './outside-assignment-notice';
 import {
   itemsForRange,
   isSelectionBackwards,
@@ -247,6 +248,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    */
   private _hoveredAnnotations: Set<string>;
 
+  private _outsideAssignmentNotice: OutsideAssignmentNoticeController | null;
+
   /**
    * @param element -
    *   The root element in which the `Guest` instance should be able to anchor
@@ -270,6 +273,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._isAdderVisible = false;
     this._informHostOnNextSelectionClear = true;
     this.selectedRanges = [];
+    this._outsideAssignmentNotice = null;
 
     this._adder = new Adder(this.element, {
       onAnnotate: () => this.createAnnotation(),
@@ -582,6 +586,10 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       this._integration.showContentInfo?.(info),
     );
 
+    this._sidebarRPC.on('showOutsideAssignmentNotice', (show: boolean) => {
+      this._showOutsideAssignmentNotice(show);
+    });
+
     this._sidebarRPC.on('navigateToSegment', (annotation: AnnotationData) =>
       this._integration.navigateToSegment?.(annotation),
     );
@@ -608,6 +616,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._adder.destroy();
     this._bucketBarClient.destroy();
     this._clusterToolbar?.destroy();
+    this._outsideAssignmentNotice?.destroy();
 
     removeAllHighlights(this.element);
 
@@ -920,5 +929,14 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     if (matchShortcut(event, 'Ctrl+Shift+H')) {
       this.setHighlightsVisible(!this._highlightsVisible);
     }
+  }
+
+  _showOutsideAssignmentNotice(show: boolean) {
+    if (!this._outsideAssignmentNotice) {
+      this._outsideAssignmentNotice = new OutsideAssignmentNoticeController(
+        this.element,
+      );
+    }
+    this._outsideAssignmentNotice.setVisible(show);
   }
 }

@@ -47,6 +47,7 @@ describe('Guest', () => {
   let fakePortFinder;
   let FakePortRPC;
   let fakePortRPCs;
+  let fakeOutsideAssignmentNotice;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -190,6 +191,11 @@ describe('Guest', () => {
       destroy: sinon.stub(),
     };
 
+    fakeOutsideAssignmentNotice = {
+      destroy: sinon.stub(),
+      setVisible: sinon.stub(),
+    };
+
     class FakeSelectionObserver {
       constructor(callback) {
         notifySelectionChanged = callback;
@@ -217,6 +223,11 @@ describe('Guest', () => {
         createIntegration: fakeCreateIntegration,
       },
       './range-util': rangeUtil,
+      './outside-assignment-notice': {
+        OutsideAssignmentNoticeController: sinon
+          .stub()
+          .returns(fakeOutsideAssignmentNotice),
+      },
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
@@ -592,6 +603,16 @@ describe('Guest', () => {
         createGuest();
         fakeIntegration.showContentInfo = null;
         emitSidebarEvent('showContentInfo', contentInfo);
+      });
+    });
+
+    describe('on "showOutsideAssignmentNotice" event', () => {
+      [true, false].forEach(arg => {
+        it('shows notice if argument is `true`', () => {
+          createGuest();
+          emitSidebarEvent('showOutsideAssignmentNotice', arg);
+          assert.calledWith(fakeOutsideAssignmentNotice.setVisible, arg);
+        });
       });
     });
   });

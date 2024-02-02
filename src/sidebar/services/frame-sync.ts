@@ -20,7 +20,10 @@ import type {
   GuestToSidebarEvent,
 } from '../../types/port-rpc-events';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
-import { annotationMatchesSegment } from '../helpers/annotation-segment';
+import {
+  annotationMatchesSegment,
+  segmentMatchesFocusFilters,
+} from '../helpers/annotation-segment';
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
 import { watch } from '../util/watch';
@@ -358,6 +361,18 @@ export class FrameSyncService {
     // immediately after it connects to the sidebar. It may call it again
     // later if the document in the guest frame is navigated.
     guestRPC.on('documentInfoChanged', (info: DocumentInfo) => {
+      const focusFilters = this._store.getFocusFilters();
+
+      // If we are in a classroom assignment with an associated page range,
+      // tell the user if they have navigated outside that range.
+      if (info.segmentInfo && Object.keys(focusFilters).length > 0) {
+        const match = segmentMatchesFocusFilters(
+          info.segmentInfo,
+          focusFilters,
+        );
+        guestRPC.call('showOutsideAssignmentNotice', !match);
+      }
+
       this._store.connectFrame({
         id: sourceId,
         metadata: info.metadata,

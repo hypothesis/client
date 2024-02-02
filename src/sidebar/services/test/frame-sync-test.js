@@ -150,6 +150,7 @@ describe('FrameSyncService', () => {
 
         findIDsForTags: sinon.stub().returns([]),
         focusedGroup: sinon.stub().returns({ id: 'foobar' }),
+        getFocusFilters: sinon.stub().returns({}),
         hoverAnnotations: sinon.stub(),
         isLoggedIn: sinon.stub().returns(false),
         openSidebarPanel: sinon.stub(),
@@ -421,7 +422,7 @@ describe('FrameSyncService', () => {
 
       let clock;
 
-      beforeEach(async () => {
+      async function connectEPUBGuest() {
         await connectGuest();
         emitGuestEvent('documentInfoChanged', {
           uri: bookURI,
@@ -430,13 +431,15 @@ describe('FrameSyncService', () => {
             url: '/chapters/02.xhtml',
           },
         });
-      });
+      }
 
       afterEach(() => {
         clock?.restore();
       });
 
-      it('sends annotations to frame only if current segment matches frame', () => {
+      it('sends annotations to frame only if current segment matches frame', async () => {
+        await connectEPUBGuest();
+
         fakeStore.setState({ annotations: [chapter1ann, chapter2ann] });
 
         assert.calledWithMatch(
@@ -446,7 +449,9 @@ describe('FrameSyncService', () => {
         );
       });
 
-      it('"immediately" marks annotations for other document segments as anchored', () => {
+      it('"immediately" marks annotations for other document segments as anchored', async () => {
+        await connectEPUBGuest();
+
         clock = sinon.useFakeTimers();
 
         fakeStore.setState({ annotations: [chapter1ann, chapter2ann] });
@@ -456,6 +461,35 @@ describe('FrameSyncService', () => {
 
         assert.calledWith(fakeStore.updateAnchorStatus, {
           [chapter1ann.$tag]: 'anchored',
+        });
+      });
+
+      describe('outside assignment warning', () => {
+        it('is not displayed if no focus filter is configured', async () => {
+          await connectEPUBGuest();
+          assert.isFalse(
+            guestRPC().call.calledWith('showOutsideAssignmentNotice'),
+          );
+        });
+
+        it('is not displayed if user is inside assignment', async () => {
+          fakeStore.getFocusFilters.returns({ cfi: { value: '/2-/8' } });
+          await connectEPUBGuest();
+          assert.calledWith(
+            guestRPC().call,
+            'showOutsideAssignmentNotice',
+            false,
+          );
+        });
+
+        it('is displayed if user is outside of assignment', async () => {
+          fakeStore.getFocusFilters.returns({ cfi: { value: '/6-/8' } });
+          await connectEPUBGuest();
+          assert.calledWith(
+            guestRPC().call,
+            'showOutsideAssignmentNotice',
+            true,
+          );
         });
       });
     });

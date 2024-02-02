@@ -1,4 +1,7 @@
-import { annotationMatchesSegment } from '../annotation-segment';
+import {
+  annotationMatchesSegment,
+  segmentMatchesFocusFilters,
+} from '../annotation-segment';
 
 describe('annotationMatchesSegment', () => {
   it('returns true if annotation has no segment selectors', () => {
@@ -88,6 +91,46 @@ describe('annotationMatchesSegment', () => {
     it(`returns true if CFI or URL matches current segment (${index})`, () => {
       const ann = { target: [{ selector: [selector] }] };
       assert.equal(annotationMatchesSegment(ann, segment), expected);
+    });
+  });
+});
+
+describe('segmentMatchesFocusFilters', () => {
+  [
+    // No segment CFI
+    {
+      segment: {},
+      filters: {},
+      expected: true,
+    },
+    // No filters
+    {
+      segment: { cfi: '/2' },
+      filters: {},
+      expected: true,
+    },
+
+    // Filter present, but segment CFI is unknown.
+    {
+      segment: {},
+      filters: { cfi: { value: '/2-/4' } },
+      expected: true,
+    },
+    // Filter present, matches segment
+    {
+      segment: { cfi: '/2' },
+      filters: { cfi: { value: '/2-/4' } },
+      expected: true,
+    },
+    // Filter present, does not match segment
+    {
+      segment: { cfi: '/6' },
+      filters: { cfi: { value: '/2-/4' } },
+      expected: false,
+    },
+  ].forEach(({ segment, filters, expected }) => {
+    it('returns true if segment matches filters', () => {
+      assert.equal(segmentMatchesFocusFilters(segment, filters), expected);
     });
   });
 });

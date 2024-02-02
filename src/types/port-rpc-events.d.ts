@@ -138,7 +138,13 @@ export type SidebarToGuestEvent =
   /**
    * Show a banner with information about the current content.
    */
-  | 'showContentInfo';
+  | 'showContentInfo'
+
+  /**
+   * Show a notice that the user is outside the region of the document for the
+   * current activity / assignment.
+   */
+  | 'showOutsideAssignmentNotice';
 
 /**
  * Events that the sidebar sends to the host
