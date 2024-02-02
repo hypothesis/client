@@ -1,6 +1,7 @@
-import { stripCFIAssertions } from '../../shared/cfi';
+import { cfiInRange, stripCFIAssertions } from '../../shared/cfi';
 import type { SegmentInfo } from '../../types/annotator';
 import type { Annotation, EPUBContentSelector } from '../../types/api';
+import type { Filters } from '../store/modules/filters';
 
 /**
  * Return true if an annotation matches the currently loaded segment of a document.
@@ -28,4 +29,19 @@ export function annotationMatchesSegment(
         selector.cfi &&
         stripCFIAssertions(selector.cfi) === stripCFIAssertions(segment.cfi)),
   );
+}
+
+/**
+ * Return true if the document segment displayed in a guest frame matches the
+ * configured focus filters.
+ */
+export function segmentMatchesFocusFilters(
+  segment: SegmentInfo,
+  filters: Filters,
+): boolean {
+  if (segment.cfi && filters.cfi) {
+    const [cfiStart, cfiEnd] = filters.cfi.value.split('-');
+    return cfiInRange(segment.cfi, cfiStart, cfiEnd);
+  }
+  return true;
 }
