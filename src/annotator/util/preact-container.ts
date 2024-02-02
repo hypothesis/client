@@ -1,4 +1,4 @@
-import type { JSX } from 'preact';
+import type { ComponentChild } from 'preact';
 import { render } from 'preact';
 
 import type { Destroyable } from '../../types/annotator';
@@ -19,7 +19,7 @@ import { createShadowRoot } from './shadow-root';
 export class PreactContainer implements Destroyable {
   private _element: HTMLElement;
   private _shadowRoot: ShadowRoot;
-  private _render: () => JSX.Element;
+  private _render: () => ComponentChild;
 
   /**
    * Create a new `<hypothesis-{name}>` container element.
@@ -30,7 +30,7 @@ export class PreactContainer implements Destroyable {
    * @param name - Suffix for the element
    * @param render - Callback that renders the root JSX element for this container
    */
-  constructor(name: string, render: () => JSX.Element) {
+  constructor(name: string, render: () => ComponentChild) {
     const tag = `hypothesis-${name}`;
     this._element = document.createElement(tag);
     this._shadowRoot = createShadowRoot(this._element);
