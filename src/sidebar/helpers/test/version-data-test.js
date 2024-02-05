@@ -83,9 +83,18 @@ describe('sidebar/helpers/version-data', () => {
 
       it('sets `segment` property if `segment` is present in frame details', () => {
         const versionData = new VersionData({}, [
-          { segment: { cfi: '/2', url: '/chapters/02.xhtml' } },
+          {
+            segment: {
+              cfi: '/2',
+              url: '/chapters/02.xhtml',
+              pages: { start: '4', end: '9' },
+            },
+          },
         ]);
-        assert.equal(versionData.segment, 'CFI: /2, URL: /chapters/02.xhtml');
+        assert.equal(
+          versionData.segment,
+          ['CFI: /2', 'Pages: 4-9', 'URL: /chapters/02.xhtml'].join(', '),
+        );
       });
 
       it('does not set `segment` property if `segment` is not present in frame details', () => {
