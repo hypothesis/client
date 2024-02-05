@@ -394,6 +394,7 @@ export default function MarkdownEditor({
       ) : (
         <TextArea
           aria-label={label}
+          placeholder={label}
           dir="auto"
           classes={classnames(
             'w-full min-h-[8em] resize-y',

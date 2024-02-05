@@ -106,6 +106,21 @@ describe('AnnotationEditor', () => {
       assert.calledOnce(fakeStore.createDraft);
       assert.equal(call.args[1].text, 'updated text');
     });
+
+    [
+      { annotation: fixtures.newReply(), expectedLabel: 'Enter reply' },
+      {
+        annotation: fixtures.defaultAnnotation(),
+        expectedLabel: 'Enter comment',
+      },
+    ].forEach(({ annotation, expectedLabel }) => {
+      it('sets proper label', () => {
+        const wrapper = createComponent({ annotation });
+        const editor = wrapper.find('MarkdownEditor');
+
+        assert.equal(editor.prop('label'), expectedLabel);
+      });
+    });
   });
 
   describe('editing tags', () => {
