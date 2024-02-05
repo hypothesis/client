@@ -37,6 +37,16 @@
       by searching for the book ID (9781938168239) in the Bookshelf store.
     </p>
 
+    <!-- Add a focus filter to simulate an LMS assignment with a page range
+         configured. -->
+    <script type="application/json" class="js-hypothesis-config">
+      {
+        "focus": {
+          "pages": "1-2"
+        }
+      }
+    </script>
+
     <mosaic-book book="test-pdf"></mosaic-book>
 
     {{{hypothesisScript}}}
