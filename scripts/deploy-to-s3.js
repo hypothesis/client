@@ -5,7 +5,7 @@
 const fs = require('fs');
 const { extname } = require('path');
 
-const commander = require('commander');
+const { program } = require('commander');
 const Arborist = require('@npmcli/arborist');
 const packlist = require('npm-packlist');
 const AWS = require('aws-sdk');
@@ -151,13 +151,13 @@ async function uploadPackageToS3(bucket, options) {
   });
 }
 
-commander
+program
   .option('--bucket [bucket]', 'S3 bucket name')
   .option('--tag [tag]', 'Version tag')
   .option('--no-cache-entry', 'Prevent CDN/browser caching of entry point')
   .parse(process.argv);
 
-const cliOpts = commander.opts();
+const cliOpts = program.opts();
 
 const options = {
   tag: cliOpts.tag,
