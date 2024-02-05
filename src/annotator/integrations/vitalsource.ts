@@ -1,6 +1,6 @@
 import { TinyEmitter } from 'tiny-emitter';
 
-import { documentCFI } from '../../shared/cfi';
+import { documentCFI, stripCFIAssertions } from '../../shared/cfi';
 import { ListenerCollection } from '../../shared/listener-collection';
 import type {
   Anchor,
@@ -17,6 +17,7 @@ import type {
 import type {
   ContentFrameGlobals,
   MosaicBookElement,
+  PageBreakInfo,
 } from '../../types/vitalsource';
 import { FeatureFlags } from '../features';
 import { onDocumentReady } from '../frame-observer';
@@ -529,9 +530,41 @@ export class VitalSourceContentIntegration
     };
   }
 
+  /**
+   * Get the page range for the current segment.
+   */
+  private async _getPageRange(
+    cfi: string,
+  ): Promise<{ start: string; end: string } | undefined> {
+    let pageBreaks: PageBreakInfo[] = [];
+    try {
+      const pageBreaksResponse = await this._bookElement.getPageBreaks();
+      if (pageBreaksResponse.ok && pageBreaksResponse.data) {
+        pageBreaks = pageBreaksResponse.data;
+      }
+    } catch (err) {
+      /* istanbul ignore next */
+      console.error('Failed to get page breaks', err);
+    }
+
+    const cfiWithoutAssertions = stripCFIAssertions(cfi);
+    const segmentPageBreaks = pageBreaks.filter(
+      page => page.cfiWithoutAssertions.split('!')[0] === cfiWithoutAssertions,
+    );
+
+    let pages;
+    if (segmentPageBreaks.length > 0) {
+      const start = segmentPageBreaks[0].label;
+      const end = segmentPageBreaks[segmentPageBreaks.length - 1].label;
+      pages = { start, end };
+    }
+    return pages;
+  }
+
   async segmentInfo(): Promise<SegmentInfo> {
     const { cfi, url } = await this._getPageInfo();
-    return { cfi, url };
+    const pages = await this._getPageRange(cfi);
+    return { cfi, pages, url };
   }
 
   async uri() {

@@ -52,6 +52,10 @@ export class VersionData {
       if (segmentInfo.cfi) {
         segmentFields.push(['CFI', segmentInfo.cfi]);
       }
+      if (segmentInfo.pages) {
+        const range = `${segmentInfo.pages.start}-${segmentInfo.pages.end}`;
+        segmentFields.push(['Pages', range]);
+      }
       if (segmentInfo.url) {
         segmentFields.push(['URL', segmentInfo.url]);
       }

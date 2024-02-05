@@ -128,6 +128,18 @@ describe('segmentMatchesFocusFilters', () => {
       filters: { cfi: { value: '/2-/4' } },
       expected: false,
     },
+    // Segment within page range
+    {
+      segment: { pages: { start: '1', end: '10' } },
+      filters: { page: { value: '1-2' } },
+      expected: true,
+    },
+    // Segment outside page range
+    {
+      segment: { pages: { start: '3', end: '4' } },
+      filters: { page: { value: '1-2' } },
+      expected: false,
+    },
   ].forEach(({ segment, filters, expected }) => {
     it('returns true if segment matches filters', () => {
       assert.equal(segmentMatchesFocusFilters(segment, filters), expected);

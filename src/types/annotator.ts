@@ -57,6 +57,13 @@ export type DocumentMetadata = {
 export type SegmentInfo = {
   /** Canonical Fragment Identifier for an EPUB Content Document */
   cfi?: string;
+
+  /** Range of page numbers in this segment. */
+  pages?: {
+    start: string;
+    end: string;
+  };
+
   /** Relative or absolute URL of the segment. */
   url?: string;
 };

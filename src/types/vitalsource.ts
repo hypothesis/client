@@ -87,6 +87,26 @@ export type PageInfo = {
 };
 
 /**
+ * Data about the location of a page break.
+ */
+export type PageBreakInfo = {
+  /**
+   * The CFI identifying the location of the page break.
+   *
+   * This will be something like `/6/26[;vnd.vst.idref=ch05]!/4/66` where the
+   * part before the `!` identifies the EPUB content document and the part
+   * after is optional and identifies a DOM element within the content document.
+   */
+  cfi: string;
+
+  /** Same as `cfi`, but with any CFI assertions stripped out. */
+  cfiWithoutAssertions: string;
+
+  /** The label of the page that begins at this point. */
+  label: string;
+};
+
+/**
  * An entry from a book's table of contents. This information comes from
  * an EPUB's Navigation Document [1] or Navigation Control File ("toc.ncx") [2].
  *
@@ -166,6 +186,9 @@ export type MosaicBookElement = HTMLElement & {
 
   /** Get the list of pages in the book. */
   getPages(): Promise<DataResponse<PageInfo[]>>;
+
+  /** Get the locations of page breaks in the book. */
+  getPageBreaks(): Promise<DataResponse<PageBreakInfo[]>>;
 
   /** Retrieve the book's table of contents. */
   getTOC(): Promise<DataResponse<TableOfContentsEntry[]>>;

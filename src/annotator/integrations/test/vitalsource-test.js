@@ -258,6 +258,38 @@ describe('annotator/integrations/vitalsource', () => {
       return { ok: true, data };
     }
 
+    async getPageBreaks() {
+      let data = [];
+      if (this._format === 'epub') {
+        data = [
+          // Pages before chapter
+          {
+            cfi: '/0',
+            cfiWithoutAssertions: '/0',
+            label: '5',
+          },
+          // Pages within current chapter
+          {
+            cfi: '/2',
+            cfiWithoutAssertions: '/2',
+            label: '20',
+          },
+          {
+            cfi: '/2!/2',
+            cfiWithoutAssertions: '/2!/2',
+            label: '21',
+          },
+          // Pages after current chapter
+          {
+            cfi: '/4!/2',
+            cfiWithoutAssertions: '/4!/2',
+            label: '22',
+          },
+        ];
+      }
+      return { ok: true, data };
+    }
+
     async getTOC() {
       if (this._format === 'epub') {
         const toc = [
@@ -534,6 +566,7 @@ describe('annotator/integrations/vitalsource', () => {
         const segment = await integration.segmentInfo();
         assert.deepEqual(segment, {
           cfi: '/2',
+          pages: { start: '20', end: '21' },
           url: resolveURL('/pages/chapter_02.xhtml'),
         });
       });

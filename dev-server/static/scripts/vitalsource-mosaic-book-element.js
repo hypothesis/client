@@ -26,6 +26,7 @@ export class MosaicBookElement extends HTMLElement {
      */
     this.pageIndex = 0;
     this.pageData = [];
+    this.pageBreaks = [];
 
     const styles = document.createElement('style');
     styles.innerHTML = `
@@ -85,6 +86,27 @@ export class MosaicBookElement extends HTMLElement {
           page: '30',
         },
       ];
+      this.pageBreaks = this.pageData.flatMap(page => {
+        const breaks = [
+          {
+            cfi: page.cfi,
+            cfiWithoutAssertions: page.cfi,
+            label: page.page,
+          },
+        ];
+
+        const startPage = parseInt(page.page);
+        for (let i = 1; i < 10; i++) {
+          const cfi = `${page.cfi}!/${i * 2}`;
+          breaks.push({
+            cfi,
+            cfiWithoutAssertions: cfi,
+            label: (startPage + i).toString(),
+          });
+        }
+
+        return breaks;
+      });
     } else if (book === 'test-pdf') {
       // Each of the pages of this PDF book uses the same content, because
       // we are lazy, but we give each page a distinct URL so that only
@@ -112,6 +134,11 @@ export class MosaicBookElement extends HTMLElement {
           page: '3',
         },
       ];
+      this.pageBreaks = this.pageData.map(page => ({
+        cfi: page.cfi,
+        cfiWithoutAssertions: page.cfi,
+        label: page.page,
+      }));
     } else {
       console.warn(`Unknown VitalSource book "${book}"`);
     }
@@ -195,6 +222,10 @@ export class MosaicBookElement extends HTMLElement {
 
   async getPages() {
     return { ok: true, data: [...this.pageData], status: 200 };
+  }
+
+  async getPageBreaks() {
+    return { ok: true, data: [...this.pageBreaks], status: 200 };
   }
 
   async getTOC() {

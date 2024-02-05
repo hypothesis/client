@@ -2,6 +2,7 @@ import { cfiInRange, stripCFIAssertions } from '../../shared/cfi';
 import type { SegmentInfo } from '../../types/annotator';
 import type { Annotation, EPUBContentSelector } from '../../types/api';
 import type { Filters } from '../store/modules/filters';
+import { pageRangesOverlap } from '../util/page-range';
 
 /**
  * Return true if an annotation matches the currently loaded segment of a document.
@@ -42,6 +43,13 @@ export function segmentMatchesFocusFilters(
   if (segment.cfi && filters.cfi) {
     const [cfiStart, cfiEnd] = filters.cfi.value.split('-');
     return cfiInRange(segment.cfi, cfiStart, cfiEnd);
+  }
+  if (segment.pages && filters.page) {
+    const segmentRange = `${segment.pages.start}-${segment.pages.end}`;
+    const overlap = pageRangesOverlap(segmentRange, filters.page.value);
+
+    // nb. `overlap` may be `null` if the relation is unknown.
+    return overlap === true;
   }
   return true;
 }
