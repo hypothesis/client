@@ -55,6 +55,12 @@ export class MosaicBookElement extends HTMLElement {
   connectedCallback() {
     const book = this.getAttribute('book');
 
+    const isPDF = book?.includes('pdf');
+    const stepType = isPDF ? 'page' : 'chapter';
+
+    this.prevButton.textContent = `Prev ${stepType}`;
+    this.nextButton.textContent = `Next ${stepType}`;
+
     if (book === 'little-women') {
       this.pageData = [
         {
@@ -80,13 +86,30 @@ export class MosaicBookElement extends HTMLElement {
         },
       ];
     } else if (book === 'test-pdf') {
+      // Each of the pages of this PDF book uses the same content, because
+      // we are lazy, but we give each page a distinct URL so that only
+      // annotations made on that page anchor there.
       this.pageData = [
         {
           absoluteURL: '/document/vitalsource-pdf-page',
-          chapterTitle: 'Test chapter',
+          chapterTitle: 'Test page 1',
           cfi: '/0',
           index: 0,
           page: '1',
+        },
+        {
+          absoluteURL: '/document/vitalsource-pdf-page?dummy_page=2',
+          chapterTitle: 'Test page 2',
+          cfi: '/1',
+          index: 1,
+          page: '2',
+        },
+        {
+          absoluteURL: '/document/vitalsource-pdf-page?dummy_page=3',
+          chapterTitle: 'Test page 3',
+          cfi: '/2',
+          index: 2,
+          page: '3',
         },
       ];
     } else {
