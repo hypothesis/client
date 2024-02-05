@@ -8,7 +8,11 @@ const { extname } = require('path');
 const { program } = require('commander');
 const Arborist = require('@npmcli/arborist');
 const packlist = require('npm-packlist');
-const AWS = require('aws-sdk');
+const {
+  S3Client,
+  PutObjectCommand,
+  GetBucketLocationCommand,
+} = require('@aws-sdk/client-s3');
 
 /**
  * File extension / mime type associations for file types we actually use.
@@ -52,7 +56,9 @@ function contentTypeFromFilename(path) {
 
 class S3Uploader {
   constructor(bucket) {
-    this.s3 = new AWS.S3();
+    // Set an initial region that we'll use for the call to get the bucket's
+    // location. We'll create a new client for the bucket's region later.
+    this.s3 = new S3Client({ region: 'us-west-1' });
     this.bucket = bucket;
     this.region = null;
   }
@@ -60,13 +66,15 @@ class S3Uploader {
   async upload(destPath, srcFile, { cacheControl }) {
     if (!this.region) {
       // Find out where the S3 bucket is.
-      const regionResult = await this.s3
-        .getBucketLocation({
-          Bucket: this.bucket,
-        })
-        .promise();
-      this.region = regionResult.LocationConstraint;
-      this.s3 = new AWS.S3({ region: this.region });
+      const command = new GetBucketLocationCommand({
+        Bucket: this.bucket,
+      });
+      const regionResult = await this.s3.send(command);
+
+      // LocationConstraint is omitted for us-east-1.
+      // See https://github.com/aws/aws-sdk-js-v3/pull/844
+      this.region = regionResult.LocationConstraint ?? 'us-east-1';
+      this.s3 = new S3Client({ region: this.region });
     }
 
     const fileContent = fs.readFileSync(srcFile);
@@ -78,7 +86,8 @@ class S3Uploader {
       CacheControl: cacheControl,
       ContentType: contentTypeFromFilename(srcFile),
     };
-    return this.s3.putObject(params).promise();
+    const putObjectCommand = new PutObjectCommand(params);
+    return this.s3.send(putObjectCommand);
   }
 }
 

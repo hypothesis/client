@@ -7,6 +7,7 @@
   "bugs": "https://github.com/hypothesis/client/issues",
   "repository": "hypothesis/client",
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.504.0",
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
@@ -38,7 +39,6 @@
     "@typescript-eslint/parser": "^6.0.0",
     "approx-string-match": "^2.0.0",
     "autoprefixer": "^10.0.1",
-    "aws-sdk": "^2.345.0",
     "axe-core": "^4.0.0",
     "babel-plugin-inject-args": "^1.0.0",
     "babel-plugin-istanbul": "^6.0.0",
