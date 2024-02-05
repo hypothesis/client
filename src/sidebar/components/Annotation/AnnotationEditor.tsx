@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'preact/hooks';
+import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
@@ -48,6 +48,7 @@ function AnnotationEditor({
 
   const store = useSidebarStore();
   const group = store.getGroup(annotation.group);
+  const isReplyAnno = useMemo(() => isReply(annotation), [annotation]);
 
   const shouldShowLicense =
     !draft.isPrivate && group && group.type !== 'private';
@@ -118,11 +119,11 @@ function AnnotationEditor({
         isPrivate,
       });
       // Persist this as privacy default for future annotations unless this is a reply
-      if (!isReply(annotation)) {
+      if (!isReplyAnno) {
         store.setDefault('annotationPrivacy', isPrivate ? 'private' : 'shared');
       }
     },
-    [annotation, draft, store],
+    [annotation, draft, isReplyAnno, store],
   );
 
   const onSave = async () => {
@@ -175,7 +176,7 @@ function AnnotationEditor({
     >
       <MarkdownEditor
         textStyle={textStyle}
-        label="Annotation body"
+        label={isReplyAnno ? 'Enter reply' : 'Enter comment'}
         text={text}
         onEditText={onEditText}
       />

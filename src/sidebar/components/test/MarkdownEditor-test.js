@@ -291,9 +291,10 @@ describe('MarkdownEditor', () => {
   });
 
   it('sets accessible label for input field', () => {
-    const wrapper = createComponent({ label: 'Annotation body' });
+    const wrapper = createComponent({ label: 'Enter comment' });
     const inputField = wrapper.find('textarea');
-    assert.equal(inputField.prop('aria-label'), 'Annotation body');
+    assert.equal(inputField.prop('aria-label'), 'Enter comment');
+    assert.equal(inputField.prop('placeholder'), 'Enter comment');
   });
 
   describe('keyboard navigation', () => {
