@@ -586,9 +586,12 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       this._integration.showContentInfo?.(info),
     );
 
-    this._sidebarRPC.on('showOutsideAssignmentNotice', (show: boolean) => {
-      this._showOutsideAssignmentNotice(show);
-    });
+    this._sidebarRPC.on(
+      'setOutsideAssignmentNoticeVisible',
+      (show: boolean) => {
+        this._setOutsideAssignmentNoticeVisible(show);
+      },
+    );
 
     this._sidebarRPC.on('navigateToSegment', (annotation: AnnotationData) =>
       this._integration.navigateToSegment?.(annotation),
@@ -925,13 +928,14 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   /**
    * Handle a potential shortcut trigger.
    */
-  _handleShortcut(event: KeyboardEvent) {
+  private _handleShortcut(event: KeyboardEvent) {
     if (matchShortcut(event, 'Ctrl+Shift+H')) {
       this.setHighlightsVisible(!this._highlightsVisible);
     }
   }
 
-  _showOutsideAssignmentNotice(show: boolean) {
+  /** Show or hide banner warning user they are outside page range for assignment. */
+  private _setOutsideAssignmentNoticeVisible(show: boolean) {
     if (!this._outsideAssignmentNotice) {
       this._outsideAssignmentNotice = new OutsideAssignmentNoticeController(
         this.element,

@@ -606,11 +606,11 @@ describe('Guest', () => {
       });
     });
 
-    describe('on "showOutsideAssignmentNotice" event', () => {
+    describe('on "setOutsideAssignmentNoticeVisible" event', () => {
       [true, false].forEach(arg => {
         it('shows notice if argument is `true`', () => {
           createGuest();
-          emitSidebarEvent('showOutsideAssignmentNotice', arg);
+          emitSidebarEvent('setOutsideAssignmentNoticeVisible', arg);
           assert.calledWith(fakeOutsideAssignmentNotice.setVisible, arg);
         });
       });
