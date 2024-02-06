@@ -370,7 +370,7 @@ export class FrameSyncService {
           info.segmentInfo,
           focusFilters,
         );
-        guestRPC.call('showOutsideAssignmentNotice', !match);
+        guestRPC.call('setOutsideAssignmentNoticeVisible', !match);
       }
 
       this._store.connectFrame({

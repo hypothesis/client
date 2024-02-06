@@ -468,7 +468,7 @@ describe('FrameSyncService', () => {
         it('is not displayed if no focus filter is configured', async () => {
           await connectEPUBGuest();
           assert.isFalse(
-            guestRPC().call.calledWith('showOutsideAssignmentNotice'),
+            guestRPC().call.calledWith('setOutsideAssignmentNoticeVisible'),
           );
         });
 
@@ -477,7 +477,7 @@ describe('FrameSyncService', () => {
           await connectEPUBGuest();
           assert.calledWith(
             guestRPC().call,
-            'showOutsideAssignmentNotice',
+            'setOutsideAssignmentNoticeVisible',
             false,
           );
         });
@@ -487,7 +487,7 @@ describe('FrameSyncService', () => {
           await connectEPUBGuest();
           assert.calledWith(
             guestRPC().call,
-            'showOutsideAssignmentNotice',
+            'setOutsideAssignmentNoticeVisible',
             true,
           );
         });

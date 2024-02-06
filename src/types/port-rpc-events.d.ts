@@ -144,7 +144,7 @@ export type SidebarToGuestEvent =
    * Show a notice that the user is outside the region of the document for the
    * current activity / assignment.
    */
-  | 'showOutsideAssignmentNotice';
+  | 'setOutsideAssignmentNoticeVisible';
 
 /**
  * Events that the sidebar sends to the host
