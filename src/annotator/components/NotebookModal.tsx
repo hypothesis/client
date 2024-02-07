@@ -1,6 +1,7 @@
 import { IconButton, CancelIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import type { ComponentChildren } from 'preact';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { addConfigFragment } from '../../shared/config-fragment';
 import { createAppConfig } from '../config/app';
@@ -27,7 +28,7 @@ function NotebookIframe({ config, groupId }: NotebookIframeProps) {
   const notebookAppSrc = addConfigFragment(config.notebookAppUrl, {
     ...createAppConfig(config.notebookAppUrl, config),
 
-    // Explicity set the "focused" group
+    // Explicitly set the "focused" group
     group: groupId,
   });
 
@@ -40,9 +41,76 @@ function NotebookIframe({ config, groupId }: NotebookIframeProps) {
     />
   );
 }
+
+/** Checks if the browser supports native modal dialogs */
+function isModalDialogSupported(document: Document) {
+  const dialog = document.createElement('dialog');
+  return typeof dialog.showModal === 'function';
+}
+
 export type NotebookModalProps = {
   eventBus: EventBus;
   config: NotebookConfig;
+
+  /** Test seam */
+  document_?: Document;
+};
+
+type DialogProps = { isHidden: boolean; children: ComponentChildren };
+
+const NativeDialog = ({ isHidden, children }: DialogProps) => {
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+
+  useEffect(() => {
+    if (isHidden) {
+      dialogRef.current?.close();
+    } else {
+      dialogRef.current?.showModal();
+    }
+  }, [isHidden]);
+
+  // Prevent the dialog from closing when `Esc` is pressed, to keep previous
+  // behavior
+  useEffect(() => {
+    const dialogElement = dialogRef.current;
+    const listener = (event: Event) => event.preventDefault();
+
+    dialogElement?.addEventListener('cancel', listener);
+
+    return () => {
+      dialogElement?.removeEventListener('cancel', listener);
+    };
+  }, []);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      className="relative w-full h-full backdrop:bg-black/50"
+      data-testid="notebook-outer"
+    >
+      {children}
+    </dialog>
+  );
+};
+
+/**
+ * Temporary fallback used in browsers not supporting `dialog` element.
+ * It can be removed once all browsers we support can use it.
+ */
+const FallbackDialog = ({ isHidden, children }: DialogProps) => {
+  return (
+    <div
+      className={classnames(
+        'fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50',
+        { hidden: isHidden },
+      )}
+      data-testid="notebook-outer"
+    >
+      <div className="relative w-full h-full" data-testid="notebook-inner">
+        {children}
+      </div>
+    </div>
+  );
 };
 
 /**
@@ -51,6 +119,8 @@ export type NotebookModalProps = {
 export default function NotebookModal({
   eventBus,
   config,
+  /* istanbul ignore next - test seam */
+  document_ = document,
 }: NotebookModalProps) {
   // Temporary solution: while there is no mechanism to sync new annotations in
   // the notebook, we force re-rendering of the iframe on every 'openNotebook'
@@ -61,6 +131,11 @@ export default function NotebookModal({
   const [groupId, setGroupId] = useState<string | null>(null);
   const originalDocumentOverflowStyle = useRef('');
   const emitterRef = useRef<Emitter | null>(null);
+
+  const Dialog = useMemo(
+    () => (isModalDialogSupported(document_) ? NativeDialog : FallbackDialog),
+    [document_],
+  );
 
   // Stores the original overflow CSS property of document.body and reset it
   // when the component is destroyed
@@ -106,32 +181,25 @@ export default function NotebookModal({
   }
 
   return (
-    <div
-      className={classnames(
-        'fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50',
-        { hidden: isHidden },
-      )}
-      data-testid="notebook-outer"
-    >
-      <div className="relative w-full h-full" data-testid="notebook-inner">
-        <div className="absolute right-0 m-3">
-          <IconButton
-            title="Close the Notebook"
-            onClick={onClose}
-            variant="dark"
-            classes={classnames(
-              // Remove the dark variant's background color to avoid
-              // interfering with modal overlays. Re-activate the dark variant's
-              // background color on hover.
-              // See https://github.com/hypothesis/client/issues/3676
-              '!bg-transparent enabled:hover:!bg-grey-3',
-            )}
-          >
-            <CancelIcon className="w-4 h-4" />
-          </IconButton>
-        </div>
-        <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
+    <Dialog isHidden={isHidden}>
+      <div className="absolute right-0 m-3">
+        <IconButton
+          title="Close the Notebook"
+          onClick={onClose}
+          variant="dark"
+          classes={classnames(
+            // Remove the dark variant's background color to avoid
+            // interfering with modal overlays. Re-activate the dark variant's
+            // background color on hover.
+            // See https://github.com/hypothesis/client/issues/3676
+            '!bg-transparent enabled:hover:!bg-grey-3',
+          )}
+          data-testid="close-button"
+        >
+          <CancelIcon className="w-4 h-4" />
+        </IconButton>
       </div>
-    </div>
+      <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
+    </Dialog>
   );
 }
