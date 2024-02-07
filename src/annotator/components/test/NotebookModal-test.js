@@ -14,14 +14,19 @@ describe('NotebookModal', () => {
 
   const outerSelector = '[data-testid="notebook-outer"]';
 
-  const createComponent = config => {
+  const createComponent = (config, fakeDocument) => {
+    const attachTo = document.createElement('div');
+    document.body.appendChild(attachTo);
+
     const component = mount(
       <NotebookModal
         eventBus={eventBus}
         config={{ notebookAppUrl: notebookURL, ...config }}
+        document_={fakeDocument}
       />,
+      { attachTo },
     );
-    components.push(component);
+    components.push([component, attachTo]);
     return component;
   };
 
@@ -42,9 +47,15 @@ describe('NotebookModal', () => {
   });
 
   afterEach(() => {
-    components.forEach(component => component.unmount());
+    components.forEach(([component, container]) => {
+      component.unmount();
+      container.remove();
+    });
     $imports.$restore();
   });
+
+  const getCloseButton = wrapper =>
+    wrapper.find('IconButton[data-testid="close-button"]');
 
   it('hides modal on first render', () => {
     const wrapper = createComponent();
@@ -114,23 +125,66 @@ describe('NotebookModal', () => {
     assert.equal(document.body.style.overflow, 'hidden');
   });
 
-  it('hides modal on closing', () => {
-    const wrapper = createComponent();
+  context('when native modal dialog is not supported', () => {
+    let fakeDocument;
 
-    emitter.publish('openNotebook', 'myGroup');
-    wrapper.update();
-
-    let outer = wrapper.find(outerSelector);
-    assert.isFalse(outer.hasClass('hidden'));
-
-    act(() => {
-      wrapper.find('IconButton').prop('onClick')();
+    beforeEach(() => {
+      fakeDocument = {
+        createElement: sinon.stub().returns({}),
+      };
     });
-    wrapper.update();
 
-    outer = wrapper.find(outerSelector);
+    it('does not render a dialog element', () => {
+      const wrapper = createComponent({}, fakeDocument);
 
-    assert.isTrue(outer.hasClass('hidden'));
+      emitter.publish('openNotebook', 'myGroup');
+      wrapper.update();
+
+      assert.isFalse(wrapper.exists('dialog'));
+    });
+
+    it('hides modal on closing', () => {
+      const wrapper = createComponent({}, fakeDocument);
+
+      emitter.publish('openNotebook', 'myGroup');
+      wrapper.update();
+
+      let outer = wrapper.find(outerSelector);
+      assert.isFalse(outer.hasClass('hidden'));
+
+      act(() => {
+        getCloseButton(wrapper).prop('onClick')();
+      });
+      wrapper.update();
+
+      outer = wrapper.find(outerSelector);
+
+      assert.isTrue(outer.hasClass('hidden'));
+    });
+  });
+
+  context('when native modal dialog is supported', () => {
+    it('renders a dialog element', () => {
+      const wrapper = createComponent({});
+
+      emitter.publish('openNotebook', 'myGroup');
+      wrapper.update();
+
+      assert.isTrue(wrapper.exists('dialog'));
+    });
+
+    it('opens and closes native dialog', () => {
+      const wrapper = createComponent({});
+      const isDialogOpen = () => wrapper.find('dialog').getDOMNode().open;
+
+      act(() => emitter.publish('openNotebook', 'myGroup'));
+      wrapper.update();
+      assert.isTrue(isDialogOpen());
+
+      act(() => getCloseButton(wrapper).prop('onClick')());
+      wrapper.update();
+      assert.isFalse(isDialogOpen());
+    });
   });
 
   it('resets document scrollability on closing the modal', () => {
@@ -141,7 +195,7 @@ describe('NotebookModal', () => {
     assert.equal(document.body.style.overflow, 'hidden');
     wrapper.update();
     act(() => {
-      wrapper.find('IconButton').prop('onClick')();
+      getCloseButton(wrapper).prop('onClick')();
     });
     assert.notEqual(document.body.style.overflow, 'hidden');
   });
