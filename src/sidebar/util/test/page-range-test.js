@@ -1,4 +1,8 @@
-import { pageLabelInRange, pageRangesOverlap } from '../page-range';
+import {
+  RangeOverlap,
+  pageLabelInRange,
+  pageRangeOverlap,
+} from '../page-range';
 
 describe('pageLabelInRange', () => {
   [
@@ -95,79 +99,81 @@ describe('pageLabelInRange', () => {
   });
 });
 
+const RO = RangeOverlap;
+
 describe('pageRangesOverlap', () => {
   [
     // Matching single page
     {
       rangeA: '1',
       rangeB: '1',
-      overlap: true,
+      overlap: RO.Overlap,
     },
     // Non-matching single page
     {
       rangeA: '1',
       rangeB: '2',
-      overlap: false,
+      overlap: RO.NoOverlap,
     },
     // Overlapping numeric ranges
     {
       rangeA: '1-2',
       rangeB: '2-4',
-      overlap: true,
+      overlap: RO.Overlap,
     },
     {
       rangeA: '2-4',
       rangeB: '1-2',
-      overlap: true,
+      overlap: RO.Overlap,
     },
     // Inverted numeric ranges. These are implicitly normalized.
     {
       rangeA: '2-1',
       rangeB: '4-2',
-      overlap: true,
+      overlap: RO.Overlap,
     },
     // Half-open ranges
     {
       rangeA: '1-',
       rangeB: '-3',
-      overlap: true,
+      overlap: RO.Overlap,
     },
     // Non-overlapping numeric ranges
     {
       rangeA: '1-2',
       rangeB: '3-4',
-      overlap: false,
+      overlap: RO.NoOverlap,
     },
     {
       rangeA: '3-4',
       rangeB: '1-2',
-      overlap: false,
+      overlap: RO.NoOverlap,
     },
     // Relation is undefined if either of the ranges is non-numeric.
     {
       rangeA: 'ii',
       rangeB: '3-4',
-      overlap: null,
+      overlap: RO.Unknown,
     },
     {
       rangeA: 'i-iii',
       rangeB: 'iii-iv',
-      overlap: null,
+      overlap: RO.Unknown,
     },
     {
       rangeA: '1-ii',
       rangeB: 'ii-3',
-      overlap: null,
+      overlap: RO.Unknown,
     },
     // As a special case, matching non-numeric ranges overlap.
     {
       rangeA: 'ii',
       rangeB: 'ii',
-      overlap: true,
+      overlap: RO.Overlap,
     },
   ].forEach(({ rangeA, rangeB, overlap }) => {
-    it('returns true if the two ranges overlap', () => {
-      assert.strictEqual(pageRangesOverlap(rangeA, rangeB), overlap);
+    it('returns whether two ranges overlap', () => {
+      assert.strictEqual(pageRangeOverlap(rangeA, rangeB), overlap);
     });
   });
 });
