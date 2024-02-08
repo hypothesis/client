@@ -5,15 +5,7 @@
  * Returns `null` if the page range could not be parsed.
  */
 function parseRange(range: string): [number | null, number | null] | null {
-  let start;
-  let end;
-
-  if (range.includes('-')) {
-    [start, end] = range.split('-');
-  } else {
-    start = range;
-    end = range;
-  }
+  const [start, end] = range.includes('-') ? range.split('-') : [range, range];
 
   let startInt = null;
   if (start) {
@@ -35,11 +27,14 @@ function parseRange(range: string): [number | null, number | null] | null {
     return [startInt, endInt];
   }
 
-  if (startInt <= endInt) {
-    return [startInt, endInt];
-  } else {
-    return [endInt, startInt];
-  }
+  return [Math.min(startInt, endInt), Math.max(startInt, endInt)];
+}
+
+/** Describes whether two page ranges overlap. */
+export enum RangeOverlap {
+  Overlap,
+  NoOverlap,
+  Unknown,
 }
 
 /**
@@ -55,7 +50,7 @@ function parseRange(range: string): [number | null, number | null] | null {
  *   specify an empty range.
  */
 export function pageLabelInRange(label: string, range: string): boolean {
-  return pageRangesOverlap(label, range) === true;
+  return pageRangeOverlap(label, range) === RangeOverlap.Overlap;
 }
 
 /** Convert an open range into an integer range. */
@@ -76,10 +71,7 @@ function normalizeRange(
  * Returns true if the ranges overlap, false if the ranges do not overlap, or
  * `null` if the relation could not be determined.
  */
-export function pageRangesOverlap(
-  rangeA: string,
-  rangeB: string,
-): boolean | null {
+export function pageRangeOverlap(rangeA: string, rangeB: string): RangeOverlap {
   const intRangeA = parseRange(rangeA);
   const intRangeB = parseRange(rangeB);
 
@@ -88,11 +80,11 @@ export function pageRangesOverlap(
       // As a special case for non-numeric ranges, we consider them overlapping
       // if both are equal. This means `pageRangesOverlap("iv", "iv")` is true
       // for example.
-      return true;
+      return RangeOverlap.Overlap;
     }
 
     // We could not determine whether the ranges overlap.
-    return null;
+    return RangeOverlap.Unknown;
   }
 
   const minPage = 1;
@@ -101,8 +93,8 @@ export function pageRangesOverlap(
   const [bStart, bEnd] = normalizeRange(intRangeB, minPage, maxPage);
 
   if (aStart <= bStart) {
-    return bStart <= aEnd;
+    return bStart <= aEnd ? RangeOverlap.Overlap : RangeOverlap.NoOverlap;
   } else {
-    return aStart <= bEnd;
+    return aStart <= bEnd ? RangeOverlap.Overlap : RangeOverlap.NoOverlap;
   }
 }
