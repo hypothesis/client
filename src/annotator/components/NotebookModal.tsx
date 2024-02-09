@@ -1,7 +1,13 @@
 import { IconButton, CancelIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
 import { addConfigFragment } from '../../shared/config-fragment';
 import { createAppConfig } from '../config/app';
@@ -56,9 +62,13 @@ export type NotebookModalProps = {
   document_?: Document;
 };
 
-type DialogProps = { isHidden: boolean; children: ComponentChildren };
+type DialogProps = {
+  isHidden: boolean;
+  children: ComponentChildren;
+  onClose: () => void;
+};
 
-const NativeDialog = ({ isHidden, children }: DialogProps) => {
+const NativeDialog = ({ isHidden, children, onClose }: DialogProps) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
@@ -69,18 +79,14 @@ const NativeDialog = ({ isHidden, children }: DialogProps) => {
     }
   }, [isHidden]);
 
-  // Prevent the dialog from closing when `Esc` is pressed, to keep previous
-  // behavior
   useEffect(() => {
     const dialogElement = dialogRef.current;
-    const listener = (event: Event) => event.preventDefault();
 
-    dialogElement?.addEventListener('cancel', listener);
-
+    dialogElement?.addEventListener('cancel', onClose);
     return () => {
-      dialogElement?.removeEventListener('cancel', listener);
+      dialogElement?.removeEventListener('cancel', onClose);
     };
-  }, []);
+  }, [onClose]);
 
   return (
     <dialog
@@ -171,17 +177,17 @@ export default function NotebookModal({
     };
   }, [eventBus]);
 
-  const onClose = () => {
+  const onClose = useCallback(() => {
     setIsHidden(true);
     emitterRef.current?.publish('closeNotebook');
-  };
+  }, []);
 
   if (groupId === null) {
     return null;
   }
 
   return (
-    <Dialog isHidden={isHidden}>
+    <Dialog isHidden={isHidden} onClose={onClose}>
       <div className="absolute right-0 m-3">
         <IconButton
           title="Close the Notebook"

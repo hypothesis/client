@@ -173,17 +173,26 @@ describe('NotebookModal', () => {
       assert.isTrue(wrapper.exists('dialog'));
     });
 
-    it('opens and closes native dialog', () => {
-      const wrapper = createComponent({});
-      const isDialogOpen = () => wrapper.find('dialog').getDOMNode().open;
+    [
+      // Close via clicking close button
+      wrapper => getCloseButton(wrapper).props().onClick(),
 
-      act(() => emitter.publish('openNotebook', 'myGroup'));
-      wrapper.update();
-      assert.isTrue(isDialogOpen());
+      // Close via "cancel" event, like pressing `Esc` key
+      wrapper =>
+        wrapper.find('dialog').getDOMNode().dispatchEvent(new Event('cancel')),
+    ].forEach(closeDialog => {
+      it('opens and closes native dialog', () => {
+        const wrapper = createComponent({});
+        const isDialogOpen = () => wrapper.find('dialog').getDOMNode().open;
 
-      act(() => getCloseButton(wrapper).prop('onClick')());
-      wrapper.update();
-      assert.isFalse(isDialogOpen());
+        act(() => emitter.publish('openNotebook', 'myGroup'));
+        wrapper.update();
+        assert.isTrue(isDialogOpen());
+
+        act(() => closeDialog(wrapper));
+        wrapper.update();
+        assert.isFalse(isDialogOpen());
+      });
     });
   });
 
