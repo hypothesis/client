@@ -2,14 +2,16 @@ import { CloseButton, TabList } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 
+export type TabHeaderProps = {
+  children: ComponentChildren;
+  /** Title for the close button. */
+  closeTitle: string;
+};
+
 /**
  * Render a header to go above a Card, with contents in a TabList
  */
-export default function TabHeader({
-  children,
-}: {
-  children: ComponentChildren;
-}) {
+export default function TabHeader({ children, closeTitle }: TabHeaderProps) {
   return (
     <div data-testid="tab-header" className="flex items-center">
       <CloseButton
@@ -30,7 +32,7 @@ export default function TabHeader({
           // the `Tab` components rendered inside the `TabList`. See issue #6131.
           'touch:!min-h-0',
         )}
-        title="Close"
+        title={closeTitle}
         variant="custom"
         size="sm"
       />
