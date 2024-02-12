@@ -12,7 +12,7 @@ describe('NotebookModal', () => {
   let eventBus;
   let emitter;
 
-  const outerSelector = '[data-testid="notebook-outer"]';
+  const outerSelector = 'dialog[data-testid="notebook-outer"]';
 
   const createComponent = config => {
     const attachTo = document.createElement('div');

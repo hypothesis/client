@@ -6,13 +6,13 @@ describe('ModalDialog', () => {
   let components;
 
   const createComponent = props => {
-    const attachTo = document.createElement('div');
-    document.body.appendChild(attachTo);
+    const container = document.createElement('div');
+    document.body.appendChild(container);
 
     const component = mount(<ModalDialog open {...props} />, {
-      attachTo,
+      attachTo: container,
     });
-    components.push([component, attachTo]);
+    components.push([component, container]);
     return component;
   };
 

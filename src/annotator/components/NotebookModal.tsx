@@ -108,7 +108,11 @@ export default function NotebookModal({
   }
 
   return (
-    <ModalDialog closed={isHidden} onClose={onClose}>
+    <ModalDialog
+      closed={isHidden}
+      onClose={onClose}
+      data-testid="notebook-outer"
+    >
       <div className="absolute right-0 m-3">
         <IconButton
           title="Close the Notebook"
