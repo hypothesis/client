@@ -92,13 +92,13 @@ describe('AnnotationActionBar', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      '@hypothesis/frontend-shared': { confirm: fakeConfirm },
       '../../helpers/annotation-sharing': {
         sharingEnabled: fakeSharingEnabled,
         annotationSharingLink: fakeAnnotationSharingLink,
       },
       '../../helpers/permissions': { permits: fakePermits },
       '../../store': { useSidebarStore: () => fakeStore },
-      '../../../shared/prompts': { confirm: fakeConfirm },
     });
   });
 

@@ -1,7 +1,11 @@
-import { CopyIcon, ExternalIcon, LeaveIcon } from '@hypothesis/frontend-shared';
+import {
+  confirm,
+  CopyIcon,
+  ExternalIcon,
+  LeaveIcon,
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import { confirm } from '../../../shared/prompts';
 import type { Group } from '../../../types/api';
 import { orgName } from '../../helpers/group-list-item-common';
 import { withServices } from '../../service-context';

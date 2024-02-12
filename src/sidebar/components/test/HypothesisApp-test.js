@@ -81,13 +81,13 @@ describe('HypothesisApp', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      '@hypothesis/frontend-shared': { confirm: fakeConfirm },
       '../config/service-config': { serviceConfig: fakeServiceConfig },
       '../store': { useSidebarStore: () => fakeStore },
       '../helpers/session': {
         shouldAutoDisplayTutorial: fakeShouldAutoDisplayTutorial,
       },
       '../helpers/theme': { applyTheme: fakeApplyTheme },
-      '../../shared/prompts': { confirm: fakeConfirm },
       '../helpers/is-third-party-service': {
         isThirdPartyService: fakeIsThirdPartyService,
       },

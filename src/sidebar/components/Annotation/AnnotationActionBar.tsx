@@ -1,4 +1,5 @@
 import {
+  confirm,
   IconButton,
   EditIcon,
   FlagIcon,
@@ -7,7 +8,6 @@ import {
   TrashIcon,
 } from '@hypothesis/frontend-shared';
 
-import { confirm } from '../../../shared/prompts';
 import type { SavedAnnotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
 import { serviceConfig } from '../../config/service-config';
