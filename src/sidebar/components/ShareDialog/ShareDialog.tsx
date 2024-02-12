@@ -39,7 +39,7 @@ export default function ShareDialog({ shareTab }: ShareDialogProps) {
       panelName="shareGroupAnnotations"
       variant="custom"
     >
-      <TabHeader>
+      <TabHeader closeTitle="Close share panel">
         {shareTab && (
           <Tab
             id="share-panel-tab"

@@ -114,7 +114,7 @@ function HelpPanel({ session }: HelpPanelProps) {
       onActiveChanged={onActiveChanged}
       variant="custom"
     >
-      <TabHeader>
+      <TabHeader closeTitle="Close help panel">
         <Tab
           id={tutorialTabId}
           aria-controls={tutorialPanelId}
