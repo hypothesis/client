@@ -6,9 +6,15 @@ type DialogProps = {
   closed: boolean;
   children: ComponentChildren;
   onClose: () => void;
+  'data-testid'?: string;
 };
 
-const NativeDialog = ({ closed, children, onClose }: DialogProps) => {
+function NativeDialog({
+  closed,
+  onClose,
+  children,
+  'data-testid': testId,
+}: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
@@ -32,32 +38,30 @@ const NativeDialog = ({ closed, children, onClose }: DialogProps) => {
     <dialog
       ref={dialogRef}
       className="relative w-full h-full backdrop:bg-black/50"
-      data-testid="notebook-outer"
+      data-testid={testId}
     >
       {children}
     </dialog>
   );
-};
+}
 
 /**
  * Temporary fallback used in browsers not supporting `dialog` element.
  * It can be removed once all browsers we support can use it.
  */
-const FallbackDialog = ({ closed, children }: DialogProps) => {
+function FallbackDialog({ closed, children, ...rest }: DialogProps) {
   return (
     <div
+      {...rest}
       className={classnames(
         'fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50',
         { hidden: closed },
       )}
-      data-testid="notebook-outer"
     >
-      <div className="relative w-full h-full" data-testid="notebook-inner">
-        {children}
-      </div>
+      <div className="relative w-full h-full">{children}</div>
     </div>
   );
-};
+}
 
 /** Checks if the browser supports native modal dialogs */
 function isModalDialogSupported(document: Document) {
