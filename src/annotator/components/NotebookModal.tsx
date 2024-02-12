@@ -1,17 +1,11 @@
 import { IconButton, CancelIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import type { ComponentChildren } from 'preact';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import { addConfigFragment } from '../../shared/config-fragment';
 import { createAppConfig } from '../config/app';
 import type { EventBus, Emitter } from '../util/emitter';
+import ModalDialog from './ModalDialog';
 
 /**
  * Configuration used to launch the notebook application.
@@ -48,75 +42,9 @@ function NotebookIframe({ config, groupId }: NotebookIframeProps) {
   );
 }
 
-/** Checks if the browser supports native modal dialogs */
-function isModalDialogSupported(document: Document) {
-  const dialog = document.createElement('dialog');
-  return typeof dialog.showModal === 'function';
-}
-
 export type NotebookModalProps = {
   eventBus: EventBus;
   config: NotebookConfig;
-
-  /** Test seam */
-  document_?: Document;
-};
-
-type DialogProps = {
-  isHidden: boolean;
-  children: ComponentChildren;
-  onClose: () => void;
-};
-
-const NativeDialog = ({ isHidden, children, onClose }: DialogProps) => {
-  const dialogRef = useRef<HTMLDialogElement | null>(null);
-
-  useEffect(() => {
-    if (isHidden) {
-      dialogRef.current?.close();
-    } else {
-      dialogRef.current?.showModal();
-    }
-  }, [isHidden]);
-
-  useEffect(() => {
-    const dialogElement = dialogRef.current;
-
-    dialogElement?.addEventListener('cancel', onClose);
-    return () => {
-      dialogElement?.removeEventListener('cancel', onClose);
-    };
-  }, [onClose]);
-
-  return (
-    <dialog
-      ref={dialogRef}
-      className="relative w-full h-full backdrop:bg-black/50"
-      data-testid="notebook-outer"
-    >
-      {children}
-    </dialog>
-  );
-};
-
-/**
- * Temporary fallback used in browsers not supporting `dialog` element.
- * It can be removed once all browsers we support can use it.
- */
-const FallbackDialog = ({ isHidden, children }: DialogProps) => {
-  return (
-    <div
-      className={classnames(
-        'fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50',
-        { hidden: isHidden },
-      )}
-      data-testid="notebook-outer"
-    >
-      <div className="relative w-full h-full" data-testid="notebook-inner">
-        {children}
-      </div>
-    </div>
-  );
 };
 
 /**
@@ -125,8 +53,6 @@ const FallbackDialog = ({ isHidden, children }: DialogProps) => {
 export default function NotebookModal({
   eventBus,
   config,
-  /* istanbul ignore next - test seam */
-  document_ = document,
 }: NotebookModalProps) {
   // Temporary solution: while there is no mechanism to sync new annotations in
   // the notebook, we force re-rendering of the iframe on every 'openNotebook'
@@ -137,11 +63,6 @@ export default function NotebookModal({
   const [groupId, setGroupId] = useState<string | null>(null);
   const originalDocumentOverflowStyle = useRef('');
   const emitterRef = useRef<Emitter | null>(null);
-
-  const Dialog = useMemo(
-    () => (isModalDialogSupported(document_) ? NativeDialog : FallbackDialog),
-    [document_],
-  );
 
   // Stores the original overflow CSS property of document.body and reset it
   // when the component is destroyed
@@ -187,7 +108,7 @@ export default function NotebookModal({
   }
 
   return (
-    <Dialog isHidden={isHidden} onClose={onClose}>
+    <ModalDialog closed={isHidden} onClose={onClose}>
       <div className="absolute right-0 m-3">
         <IconButton
           title="Close the Notebook"
@@ -206,6 +127,6 @@ export default function NotebookModal({
         </IconButton>
       </div>
       <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
-    </Dialog>
+    </ModalDialog>
   );
 }

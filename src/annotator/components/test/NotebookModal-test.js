@@ -14,7 +14,7 @@ describe('NotebookModal', () => {
 
   const outerSelector = '[data-testid="notebook-outer"]';
 
-  const createComponent = (config, fakeDocument) => {
+  const createComponent = config => {
     const attachTo = document.createElement('div');
     document.body.appendChild(attachTo);
 
@@ -22,7 +22,6 @@ describe('NotebookModal', () => {
       <NotebookModal
         eventBus={eventBus}
         config={{ notebookAppUrl: notebookURL, ...config }}
-        document_={fakeDocument}
       />,
       { attachTo },
     );
@@ -125,74 +124,25 @@ describe('NotebookModal', () => {
     assert.equal(document.body.style.overflow, 'hidden');
   });
 
-  context('when native modal dialog is not supported', () => {
-    let fakeDocument;
+  [
+    // Close via clicking close button
+    wrapper => getCloseButton(wrapper).props().onClick(),
 
-    beforeEach(() => {
-      fakeDocument = {
-        createElement: sinon.stub().returns({}),
-      };
-    });
-
-    it('does not render a dialog element', () => {
-      const wrapper = createComponent({}, fakeDocument);
-
-      emitter.publish('openNotebook', 'myGroup');
-      wrapper.update();
-
-      assert.isFalse(wrapper.exists('dialog'));
-    });
-
-    it('hides modal on closing', () => {
-      const wrapper = createComponent({}, fakeDocument);
-
-      emitter.publish('openNotebook', 'myGroup');
-      wrapper.update();
-
-      let outer = wrapper.find(outerSelector);
-      assert.isFalse(outer.hasClass('hidden'));
-
-      act(() => {
-        getCloseButton(wrapper).prop('onClick')();
-      });
-      wrapper.update();
-
-      outer = wrapper.find(outerSelector);
-
-      assert.isTrue(outer.hasClass('hidden'));
-    });
-  });
-
-  context('when native modal dialog is supported', () => {
-    it('renders a dialog element', () => {
+    // Close via "cancel" event, like pressing `Esc` key
+    wrapper =>
+      wrapper.find('dialog').getDOMNode().dispatchEvent(new Event('cancel')),
+  ].forEach(closeDialog => {
+    it('opens and closes native dialog', () => {
       const wrapper = createComponent({});
+      const isDialogOpen = () => wrapper.find('dialog').getDOMNode().open;
 
-      emitter.publish('openNotebook', 'myGroup');
+      act(() => emitter.publish('openNotebook', 'myGroup'));
       wrapper.update();
+      assert.isTrue(isDialogOpen());
 
-      assert.isTrue(wrapper.exists('dialog'));
-    });
-
-    [
-      // Close via clicking close button
-      wrapper => getCloseButton(wrapper).props().onClick(),
-
-      // Close via "cancel" event, like pressing `Esc` key
-      wrapper =>
-        wrapper.find('dialog').getDOMNode().dispatchEvent(new Event('cancel')),
-    ].forEach(closeDialog => {
-      it('opens and closes native dialog', () => {
-        const wrapper = createComponent({});
-        const isDialogOpen = () => wrapper.find('dialog').getDOMNode().open;
-
-        act(() => emitter.publish('openNotebook', 'myGroup'));
-        wrapper.update();
-        assert.isTrue(isDialogOpen());
-
-        act(() => closeDialog(wrapper));
-        wrapper.update();
-        assert.isFalse(isDialogOpen());
-      });
+      act(() => closeDialog(wrapper));
+      wrapper.update();
+      assert.isFalse(isDialogOpen());
     });
   });
 
