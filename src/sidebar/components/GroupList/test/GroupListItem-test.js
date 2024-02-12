@@ -62,13 +62,13 @@ describe('GroupListItem', () => {
     fakeConfirm = sinon.stub().resolves(false);
 
     $imports.$mock({
+      '@hypothesis/frontend-shared': { confirm: fakeConfirm },
       '../MenuItem': FakeMenuItem,
       '../../util/copy-to-clipboard': {
         copyPlainText: fakeCopyPlainText,
       },
       '../../helpers/group-list-item-common': fakeGroupListItemCommon,
       '../../store': { useSidebarStore: () => fakeStore },
-      '../../../shared/prompts': { confirm: fakeConfirm },
     });
   });
 

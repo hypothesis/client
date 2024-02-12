@@ -1,7 +1,7 @@
+import { confirm } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useEffect, useMemo } from 'preact/hooks';
 
-import { confirm } from '../../shared/prompts';
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import { isThirdPartyService } from '../helpers/is-third-party-service';
