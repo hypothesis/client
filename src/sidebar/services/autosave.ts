@@ -1,3 +1,4 @@
+import { quote } from '../helpers/annotation-metadata';
 import type { SidebarStore } from '../store';
 import { retryPromiseOperation } from '../util/retry';
 import type { AnnotationsService } from './annotations';
@@ -65,7 +66,7 @@ export class AutosaveService {
 
         retryPromiseOperation(() => this._annotationsService.save(highlight))
           .then(() => {
-            this._toastMessenger.success('Highlight saved', {
+            this._toastMessenger.success(`Highlighted "${quote(highlight)}"`, {
               visuallyHidden: true,
             });
           })

@@ -31,8 +31,19 @@ describe('AutosaveService', () => {
    * Make `fakeStore.newHighlights` return a single highlight fixture.
    */
   const oneNewHighlight = () => {
-    const newHighlight = annotationFixtures.newHighlight();
-    newHighlight.$tag = 'deadbeef';
+    const newHighlight = Object.assign(annotationFixtures.newHighlight(), {
+      $tag: 'deadbeef',
+      target: [
+        {
+          selector: [
+            {
+              type: 'TextQuoteSelector',
+              exact: 'Quote',
+            },
+          ],
+        },
+      ],
+    });
     fakeStore.newHighlights.returns([newHighlight]);
     return newHighlight;
   };
@@ -73,7 +84,7 @@ describe('AutosaveService', () => {
     await waitFor(() => !svc.isSaving());
 
     assert.calledOnce(fakeToastMessenger.success);
-    assert.calledWith(fakeToastMessenger.success, 'Highlight saved', {
+    assert.calledWith(fakeToastMessenger.success, 'Highlighted "Quote"', {
       visuallyHidden: true,
     });
   });
