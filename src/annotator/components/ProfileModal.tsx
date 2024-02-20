@@ -42,6 +42,7 @@ export default function ProfileModal({ eventBus, config }: ProfileModalProps) {
       closed={isHidden}
       onClose={onClose}
       data-testid="profile-outer"
+      aria-label="Hypothesis profile"
     >
       <div className="absolute right-0 m-3">
         <IconButton

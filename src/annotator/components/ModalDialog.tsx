@@ -7,6 +7,7 @@ type DialogProps = {
   children: ComponentChildren;
   onClose: () => void;
   'data-testid'?: string;
+  'aria-label'?: string;
 };
 
 function NativeDialog({
@@ -14,6 +15,7 @@ function NativeDialog({
   onClose,
   children,
   'data-testid': testId,
+  'aria-label': label,
 }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
@@ -39,6 +41,7 @@ function NativeDialog({
       ref={dialogRef}
       className="relative w-full h-full backdrop:bg-black/50"
       data-testid={testId}
+      aria-label={label}
     >
       {children}
     </dialog>
