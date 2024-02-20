@@ -112,10 +112,11 @@ export default function NotebookModal({
       closed={isHidden}
       onClose={onClose}
       data-testid="notebook-outer"
+      aria-label="Hypothesis notebook"
     >
       <div className="absolute right-0 m-3">
         <IconButton
-          title="Close the Notebook"
+          title="Close notebook"
           onClick={onClose}
           variant="dark"
           classes={classnames(
