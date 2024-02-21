@@ -9133,7 +9133,7 @@ __metadata:
     npm-packlist: ^8.0.0
     postcss: ^8.0.3
     preact: ^10.4.0
-    preact-render-to-string: ^6.3.1
+    preact-render-to-string: ^6.4.0
     prettier: 3.2.5
     redux: ^5.0.0
     redux-thunk: ^3.1.0
@@ -12380,14 +12380,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"preact-render-to-string@npm:^6.3.1":
-  version: 6.3.1
-  resolution: "preact-render-to-string@npm:6.3.1"
+"preact-render-to-string@npm:^6.4.0":
+  version: 6.4.0
+  resolution: "preact-render-to-string@npm:6.4.0"
   dependencies:
     pretty-format: ^3.8.0
   peerDependencies:
     preact: ">=10"
-  checksum: bb640f3e9045585ac23d64878f02134aa78e83589edce697e350c782e375d64c900210861caf3018a95b696ef4e77a777ae6174f4624c562a6067214a3dfd91e
+  checksum: 487b14254660e37a1d2dafa49b240ae4ad5c936d099617cee043036f074eabbe7d6dd55330c22a4e13a116b1aeed8325a2d97ca76178f6d8f7d8d5a34011c72f
   languageName: node
   linkType: hard
 
