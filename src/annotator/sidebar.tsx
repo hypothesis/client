@@ -89,9 +89,12 @@ export function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
 
   // In viahtml, pywb uses wombat.js, which monkey-patches some JS methods.
   // One of those causes the `allow` attribute to be overwritten, so we want to
-  // make it non-writable to preserve the permissions we set above.
+  // define a noop setter to preserve the permissions we set above.
+  // We can remove this workaround once pywb has been updated to use the latest
+  // version of wombat.js, which includes a fix for this.
+  // See https://github.com/webrecorder/wombat/pull/134
   return Object.defineProperty(sidebarFrame, 'allow', {
-    writable: false,
+    set: () => {},
   });
 }
 
