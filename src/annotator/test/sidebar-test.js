@@ -1142,10 +1142,11 @@ describe('Sidebar', () => {
   describe('createSidebarIframe', () => {
     it('does not let `allow` attribute to be overwritten', () => {
       const iframe = createSidebarIframe({ sidebarAppUrl: 'https://foo.com' });
+      const initialAllow = iframe.allow;
 
-      assert.throws(() => {
-        iframe.allow = 'something else';
-      }, "Cannot assign to read only property 'allow' of object '#<HTMLIFrameElement>'");
+      iframe.allow = 'something else';
+
+      assert.equal(iframe.allow, initialAllow);
     });
   });
 });
