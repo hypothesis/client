@@ -405,5 +405,24 @@ describe('HTMLMetadata', () => {
 
       assert.equal(doc.uri(), canonicalLink.href);
     });
+
+    it('should log an error if URI is not decodable', () => {
+      // '%%CUST_ID%%' is an invalid escape sequence, so it will throw a URIError when decoded
+      const badURI = 'https://example.com/?foo=%%CUST_ID%%';
+      const doc = createDoc(badURI);
+      const consoleErrorSpy = sinon.stub(console, 'error');
+
+      try {
+        assert.equal(badURI, doc.uri());
+        assert.calledOnce(consoleErrorSpy);
+        assert.calledWith(
+          consoleErrorSpy,
+          'Error decoding URI:',
+          sinon.match.instanceOf(URIError),
+        );
+      } finally {
+        console.error.restore();
+      }
+    });
   });
 });
