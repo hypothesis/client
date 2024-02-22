@@ -47,16 +47,23 @@ export class HTMLMetadata {
    * Returns the primary URI for the document being annotated
    */
   uri(): string {
-    let uri = decodeURIComponent(this._getDocumentHref());
+    let uri = this._getDocumentHref(); // Get the URI without decoding it first
 
-    // Use the `link[rel=canonical]` element's href as the URL if present.
+    // Attempt to decode the URI, handle exceptions if the URI is malformed
+    try {
+      uri = decodeURIComponent(uri);
+    } catch (error) {
+      // Log error for debugging. After this point we fall back to the original URI
+      console.error('Error decoding URI:', error);
+    }
+
+    // Use the `link[rel=canonical]` element's href as the URI if present.
     const links = this._getLinks();
     for (const link of links) {
       if (link.rel === 'canonical') {
-        uri = link.href;
+        uri = link.href; // Assuming canonical hrefs are correctly encoded
       }
     }
-
     return uri;
   }
 
