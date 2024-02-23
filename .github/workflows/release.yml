@@ -21,6 +21,8 @@ jobs:
   continuous-integration:
     uses: ./.github/workflows/continuous-integration.yml
     name: continuous integration
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   release-staging:
     needs: continuous-integration
