@@ -156,7 +156,7 @@ gulp.task(
       bootstrapFile: 'src/sidebar/test/bootstrap.js',
       karmaConfig: 'src/karma.config.js',
       rollupConfig: 'rollup-tests.config.mjs',
-      testsPattern: 'src/**/*-test.js',
+      testsPattern: 'src/**/*-test.{js,ts,tsx}',
     })
   )
 );

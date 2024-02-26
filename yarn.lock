@@ -2718,14 +2718,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hypothesis/frontend-testing@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@hypothesis/frontend-testing@npm:1.2.0"
+"@hypothesis/frontend-testing@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@hypothesis/frontend-testing@npm:1.2.1"
   dependencies:
     axe-core: ^4.8.2
     enzyme: ^3.11.0
     preact: ^10.18.1
-  checksum: 0bd15494c81df6da2b0e3a738ee5abfafdbcdd6f0a3c17a3ac7b87b457c03d0c4a82e0fa3c37392f5f14209ec6f716cc1e24c734b16c1c917152fbdb01b850d2
+  checksum: de9317f3c8e2ece11dd5b613b4cf293f3b7de37467394bd1a53981e93a40d00ac2a568a9bc86fcb6502d6c2b2762961c9bcb85ee5b8cafc1fc925e3f70181af2
   languageName: node
   linkType: hard
 
@@ -4457,6 +4457,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/chai@npm:^4.3.12":
+  version: 4.3.12
+  resolution: "@types/chai@npm:4.3.12"
+  checksum: 64e9354181046bfc78f527bba006f2e58b49efb702a501bdd1faec51e21e4d2248e7fb49843fd3f2189e3bf3680480b94e8a1ab6d097e67183bdeacd6d024ed6
+  languageName: node
+  linkType: hard
+
 "@types/cookie@npm:^0.4.1":
   version: 0.4.1
   resolution: "@types/cookie@npm:0.4.1"
@@ -4536,6 +4543,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mocha@npm:^10.0.6":
+  version: 10.0.6
+  resolution: "@types/mocha@npm:10.0.6"
+  checksum: f7c836cf6cf27dc0f5970d262591b56f2a3caeaec8cfdc612c12e1cfbb207f601f710ece207e935164d4e3343b93be5054d0db5544f31f453b3923775d82099f
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 14.14.43
   resolution: "@types/node@npm:14.14.43"
@@ -4589,6 +4603,22 @@ __metadata:
   version: 2.0.6
   resolution: "@types/showdown@npm:2.0.6"
   checksum: c4c341e4a93061cabed6168f2c2eb7b83c08bc57284f5c14bc2e5d18c6b42b533cc2efc4fa3e4cd96e009520ae2fa8c40997be31e4409239aabf8a2cf37c1ada
+  languageName: node
+  linkType: hard
+
+"@types/sinon@npm:^17.0.3":
+  version: 17.0.3
+  resolution: "@types/sinon@npm:17.0.3"
+  dependencies:
+    "@types/sinonjs__fake-timers": "*"
+  checksum: c8e9956d9c90fe1ec1cc43085ae48897f93f9ea86e909ab47f255ea71f5229651faa070393950fb6923aef426c84e92b375503f9f8886ef44668b82a8ee49e9a
+  languageName: node
+  linkType: hard
+
+"@types/sinonjs__fake-timers@npm:*":
+  version: 8.1.5
+  resolution: "@types/sinonjs__fake-timers@npm:8.1.5"
+  checksum: 7e3c08f6c13df44f3ea7d9a5155ddf77e3f7314c156fa1c5a829a4f3763bafe2f75b1283b887f06e6b4296996a2f299b70f64ff82625f9af5885436e2524d10c
   languageName: node
   linkType: hard
 
@@ -9176,7 +9206,7 @@ __metadata:
     "@babel/preset-typescript": ^7.16.7
     "@hypothesis/frontend-build": ^3.0.0
     "@hypothesis/frontend-shared": ^7.2.0
-    "@hypothesis/frontend-testing": ^1.2.0
+    "@hypothesis/frontend-testing": ^1.2.1
     "@npmcli/arborist": ^7.0.0
     "@octokit/rest": ^20.0.1
     "@rollup/plugin-babel": ^6.0.0
@@ -9189,14 +9219,17 @@ __metadata:
     "@sentry/browser": ^7.1.1
     "@sentry/cli": ^2.0.2
     "@trivago/prettier-plugin-sort-imports": ^4.1.1
+    "@types/chai": ^4.3.12
     "@types/dompurify": ^3.0.0
     "@types/escape-html": ^1.0.1
     "@types/hammerjs": ^2.0.41
     "@types/katex": ^0.16.0
+    "@types/mocha": ^10.0.6
     "@types/retry": ^0.12.1
     "@types/scroll-into-view": ^1.16.0
     "@types/shallowequal": ^1.1.1
     "@types/showdown": ^2.0.0
+    "@types/sinon": ^17.0.3
     "@typescript-eslint/eslint-plugin": ^7.0.1
     "@typescript-eslint/parser": ^7.0.1
     approx-string-match: ^2.0.0

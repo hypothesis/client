@@ -1,16 +1,20 @@
+import type { SinonSandbox, SinonStub } from 'sinon';
+import { createSandbox } from 'sinon';
+
+import type { PortRPC } from '../../shared/messaging';
 import { annotationCounts } from '../annotation-counts';
 
+type PortRPCMock = PortRPC<any, any> & { on: SinonStub };
+
 describe('annotationCounts', () => {
-  let countEl1;
-  let countEl2;
-  let CrossFrame;
-  let fakeCrossFrame;
-  let sandbox;
+  let countEl1: HTMLElement;
+  let countEl2: HTMLElement;
+  let CrossFrame: SinonStub;
+  let fakeCrossFrame: PortRPCMock;
+  let sandbox: SinonSandbox;
 
   beforeEach(() => {
-    CrossFrame = null;
-    fakeCrossFrame = {};
-    sandbox = sinon.createSandbox();
+    sandbox = createSandbox();
 
     countEl1 = document.createElement('button');
     countEl1.setAttribute('data-hypothesis-annotation-count', '');
@@ -20,7 +24,9 @@ describe('annotationCounts', () => {
     countEl2.setAttribute('data-hypothesis-annotation-count', '');
     document.body.appendChild(countEl2);
 
-    fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame);
+    fakeCrossFrame = {
+      on: sandbox.stub().returns(fakeCrossFrame),
+    } as PortRPCMock;
 
     CrossFrame = sandbox.stub();
     CrossFrame.returns(fakeCrossFrame);
@@ -33,22 +39,20 @@ describe('annotationCounts', () => {
   });
 
   describe('listen for "publicAnnotationCountChanged" event', () => {
-    const emitEvent = function () {
-      let crossFrameArgs;
+    const emitEvent = function (...arg: any[]) {
       let evt;
-      let fn;
+      let fn: (...args: any[]) => void;
 
-      const event = arguments[0];
-      const args =
-        2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
+      const event = arg[0];
+      const args = 2 <= arg.length ? Array.prototype.slice.call(arg, 1) : [];
 
-      crossFrameArgs = fakeCrossFrame.on.args;
+      const crossFrameArgs = fakeCrossFrame.on.args ?? [];
       for (let i = 0, len = crossFrameArgs.length; i < len; i++) {
         evt = crossFrameArgs[i][0];
         fn = crossFrameArgs[i][1];
 
         if (event === evt) {
-          fn.apply(null, args);
+          fn(...args);
         }
       }
     };
@@ -59,8 +63,8 @@ describe('annotationCounts', () => {
 
       emitEvent('publicAnnotationCountChanged', newCount);
 
-      assert.equal(countEl1.textContent, newCount);
-      assert.equal(countEl2.textContent, newCount);
+      assert.equal(countEl1.textContent, `${newCount}`);
+      assert.equal(countEl2.textContent, `${newCount}`);
     });
   });
 });

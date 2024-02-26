@@ -7,7 +7,7 @@ import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
 import { useRootThread } from './hooks/use-root-thread';
 
-type AnnotationViewProps = {
+export type AnnotationViewProps = {
   onLogin: () => void;
 
   // Injected
