@@ -14,7 +14,7 @@
     "@babel/preset-typescript": "^7.16.7",
     "@hypothesis/frontend-build": "^3.0.0",
     "@hypothesis/frontend-shared": "^7.2.0",
-    "@hypothesis/frontend-testing": "^1.2.1",
+    "@hypothesis/frontend-testing": "^1.2.2",
     "@npmcli/arborist": "^7.0.0",
     "@octokit/rest": "^20.0.1",
     "@rollup/plugin-babel": "^6.0.0",

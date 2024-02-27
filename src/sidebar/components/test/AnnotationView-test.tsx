@@ -9,10 +9,10 @@ import type { SidebarStore } from '../../store';
 import * as AnnotationViewExports from '../AnnotationView';
 import type { AnnotationViewProps } from '../AnnotationView';
 
-const AnnotationView = AnnotationViewExports.default;
-const $imports = getImports(AnnotationViewExports);
-
 describe('AnnotationView', () => {
+  const AnnotationView = AnnotationViewExports.default;
+  const $imports = getImports(AnnotationViewExports);
+
   let highlightAnnotations: SinonStub;
   let setExpanded: SinonStub;
   let profile: SinonStub;
