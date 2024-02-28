@@ -10,7 +10,7 @@
  * e.g. await rejects(someAsyncFunction(), /expected error/g);
  *
  * @param {Promise} promiseResult - The returned promise a function to test
- * @param {RegEx|String} errorMessage - A string or regex that matches the error
+ * @param {RegExp|string} errorMessage - A string or regex that matches the error
  * which is expected to be thrown.
  */
 
