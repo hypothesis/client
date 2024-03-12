@@ -97,6 +97,23 @@ describe('sidebar/util/cfi', () => {
         b: '',
         expected: 0,
       },
+      // CFIs with step indirections. Only the part before the step indirection
+      // is considered.
+      {
+        a: '/2!/4',
+        b: '/2!/8',
+        expected: 0,
+      },
+      {
+        a: '/2!/4',
+        b: '/4!/8',
+        expected: -1,
+      },
+      {
+        a: '/4!/8',
+        b: '/2!/4',
+        expected: 1,
+      },
     ].forEach(({ a, b, expected }) => {
       it('compares CFIs', () => {
         assert.equal(
@@ -161,6 +178,14 @@ describe('sidebar/util/cfi', () => {
         start: '/2',
         end: '/4',
         expected: false,
+      },
+      // CFIs with step indirections. Only the part before the first step
+      // indirection is considered.
+      {
+        cfi: '/6',
+        start: '/6!/2',
+        end: '/8!/4',
+        expected: true,
       },
     ].forEach(({ cfi, start, end, expected }) => {
       it('should return true if the cfi is in the range [start, end)', () => {
