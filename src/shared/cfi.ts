@@ -35,6 +35,22 @@ function compareArrays(
 }
 
 /**
+ * Split a hyphen-separated CFI range.
+ *
+ * CFI assertions are stripped in the process. If `range` does not contain a
+ * hyphen, the result will be an empty range with the end point being the same
+ * as the start point.
+ *
+ * @example
+ *   splitCFIRange("/2/4[chap-02]-/2/6[chap-03]") // returns `["/2/4", "/2/6"]`.
+ */
+export function splitCFIRange(range: string): [string, string] {
+  const rangeWithoutAssertions = stripCFIAssertions(range);
+  const [start, end] = rangeWithoutAssertions.split('-', 2);
+  return [start, end ?? start];
+}
+
+/**
  * Strip assertions from a Canonical Fragment Identifier.
  *
  * Assertions are `[...]` enclosed sections which act as checks on the validity

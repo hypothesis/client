@@ -2,6 +2,7 @@ import {
   cfiInRange,
   compareCFIs,
   documentCFI,
+  splitCFIRange,
   stripCFIAssertions,
 } from '../cfi';
 
@@ -22,6 +23,25 @@ describe('sidebar/util/cfi', () => {
     it('ignores escaped characters', () => {
       assert.equal(stripCFIAssertions('/1/2[chap4^[ignoreme^]ref]'), '/1/2');
       assert.equal(stripCFIAssertions('/1/2[a^[b^]]/3[c^[d^]]'), '/1/2/3');
+    });
+  });
+
+  describe('splitCFIRange', () => {
+    [
+      {
+        range: '/2/4-/4/6',
+        expected: ['/2/4', '/4/6'],
+      },
+      {
+        range: '/2/4[chap-02]-/2/6[chap-03]',
+        expected: ['/2/4', '/2/6'],
+      },
+      {
+        range: '/2/4',
+        expected: ['/2/4', '/2/4'],
+      },
+    ].forEach(({ range, expected }) => {
+      assert.deepEqual(splitCFIRange(range), expected);
     });
   });
 
