@@ -122,6 +122,13 @@ describe('segmentMatchesFocusFilters', () => {
       filters: { cfi: { value: '/2-/4' } },
       expected: true,
     },
+    // Filter present, matches segment. Filter CFI has step indirections,
+    // which should be ignored.
+    {
+      segment: { cfi: '/2' },
+      filters: { cfi: { value: '/2!/2-/4!/4' } },
+      expected: true,
+    },
     // Filter present, does not match segment
     {
       segment: { cfi: '/6' },

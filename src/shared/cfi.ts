@@ -82,10 +82,11 @@ export function stripCFIAssertions(cfi: string): string {
  *
  * The full sorting rules for CFIs are specified by https://idpf.org/epub/linking/cfi/#sec-sorting.
  *
- * This function currently only implements what is necessary to compare simple
- * CFIs that specify a location within an EPUB's Package Document, without any step
- * indirections ("!"). These CFIs consist of a "/"-delimited sequence of numbers,
- * with optional assertions in `[...]` brackets (eg. "/2/4[chapter2ref]").
+ * This function only considers the part of the CFI up to the first step
+ * indirection ("!"), which identify a location within the EPUB's Package
+ * Document. These portions of CFIs consist of a "/"-delimited sequence of
+ * numbers, with optional assertions in `[...]` brackets (eg.
+ * "/2/4[chapter2ref]").
  *
  * Per the sorting rules linked above, the input CFIs are assumed to be
  * unescaped. This means that they may contain circumflex (^) escape characters,
@@ -102,7 +103,7 @@ export function stripCFIAssertions(cfi: string): string {
  */
 export function compareCFIs(a: string, b: string): number {
   const parseCFI = (cfi: string) => {
-    return stripCFIAssertions(cfi)
+    return documentCFI(cfi)
       .split('/')
       .map(str => {
         // CFI step values _should_ always be integers. We currently handle
@@ -117,6 +118,9 @@ export function compareCFIs(a: string, b: string): number {
 
 /**
  * Return true if the CFI `cfi` lies in the range [start, end).
+ *
+ * Only the part of the CFI up to the first step indirection ("!") is
+ * considered. See {@link documentCFI}.
  */
 export function cfiInRange(cfi: string, start: string, end: string): boolean {
   return compareCFIs(cfi, start) >= 0 && compareCFIs(cfi, end) < 0;
