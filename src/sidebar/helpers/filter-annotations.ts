@@ -1,4 +1,8 @@
-import { cfiInRange, stripCFIAssertions } from '../../shared/cfi';
+import {
+  cfiInRange,
+  splitCFIRange,
+  stripCFIAssertions,
+} from '../../shared/cfi';
 import type { Annotation } from '../../types/api';
 import { pageLabelInRange } from '../util/page-range';
 import * as unicodeUtils from '../util/unicode';
@@ -113,12 +117,11 @@ const fieldMatchers: Record<string, Matcher | Matcher<number>> = {
       //
       // If we wanted to use a more standard CFI range representation,
       // we could follow https://idpf.org/epub/linking/cfi/#sec-ranges.
-      if (cfiTerm.includes('-')) {
-        const [start, end] = cfiTerm.split('-');
-        return cfiInRange(cfi, start, end);
-      } else {
-        return false;
-      }
+      //
+      // If `cfiTerm` does not contain a hyphen, the result will be an empty
+      // range that does not match any CFIs.
+      const [start, end] = splitCFIRange(cfiTerm);
+      return cfiInRange(cfi, start, end);
     },
     normalize: (val: string) => stripCFIAssertions(val.trim()),
   },

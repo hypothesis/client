@@ -1,4 +1,8 @@
-import { cfiInRange, stripCFIAssertions } from '../../shared/cfi';
+import {
+  cfiInRange,
+  splitCFIRange,
+  stripCFIAssertions,
+} from '../../shared/cfi';
 import type { SegmentInfo } from '../../types/annotator';
 import type { Annotation, EPUBContentSelector } from '../../types/api';
 import type { Filters } from '../store/modules/filters';
@@ -41,7 +45,7 @@ export function segmentMatchesFocusFilters(
   filters: Filters,
 ): boolean {
   if (segment.cfi && filters.cfi) {
-    const [cfiStart, cfiEnd] = filters.cfi.value.split('-');
+    const [cfiStart, cfiEnd] = splitCFIRange(filters.cfi.value);
     return cfiInRange(segment.cfi, cfiStart, cfiEnd);
   }
   if (segment.pages && filters.page) {
