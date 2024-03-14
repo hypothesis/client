@@ -70,6 +70,7 @@ describe('SidebarView', () => {
       profile: sinon.stub().returns({ userid: null }),
       searchUris: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     fakeTabsUtil = {
@@ -285,6 +286,19 @@ describe('SidebarView', () => {
       fakeStore.isLoggedIn.returns(true);
       wrapper.setProps({});
       assert.calledOnce(fakeStreamer.connect);
+    });
+  });
+
+  context('when pending_updates_notification is enabled', () => {
+    [true, false].forEach(pendingUpdatesNotificationEnabled => {
+      it('shows PendingUpdatesNotification', () => {
+        fakeStore.isFeatureEnabled.returns(pendingUpdatesNotificationEnabled);
+        const wrapper = createComponent();
+        assert.equal(
+          wrapper.exists('PendingUpdatesNotification'),
+          pendingUpdatesNotificationEnabled,
+        );
+      });
     });
   });
 

@@ -19,6 +19,7 @@ describe('TopBar', () => {
       isLoggedIn: sinon.stub().returns(false),
       isSidebarPanelOpen: sinon.stub().returns(false),
       toggleSidebarPanel: sinon.stub(),
+      isFeatureEnabled: sinon.stub().returns(true),
     };
 
     fakeFrameSync = {
@@ -189,6 +190,17 @@ describe('TopBar', () => {
       assert.equal(
         wrapper.exists('button[data-testid="share-icon-button"]'),
         isSidebar,
+      );
+    });
+  });
+
+  [true, false].forEach(pendingUpdatesNotificationEnabled => {
+    it('renders PendingUpdatesButton when pending_updates_notification feature is not enabled', () => {
+      fakeStore.isFeatureEnabled.returns(pendingUpdatesNotificationEnabled);
+      const wrapper = createTopBar();
+      assert.equal(
+        wrapper.exists('PendingUpdatesButton'),
+        !pendingUpdatesNotificationEnabled,
       );
     });
   });
