@@ -11,6 +11,7 @@ import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
 import PaginatedThreadList from './PaginatedThreadList';
 import PendingUpdatesButton from './PendingUpdatesButton';
+import PendingUpdatesNotification from './PendingUpdatesNotification';
 import { useRootThread } from './hooks/use-root-thread';
 
 export type NotebookViewProps = {
@@ -32,6 +33,9 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
   const hasAppliedFilter = store.hasAppliedFilter();
   const isLoading = store.isLoading();
   const resultCount = store.annotationResultCount();
+  const pendingUpdatesNotification = store.isFeatureEnabled(
+    'pending_updates_notification',
+  );
 
   const { rootThread } = useRootThread();
 
@@ -129,11 +133,16 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
           {groupName}
         </h1>
       </header>
+      <div className="absolute w-full z-5 left-0 top-7">
+        <div className="container flex flex-row-reverse">
+          {pendingUpdatesNotification && <PendingUpdatesNotification />}
+        </div>
+      </div>
       <div className="justify-self-start">
         <NotebookFilters />
       </div>
       <div className="flex items-center lg:justify-self-end text-md font-medium">
-        <PendingUpdatesButton />
+        {!pendingUpdatesNotification && <PendingUpdatesButton />}
         <NotebookResultCount
           forcedVisibleCount={forcedVisibleCount}
           isFiltered={hasAppliedFilter}

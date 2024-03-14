@@ -50,6 +50,9 @@ function TopBar({
   const store = useSidebarStore();
   const isLoggedIn = store.isLoggedIn();
   const hasFetchedProfile = store.hasFetchedProfile();
+  const pendingUpdatesNotification = store.isFeatureEnabled(
+    'pending_updates_notification',
+  );
 
   const toggleSharePanel = () => {
     store.toggleSidebarPanel('shareGroupAnnotations');
@@ -93,7 +96,7 @@ function TopBar({
         <div className="grow flex items-center justify-end">
           {isSidebar && (
             <>
-              <PendingUpdatesButton />
+              {!pendingUpdatesNotification && <PendingUpdatesButton />}
               <SearchIconButton />
               <SortMenu />
               <TopBarToggleButton

@@ -8,6 +8,7 @@ import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
 import LoggedOutMessage from './LoggedOutMessage';
 import LoginPromptPanel from './LoginPromptPanel';
+import PendingUpdatesNotification from './PendingUpdatesNotification';
 import SelectionTabs from './SelectionTabs';
 import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
@@ -41,6 +42,9 @@ function SidebarView({
   const focusedGroupId = store.focusedGroupId();
   const isLoading = store.isLoading();
   const isLoggedIn = store.isLoggedIn();
+  const pendingUpdatesNotification = store.isFeatureEnabled(
+    'pending_updates_notification',
+  );
 
   const linkedAnnotationId = store.directLinkedAnnotationId();
   const linkedAnnotation = linkedAnnotationId
@@ -132,7 +136,7 @@ function SidebarView({
   }, [hasFetchedProfile, isLoggedIn, sidebarHasOpened, streamer]);
 
   return (
-    <div>
+    <div className="relative">
       <h2 className="sr-only">Annotations</h2>
       {showFilterControls && <FilterControls withCardContainer />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
@@ -148,6 +152,11 @@ function SidebarView({
       )}
       {showTabs && (
         <SelectionTabs isLoading={isLoading} tabCounts={tabCounts} />
+      )}
+      {pendingUpdatesNotification && (
+        <div className="fixed z-1 right-2 top-12">
+          <PendingUpdatesNotification />
+        </div>
       )}
       <ThreadList threads={rootThread.children} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
