@@ -42,6 +42,7 @@ function SidebarView({
   const focusedGroupId = store.focusedGroupId();
   const isLoading = store.isLoading();
   const isLoggedIn = store.isLoggedIn();
+  const selectedTab = store.selectedTab();
   const pendingUpdatesNotification = store.isFeatureEnabled(
     'pending_updates_notification',
   );
@@ -158,7 +159,13 @@ function SidebarView({
           <PendingUpdatesNotification />
         </div>
       )}
-      <ThreadList threads={rootThread.children} />
+      <div
+        role="tabpanel"
+        id={`${selectedTab}-panel`}
+        aria-labelledby={`${selectedTab}-tab`}
+      >
+        <ThreadList threads={rootThread.children} />
+      </div>
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>
   );

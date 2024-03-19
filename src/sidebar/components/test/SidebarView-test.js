@@ -3,6 +3,7 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
+import sinon from 'sinon';
 
 import SidebarView, { $imports } from '../SidebarView';
 
@@ -71,6 +72,7 @@ describe('SidebarView', () => {
       searchUris: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
       isFeatureEnabled: sinon.stub().returns(false),
+      selectedTab: sinon.stub().returns(''),
     };
 
     fakeTabsUtil = {

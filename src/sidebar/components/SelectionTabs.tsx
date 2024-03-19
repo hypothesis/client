@@ -29,6 +29,7 @@ type TabProps = {
   isWaitingToAnchor: boolean;
 
   label: string;
+  name: TabName;
 
   /** Callback to invoke when this tab is selected */
   onSelect: () => void;
@@ -44,6 +45,7 @@ function Tab({
   isSelected,
   label,
   onSelect,
+  name,
 }: TabProps) {
   const selectTab = () => {
     if (!isSelected) {
@@ -69,6 +71,8 @@ function Tab({
       tabIndex={0}
       title={title}
       underline="none"
+      id={`${name}-tab`}
+      aria-controls={`${name}-panel`}
     >
       <>
         {children}
@@ -163,6 +167,7 @@ function SelectionTabs({
             isSelected={selectedTab === 'annotation'}
             label="Annotations"
             onSelect={() => selectTab('annotation')}
+            name="annotation"
           >
             Annotations
           </Tab>
@@ -172,6 +177,7 @@ function SelectionTabs({
             isSelected={selectedTab === 'note'}
             label="Page notes"
             onSelect={() => selectTab('note')}
+            name="note"
           >
             Page Notes
           </Tab>
@@ -182,6 +188,7 @@ function SelectionTabs({
               isSelected={selectedTab === 'orphan'}
               label="Orphans"
               onSelect={() => selectTab('orphan')}
+              name="orphan"
             >
               Orphans
             </Tab>
