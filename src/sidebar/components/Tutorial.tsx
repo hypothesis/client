@@ -26,6 +26,9 @@ function LabeledIcon({ commandName, icon: Icon }: LabeledIconProps) {
           'mx-1 -mt-1', // Give horizontal space; pull up top margin a little
           'text-color-text-light inline',
         )}
+        // The icon is just a visual hint representing the command, but it
+        // provides no extra information
+        aria-hidden
       />
       <em data-testid="command-name">{commandName}</em>
     </span>
