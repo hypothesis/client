@@ -1,4 +1,5 @@
 import { Link, Panel } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
@@ -133,8 +134,15 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
           {groupName}
         </h1>
       </header>
-      <div className="absolute w-full z-5 left-0 top-7">
-        <div className="container flex flex-row-reverse">
+      <div className="absolute w-full z-5 left-0 lg:top-8 top-5">
+        <div
+          className={classnames(
+            'container flex flex-row-reverse relative',
+            // Compensate for container's right padding, which is defined in
+            // tailwind.config.mjs
+            'right-[4rem]',
+          )}
+        >
           {pendingUpdatesNotification && <PendingUpdatesNotification />}
         </div>
       </div>

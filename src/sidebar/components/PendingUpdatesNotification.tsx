@@ -55,7 +55,10 @@ function PendingUpdatesNotification({
   }
 
   return (
-    <div role="status" className="animate-fade-in">
+    <div
+      role="status"
+      className="absolute right-0 animate-updates-notification-slide-in"
+    >
       <Button
         onClick={applyPendingUpdates}
         unstyled
@@ -70,7 +73,7 @@ function PendingUpdatesNotification({
       >
         <RefreshIcon />
         {!collapsed && (
-          <span data-testid="full-notification">
+          <span data-testid="full-notification" className="whitespace-nowrap">
             Load <span className="font-bold">{pendingUpdateCount}</span> updates{' '}
             <span className="sr-only">by pressing l</span>
           </span>
