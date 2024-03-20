@@ -23,6 +23,7 @@ export default {
         'fade-out': 'fade-out 0.3s forwards',
         'pulse-fade-out': 'pulse-fade-out 5s ease-in-out forwards',
         'slide-in-from-right': 'slide-in-from-right 0.3s forwards ease-in-out',
+        'updates-notification-slide-in': 'updates-notification-slide-in 0.3s ease-in'
       },
       boxShadow: {
         // A more prominent shadow than the one used by tailwind, intended for
@@ -173,6 +174,16 @@ export default {
           '100%': {
             left: '0',
             opacity: '1',
+          },
+        },
+        'updates-notification-slide-in': {
+          '0%': {
+            opacity: '0',
+            right: '-15px',
+          },
+          '100%': {
+            opacity: '1',
+            right: '0',
           },
         },
       },
