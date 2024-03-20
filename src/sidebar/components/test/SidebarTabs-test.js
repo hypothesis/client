@@ -4,32 +4,38 @@ import {
 } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 
-import SelectionTabs, { $imports } from '../SelectionTabs';
+import SidebarTabs, { $imports } from '../SidebarTabs';
 
-describe('SelectionTabs', () => {
+describe('SidebarTabs', () => {
   // mock services
   let fakeAnnotationsService;
   let fakeSettings;
   let fakeStore;
+  let fakeUseRootThread;
 
-  const defaultProps = {
-    isLoading: false,
-    tabCounts: {
-      annotation: 123,
-      note: 456,
-      orphan: 0,
-    },
-  };
-
-  function createComponent(props) {
+  function createComponent(props = {}) {
     return mount(
-      <SelectionTabs
+      <SidebarTabs
         annotationsService={fakeAnnotationsService}
         settings={fakeSettings}
-        {...defaultProps}
+        isLoading={false}
         {...props}
       />,
     );
+  }
+
+  function stubTabCounts(tabCounts = {}) {
+    fakeUseRootThread.returns({
+      rootThread: {
+        children: [],
+      },
+      tabCounts: {
+        annotation: 123,
+        note: 456,
+        orphan: 0,
+        ...tabCounts,
+      },
+    });
   }
 
   beforeEach(() => {
@@ -44,9 +50,12 @@ describe('SelectionTabs', () => {
       isWaitingToAnchorAnnotations: sinon.stub().returns(false),
       selectedTab: sinon.stub().returns('annotation'),
     };
+    fakeUseRootThread = sinon.stub();
+    stubTabCounts();
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../store': { useSidebarStore: () => fakeStore },
     });
   });
@@ -155,12 +164,8 @@ describe('SelectionTabs', () => {
 
   describe('orphans tab', () => {
     it('should display orphans tab if there is 1 or more orphans', () => {
-      const wrapper = createComponent({
-        tabCounts: {
-          ...defaultProps.tabCounts,
-          orphan: 1,
-        },
-      });
+      stubTabCounts({ orphan: 1 });
+      const wrapper = createComponent();
 
       const orphanTab = wrapper.find('Tab[label="Orphans"]');
       assert.isTrue(orphanTab.exists());
@@ -168,8 +173,9 @@ describe('SelectionTabs', () => {
 
     it('should display orphans tab as selected when it is active', () => {
       fakeStore.selectedTab.returns('orphan');
+      stubTabCounts({ orphan: 1 });
 
-      const wrapper = createComponent({ tabCounts: { orphan: 1 } });
+      const wrapper = createComponent();
 
       const orphanTab = wrapper.find('Tab[label="Orphans"]');
       assert.isTrue(orphanTab.find('LinkButton').prop('pressed'));
@@ -186,12 +192,8 @@ describe('SelectionTabs', () => {
 
   describe('tab display and counts', () => {
     it('should not render count if there are no page notes', () => {
-      const wrapper = createComponent({
-        tabCounts: {
-          ...defaultProps.tabCounts,
-          note: 0,
-        },
-      });
+      stubTabCounts({ note: 0 });
+      const wrapper = createComponent();
 
       const noteTab = wrapper.find('Tab[label="Page notes"]');
 
@@ -199,54 +201,35 @@ describe('SelectionTabs', () => {
     });
 
     it('should not display a message when its loading annotation count is 0', () => {
-      const wrapper = createComponent({
-        isLoading: true,
-        tabCounts: {
-          ...defaultProps.tabCounts,
-          annotation: 0,
-        },
-      });
+      stubTabCounts({ annotation: 0 });
+      const wrapper = createComponent({ isLoading: true });
       assert.isFalse(
         wrapper.exists('[data-testid="annotations-unavailable-message"]'),
       );
     });
 
     it('should not display a message when its loading notes count is 0', () => {
+      stubTabCounts({ note: 0 });
       fakeStore.selectedTab.returns('note');
-      const wrapper = createComponent({
-        isLoading: true,
-        tabCounts: {
-          ...defaultProps.tabCounts,
-          note: 0,
-        },
-      });
+      const wrapper = createComponent({ isLoading: true });
       assert.isFalse(
         wrapper.exists('[data-testid="notes-unavailable-message"]'),
       );
     });
 
     it('should not display the longer version of the no annotations message when there are no annotations and isWaitingToAnchorAnnotations is true', () => {
+      stubTabCounts({ annotation: 0 });
       fakeStore.isWaitingToAnchorAnnotations.returns(true);
-      const wrapper = createComponent({
-        isLoading: false,
-        tabCounts: {
-          ...defaultProps.tabCounts,
-          annotationn: 0,
-        },
-      });
+      const wrapper = createComponent({ isLoading: false });
       assert.isFalse(
         wrapper.exists('[data-testid="annotations-unavailable-message"]'),
       );
     });
 
     it('should display the longer version of the no notes message when there are no notes', () => {
+      stubTabCounts({ note: 0 });
       fakeStore.selectedTab.returns('note');
-      const wrapper = createComponent({
-        tabCounts: {
-          ...defaultProps.tabCounts,
-          note: 0,
-        },
-      });
+      const wrapper = createComponent();
 
       assert.include(
         wrapper.find('Card[data-testid="notes-unavailable-message"]').text(),
@@ -255,12 +238,8 @@ describe('SelectionTabs', () => {
     });
 
     it('should display the longer version of the no annotations message when there are no annotations', () => {
-      const wrapper = createComponent({
-        tabCounts: {
-          ...defaultProps.tabCounts,
-          annotation: 0,
-        },
-      });
+      stubTabCounts({ annotation: 0 });
+      const wrapper = createComponent();
       assert.include(
         wrapper
           .find('Card[data-testid="annotations-unavailable-message"]')
@@ -283,14 +262,10 @@ describe('SelectionTabs', () => {
     it(`should change the selected tab when "${label}" tab is clicked`, () => {
       // Pre-select a different tab than the one we are about to click.
       fakeStore.selectedTab.returns('other-tab');
+      // Make the "Orphans" tab appear.
+      stubTabCounts({ orphan: 1 });
 
-      const wrapper = createComponent({
-        // Make the "Orphans" tab appear.
-        tabCounts: {
-          ...defaultProps.tabCounts,
-          orphan: 1,
-        },
-      });
+      const wrapper = createComponent();
 
       findButton(wrapper, label).simulate('click');
 
@@ -300,7 +275,7 @@ describe('SelectionTabs', () => {
 
   it('does not change the selected tab if it is already selected', () => {
     fakeStore.selectedTab.returns('note');
-    const wrapper = createComponent({});
+    const wrapper = createComponent();
 
     findButton(wrapper, 'Page Notes').simulate('click');
 
@@ -350,9 +325,8 @@ describe('SelectionTabs', () => {
     },
   ].forEach(({ tabCounts, message }) => {
     it('reports annotation count to screen readers', () => {
-      const wrapper = createComponent({
-        tabCounts,
-      });
+      stubTabCounts(tabCounts);
+      const wrapper = createComponent();
       const status = wrapper.find('[role="status"]');
       assert.equal(status.text(), message);
     });
@@ -362,13 +336,12 @@ describe('SelectionTabs', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => {
-        return createComponent({
-          tabCounts: {
-            annotation: 1,
-            note: 2,
-            orphan: 3,
-          },
+        stubTabCounts({
+          annotation: 1,
+          note: 2,
+          orphan: 3,
         });
+        return createComponent();
       },
     }),
   );

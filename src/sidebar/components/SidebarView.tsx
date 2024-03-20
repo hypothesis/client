@@ -9,10 +9,8 @@ import { useSidebarStore } from '../store';
 import LoggedOutMessage from './LoggedOutMessage';
 import LoginPromptPanel from './LoginPromptPanel';
 import PendingUpdatesNotification from './PendingUpdatesNotification';
-import SelectionTabs from './SelectionTabs';
 import SidebarContentError from './SidebarContentError';
-import ThreadList from './ThreadList';
-import { useRootThread } from './hooks/use-root-thread';
+import SidebarTabs from './SidebarTabs';
 import FilterControls from './search/FilterControls';
 
 export type SidebarViewProps = {
@@ -35,8 +33,6 @@ function SidebarView({
   loadAnnotationsService,
   streamer,
 }: SidebarViewProps) {
-  const { rootThread, tabCounts } = useRootThread();
-
   // Store state values
   const store = useSidebarStore();
   const focusedGroupId = store.focusedGroupId();
@@ -67,8 +63,6 @@ function SidebarView({
 
   const hasContentError =
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
-
-  const showTabs = !hasContentError;
 
   // Whether to render the new filter UI. Note that when the search panel is
   // open, filter controls are integrated into it. The UI may render nothing
@@ -150,15 +144,12 @@ function SidebarView({
       {hasDirectLinkedGroupError && (
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
-      {showTabs && (
-        <SelectionTabs isLoading={isLoading} tabCounts={tabCounts} />
-      )}
+      {!hasContentError && <SidebarTabs isLoading={isLoading} />}
       {pendingUpdatesNotification && (
         <div className="fixed z-1 right-2 top-12">
           <PendingUpdatesNotification />
         </div>
       )}
-      <ThreadList threads={rootThread.children} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>
   );

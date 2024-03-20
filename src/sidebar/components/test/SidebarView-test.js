@@ -9,7 +9,6 @@ import SidebarView, { $imports } from '../SidebarView';
 describe('SidebarView', () => {
   let fakeFrameSync;
   let fakeLoadAnnotationsService;
-  let fakeUseRootThread;
   let fakeStore;
   let fakeStreamer;
   let fakeTabsUtil;
@@ -34,16 +33,6 @@ describe('SidebarView', () => {
     fakeLoadAnnotationsService = {
       load: sinon.stub(),
     };
-    fakeUseRootThread = sinon.stub().returns({
-      rootThread: {
-        children: [],
-      },
-      tabCounts: {
-        annotation: 1,
-        note: 2,
-        orphan: 0,
-      },
-    });
     fakeStreamer = {
       connect: sinon.stub(),
     };
@@ -79,7 +68,6 @@ describe('SidebarView', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../store': { useSidebarStore: () => fakeStore },
       '../helpers/tabs': fakeTabsUtil,
     });
@@ -210,7 +198,7 @@ describe('SidebarView', () => {
 
       it('does not render tabs', () => {
         const wrapper = createComponent();
-        assert.isFalse(wrapper.find('SelectionTabs').exists());
+        assert.isFalse(wrapper.find('SidebarTabs').exists());
       });
 
       it('does not render filter status', () => {
@@ -239,7 +227,7 @@ describe('SidebarView', () => {
 
     it('does not render tabs', () => {
       const wrapper = createComponent();
-      assert.isFalse(wrapper.find('SelectionTabs').exists());
+      assert.isFalse(wrapper.find('SidebarTabs').exists());
     });
 
     it('does not render filter status', () => {
