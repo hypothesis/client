@@ -193,4 +193,20 @@ describe('sidebar/store/modules/real-time-updates', () => {
       assert.equal(store.hasPendingUpdates(), true);
     });
   });
+
+  describe('hasPendingUpdatesOrDeletions', () => {
+    it('returns false if there are no pending updates nor deletions', () => {
+      assert.isFalse(store.hasPendingUpdatesOrDeletions());
+    });
+
+    it('returns true if there are pending updates', () => {
+      addPendingUpdates(store);
+      assert.isTrue(store.hasPendingUpdatesOrDeletions());
+    });
+
+    it('returns true if there are pending deletions', () => {
+      addPendingDeletions(store);
+      assert.isTrue(store.hasPendingUpdatesOrDeletions());
+    });
+  });
 });
