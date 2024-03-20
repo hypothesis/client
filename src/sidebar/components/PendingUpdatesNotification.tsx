@@ -27,7 +27,7 @@ function PendingUpdatesNotification({
 }: PendingUpdatesNotificationProps) {
   const store = useSidebarStore();
   const pendingUpdateCount = store.pendingUpdateCount();
-  const hasPendingUpdates = store.hasPendingUpdates();
+  const hasPendingChanges = store.hasPendingUpdatesOrDeletions();
   const applyPendingUpdates = useCallback(
     () => streamer.applyPendingUpdates(),
     [streamer],
@@ -35,10 +35,10 @@ function PendingUpdatesNotification({
   const [collapsed, setCollapsed] = useState(false);
   const timeout = useRef<number | null>(null);
 
-  useShortcut('l', () => hasPendingUpdates && applyPendingUpdates());
+  useShortcut('l', () => hasPendingChanges && applyPendingUpdates());
 
   useEffect(() => {
-    if (hasPendingUpdates) {
+    if (hasPendingChanges) {
       timeout.current = setTimeout_(() => {
         setCollapsed(true);
         timeout.current = null;
@@ -48,9 +48,9 @@ function PendingUpdatesNotification({
     }
 
     return () => timeout.current && clearTimeout_(timeout.current);
-  }, [clearTimeout_, hasPendingUpdates, setTimeout_]);
+  }, [clearTimeout_, hasPendingChanges, setTimeout_]);
 
-  if (!hasPendingUpdates) {
+  if (!hasPendingChanges) {
     return null;
   }
 

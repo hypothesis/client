@@ -20,7 +20,7 @@ describe('PendingUpdatesNotification', () => {
     };
     fakeStore = {
       pendingUpdateCount: sinon.stub().returns(3),
-      hasPendingUpdates: sinon.stub().returns(true),
+      hasPendingUpdatesOrDeletions: sinon.stub().returns(true),
     };
 
     $imports.$mock({
@@ -68,7 +68,7 @@ describe('PendingUpdatesNotification', () => {
   }
 
   it('does not render anything while there are no pending updates', () => {
-    fakeStore.hasPendingUpdates.returns(false);
+    fakeStore.hasPendingUpdatesOrDeletions.returns(false);
     const wrapper = createComponent();
 
     assert.isEmpty(wrapper);
@@ -112,7 +112,7 @@ describe('PendingUpdatesNotification', () => {
 
   [true, false].forEach(hasPendingUpdates => {
     it('applies updates when "l" is pressed', () => {
-      fakeStore.hasPendingUpdates.returns(hasPendingUpdates);
+      fakeStore.hasPendingUpdatesOrDeletions.returns(hasPendingUpdates);
       let wrapper;
       const container = document.createElement('div');
       document.body.append(container);
