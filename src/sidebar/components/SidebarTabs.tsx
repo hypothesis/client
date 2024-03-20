@@ -15,6 +15,11 @@ import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import type { AnnotationsService } from '../services/annotations';
 import { useSidebarStore } from '../store';
+import ThreadList from './ThreadList';
+import { useRootThread } from './hooks/use-root-thread';
+
+const idForTab = (name: TabName) => `${name}-tab`;
+const idForPanel = (name: TabName) => `${name}-panel`;
 
 type TabProps = {
   children: ComponentChildren;
@@ -29,6 +34,7 @@ type TabProps = {
   isWaitingToAnchor: boolean;
 
   label: string;
+  name: TabName;
 
   /** Callback to invoke when this tab is selected */
   onSelect: () => void;
@@ -44,6 +50,7 @@ function Tab({
   isSelected,
   label,
   onSelect,
+  name,
 }: TabProps) {
   const selectTab = () => {
     if (!isSelected) {
@@ -66,6 +73,8 @@ function Tab({
       onMouseDown={selectTab}
       pressed={!!isSelected}
       role="tab"
+      id={idForTab(name)}
+      aria-controls={idForPanel(name)}
       tabIndex={0}
       title={title}
       underline="none"
@@ -82,16 +91,9 @@ function Tab({
   );
 }
 
-export type SelectionTabProps = {
+export type SidebarTabsProps = {
   /** Are we waiting on any annotations from the server? */
   isLoading: boolean;
-
-  /** Counts of threads in each tab, to be displayed next to the tab title. */
-  tabCounts: {
-    annotation: number;
-    note: number;
-    orphan: number;
-  };
 
   // injected
   settings: SidebarSettings;
@@ -101,12 +103,12 @@ export type SelectionTabProps = {
 /**
  * Tabbed display of annotations and notes
  */
-function SelectionTabs({
+function SidebarTabs({
   annotationsService,
   isLoading,
   settings,
-  tabCounts,
-}: SelectionTabProps) {
+}: SidebarTabsProps) {
+  const { rootThread, tabCounts } = useRootThread();
   const store = useSidebarStore();
   const selectedTab = store.selectedTab();
   const noteCount = tabCounts.note;
@@ -162,6 +164,7 @@ function SelectionTabs({
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
             isSelected={selectedTab === 'annotation'}
             label="Annotations"
+            name="annotation"
             onSelect={() => selectTab('annotation')}
           >
             Annotations
@@ -171,6 +174,7 @@ function SelectionTabs({
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
             isSelected={selectedTab === 'note'}
             label="Page notes"
+            name="note"
             onSelect={() => selectTab('note')}
           >
             Page Notes
@@ -181,54 +185,64 @@ function SelectionTabs({
               isWaitingToAnchor={isWaitingToAnchorAnnotations}
               isSelected={selectedTab === 'orphan'}
               label="Orphans"
+              name="orphan"
               onSelect={() => selectTab('orphan')}
             >
               Orphans
             </Tab>
           )}
         </div>
-        {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
-          <div className="flex justify-end">
-            <Button
-              data-testid="new-note-button"
-              onClick={() => annotationsService.createPageNote()}
-              variant="primary"
-              style={applyTheme(['ctaBackgroundColor'], settings)}
-            >
-              <PlusIcon />
-              New note
-            </Button>
-          </div>
-        )}
-        {!isLoading && showNotesUnavailableMessage && (
-          <Card data-testid="notes-unavailable-message" variant="flat">
-            <CardContent classes="text-center">
-              There are no page notes in this group.
-            </CardContent>
-          </Card>
-        )}
-        {!isLoading && showAnnotationsUnavailableMessage && (
-          <Card data-testid="annotations-unavailable-message" variant="flat">
-            <CardContent
-              // TODO: Remove !important spacing class after
-              // https://github.com/hypothesis/frontend-shared/issues/676 is addressed
-              classes="text-center !space-y-1"
-            >
-              <p>There are no annotations in this group.</p>
-              <p>
-                Create one by selecting some text and clicking the{' '}
-                <AnnotateIcon
-                  className="w-em h-em inline m-0.5 -mt-0.5"
-                  title="Annotate"
-                />{' '}
-                button.
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        <div
+          className="space-y-3"
+          role="tabpanel"
+          id={idForPanel(selectedTab)}
+          aria-labelledby={idForTab(selectedTab)}
+        >
+          {selectedTab === 'note' &&
+            settings.enableExperimentalNewNoteButton && (
+              <div className="flex justify-end">
+                <Button
+                  data-testid="new-note-button"
+                  onClick={() => annotationsService.createPageNote()}
+                  variant="primary"
+                  style={applyTheme(['ctaBackgroundColor'], settings)}
+                >
+                  <PlusIcon />
+                  New note
+                </Button>
+              </div>
+            )}
+          {!isLoading && showNotesUnavailableMessage && (
+            <Card data-testid="notes-unavailable-message" variant="flat">
+              <CardContent classes="text-center">
+                There are no page notes in this group.
+              </CardContent>
+            </Card>
+          )}
+          {!isLoading && showAnnotationsUnavailableMessage && (
+            <Card data-testid="annotations-unavailable-message" variant="flat">
+              <CardContent
+                // TODO: Remove !important spacing class after
+                // https://github.com/hypothesis/frontend-shared/issues/676 is addressed
+                classes="text-center !space-y-1"
+              >
+                <p>There are no annotations in this group.</p>
+                <p>
+                  Create one by selecting some text and clicking the{' '}
+                  <AnnotateIcon
+                    className="w-em h-em inline m-0.5 -mt-0.5"
+                    title="Annotate"
+                  />{' '}
+                  button.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+          <ThreadList threads={rootThread.children} />
+        </div>
       </div>
     </>
   );
 }
 
-export default withServices(SelectionTabs, ['annotationsService', 'settings']);
+export default withServices(SidebarTabs, ['annotationsService', 'settings']);
