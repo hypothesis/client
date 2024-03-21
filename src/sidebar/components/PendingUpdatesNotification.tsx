@@ -2,6 +2,7 @@ import { Button, DownloadIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
+import { pluralize } from '../../shared/pluralize';
 import { useShortcut } from '../../shared/shortcut';
 import { withServices } from '../service-context';
 import type { StreamerService } from '../services/streamer';
@@ -74,7 +75,8 @@ function PendingUpdatesNotification({
       >
         {!collapsed && (
           <span data-testid="full-notification" className="whitespace-nowrap">
-            Load <span className="font-bold">{pendingUpdateCount}</span> updates{' '}
+            Load <span className="font-bold">{pendingUpdateCount}</span>{' '}
+            {pluralize(pendingUpdateCount, 'update', 'updates')}{' '}
             <span className="sr-only">by pressing l</span>
           </span>
         )}

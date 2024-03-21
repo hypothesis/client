@@ -9,6 +9,7 @@ import {
 import { useCallback, useId, useMemo, useState } from 'preact/hooks';
 
 import { downloadFile } from '../../../shared/download-file';
+import { pluralize } from '../../../shared/pluralize';
 import type { APIAnnotationData } from '../../../types/api';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import type { UserAnnotations } from '../../helpers/annotations-by-user';
@@ -255,11 +256,6 @@ function ExportAnnotations({
   if (!exportReady) {
     return <LoadingSpinner />;
   }
-
-  // Naive simple English pluralization
-  const pluralize = (count: number, singular: string, plural: string) => {
-    return count === 1 ? singular : plural;
-  };
 
   return (
     <form

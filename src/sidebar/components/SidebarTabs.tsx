@@ -9,6 +9,7 @@ import {
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 
+import { pluralize } from '../../shared/pluralize';
 import type { SidebarSettings } from '../../types/config';
 import type { TabName } from '../../types/sidebar';
 import { applyTheme } from '../helpers/theme';
@@ -126,11 +127,6 @@ function SidebarTabs({
     !isWaitingToAnchorAnnotations;
 
   const showNotesUnavailableMessage = selectedTab === 'note' && noteCount === 0;
-
-  // Naive simple English pluralization
-  const pluralize = (count: number, singular: string, plural: string) => {
-    return count === 1 ? singular : plural;
-  };
 
   const tabCountsSummaryPieces = [];
   if (annotationCount > 0) {
