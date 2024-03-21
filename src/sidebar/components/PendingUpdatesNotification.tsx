@@ -67,12 +67,12 @@ function PendingUpdatesNotification({
           'flex gap-1.5 items-center py-1 px-2',
           'rounded shadow-lg bg-gray-900 text-white',
         )}
-        icon={DownloadIcon}
         onMouseEnter={() => setCollapsed(false)}
         onFocus={() => setCollapsed(false)}
         onMouseLeave={() => !timeout.current && setCollapsed(true)}
         onBlur={() => !timeout.current && setCollapsed(true)}
       >
+        <DownloadIcon className="w-em h-em opacity-80" />
         {!collapsed && (
           <span data-testid="full-notification" className="whitespace-nowrap">
             Load <span className="font-bold">{pendingUpdateCount}</span>{' '}
