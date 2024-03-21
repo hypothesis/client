@@ -1,4 +1,4 @@
-import { Button, RefreshIcon } from '@hypothesis/frontend-shared';
+import { Button, DownloadIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
@@ -66,12 +66,12 @@ function PendingUpdatesNotification({
           'flex gap-1.5 items-center py-1 px-2',
           'rounded shadow-lg bg-gray-900 text-white',
         )}
+        icon={DownloadIcon}
         onMouseEnter={() => setCollapsed(false)}
         onFocus={() => setCollapsed(false)}
         onMouseLeave={() => !timeout.current && setCollapsed(true)}
         onBlur={() => !timeout.current && setCollapsed(true)}
       >
-        <RefreshIcon />
         {!collapsed && (
           <span data-testid="full-notification" className="whitespace-nowrap">
             Load <span className="font-bold">{pendingUpdateCount}</span> updates{' '}
