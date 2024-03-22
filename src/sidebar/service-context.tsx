@@ -58,7 +58,7 @@ export const ServiceContext = createContext(fallbackInjector);
  */
 export function withServices<
   Props extends Record<string, unknown>,
-  ServiceName extends string,
+  ServiceName extends string & keyof Props,
 >(
   Component: ComponentType<Props>,
   serviceNames: ServiceName[],
@@ -71,16 +71,14 @@ export function withServices<
     // Inject services, unless they have been overridden by props passed from
     // the parent component.
 
-    const services: Record<string, unknown> = {};
+    const services: Partial<Record<ServiceName, unknown>> = {};
     for (const service of serviceNames) {
       // Debugging check to make sure the store is used correctly.
-      if (process.env.NODE_ENV !== 'production') {
-        if (service === 'store') {
-          /* istanbul ignore next - Ignore debug code */
-          throw new Error(
-            'Do not use `withServices` to inject the `store` service. Use the `useStore` hook instead',
-          );
-        }
+      if (process.env.NODE_ENV !== 'production' && service === 'store') {
+        /* istanbul ignore next - Ignore debug code */
+        throw new Error(
+          'Do not use `withServices` to inject the `store` service. Use the `useStore` hook instead',
+        );
       }
 
       if (!(service in props)) {
