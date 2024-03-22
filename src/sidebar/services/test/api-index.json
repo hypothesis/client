@@ -84,6 +84,15 @@
         "method": "DELETE",
         "desc": "Delete an annotation"
       }
+    },
+    "analytics": {
+      "events": {
+        "create": {
+          "url": "https://example.com/api/analytics/events",
+          "method": "POST",
+          "desc": "Create a new analytics event"
+        }
+      }
     }
   }
 }
