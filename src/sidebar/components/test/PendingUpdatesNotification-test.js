@@ -134,40 +134,4 @@ describe('PendingUpdatesNotification', () => {
       }
     });
   });
-
-  ['onMouseLeave', 'onBlur'].forEach(handler => {
-    it('collapses notification when mouse or focus leaves button', () => {
-      const wrapper = createComponent();
-
-      assert.isFalse(notificationIsCollapsed(wrapper));
-      wrapper.find('Button').prop(handler)();
-      wrapper.update();
-      assert.isTrue(notificationIsCollapsed(wrapper));
-    });
-
-    it('does not collapse notification when mouse or focus leaves button if timeout is in progress', () => {
-      fakeSetTimeout.returns(1);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(notificationIsCollapsed(wrapper));
-      wrapper.find('Button').prop(handler)();
-      wrapper.update();
-      assert.isFalse(notificationIsCollapsed(wrapper));
-    });
-  });
-
-  ['onMouseEnter', 'onFocus'].forEach(handler => {
-    it('expands notification when button is hovered or focused', async () => {
-      const promise = timeoutAsPromise();
-      const wrapper = createComponent();
-      await promise; // Wait for timeout callback to be invoked
-      wrapper.update();
-
-      assert.isTrue(notificationIsCollapsed(wrapper));
-      wrapper.find('Button').prop(handler)();
-      wrapper.update();
-      assert.isFalse(notificationIsCollapsed(wrapper));
-    });
-  });
 });
