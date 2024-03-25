@@ -133,19 +133,6 @@ function SidebarView({
   return (
     <div className="relative">
       <h2 className="sr-only">Annotations</h2>
-      {showFilterControls && <FilterControls withCardContainer />}
-      <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
-      {hasDirectLinkedAnnotationError && (
-        <SidebarContentError
-          errorType="annotation"
-          onLoginRequest={onLogin}
-          showClearSelection={true}
-        />
-      )}
-      {hasDirectLinkedGroupError && (
-        <SidebarContentError errorType="group" onLoginRequest={onLogin} />
-      )}
-      {!hasContentError && <SidebarTabs isLoading={isLoading} />}
       {pendingUpdatesNotification && (
         <div
           className={classnames(
@@ -159,6 +146,19 @@ function SidebarView({
           <PendingUpdatesNotification />
         </div>
       )}
+      {showFilterControls && <FilterControls withCardContainer />}
+      <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
+      {hasDirectLinkedAnnotationError && (
+        <SidebarContentError
+          errorType="annotation"
+          onLoginRequest={onLogin}
+          showClearSelection={true}
+        />
+      )}
+      {hasDirectLinkedGroupError && (
+        <SidebarContentError errorType="group" onLoginRequest={onLogin} />
+      )}
+      {!hasContentError && <SidebarTabs isLoading={isLoading} />}
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>
   );
