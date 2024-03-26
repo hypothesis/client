@@ -1,5 +1,6 @@
 import { Button, DownloadIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
+import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import { pluralize } from '../../shared/pluralize';
@@ -16,6 +17,27 @@ export type PendingUpdatesNotificationProps = {
   setTimeout_?: typeof setTimeout;
   clearTimeout_?: typeof clearTimeout;
 };
+
+type HideableBlockProps = {
+  hidden: boolean;
+  children: ComponentChildren;
+};
+
+/**
+ * A component that can be hidden but will be unconditionally displayed when the
+ * group it belongs to is focused or hovered
+ */
+function HideableBlock({ hidden, children }: HideableBlockProps) {
+  return (
+    <span
+      className={classnames('group-hover:inline group-focus:inline', {
+        hidden,
+      })}
+    >
+      {children}
+    </span>
+  );
+}
 
 const collapseDelay = 5000;
 
@@ -66,25 +88,23 @@ function PendingUpdatesNotification({
         classes={classnames(
           'flex gap-1.5 items-center py-1 px-2',
           'rounded shadow-lg bg-gray-900 text-white',
+          'group focus-visible-ring',
         )}
-        onMouseEnter={() => setCollapsed(false)}
-        onFocus={() => setCollapsed(false)}
-        onMouseLeave={() => !timeout.current && setCollapsed(true)}
-        onBlur={() => !timeout.current && setCollapsed(true)}
       >
         <DownloadIcon className="w-em h-em opacity-80" />
-        {!collapsed && (
-          <span data-testid="full-notification" className="whitespace-nowrap">
-            Load <span className="font-bold">{pendingUpdateCount}</span>{' '}
-            {pluralize(pendingUpdateCount, 'update', 'updates')}{' '}
-            <span className="sr-only">by pressing l</span>
-          </span>
-        )}
-        {collapsed && (
-          <span data-testid="collapsed-notification" className="font-bold">
-            {pendingUpdateCount}
-          </span>
-        )}
+        <div
+          data-testid={
+            collapsed ? 'collapsed-notification' : 'full-notification'
+          }
+          className="flex gap-1"
+        >
+          <HideableBlock hidden={collapsed}>Load</HideableBlock>
+          <span className="font-bold">{pendingUpdateCount}</span>
+          <HideableBlock hidden={collapsed}>
+            {pluralize(pendingUpdateCount, 'update', 'updates')}
+          </HideableBlock>
+        </div>
+        <span className="sr-only">by pressing l</span>
       </Button>
     </div>
   );

@@ -132,6 +132,11 @@ function SidebarView({
   return (
     <div className="relative">
       <h2 className="sr-only">Annotations</h2>
+      {pendingUpdatesNotification && (
+        <div className="fixed z-1 right-2 top-12">
+          <PendingUpdatesNotification />
+        </div>
+      )}
       {showFilterControls && <FilterControls withCardContainer />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
@@ -145,11 +150,6 @@ function SidebarView({
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
       {!hasContentError && <SidebarTabs isLoading={isLoading} />}
-      {pendingUpdatesNotification && (
-        <div className="fixed z-1 right-2 top-12">
-          <PendingUpdatesNotification />
-        </div>
-      )}
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>
   );
