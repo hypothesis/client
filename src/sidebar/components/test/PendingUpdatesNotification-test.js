@@ -10,6 +10,7 @@ describe('PendingUpdatesNotification', () => {
   let fakeSetTimeout;
   let fakeClearTimeout;
   let fakeStreamer;
+  let fakeAnalytics;
   let fakeStore;
 
   beforeEach(() => {
@@ -17,6 +18,9 @@ describe('PendingUpdatesNotification', () => {
     fakeClearTimeout = sinon.stub();
     fakeStreamer = {
       applyPendingUpdates: sinon.stub(),
+    };
+    fakeAnalytics = {
+      trackApplyPendingUpdatesEvent: sinon.stub(),
     };
     fakeStore = {
       pendingUpdateCount: sinon.stub().returns(3),
@@ -38,6 +42,7 @@ describe('PendingUpdatesNotification', () => {
     return mount(
       <PendingUpdatesNotification
         streamer={fakeStreamer}
+        analytics={fakeAnalytics}
         setTimeout_={fakeSetTimeout}
         clearTimeout_={fakeClearTimeout}
       />,
@@ -106,8 +111,10 @@ describe('PendingUpdatesNotification', () => {
     const wrapper = createComponent();
 
     assert.notCalled(fakeStreamer.applyPendingUpdates);
+    assert.notCalled(fakeAnalytics.trackApplyPendingUpdatesEvent);
     wrapper.find('button').simulate('click');
     assert.called(fakeStreamer.applyPendingUpdates);
+    assert.called(fakeAnalytics.trackApplyPendingUpdatesEvent);
   });
 
   [true, false].forEach(hasPendingUpdates => {
@@ -121,11 +128,16 @@ describe('PendingUpdatesNotification', () => {
         wrapper = createComponent(container);
 
         assert.notCalled(fakeStreamer.applyPendingUpdates);
+        assert.notCalled(fakeAnalytics.trackApplyPendingUpdatesEvent);
         document.documentElement.dispatchEvent(
           new KeyboardEvent('keydown', { key: 'l' }),
         );
         assert.equal(
           fakeStreamer.applyPendingUpdates.called,
+          hasPendingUpdates,
+        );
+        assert.equal(
+          fakeAnalytics.trackApplyPendingUpdatesEvent.called,
           hasPendingUpdates,
         );
       } finally {

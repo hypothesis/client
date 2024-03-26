@@ -17,6 +17,7 @@ import {
   preStartServer as preStartRPCServer,
 } from './cross-origin-rpc';
 import { ServiceContext } from './service-context';
+import { AnalyticsService } from './services/analytics';
 import { AnnotationActivityService } from './services/annotation-activity';
 import { AnnotationsService } from './services/annotations';
 import { AnnotationsExporter } from './services/annotations-exporter';
@@ -134,6 +135,7 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
 
   // Register services.
   container
+    .register('analytics', AnalyticsService)
     .register('annotationsExporter', AnnotationsExporter)
     .register('annotationsService', AnnotationsService)
     .register('annotationActivity', AnnotationActivityService)
