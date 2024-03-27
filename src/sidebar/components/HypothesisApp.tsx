@@ -1,6 +1,6 @@
 import { confirm } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import { useEffect, useMemo } from 'preact/hooks';
+import { useEffect, useMemo, useRef } from 'preact/hooks';
 
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
@@ -47,8 +47,15 @@ function HypothesisApp({
 }: HypothesisAppProps) {
   const store = useSidebarStore();
   const profile = store.profile();
+  const currentUser = profile.userid;
   const route = store.route();
   const isModalRoute = route === 'notebook' || route === 'profile';
+  const allAnnotations = store.savedAnnotations();
+  const currentUserHasAnnotations = useMemo(
+    () => allAnnotations.filter(ann => ann.user === currentUser).length > 0,
+    [allAnnotations, currentUser],
+  );
+  const timer = useRef<number>();
 
   const backgroundStyle = useMemo(
     () => applyTheme(['appBackgroundColor'], settings),
@@ -63,6 +70,22 @@ function HypothesisApp({
       store.openSidebarPanel('help');
     }
   }, [isSidebar, profile, settings, store]);
+
+  // As soon as the user interacts with the page creating annotations, if the
+  // help panel was auto-displayed, schedule a task that will close it after 5
+  // minutes
+  useEffect(() => {
+    if (
+      shouldAutoDisplayTutorial(isSidebar, profile, settings) &&
+      currentUserHasAnnotations &&
+      !timer.current
+    ) {
+      timer.current = setTimeout(() => {
+        store.closeSidebarPanel('help');
+        session.dismissSidebarTutorial();
+      }, 5 /** 60*/ * 1000);
+    }
+  }, [currentUserHasAnnotations, isSidebar, profile, session, settings, store]);
 
   const isThirdParty = isThirdPartyService(settings);
 
