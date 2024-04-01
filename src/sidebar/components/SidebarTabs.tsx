@@ -154,7 +154,7 @@ function SidebarTabs({
           'space-y-3 pb-[9px]',
         )}
       >
-        <div className="flex gap-x-6 theme-clean:ml-[15px]" role="tablist">
+        <div className="flex gap-x-6 theme-clean:ml-[15px] mt-1" role="tablist">
           <Tab
             count={annotationCount}
             isWaitingToAnchor={isWaitingToAnchorAnnotations}

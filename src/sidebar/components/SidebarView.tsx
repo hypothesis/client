@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { useEffect, useRef } from 'preact/hooks';
 
 import { tabForAnnotation } from '../helpers/tabs';
@@ -146,7 +147,15 @@ function SidebarView({
       )}
       {!hasContentError && <SidebarTabs isLoading={isLoading} />}
       {pendingUpdatesNotification && (
-        <div className="fixed z-1 right-2 top-12">
+        <div
+          className={classnames(
+            'fixed z-1',
+            // Setting 9px to the right instead of some standard tailwind size,
+            // so that it matches the padding of the sidebar's container.
+            // DEFAULT `.container` padding is defined in tailwind.conf.mjs
+            'right-[9px] top-12',
+          )}
+        >
           <PendingUpdatesNotification />
         </div>
       )}
