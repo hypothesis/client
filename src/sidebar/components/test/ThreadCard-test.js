@@ -3,7 +3,9 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
+import sinon from 'sinon';
 
+import { promiseWithResolvers } from '../../../shared/promise-with-resolvers';
 import ThreadCard, { $imports } from '../ThreadCard';
 
 describe('ThreadCard', () => {
@@ -12,12 +14,18 @@ describe('ThreadCard', () => {
   let fakeFrameSync;
   let fakeStore;
   let fakeThread;
+  let fakeSetTimeout;
 
   const threadCardSelector = 'div[data-testid="thread-card"]';
 
   function createComponent(props) {
     return mount(
-      <ThreadCard frameSync={fakeFrameSync} thread={fakeThread} {...props} />,
+      <ThreadCard
+        frameSync={fakeFrameSync}
+        thread={fakeThread}
+        setTimeout_={fakeSetTimeout}
+        {...props}
+      />,
       { attachTo: container },
     );
   }
@@ -37,11 +45,11 @@ describe('ThreadCard', () => {
       isAnnotationHovered: sinon.stub().returns(false),
       route: sinon.stub(),
     };
-
     fakeThread = {
       id: 't1',
       annotation: { $tag: 'myTag' },
     };
+    fakeSetTimeout = sinon.stub();
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
@@ -138,6 +146,39 @@ describe('ThreadCard', () => {
       const threadCard = container.querySelector(threadCardSelector);
       assert.equal(document.activeElement, threadCard);
       assert.called(fakeStore.clearAnnotationFocusRequest);
+    });
+  });
+
+  context('when the annotation is spotlighted', () => {
+    function timeoutAsPromise() {
+      const { resolve, promise } = promiseWithResolvers();
+      fakeSetTimeout.callsFake(callback =>
+        setTimeout(() => {
+          callback();
+          resolve();
+        }, 1),
+      );
+
+      return promise;
+    }
+
+    it('spotlights annotation for 5 seconds', async () => {
+      const promise = timeoutAsPromise();
+      const wrapper = createComponent({
+        thread: {
+          id: 't1',
+          annotation: { $spotlight: 'true' },
+        },
+      });
+      const getClasses = () =>
+        wrapper.find('Card[data-testid="thread-card"]').prop('classes');
+
+      assert.isTrue(getClasses().includes('border-brand'));
+      await promise; // Wait for timeout callback to be invoked
+      wrapper.update();
+
+      assert.isFalse(getClasses().includes('border-brand'));
+      assert.calledWith(fakeSetTimeout, sinon.match.func, 5000);
     });
   });
 

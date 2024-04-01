@@ -1,6 +1,13 @@
 import { Card, CardContent } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 import debounce from 'lodash.debounce';
-import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
 import type { Annotation } from '../../types/api';
 import type { Thread as IThread } from '../helpers/build-thread';
@@ -14,13 +21,20 @@ export type ThreadCardProps = {
 
   // injected
   frameSync: FrameSyncService;
+  // Test seams
+  setTimeout_?: typeof setTimeout;
 };
 
 /**
  * A "top-level" `Thread`, rendered as a "card" in the sidebar. A `Thread`
  * renders its own child `Thread`s within itself.
  */
-function ThreadCard({ frameSync, thread }: ThreadCardProps) {
+function ThreadCard({
+  frameSync,
+  thread,
+  /* istanbul ignore next - test seam */
+  setTimeout_ = setTimeout,
+}: ThreadCardProps) {
   const store = useSidebarStore();
   const threadTag = thread.annotation?.$tag ?? null;
   const isHovered = !!(threadTag && store.isAnnotationHovered(threadTag));
@@ -62,10 +76,24 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
     store.clearAnnotationFocusRequest();
   }, [focusRequest, store, thread.id]);
 
+  // Spotlight card if the annotation is marked as "$spotlight"
+  const [spotlight, setSpotlight] = useState(
+    thread.annotation?.$spotlight ?? false,
+  );
+  useEffect(() => {
+    if (thread.annotation?.$spotlight) {
+      setSpotlight(true);
+      setTimeout_(() => setSpotlight(false), 5000);
+    }
+  }, [setTimeout_, thread.annotation?.$spotlight]);
+
   return (
     <Card
       active={isHovered}
-      classes="cursor-pointer focus-visible-ring theme-clean:border-none"
+      classes={classnames(
+        'cursor-pointer focus-visible-ring theme-clean:border-none',
+        { 'border-brand': spotlight },
+      )}
       data-testid="thread-card"
       elementRef={cardRef}
       tabIndex={-1}

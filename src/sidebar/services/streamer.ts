@@ -82,7 +82,10 @@ export class StreamerService {
    * applied.
    */
   applyPendingUpdates() {
-    const updates = Object.values(this._store.pendingUpdates());
+    const updates = Object.values(this._store.pendingUpdates()).map(ann => ({
+      ...ann,
+      $spotlight: true,
+    }));
     if (updates.length) {
       this._store.addAnnotations(updates);
     }

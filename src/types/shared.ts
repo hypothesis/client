@@ -37,4 +37,7 @@ export type ClientAnnotationData = {
    * `true` if anchoring failed or `false` if it succeeded.
    */
   $orphan?: boolean;
+
+  /** Whether the annotation should be spotlighted or not. */
+  $spotlight?: boolean;
 };

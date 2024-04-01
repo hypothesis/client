@@ -401,7 +401,10 @@ describe('StreamerService', () => {
         });
         assert.calledWith(
           fakeStore.addAnnotations,
-          fixtures.createNotification.payload,
+          fixtures.createNotification.payload.map(ann => ({
+            ...ann,
+            $spotlight: true,
+          })),
         );
       });
     });
@@ -447,7 +450,9 @@ describe('StreamerService', () => {
     it('applies pending updates', () => {
       fakeStore.pendingUpdates.returns({ 'an-id': { id: 'an-id' } });
       activeStreamer.applyPendingUpdates();
-      assert.calledWith(fakeStore.addAnnotations, [{ id: 'an-id' }]);
+      assert.calledWith(fakeStore.addAnnotations, [
+        { id: 'an-id', $spotlight: true },
+      ]);
     });
 
     it('applies pending deletions', () => {
