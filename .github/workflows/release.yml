@@ -1,5 +1,8 @@
 name: Release
 
+permissions:
+  id-token: write  # Required for AWS OIDC auth.
+
 concurrency:
   group: ${{ github.event.repository.name }}-deploy
   cancel-in-progress: true
@@ -36,6 +39,11 @@ jobs:
       SIDEBAR_APP_URL: https://staging.hypothes.is/app.html
 
     steps:
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.CLIENT_RELEASE_ROLE_ARN }}
+        aws-region: us-east-1
+
     - name: Checkout
       uses: actions/checkout@v4
     - name: Cache the node_modules dir
@@ -64,9 +72,6 @@ jobs:
         $SENTRY_CMD files $STAGING_VERSION upload-sourcemaps --url-prefix $CDN_URL/$STAGING_VERSION/build/scripts/ build/scripts
         $SENTRY_CMD finalize $STAGING_VERSION
     - name: Deploy to S3
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
       run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }} --tag staging --no-cache-entry
 
   release-prod:
@@ -80,6 +85,11 @@ jobs:
       SIDEBAR_APP_URL: https://hypothes.is/app.html
 
     steps:
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.CLIENT_RELEASE_ROLE_ARN }}
+        aws-region: us-east-1
+
     - name: Checkout
       uses: actions/checkout@v4
     - name: Cache the node_modules dir
@@ -124,9 +134,6 @@ jobs:
         yarn npm publish
         scripts/wait-for-npm-release.sh latest
     - name: Deploy to S3
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
       run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }}
 
   update-extension:
