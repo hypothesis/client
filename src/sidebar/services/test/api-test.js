@@ -196,6 +196,14 @@ describe('APIService', () => {
     return api.profile.update({}, { preferences: {} });
   });
 
+  it('creates analytics event', () => {
+    expectCall('post', 'analytics/events');
+    return api.analytics.events.create(
+      {},
+      { event: 'client.realtime.apply_updates' },
+    );
+  });
+
   context('when an API call fails', () => {
     [
       {
