@@ -6,12 +6,14 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { pluralize } from '../../shared/pluralize';
 import { useShortcut } from '../../shared/shortcut';
 import { withServices } from '../service-context';
+import type { AnalyticsService } from '../services/analytics';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
 
 export type PendingUpdatesNotificationProps = {
   // Injected
   streamer: StreamerService;
+  analytics: AnalyticsService;
 
   // Test seams
   setTimeout_?: typeof setTimeout;
@@ -43,6 +45,7 @@ const collapseDelay = 5000;
 
 function PendingUpdatesNotification({
   streamer,
+  analytics,
   /* istanbul ignore next - test seam */
   setTimeout_ = setTimeout,
   /* istanbul ignore next - test seam */
@@ -51,10 +54,10 @@ function PendingUpdatesNotification({
   const store = useSidebarStore();
   const pendingUpdateCount = store.pendingUpdateCount();
   const hasPendingChanges = store.hasPendingUpdatesOrDeletions();
-  const applyPendingUpdates = useCallback(
-    () => streamer.applyPendingUpdates(),
-    [streamer],
-  );
+  const applyPendingUpdates = useCallback(() => {
+    streamer.applyPendingUpdates();
+    analytics.trackEvent('client.realtime.apply_updates');
+  }, [analytics, streamer]);
   const [collapsed, setCollapsed] = useState(false);
   const timeout = useRef<number | null>(null);
 
@@ -110,4 +113,7 @@ function PendingUpdatesNotification({
   );
 }
 
-export default withServices(PendingUpdatesNotification, ['streamer']);
+export default withServices(PendingUpdatesNotification, [
+  'streamer',
+  'analytics',
+]);

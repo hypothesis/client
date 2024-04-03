@@ -6,6 +6,7 @@ describe('PendingUpdatesButton', () => {
   let fakeToastMessenger;
   let fakeStore;
   let fakeStreamer;
+  let fakeAnalytics;
 
   beforeEach(() => {
     fakeToastMessenger = {
@@ -17,6 +18,9 @@ describe('PendingUpdatesButton', () => {
     };
     fakeStreamer = {
       applyPendingUpdates: sinon.stub(),
+    };
+    fakeAnalytics = {
+      trackEvent: sinon.stub(),
     };
 
     $imports.$mock({
@@ -36,6 +40,7 @@ describe('PendingUpdatesButton', () => {
       <PendingUpdatesButton
         streamer={fakeStreamer}
         toastMessenger={fakeToastMessenger}
+        analytics={fakeAnalytics}
       />,
     );
   };
@@ -82,6 +87,10 @@ describe('PendingUpdatesButton', () => {
     applyBtn.props().onClick();
 
     assert.called(fakeStreamer.applyPendingUpdates);
+    assert.calledWith(
+      fakeAnalytics.trackEvent,
+      'client.realtime.apply_updates',
+    );
   });
 
   it('applies updates when keyboard shortcut is pressed', () => {
@@ -94,5 +103,9 @@ describe('PendingUpdatesButton', () => {
     );
 
     assert.called(fakeStreamer.applyPendingUpdates);
+    assert.calledWith(
+      fakeAnalytics.trackEvent,
+      'client.realtime.apply_updates',
+    );
   });
 });

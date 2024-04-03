@@ -171,6 +171,12 @@ type ListGroupParams = {
   expand?: string[];
 };
 
+export type AnalyticsEventName = 'client.realtime.apply_updates';
+
+export type AnalyticsEvent = {
+  event: AnalyticsEventName;
+};
+
 /**
  * API client for the Hypothesis REST API.
  *
@@ -223,6 +229,11 @@ export class APIService {
     };
     read: APICall<{ authority?: string }, void, Profile>;
     update: APICall<Record<string, unknown>, Partial<Profile>, Profile>;
+  };
+  analytics: {
+    events: {
+      create: APICall<Record<string, unknown>, AnalyticsEvent>;
+    };
   };
 
   constructor(
@@ -303,6 +314,14 @@ export class APIService {
         Partial<Profile>,
         Profile
       >,
+    };
+    this.analytics = {
+      events: {
+        create: apiCall('analytics.events.create') as APICall<
+          Record<string, unknown>,
+          AnalyticsEvent
+        >,
+      },
     };
   }
 
