@@ -384,8 +384,9 @@ function hideAnnotation(id: string) {
 /**
  * Highlight annotations with the given `ids`.
  *
- * This is used to indicate the specific annotation in a thread that was
- * linked to for example. Replaces the current map of highlighted annotations.
+ * This is used to add a visual indicator to specific annotation cards, like a
+ * thread that was linked or annotations from pending updates that were applied.
+ * Replaces the current map of highlighted annotations.
  * All provided annotations (`ids`) will be set to `true` in the `highlighted`
  * map.
  */
@@ -499,6 +500,13 @@ const highlightedAnnotations = createSelector(
 );
 
 /**
+ * Is the annotation currently highlighted?
+ */
+function isAnnotationHighlighted(state: State, annotation?: Annotation) {
+  return !!annotation?.id && state.highlighted[annotation.id] === true;
+}
+
+/**
  * Is the annotation identified by `$tag` currently hovered?
  */
 function isAnnotationHovered(state: State, $tag: string) {
@@ -581,6 +589,7 @@ export const annotationsModule = createStoreModule(initialState, {
     findIDsForTags,
     hoveredAnnotations,
     highlightedAnnotations,
+    isAnnotationHighlighted,
     isAnnotationHovered,
     isWaitingToAnchorAnnotations,
     newAnnotations,

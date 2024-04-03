@@ -105,11 +105,14 @@ function Annotation({
   const annotationDescription = isSaved(annotation)
     ? annotationRole(annotation)
     : `New ${annotationRole(annotation).toLowerCase()}`;
+  const state = store.isAnnotationHighlighted(annotation)
+    ? ' - Highlighted'
+    : '';
 
   return (
     <article
       className="space-y-4"
-      aria-label={`${annotationDescription} by ${authorName}`}
+      aria-label={`${annotationDescription} by ${authorName}${state}`}
     >
       <AnnotationHeader
         annotation={annotation}

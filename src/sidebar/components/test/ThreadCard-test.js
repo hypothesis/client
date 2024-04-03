@@ -36,6 +36,7 @@ describe('ThreadCard', () => {
       clearAnnotationFocusRequest: sinon.stub(),
       isAnnotationHovered: sinon.stub().returns(false),
       route: sinon.stub(),
+      isAnnotationHighlighted: sinon.stub().returns(false),
     };
 
     fakeThread = {
@@ -138,6 +139,18 @@ describe('ThreadCard', () => {
       const threadCard = container.querySelector(threadCardSelector);
       assert.equal(document.activeElement, threadCard);
       assert.called(fakeStore.clearAnnotationFocusRequest);
+    });
+  });
+
+  [true, false].forEach(isHighlighted => {
+    it('applies UI changes when annotation is highlighted', () => {
+      fakeStore.isAnnotationHighlighted.returns(isHighlighted);
+      const wrapper = createComponent();
+
+      assert.equal(
+        wrapper.find('Card').prop('classes').includes('border-brand'),
+        isHighlighted,
+      );
     });
   });
 

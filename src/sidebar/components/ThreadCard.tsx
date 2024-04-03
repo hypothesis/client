@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 
@@ -29,6 +30,7 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
       debounce((ann: Annotation | null) => frameSync.hoverAnnotation(ann), 10),
     [frameSync],
   );
+  const isHighlighted = store.isAnnotationHighlighted(thread.annotation);
 
   const scrollToAnnotation = useCallback(
     (ann: Annotation) => {
@@ -65,7 +67,10 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
   return (
     <Card
       active={isHovered}
-      classes="cursor-pointer focus-visible-ring theme-clean:border-none"
+      classes={classnames(
+        'cursor-pointer focus-visible-ring theme-clean:border-none',
+        { 'border-brand': isHighlighted },
+      )}
       data-testid="thread-card"
       elementRef={cardRef}
       tabIndex={-1}

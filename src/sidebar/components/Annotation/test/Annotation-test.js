@@ -3,6 +3,7 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
+import sinon from 'sinon';
 
 import * as fixtures from '../../../test/annotation-fixtures';
 import Annotation, { $imports } from '../Annotation';
@@ -64,6 +65,7 @@ describe('Annotation', () => {
       isSavingAnnotation: sinon.stub().returns(false),
       profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
       setExpanded: sinon.stub(),
+      isAnnotationHighlighted: sinon.stub().returns(false),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -95,6 +97,18 @@ describe('Annotation', () => {
         wrapper.find('article').props()['aria-label'],
         'New annotation by Richard Lionheart',
       );
+    });
+
+    [true, false].forEach(isHighlighted => {
+      it('should mention if annotation is highlighted', () => {
+        fakeStore.isAnnotationHighlighted.returns(isHighlighted);
+        const wrapper = createComponent();
+
+        assert.equal(
+          wrapper.find('article').prop('aria-label').endsWith(' - Highlighted'),
+          isHighlighted,
+        );
+      });
     });
   });
 
