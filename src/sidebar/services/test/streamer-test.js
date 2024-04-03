@@ -1,6 +1,8 @@
 import { delay } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 import EventEmitter from 'tiny-emitter';
 
+import { promiseWithResolvers } from '../../../shared/promise-with-resolvers';
 import { fakeReduxStore } from '../../test/fake-redux-store';
 import { StreamerService, $imports } from '../streamer';
 
@@ -81,6 +83,7 @@ describe('StreamerService', () => {
   let fakeSession;
   let fakeWarnOnce;
   let activeStreamer;
+  let fakeSetTimeout;
 
   function createDefaultStreamer() {
     activeStreamer = new StreamerService(
@@ -89,7 +92,20 @@ describe('StreamerService', () => {
       fakeAuth,
       fakeGroups,
       fakeSession,
+      { setTimeout: fakeSetTimeout },
     );
+  }
+
+  function timeoutAsPromise() {
+    const { resolve, promise } = promiseWithResolvers();
+    fakeSetTimeout.callsFake(callback =>
+      setTimeout(() => {
+        callback();
+        resolve();
+      }, 0),
+    );
+
+    return promise;
   }
 
   beforeEach(() => {
@@ -114,6 +130,7 @@ describe('StreamerService', () => {
         }),
         receiveRealTimeUpdates: sinon.stub(),
         removeAnnotations: sinon.stub(),
+        highlightAnnotations: sinon.stub(),
       },
     );
 
@@ -127,6 +144,7 @@ describe('StreamerService', () => {
     };
 
     fakeWarnOnce = sinon.stub();
+    fakeSetTimeout = sinon.stub();
 
     $imports.$mock({
       '../../shared/warn-once': { warnOnce: fakeWarnOnce },
@@ -388,7 +406,8 @@ describe('StreamerService', () => {
         return activeStreamer.connect();
       });
 
-      it('applies updates immediately', () => {
+      it('applies updates immediately and highlights annotations', async () => {
+        const timeoutPromise = timeoutAsPromise();
         const [ann] = fixtures.createNotification.payload;
         fakeStore.pendingUpdates.returns({
           [ann.id]: ann,
@@ -403,6 +422,14 @@ describe('StreamerService', () => {
           fakeStore.addAnnotations,
           fixtures.createNotification.payload,
         );
+        assert.calledWith(
+          fakeStore.highlightAnnotations,
+          fixtures.createNotification.payload.map(({ id }) => id),
+        );
+        assert.calledWith(fakeSetTimeout, sinon.match.func, 5000);
+
+        await timeoutPromise;
+        assert.calledWith(fakeStore.highlightAnnotations, []);
       });
     });
 

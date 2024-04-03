@@ -527,4 +527,20 @@ describe('sidebar/store/modules/annotations', () => {
       assert.isTrue(store.annotationExists(annot.id));
     });
   });
+
+  describe('isAnnotationHighlighted', () => {
+    [
+      { annotation: undefined, expectedResult: false },
+      { annotation: {}, expectedResult: false },
+      { annotation: { id: '1' }, expectedResult: true },
+      { annotation: { id: '2' }, expectedResult: true },
+      { annotation: { id: '3' }, expectedResult: false },
+    ].forEach(({ annotation, expectedResult }) => {
+      it('returns true if the annotation ID is in the set of highlighted annotations', () => {
+        const store = createTestStore();
+        store.highlightAnnotations(['1', '2']);
+        assert.equal(store.isAnnotationHighlighted(annotation), expectedResult);
+      });
+    });
+  });
 });

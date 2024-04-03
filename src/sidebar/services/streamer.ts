@@ -52,6 +52,9 @@ export class StreamerService {
    */
   private _reconnectionAttempts: number;
 
+  // Test seam
+  private _window: Window;
+
   /** The randomly generated session ID */
   clientId: string;
 
@@ -61,6 +64,7 @@ export class StreamerService {
     auth: AuthService,
     groups: GroupsService,
     session: SessionService,
+    $window: Window,
   ) {
     this._auth = auth;
     this._groups = groups;
@@ -75,6 +79,7 @@ export class StreamerService {
     this._configMessages = {};
     this._reconnectionAttempts = 0;
     this._reconnectSetUp = false;
+    this._window = $window;
   }
 
   /**
@@ -85,6 +90,11 @@ export class StreamerService {
     const updates = Object.values(this._store.pendingUpdates());
     if (updates.length) {
       this._store.addAnnotations(updates);
+      // Highlight the new/edited annotations for 5 seconds
+      this._store.highlightAnnotations(
+        updates.map(({ id }) => id).filter(Boolean) as string[],
+      );
+      this._window.setTimeout(() => this._store.highlightAnnotations([]), 5000);
     }
 
     const deletions = Object.keys(this._store.pendingDeletions()).map(id => ({
