@@ -232,20 +232,14 @@ describe('ExportAnnotations', () => {
     assert.equal(input.prop('defaultValue'), 'suggested-filename');
   });
 
-  [
-    { exportFormatsEnabled: true, expectedAmountOfSelects: 2 },
-    { exportFormatsEnabled: false, expectedAmountOfSelects: 1 },
-  ].forEach(({ exportFormatsEnabled, expectedAmountOfSelects }) => {
-    it('displays format selector when feature is enabled', async () => {
-      fakeStore.isFeatureEnabled.callsFake(
-        ff => exportFormatsEnabled || ff !== 'export_formats',
-      );
+  it('displays format selector', async () => {
+    const wrapper = createComponent();
+    const select = await waitForElement(
+      wrapper,
+      '[data-testid="export-format-select"]',
+    );
 
-      const wrapper = createComponent();
-      const selects = await waitForElement(wrapper, SelectNext);
-
-      assert.equal(selects.length, expectedAmountOfSelects);
-    });
+    assert.isDefined(select);
   });
 
   it('lists supported export formats', async () => {
@@ -464,18 +458,9 @@ describe('ExportAnnotations', () => {
   });
 
   context('when copying annotations export to clipboard', () => {
-    [true, false].forEach(exportFormatsEnabled => {
-      it('displays copy button if `export_formats` FF is enabled', () => {
-        fakeStore.isFeatureEnabled.callsFake(ff =>
-          ff === 'export_formats' ? exportFormatsEnabled : true,
-        );
-
-        const wrapper = createComponent();
-        assert.equal(
-          wrapper.exists('[data-testid="copy-button"]'),
-          exportFormatsEnabled,
-        );
-      });
+    it('displays copy button', () => {
+      const wrapper = createComponent();
+      assert.isTrue(wrapper.exists('[data-testid="copy-button"]'));
     });
 
     [
@@ -515,8 +500,6 @@ describe('ExportAnnotations', () => {
         getExpectedInvokedContentBuilder,
       }) => {
         it('copies export content as rich or plain text depending on format', async () => {
-          fakeStore.isFeatureEnabled.callsFake(ff => ff === 'export_formats');
-
           const wrapper = createComponent();
           const copyButton = wrapper.find('button[data-testid="copy-button"]');
 
@@ -541,7 +524,6 @@ describe('ExportAnnotations', () => {
     );
 
     it('adds error toast message when copying annotations fails', async () => {
-      fakeStore.isFeatureEnabled.callsFake(ff => ff === 'export_formats');
       fakeCopyPlainText.rejects(new Error('Something failed'));
 
       const wrapper = createComponent();
