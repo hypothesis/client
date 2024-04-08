@@ -7,6 +7,7 @@ import UserMenu, { $imports } from '../UserMenu';
 describe('UserMenu', () => {
   let fakeProfile;
   let fakeFrameSync;
+  let fakeDashboard;
   let fakeIsThirdPartyUser;
   let fakeOnLogout;
   let fakeServiceConfig;
@@ -18,6 +19,7 @@ describe('UserMenu', () => {
     return mount(
       <UserMenu
         frameSync={fakeFrameSync}
+        dashboard={fakeDashboard}
         onLogout={fakeOnLogout}
         settings={fakeSettings}
       />,
@@ -38,6 +40,7 @@ describe('UserMenu', () => {
       userid: 'acct:eleanorFishtail@hypothes.is',
     };
     fakeFrameSync = { notifyHost: sinon.stub() };
+    fakeDashboard = { open: sinon.stub() };
     fakeIsThirdPartyUser = sinon.stub();
     fakeOnLogout = sinon.stub();
     fakeServiceConfig = sinon.stub();
@@ -363,6 +366,33 @@ describe('UserMenu', () => {
           assert.equal(logOutMenuItem.prop('onClick'), fakeOnLogout);
         }
       });
+    });
+  });
+
+  describe('open dashboard menu item', () => {
+    [
+      { dashboard: undefined, menuShouldExist: false },
+      { dashboard: { showEntryPoint: false }, menuShouldExist: false },
+      { dashboard: { showEntryPoint: true }, menuShouldExist: true },
+    ].forEach(({ dashboard, menuShouldExist }) => {
+      it('shows the menu item only if enabled in settings', () => {
+        fakeSettings.dashboard = dashboard;
+        const wrapper = createUserMenu();
+
+        assert.equal(
+          wrapper.exists('MenuItem[label="Open dashboard"]'),
+          menuShouldExist,
+        );
+      });
+    });
+
+    it('opens dashboard when clicked', () => {
+      fakeSettings.dashboard = { showEntryPoint: true };
+      const wrapper = createUserMenu();
+
+      wrapper.find('MenuItem[label="Open dashboard"]').props().onClick();
+
+      assert.called(fakeDashboard.open);
     });
   });
 });

@@ -25,6 +25,7 @@ import { APIService } from './services/api';
 import { APIRoutesService } from './services/api-routes';
 import { AuthService } from './services/auth';
 import { AutosaveService } from './services/autosave';
+import { DashboardService } from './services/dashboard';
 import { FrameSyncService } from './services/frame-sync';
 import { GroupsService } from './services/groups';
 import { ImportAnnotationsService } from './services/import-annotations';
@@ -143,6 +144,7 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
     .register('apiRoutes', APIRoutesService)
     .register('auth', AuthService)
     .register('autosaveService', AutosaveService)
+    .register('dashboard', DashboardService)
     .register('frameSync', FrameSyncService)
     .register('groups', GroupsService)
     .register('importAnnotationsService', ImportAnnotationsService)

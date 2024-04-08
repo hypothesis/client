@@ -81,6 +81,20 @@ export type ReportAnnotationActivityConfig = {
   events: AnnotationEventType[];
 };
 
+export type DashboardConfig = {
+  /**
+   * Whether the dashboard entry point should be displayed in the profile menu
+   * or not.
+   * Typically, only instructors should see this option.
+   */
+  showEntryPoint: boolean;
+
+  /**
+   * Name of the RPC method to call in embedded frame on entry point activation.
+   */
+  entryPointRPCMethod: string;
+};
+
 /**
  * Configure the client to focus on a specific subset of annotations.
  *
@@ -275,4 +289,7 @@ export type ConfigFromEmbedder = ConfigFromHost & {
    * `requestConfigFromFrame` when certain annotation activity happens.
    */
   reportActivity?: ReportAnnotationActivityConfig;
+
+  /** Configuration for menu items etc. related to LMS instructor dashboard */
+  dashboard?: DashboardConfig;
 };
