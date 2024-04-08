@@ -2925,8 +2925,8 @@ __metadata:
   linkType: hard
 
 "@npmcli/arborist@npm:^7.0.0":
-  version: 7.4.0
-  resolution: "@npmcli/arborist@npm:7.4.0"
+  version: 7.4.1
+  resolution: "@npmcli/arborist@npm:7.4.1"
   dependencies:
     "@isaacs/string-locale-compare": ^1.1.0
     "@npmcli/fs": ^3.1.0
@@ -2944,12 +2944,12 @@ __metadata:
     hosted-git-info: ^7.0.1
     json-parse-even-better-errors: ^3.0.0
     json-stringify-nice: ^1.1.4
-    minimatch: ^9.0.0
+    minimatch: ^9.0.4
     nopt: ^7.0.0
     npm-install-checks: ^6.2.0
     npm-package-arg: ^11.0.1
     npm-pick-manifest: ^9.0.0
-    npm-registry-fetch: ^16.0.0
+    npm-registry-fetch: ^16.2.0
     npmlog: ^7.0.1
     pacote: ^17.0.4
     parse-conflict-json: ^3.0.0
@@ -2963,7 +2963,7 @@ __metadata:
     walk-up-path: ^3.0.1
   bin:
     arborist: bin/index.js
-  checksum: 9590c77e28c441a917c00de6422a73c74285e28d87f06fb36a36331d7fb969cb68ee04da16174c207c6587c4eaeedf12a50a7718493e4f3f5079b53520314976
+  checksum: c0ef7ee7f722849664348d1376d03aa270fd03b6fa9cf3c3a59144c60e57f632652c902757dcdf0a6436e01e85b2d80f8ecd66ec44955eb61e75a9d819250f3b
   languageName: node
   linkType: hard
 
@@ -3092,6 +3092,13 @@ __metadata:
   dependencies:
     postcss-selector-parser: ^6.0.10
   checksum: 33c018bfcc6d64593e7969847d0442beab4e8a42b6c9f932237c9fd135c95ab55de5c4b5d5d66302dd9fc3c748bc4ead780d3595e5d586fedf9859ed6b5f2744
+  languageName: node
+  linkType: hard
+
+"@npmcli/redact@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@npmcli/redact@npm:1.1.0"
+  checksum: f200d40c485aea6fdf0487ddfed258ec13a217701261d9115f9c82b65f341403b3dfc7aaa1f5bd0b51b09f7dee03d89b86d99314356faed370bada8d0f000836
   languageName: node
   linkType: hard
 
@@ -10285,6 +10292,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"minimatch@npm:^9.0.4":
+  version: 9.0.4
+  resolution: "minimatch@npm:9.0.4"
+  dependencies:
+    brace-expansion: ^2.0.1
+  checksum: cf717f597ec3eed7dabc33153482a2e8d49f4fd3c26e58fd9c71a94c5029a0838728841b93f46bf1263b65a8010e2ee800d0dc9b004ab8ba8b6d1ec07cc115b5
+  languageName: node
+  linkType: hard
+
 "minimist@npm:^1.2.3, minimist@npm:^1.2.5":
   version: 1.2.6
   resolution: "minimist@npm:1.2.6"
@@ -10850,6 +10866,22 @@ __metadata:
     npm-package-arg: ^11.0.0
     proc-log: ^3.0.0
   checksum: d50363d1f7e03234b9fcd6aea061f2a2cb6c65f5de0b9af9bf9d3f39174cc92c02bb227f6f49e3d12d35f07fb0bd568857b67481f0ec53649727e004cf1261cd
+  languageName: node
+  linkType: hard
+
+"npm-registry-fetch@npm:^16.2.0":
+  version: 16.2.0
+  resolution: "npm-registry-fetch@npm:16.2.0"
+  dependencies:
+    "@npmcli/redact": ^1.1.0
+    make-fetch-happen: ^13.0.0
+    minipass: ^7.0.2
+    minipass-fetch: ^3.0.0
+    minipass-json-stream: ^1.0.1
+    minizlib: ^2.1.2
+    npm-package-arg: ^11.0.0
+    proc-log: ^3.0.0
+  checksum: 04d9442f274dd584617f199285431fa27dd36372c69ed0f9c79b5f6acd73633ba282fc1e57789b2538893132826f8319463c8b0fe18246b5e4fe556cf04225c3
   languageName: node
   linkType: hard
 
