@@ -130,7 +130,6 @@ function ExportAnnotations({
     [allAnnotationsOption, selectedUserId, userList],
   );
 
-  const exportFormatsEnabled = store.isFeatureEnabled('export_formats');
   const [exportFormat, setExportFormat] = useState(exportFormats[0]);
 
   const fileInputId = useId();
@@ -325,35 +324,31 @@ function ExportAnnotations({
                 required
                 maxLength={250}
               />
-              {exportFormatsEnabled && (
-                <div className="grow-0 ml-2 min-w-[5rem]">
-                  <SelectNext
-                    value={exportFormat}
-                    onChange={setExportFormat}
-                    buttonContent={
-                      exportFormat.shortTitle ?? exportFormat.title
-                    }
-                    data-testid="export-format-select"
-                    right
-                  >
-                    {exportFormats.map(exportFormat => (
-                      <SelectNext.Option
-                        key={exportFormat.value}
-                        value={exportFormat}
-                      >
-                        <div className="flex-col gap-y-2">
-                          <div className="font-bold" data-testid="format-name">
-                            {exportFormat.title}
-                          </div>
-                          <div data-testid="format-description">
-                            {exportFormat.description}
-                          </div>
+              <div className="grow-0 ml-2 min-w-[5rem]">
+                <SelectNext
+                  value={exportFormat}
+                  onChange={setExportFormat}
+                  buttonContent={exportFormat.shortTitle ?? exportFormat.title}
+                  data-testid="export-format-select"
+                  right
+                >
+                  {exportFormats.map(exportFormat => (
+                    <SelectNext.Option
+                      key={exportFormat.value}
+                      value={exportFormat}
+                    >
+                      <div className="flex-col gap-y-2">
+                        <div className="font-bold" data-testid="format-name">
+                          {exportFormat.title}
                         </div>
-                      </SelectNext.Option>
-                    ))}
-                  </SelectNext>
-                </div>
-              )}
+                        <div data-testid="format-description">
+                          {exportFormat.description}
+                        </div>
+                      </div>
+                    </SelectNext.Option>
+                  ))}
+                </SelectNext>
+              </div>
             </div>
           </div>
         </>
@@ -370,16 +365,14 @@ function ExportAnnotations({
         </p>
       )}
       <CardActions>
-        {exportFormatsEnabled && (
-          <Button
-            data-testid="copy-button"
-            icon={CopyIcon}
-            onClick={copyAnnotationsExport}
-            disabled={exportableAnnotations.length === 0}
-          >
-            Copy to clipboard
-          </Button>
-        )}
+        <Button
+          data-testid="copy-button"
+          icon={CopyIcon}
+          onClick={copyAnnotationsExport}
+          disabled={exportableAnnotations.length === 0}
+        >
+          Copy to clipboard
+        </Button>
         <Button
           data-testid="export-button"
           variant="primary"
