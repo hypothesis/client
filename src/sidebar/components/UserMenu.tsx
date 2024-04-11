@@ -8,18 +8,17 @@ import {
   username as getUsername,
 } from '../helpers/account-id';
 import { withServices } from '../service-context';
-import type { DashboardService } from '../services/dashboard';
 import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
 import Menu from './Menu';
 import MenuItem from './MenuItem';
 import MenuSection from './MenuSection';
+import OpenDashboardMenuItem from './OpenDashboardMenuItem';
 
 export type UserMenuProps = {
   onLogout: () => void;
 
   // Injected
-  dashboard: DashboardService;
   frameSync: FrameSyncService;
   settings: SidebarSettings;
 };
@@ -30,7 +29,7 @@ export type UserMenuProps = {
  * This menu will contain different items depending on service configuration,
  * context and whether the user is first- or third-party.
  */
-function UserMenu({ frameSync, onLogout, settings, dashboard }: UserMenuProps) {
+function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
   const store = useSidebarStore();
   const defaultAuthority = store.defaultAuthority();
   const profile = store.profile();
@@ -116,7 +115,7 @@ function UserMenu({ frameSync, onLogout, settings, dashboard }: UserMenuProps) {
         </MenuSection>
         {settings.dashboard?.showEntryPoint && (
           <MenuSection>
-            <MenuItem label="Open dashboard" onClick={() => dashboard.open()} />
+            <OpenDashboardMenuItem isMenuOpen={isOpen} />
           </MenuSection>
         )}
         {logoutAvailable && (
@@ -133,4 +132,4 @@ function UserMenu({ frameSync, onLogout, settings, dashboard }: UserMenuProps) {
   );
 }
 
-export default withServices(UserMenu, ['dashboard', 'frameSync', 'settings']);
+export default withServices(UserMenu, ['frameSync', 'settings']);

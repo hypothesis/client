@@ -13,10 +13,12 @@ describe('DashboardService', () => {
       origin: 'https://www.example.com',
     };
     fakeDashboard = {
-      entryPointRPCMethod: 'openDashboard',
+      authTokenRPCMethod: 'requestAuthToken',
+      entryPointURL: '/open/dashboard',
+      authFieldName: 'authorization',
     };
     fakePostMessageJsonRpc = {
-      notify: sinon.stub(),
+      call: sinon.stub(),
     };
 
     $imports.$mock({
@@ -36,28 +38,76 @@ describe('DashboardService', () => {
     });
   }
 
+  describe('getAuthToken', () => {
+    [
+      { withRpc: false },
+      { withDashboard: false },
+      { withRpc: false, withDashboard: false },
+    ].forEach(settings => {
+      it('does not call frame if there is any missing config', async () => {
+        const dashboard = createDashboardService(settings);
+        await dashboard.getAuthToken();
+        assert.notCalled(fakePostMessageJsonRpc.call);
+      });
+    });
+
+    it('calls frame to get the authToken', async () => {
+      fakePostMessageJsonRpc.call.resolves('the_token');
+      const dashboard = createDashboardService();
+
+      const result = await dashboard.getAuthToken();
+
+      assert.equal(result, 'the_token');
+      assert.calledWith(
+        fakePostMessageJsonRpc.call,
+        window,
+        'https://www.example.com',
+        'requestAuthToken',
+      );
+    });
+  });
+
   describe('open', () => {
     [
       { withRpc: false },
       { withDashboard: false },
       { withRpc: false, withDashboard: false },
     ].forEach(settings => {
-      it('does not notify frame if there is any missing config', () => {
+      it('throws error if there is any missing config', () => {
         const dashboard = createDashboardService(settings);
-        dashboard.open();
-        assert.notCalled(fakePostMessageJsonRpc.notify);
+
+        assert.throws(
+          () => dashboard.open('auth_token'),
+          'Dashboard cannot be opened due to missing configuration',
+        );
       });
     });
 
-    it('notifies frame to open the dashboard', () => {
+    it('submits form with auth token', () => {
+      const fakeForm = {
+        append: sinon.stub(),
+        submit: sinon.stub(),
+        remove: sinon.stub(),
+      };
+      const fakeInput = {};
+      const fakeDocument = {
+        createElement: tagName => (tagName === 'form' ? fakeForm : fakeInput),
+        body: {
+          append: sinon.stub(),
+        },
+      };
+
       const dashboard = createDashboardService();
-      dashboard.open();
-      assert.calledWith(
-        fakePostMessageJsonRpc.notify,
-        window,
-        'https://www.example.com',
-        'openDashboard',
-      );
+
+      dashboard.open('auth_token', fakeDocument);
+
+      assert.equal(fakeForm.action, fakeDashboard.entryPointURL);
+      assert.equal(fakeInput.name, fakeDashboard.authFieldName);
+      assert.equal(fakeInput.value, 'auth_token');
+      assert.calledWith(fakeDocument.body.append, fakeForm);
+      assert.calledWith(fakeForm.append, fakeInput);
+      assert.called(fakeForm.submit);
+      assert.called(fakeForm.remove);
     });
   });
 });

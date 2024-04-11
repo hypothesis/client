@@ -7,7 +7,6 @@ import UserMenu, { $imports } from '../UserMenu';
 describe('UserMenu', () => {
   let fakeProfile;
   let fakeFrameSync;
-  let fakeDashboard;
   let fakeIsThirdPartyUser;
   let fakeOnLogout;
   let fakeServiceConfig;
@@ -19,7 +18,6 @@ describe('UserMenu', () => {
     return mount(
       <UserMenu
         frameSync={fakeFrameSync}
-        dashboard={fakeDashboard}
         onLogout={fakeOnLogout}
         settings={fakeSettings}
       />,
@@ -40,7 +38,6 @@ describe('UserMenu', () => {
       userid: 'acct:eleanorFishtail@hypothes.is',
     };
     fakeFrameSync = { notifyHost: sinon.stub() };
-    fakeDashboard = { open: sinon.stub() };
     fakeIsThirdPartyUser = sinon.stub();
     fakeOnLogout = sinon.stub();
     fakeServiceConfig = sinon.stub();
@@ -68,6 +65,11 @@ describe('UserMenu', () => {
   afterEach(() => {
     $imports.$restore();
   });
+
+  const openMenu = wrapper => {
+    act(() => wrapper.find('Menu').props().onOpenChanged(true));
+    wrapper.update();
+  };
 
   describe('profile menu item', () => {
     context('first-party user', () => {
@@ -248,8 +250,7 @@ describe('UserMenu', () => {
 
           const wrapper = createUserMenu();
           // Make the menu "open"
-          act(() => wrapper.find('Menu').props().onOpenChanged(true));
-          wrapper.update();
+          openMenu(wrapper);
           assert.isTrue(wrapper.find('Menu').props().open);
 
           wrapper
@@ -283,10 +284,7 @@ describe('UserMenu', () => {
     it('opens the notebook and closes itself when `n` is typed', () => {
       const wrapper = createUserMenu();
       // Make the menu "open"
-      act(() => {
-        wrapper.find('Menu').props().onOpenChanged(true);
-      });
-      wrapper.update();
+      openMenu(wrapper);
       assert.isTrue(wrapper.find('Menu').props().open);
 
       wrapper
@@ -379,20 +377,19 @@ describe('UserMenu', () => {
         fakeSettings.dashboard = dashboard;
         const wrapper = createUserMenu();
 
-        assert.equal(
-          wrapper.exists('MenuItem[label="Open dashboard"]'),
-          menuShouldExist,
-        );
+        assert.equal(wrapper.exists('OpenDashboardMenuItem'), menuShouldExist);
       });
     });
 
-    it('opens dashboard when clicked', () => {
+    it('marks menu item as open when parent menu is open', () => {
       fakeSettings.dashboard = { showEntryPoint: true };
       const wrapper = createUserMenu();
+      const isMenuOpen = () =>
+        wrapper.find('OpenDashboardMenuItem').prop('isMenuOpen');
 
-      wrapper.find('MenuItem[label="Open dashboard"]').props().onClick();
-
-      assert.called(fakeDashboard.open);
+      assert.isFalse(isMenuOpen());
+      openMenu(wrapper);
+      assert.isTrue(isMenuOpen());
     });
   });
 });
