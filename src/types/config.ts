@@ -89,10 +89,17 @@ export type DashboardConfig = {
    */
   showEntryPoint: boolean;
 
+  /** Name of the RPC method to get a valid auth token */
+  authTokenRPCMethod: string;
+
   /**
-   * Name of the RPC method to call in embedded frame on entry point activation.
+   * Entry point for the dashboard, where the first request needs to happen to
+   * get authenticated.
    */
-  entryPointRPCMethod: string;
+  entryPointURL: string;
+
+  /** The name of the form field containing the auth token */
+  authFieldName: string;
 };
 
 /**
