@@ -23,7 +23,7 @@ docutils==0.17.1
     #   myst-parser
     #   sphinx
     #   sphinx-rtd-theme
-idna==3.3
+idna==3.7
     # via requests
 imagesize==1.4.1
     # via sphinx
