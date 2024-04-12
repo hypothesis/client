@@ -239,10 +239,11 @@ export default function MenuItem({
   const wrapperClasses = classnames(
     'focus-visible-ring ring-inset',
     'w-full min-w-[150px] flex items-center select-none',
-    'rounded-none cursor-pointer',
+    'rounded-none',
     {
       'focus-visible:rounded-lg': !isSelected,
       'focus-visible:rounded-r-lg': isSelected,
+      'cursor-pointer': !isDisabled,
     },
     // Set this container as a "group" so that children may style based on its
     // layout state.
@@ -251,8 +252,10 @@ export default function MenuItem({
     {
       'min-h-[30px] font-normal': isSubmenuItem,
       'min-h-[40px] font-medium': !isSubmenuItem,
-      'bg-grey-1 hover:bg-grey-3': isSubmenuItem || isExpanded,
-      'bg-white hover:bg-grey-1': !isSubmenuItem && !isExpanded,
+      'bg-grey-1': isSubmenuItem || isExpanded,
+      'hover:bg-grey-3': !isDisabled && (isSubmenuItem || isExpanded),
+      'bg-white': !isSubmenuItem && !isExpanded,
+      'hover:bg-grey-1': !isDisabled && !isSubmenuItem && !isExpanded,
       // visual "padding" on the right is part of SubmenuToggle when rendered,
       // but when not rendering a SubmenuToggle, we need to add some padding here
       'pr-1': !hasSubmenuVisible,
