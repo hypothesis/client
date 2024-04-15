@@ -11590,13 +11590,13 @@ __metadata:
   linkType: hard
 
 "preact-render-to-string@npm:^6.4.0":
-  version: 6.4.1
-  resolution: "preact-render-to-string@npm:6.4.1"
+  version: 6.4.2
+  resolution: "preact-render-to-string@npm:6.4.2"
   dependencies:
     pretty-format: ^3.8.0
   peerDependencies:
     preact: ">=10"
-  checksum: 9c8613773f8969b7a9a6b722e1731321e46bbd6daab7de0795d5579a87897702b5e4ca57df47ee7b1e5592a0d8a41b15b7a27d19496a4b9a82adb14722920055
+  checksum: 4be4d773d9a08ab17727e738dabd439fa7a85ef9a41e86c0211d0711b870defd925a4a4b6353a4852c91de8aca52d2281960f89d67ce648cb31fa6d9bba9f903
   languageName: node
   linkType: hard
 
