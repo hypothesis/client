@@ -150,19 +150,6 @@ export default function ThreadList({ threads }: ThreadListProps) {
       [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight],
     );
 
-  const store = useSidebarStore();
-
-  // Get the `$tag` of the most recently created unsaved annotation.
-  const newAnnotationTag = (() => {
-    // If multiple unsaved annotations exist, assume that the last one in the
-    // list is the most recently created one.
-    const newAnnotations = store.unsavedAnnotations();
-    if (!newAnnotations.length) {
-      return null;
-    }
-    return newAnnotations[newAnnotations.length - 1].$tag;
-  })();
-
   // Compute the heading to display above each thread. Headings are only shown
   // in some document types (eg. VitalSource books).
   //
@@ -197,6 +184,21 @@ export default function ThreadList({ threads }: ThreadListProps) {
     return headings;
   }, [threads]);
 
+  const store = useSidebarStore();
+  const editing = store.countDrafts() > 0;
+  const highlightedAnnotations = store.highlightedAnnotations();
+
+  // Get the `$tag` of the most recently created unsaved annotation.
+  const newAnnotationTag = (() => {
+    // If multiple unsaved annotations exist, assume that the last one in the
+    // list is the most recently created one.
+    const newAnnotations = store.unsavedAnnotations();
+    if (!newAnnotations.length) {
+      return null;
+    }
+    return newAnnotations[newAnnotations.length - 1].$tag;
+  })();
+
   // Scroll to newly created annotations and replies.
   //
   // nb. If there are multiple unsaved annotations and the newest one is saved
@@ -209,17 +211,20 @@ export default function ThreadList({ threads }: ThreadListProps) {
     }
   }, [store, newAnnotationTag]);
 
-  const editing = store.countDrafts() > 0;
-  const highlightedAnnotations = store.highlightedAnnotations();
+  const mostRecentlyHighlightedAnnotationId = useMemo(
+    // If multiple highlighted annotations exist, assume that the last one in
+    // the list is the most recent.
+    () => highlightedAnnotations[highlightedAnnotations.length - 1],
+    [highlightedAnnotations],
+  );
 
-  // Scroll to the first highlighted annotation, unless creating/editing another
-  // annotation
+  // Scroll to the most recently highlighted annotation, unless creating/editing
+  // another annotation
   useEffect(() => {
-    const [firstHighlightedAnnotation] = highlightedAnnotations;
-    if (!editing && firstHighlightedAnnotation) {
-      setScrollToId(firstHighlightedAnnotation);
+    if (!editing && mostRecentlyHighlightedAnnotationId) {
+      setScrollToId(mostRecentlyHighlightedAnnotationId);
     }
-  }, [editing, highlightedAnnotations]);
+  }, [editing, mostRecentlyHighlightedAnnotationId]);
 
   // Effect to scroll a particular thread into view. This is mainly used to
   // scroll a newly created annotation into view.

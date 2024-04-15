@@ -197,9 +197,9 @@ describe('ThreadList', () => {
       fakeStore.highlightedAnnotations.returns(['t2', 't3']);
       createComponent();
 
-      // The first thread in a collection of threads at default height (200)
-      // should be at 200px.
-      assert.calledWith(fakeScrollTop, 200);
+      // The last highlighted annotation is the third in the collection of
+      // threads. At default height (200) should be at 400px.
+      assert.calledWith(fakeScrollTop, 400);
     });
   });
 
