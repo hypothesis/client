@@ -209,6 +209,18 @@ export default function ThreadList({ threads }: ThreadListProps) {
     }
   }, [store, newAnnotationTag]);
 
+  const editing = store.countDrafts() > 0;
+  const highlightedAnnotations = store.highlightedAnnotations();
+
+  // Scroll to the first highlighted annotation, unless creating/editing another
+  // annotation
+  useEffect(() => {
+    const [firstHighlightedAnnotation] = highlightedAnnotations;
+    if (!editing && firstHighlightedAnnotation) {
+      setScrollToId(firstHighlightedAnnotation);
+    }
+  }, [editing, highlightedAnnotations]);
+
   // Effect to scroll a particular thread into view. This is mainly used to
   // scroll a newly created annotation into view.
   useEffect(() => {

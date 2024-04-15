@@ -4,6 +4,7 @@ import {
 } from '@hypothesis/frontend-testing';
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
+import sinon from 'sinon';
 
 import ThreadList from '../ThreadList';
 import { $imports } from '../ThreadList';
@@ -54,6 +55,8 @@ describe('ThreadList', () => {
     fakeStore = {
       setForcedVisible: sinon.stub(),
       unsavedAnnotations: sinon.stub().returns([]),
+      countDrafts: sinon.stub().returns(0),
+      highlightedAnnotations: sinon.stub().returns([]),
     };
 
     fakeTopThread = {
@@ -177,9 +180,26 @@ describe('ThreadList', () => {
       addNewAnnotation(wrapper, fakeTopThread.children[3].annotation);
 
       // The third thread in a collection of threads at default height (200)
-      // should be at 600px. This setting of `scrollTop` is the only externally-
-      // observable thing that happens here...
+      // should be at 600px. This setting of `scrollTop` is the only
+      // externally-observable thing that happens here...
       assert.calledWith(fakeScrollTop, 600);
+    });
+
+    it('should do nothing for highlighted annotations while creating/editing', () => {
+      fakeStore.highlightedAnnotations.returns(['t2', 't3']);
+      fakeStore.countDrafts.returns(10);
+      createComponent();
+
+      assert.notCalled(fakeScrollTop);
+    });
+
+    it('should set the scroll container `scrollTop` to first highlighted annotation', () => {
+      fakeStore.highlightedAnnotations.returns(['t2', 't3']);
+      createComponent();
+
+      // The first thread in a collection of threads at default height (200)
+      // should be at 200px.
+      assert.calledWith(fakeScrollTop, 200);
     });
   });
 
