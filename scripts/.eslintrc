@@ -2,18 +2,9 @@
   "env": {
     "node": true
   },
-  "parserOptions": {
-    "sourceType": "script"
-  },
   "rules": {
     "@typescript-eslint/no-var-requires": "off",
     "no-console": "off",
     "react-hooks/rules-of-hooks": "off"
-  },
-  "overrides": [
-    {
-      "files": ["*.mjs"],
-      "parserOptions": { "sourceType": "module" }
-    }
-  ]
+  }
 }

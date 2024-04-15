@@ -1,16 +1,15 @@
-'use strict';
 /* eslint-env node */
+import express from 'express';
+import log from 'fancy-log';
+import Mustache from 'mustache';
+import mustacheExpress from 'mustache-express';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const fs = require('fs');
-const path = require('path');
+import { createServer, useSsl } from './create-server.js';
 
-const express = require('express');
-const log = require('fancy-log');
-const mustacheExpress = require('mustache-express');
-const Mustache = require('mustache');
-
-const { createServer, useSsl } = require('./create-server');
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const HTML_PATH = `${__dirname}/documents/html/`;
 const PDF_PATH = `${__dirname}/documents/pdf/`;
 const TEMPLATE_PATH = `${__dirname}/templates/`;
@@ -95,7 +94,7 @@ function templateContext(config) {
  * @param {number} port - The port that the test server should listen on.
  * @param {Config} config - Config for the server
  */
-function serveDev(port, config) {
+export function serveDev(port, config) {
   const app = express();
 
   app.engine('mustache', mustacheExpress());
@@ -197,5 +196,3 @@ function serveDev(port, config) {
     }
   });
 }
-
-module.exports = serveDev;

@@ -1,12 +1,13 @@
-'use strict';
+import express from 'express';
+import log from 'fancy-log';
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const { readFileSync } = require('fs');
+import { createServer, useSsl } from './create-server.js';
 
-const express = require('express');
-const log = require('fancy-log');
-
-const { createServer, useSsl } = require('./create-server');
-const { version } = require('../package.json');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const { version } = JSON.parse(readFileSync(`${__dirname}/../package.json`));
 
 /**
  * An express server which serves the contents of the package.
@@ -19,7 +20,7 @@ const { version } = require('../package.json');
  * returned by the service's '/embed.js' route and included in the '/app.html'
  * app.
  */
-function servePackage(port) {
+export function servePackage(port) {
   const app = express();
 
   // Enable CORS for assets so that cross-origin font loading works.
@@ -47,5 +48,3 @@ function servePackage(port) {
     log(`Package served at ${scheme}://localhost:${port}/hypothesis`);
   });
 }
-
-module.exports = servePackage;
