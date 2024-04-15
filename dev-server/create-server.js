@@ -1,8 +1,6 @@
-'use strict';
-
-const { existsSync, readFileSync } = require('fs');
-const https = require('https');
-const http = require('http');
+import { existsSync, readFileSync } from 'node:fs';
+import * as http from 'node:http';
+import * as https from 'node:https';
 
 const SSL_KEYFILE = '.tlskey.pem';
 const SSL_CERTFILE = '.tlscert.pem';
@@ -12,7 +10,7 @@ const SSL_CERTFILE = '.tlscert.pem';
  *
  * @type {boolean}
  */
-const useSsl = existsSync(SSL_KEYFILE) && existsSync(SSL_CERTFILE);
+export const useSsl = existsSync(SSL_KEYFILE) && existsSync(SSL_CERTFILE);
 
 /**
  * Create an HTTP(S) server to serve client assets in development.
@@ -22,7 +20,7 @@ const useSsl = existsSync(SSL_KEYFILE) && existsSync(SSL_CERTFILE);
  *
  * @param {Function} requestListener
  */
-function createServer(requestListener) {
+export function createServer(requestListener) {
   let server;
   if (useSsl) {
     const options = {
@@ -35,8 +33,3 @@ function createServer(requestListener) {
   }
   return server;
 }
-
-module.exports = {
-  createServer,
-  useSsl,
-};

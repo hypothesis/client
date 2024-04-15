@@ -8,8 +8,8 @@ import {
 import changed from 'gulp-changed';
 import gulp from 'gulp';
 
-import serveDev from './dev-server/serve-dev.js';
-import servePackage from './dev-server/serve-package.js';
+import { serveDev } from './dev-server/serve-dev.js';
+import { servePackage } from './dev-server/serve-package.js';
 import tailwindConfig from './tailwind.config.mjs';
 import annotatorTailwindConfig from './tailwind-annotator.config.mjs';
 import sidebarTailwindConfig from './tailwind-sidebar.config.mjs';
@@ -154,7 +154,7 @@ gulp.task(
   gulp.parallel('build-css', () =>
     runTests({
       bootstrapFile: 'src/sidebar/test/bootstrap.js',
-      karmaConfig: 'src/karma.config.js',
+      karmaConfig: 'src/karma.config.cjs',
       rollupConfig: 'rollup-tests.config.mjs',
       testsPattern: 'src/**/*-test.js',
     })

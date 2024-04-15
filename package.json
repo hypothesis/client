@@ -6,6 +6,7 @@
   "homepage": "https://hypothes.is",
   "bugs": "https://github.com/hypothesis/client/issues",
   "repository": "hypothesis/client",
+  "type": "module",
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.504.0",
     "@babel/core": "^7.1.6",

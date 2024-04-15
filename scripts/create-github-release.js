@@ -1,18 +1,20 @@
 #!/usr/bin/env node
 
-'use strict';
-
 /**
  * Creates a GitHub release for the repository.
  *
  * This should be run just after a released is tagged with the tag name
  * `v<VERSION>` where <VERSION> is the `version` field in package.json.
  */
+import { Octokit } from '@octokit/rest';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const { Octokit } = require('@octokit/rest');
+import { changelistSinceTag } from './generate-change-list.js';
 
-const pkg = require('../package.json');
-const { changelistSinceTag } = require('./generate-change-list');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(fs.readFileSync(`${__dirname}/../package.json`));
 
 async function createGitHubRelease({ previousVersion }) {
   // See https://github.com/docker/docker/issues/679
