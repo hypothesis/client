@@ -31,7 +31,7 @@ export function servePackage(port) {
   });
 
   const serveBootScript = function (req, res) {
-    const entryPath = require.resolve('../');
+    const entryPath = `${__dirname}/../build/boot.js`;
     const entryScript = readFileSync(entryPath).toString('utf-8');
     res.append('Content-Type', 'application/javascript; charset=utf-8');
     res.send(entryScript);
