@@ -187,6 +187,7 @@ export default function ThreadList({ threads }: ThreadListProps) {
   const store = useSidebarStore();
   const editing = store.countDrafts() > 0;
   const highlightedAnnotations = store.highlightedAnnotations();
+  const allAnnotations = store.allAnnotations();
 
   // Get the `$tag` of the most recently created unsaved annotation.
   const newAnnotationTag = (() => {
@@ -211,20 +212,32 @@ export default function ThreadList({ threads }: ThreadListProps) {
     }
   }, [store, newAnnotationTag]);
 
-  const mostRecentlyHighlightedAnnotationId = useMemo(
-    // If multiple highlighted annotations exist, assume that the last one in
-    // the list is the most recent.
-    () => highlightedAnnotations[highlightedAnnotations.length - 1],
-    [highlightedAnnotations],
-  );
+  const mostRecentHighlightedAnnotationId = useMemo(() => {
+    const highlightedAnnos = allAnnotations.filter(
+      anno => anno.id && highlightedAnnotations.includes(anno.id),
+    );
+    // Get the annotation with most recent updated field, which contains a
+    // date in ISO format. This means their alphabetical and chronological
+    // orders match.
+    const mostRecentHighlightedAnnotation =
+      highlightedAnnos.reduce<Annotation | null>(
+        (mostRecent, current) =>
+          !mostRecent || mostRecent.updated < current.updated
+            ? current
+            : mostRecent,
+        null,
+      );
+
+    return mostRecentHighlightedAnnotation?.id;
+  }, [allAnnotations, highlightedAnnotations]);
 
   // Scroll to the most recently highlighted annotation, unless creating/editing
   // another annotation
   useEffect(() => {
-    if (!editing && mostRecentlyHighlightedAnnotationId) {
-      setScrollToId(mostRecentlyHighlightedAnnotationId);
+    if (!editing && mostRecentHighlightedAnnotationId) {
+      setScrollToId(mostRecentHighlightedAnnotationId);
     }
-  }, [editing, mostRecentlyHighlightedAnnotationId]);
+  }, [editing, mostRecentHighlightedAnnotationId]);
 
   // Effect to scroll a particular thread into view. This is mainly used to
   // scroll a newly created annotation into view.
