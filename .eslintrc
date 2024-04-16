@@ -47,7 +47,8 @@
   },
   "overrides": [
     {
-      "files": ["*.mjs"],
+      "files": ["*.js"],
+      "excludedFiles": ["src/**"],
       "env": { "node": true },
     }
   ]

@@ -104,7 +104,7 @@ jobs:
       run: |
         git fetch --tags --quiet
         PREV_VERSION=$(git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2)
-        NEW_VERSION=$(node scripts/bump-version.mjs minor $PREV_VERSION)
+        NEW_VERSION=$(node scripts/bump-version.js minor $PREV_VERSION)
         echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
     - name: Tag new version
       run: |

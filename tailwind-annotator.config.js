@@ -1,4 +1,4 @@
-import tailwindConfig from './tailwind.config.mjs';
+import tailwindConfig from './tailwind.config.js';
 
 export default {
   presets: [tailwindConfig],

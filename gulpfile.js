@@ -10,12 +10,12 @@ import gulp from 'gulp';
 
 import { serveDev } from './dev-server/serve-dev.js';
 import { servePackage } from './dev-server/serve-package.js';
-import tailwindConfig from './tailwind.config.mjs';
-import annotatorTailwindConfig from './tailwind-annotator.config.mjs';
-import sidebarTailwindConfig from './tailwind-sidebar.config.mjs';
+import tailwindConfig from './tailwind.config.js';
+import annotatorTailwindConfig from './tailwind-annotator.config.js';
+import sidebarTailwindConfig from './tailwind-sidebar.config.js';
 
-gulp.task('build-js', () => buildJS('./rollup.config.mjs'));
-gulp.task('watch-js', () => watchJS('./rollup.config.mjs'));
+gulp.task('build-js', () => buildJS('./rollup.config.js'));
+gulp.task('watch-js', () => watchJS('./rollup.config.js'));
 
 gulp.task('build-annotator-tailwind-css', () =>
   buildCSS(['./src/styles/annotator/annotator.scss'], {
@@ -96,7 +96,7 @@ const manifestSourceFiles = 'build/{scripts,styles}/*.{css,js,map}';
 
 gulp.task('build-boot-script', async () => {
   await generateManifest({ pattern: manifestSourceFiles });
-  await buildJS('./rollup-boot.config.mjs');
+  await buildJS('./rollup-boot.config.js');
 });
 
 gulp.task('watch-boot-script', () => {
@@ -155,7 +155,7 @@ gulp.task(
     runTests({
       bootstrapFile: 'src/sidebar/test/bootstrap.js',
       karmaConfig: 'src/karma.config.cjs',
-      rollupConfig: 'rollup-tests.config.mjs',
+      rollupConfig: 'rollup-tests.config.js',
       testsPattern: 'src/**/*-test.js',
     })
   )
