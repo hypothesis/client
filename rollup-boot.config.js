@@ -1,10 +1,9 @@
-import { readFileSync } from 'fs';
-
 import { babel } from '@rollup/plugin-babel';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
+import { readFileSync } from 'fs';
 
 const isProd = process.env.NODE_ENV === 'production';
 const prodPlugins = [];
@@ -65,7 +64,7 @@ export default {
       // produces a prod bundle of the same size and dev bundle that has less cruft in it.
       babelHelpers: 'inline',
       exclude: 'node_modules/**',
-      extensions: ['.js', '.ts', '.tsx']
+      extensions: ['.js', '.ts', '.tsx'],
     }),
     json(),
     nodeResolve({ extensions: ['.js', '.ts', '.tsx'] }),

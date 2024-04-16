@@ -5,14 +5,14 @@ import {
   runTests,
   watchJS,
 } from '@hypothesis/frontend-build';
-import changed from 'gulp-changed';
 import gulp from 'gulp';
+import changed from 'gulp-changed';
 
 import { serveDev } from './dev-server/serve-dev.js';
 import { servePackage } from './dev-server/serve-package.js';
-import tailwindConfig from './tailwind.config.js';
 import annotatorTailwindConfig from './tailwind-annotator.config.js';
 import sidebarTailwindConfig from './tailwind-sidebar.config.js';
+import tailwindConfig from './tailwind.config.js';
 
 gulp.task('build-js', () => buildJS('./rollup.config.js'));
 gulp.task('watch-js', () => watchJS('./rollup.config.js'));
@@ -20,7 +20,7 @@ gulp.task('watch-js', () => watchJS('./rollup.config.js'));
 gulp.task('build-annotator-tailwind-css', () =>
   buildCSS(['./src/styles/annotator/annotator.scss'], {
     tailwindConfig: annotatorTailwindConfig,
-  })
+  }),
 );
 
 gulp.task('build-sidebar-tailwind-css', () =>
@@ -32,8 +32,8 @@ gulp.task('build-sidebar-tailwind-css', () =>
       // be managed with its own tailwind config?
       './src/styles/ui-playground/ui-playground.scss',
     ],
-    { tailwindConfig: sidebarTailwindConfig }
-  )
+    { tailwindConfig: sidebarTailwindConfig },
+  ),
 );
 
 gulp.task('build-standalone-css', () =>
@@ -47,8 +47,8 @@ gulp.task('build-standalone-css', () =>
       // Vendor
       './node_modules/katex/dist/katex.min.css',
     ],
-    { tailwindConfig }
-  )
+    { tailwindConfig },
+  ),
 );
 
 gulp.task(
@@ -56,8 +56,8 @@ gulp.task(
   gulp.parallel(
     'build-annotator-tailwind-css',
     'build-sidebar-tailwind-css',
-    'build-standalone-css'
-  )
+    'build-standalone-css',
+  ),
 );
 
 gulp.task(
@@ -70,9 +70,9 @@ gulp.task(
         'src/**/*.tsx',
         'dev-server/ui-playground/**/*.tsx',
       ],
-      gulp.task('build-css')
+      gulp.task('build-css'),
     );
-  })
+  }),
 );
 
 const fontFiles = ['node_modules/katex/dist/fonts/*.woff2'];
@@ -88,7 +88,7 @@ gulp.task(
   'watch-fonts',
   gulp.series('build-fonts', function watchFonts() {
     gulp.watch(fontFiles, gulp.task('build-fonts'));
-  })
+  }),
 );
 
 // Files to reference in `build/manifest.json`, used by `build/boot.js`.
@@ -111,7 +111,7 @@ gulp.task('watch-boot-script', () => {
       'src/boot/**/*.{js,ts,tsx}',
     ],
     { delay: 500 },
-    gulp.task('build-boot-script')
+    gulp.task('build-boot-script'),
   );
 });
 
@@ -129,8 +129,8 @@ gulp.task(
   'build',
   gulp.series(
     gulp.parallel('build-js', 'build-css', 'build-fonts'),
-    'build-boot-script'
-  )
+    'build-boot-script',
+  ),
 );
 
 gulp.task(
@@ -141,8 +141,8 @@ gulp.task(
     'watch-boot-script',
     'watch-css',
     'watch-fonts',
-    'watch-js'
-  )
+    'watch-js',
+  ),
 );
 
 // Unit and integration testing tasks.
@@ -157,6 +157,6 @@ gulp.task(
       karmaConfig: 'src/karma.config.cjs',
       rollupConfig: 'rollup-tests.config.js',
       testsPattern: 'src/**/*-test.js',
-    })
-  )
+    }),
+  ),
 );
