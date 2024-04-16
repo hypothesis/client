@@ -139,7 +139,7 @@ function SidebarView({
             'fixed z-1',
             // Setting 9px to the right instead of some standard tailwind size,
             // so that it matches the padding of the sidebar's container.
-            // DEFAULT `.container` padding is defined in tailwind.conf.mjs
+            // DEFAULT `.container` padding is defined in tailwind.conf.js
             'right-[9px] top-12',
           )}
         >
