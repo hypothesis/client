@@ -57,6 +57,7 @@ describe('ThreadList', () => {
       unsavedAnnotations: sinon.stub().returns([]),
       countDrafts: sinon.stub().returns(0),
       highlightedAnnotations: sinon.stub().returns([]),
+      allAnnotations: sinon.stub().returns([]),
     };
 
     fakeTopThread = {
@@ -193,13 +194,65 @@ describe('ThreadList', () => {
       assert.notCalled(fakeScrollTop);
     });
 
-    it('should set the scroll container `scrollTop` to first highlighted annotation', () => {
-      fakeStore.highlightedAnnotations.returns(['t2', 't3']);
-      createComponent();
+    [
+      {
+        annotationUpdates: {
+          t2: '2024-01-01T10:40:00',
+          t3: '2024-01-01T10:41:00', // Most recent
+          t4: '2024-01-01T10:39:00',
+        },
+        // The most recent highlighted annotation is the third.
+        // At default height (200) should be at 400px.
+        expectedScrollTop: 400,
+      },
+      {
+        annotationUpdates: {
+          t1: '2024-01-01T10:42:00', // Most recent
+          t3: '2024-01-01T10:39:00',
+          t4: '2024-01-01T10:39:00',
+        },
+        // The most recent highlighted annotation is the first.
+        // At default height (200) should be at 0px.
+        expectedScrollTop: 0,
+      },
+      {
+        annotationUpdates: {
+          t1: '2024-01-01T10:42:00',
+          t3: '2024-01-01T10:39:00',
+          t4: '2024-01-01T10:51:00', // Most recent
+        },
+        // The most recent highlighted annotation is the fourth.
+        // At default height (200) should be at 600px.
+        expectedScrollTop: 600,
+      },
+      {
+        annotationUpdates: {
+          t1: '2024-01-01T10:42:00',
+          t3: '2024-01-01T10:39:00',
+          t2: '2024-01-01T10:51:00', // Most recent
+        },
+        // The most recent highlighted annotation is the second.
+        // At default height (200) should be at 200px.
+        expectedScrollTop: 200,
+      },
+    ].forEach(({ annotationUpdates, expectedScrollTop }) => {
+      it('should set the scroll container `scrollTop` to most recent highlighted annotation', () => {
+        fakeStore.highlightedAnnotations.returns(
+          Object.keys(annotationUpdates),
+        );
+        fakeStore.allAnnotations.returns([
+          {}, // Discarded
+          { id: 't1', updated: annotationUpdates.t1 },
+          { id: 't2', updated: annotationUpdates.t2 },
+          { id: 't3', updated: annotationUpdates.t3 },
+          { id: 't4', updated: annotationUpdates.t4 },
+          { id: 't5', updated: annotationUpdates.t5 },
+        ]);
 
-      // The last highlighted annotation is the third in the collection of
-      // threads. At default height (200) should be at 400px.
-      assert.calledWith(fakeScrollTop, 400);
+        createComponent();
+
+        assert.calledWith(fakeScrollTop, expectedScrollTop);
+      });
     });
   });
 
