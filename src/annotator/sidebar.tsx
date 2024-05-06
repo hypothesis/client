@@ -70,7 +70,7 @@ export type SidebarContainerConfig = {
 /**
  * Create the iframe that will load the sidebar application.
  */
-export function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
+function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
   const sidebarURL = config.sidebarAppUrl;
   const sidebarAppSrc = addConfigFragment(
     sidebarURL,
@@ -87,15 +87,7 @@ export function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
   // the clipboard.
   sidebarFrame.allow = 'fullscreen; clipboard-write';
 
-  // In viahtml, pywb uses wombat.js, which monkey-patches some JS methods.
-  // One of those causes the `allow` attribute to be overwritten, so we want to
-  // define a noop setter to preserve the permissions we set above.
-  // We can remove this workaround once pywb has been updated to use the latest
-  // version of wombat.js, which includes a fix for this.
-  // See https://github.com/webrecorder/wombat/pull/134
-  return Object.defineProperty(sidebarFrame, 'allow', {
-    set: () => {},
-  });
+  return sidebarFrame;
 }
 
 type GestureState = {
