@@ -58,7 +58,7 @@
     "enzyme-adapter-preact-pure": "^4.0.1",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^4.0.0",
-    "eslint": "^8.3.0",
+    "eslint": "^9.2.0",
     "eslint-config-hypothesis": "^2.6.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-mocha": "^10.0.1",
