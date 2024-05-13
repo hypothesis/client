@@ -18,6 +18,7 @@ describe('ExportAnnotations', () => {
   let fakeSuggestedFilename;
   let fakeCopyPlainText;
   let fakeCopyHTML;
+  let wrappers;
 
   const fakePrivateGroup = {
     type: 'private',
@@ -25,16 +26,20 @@ describe('ExportAnnotations', () => {
     id: 'testprivate',
   };
 
-  const createComponent = props =>
-    mount(
+  const createComponent = props => {
+    const wrapper = mount(
       <ExportAnnotations
         annotationsExporter={fakeAnnotationsExporter}
         toastMessenger={fakeToastMessenger}
         {...props}
       />,
     );
+    wrappers.push(wrapper);
+    return wrapper;
+  };
 
   beforeEach(() => {
+    wrappers = [];
     fakeAnnotationsExporter = {
       buildJSONExportContent: sinon.stub().returns({}),
       buildTextExportContent: sinon.stub().returns(''),
@@ -90,6 +95,7 @@ describe('ExportAnnotations', () => {
   });
 
   afterEach(() => {
+    wrappers.forEach(w => w.unmount());
     $imports.$restore();
   });
 
