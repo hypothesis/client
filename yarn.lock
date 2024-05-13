@@ -3059,8 +3059,8 @@ __metadata:
   linkType: hard
 
 "@npmcli/arborist@npm:^7.0.0":
-  version: 7.5.0
-  resolution: "@npmcli/arborist@npm:7.5.0"
+  version: 7.5.1
+  resolution: "@npmcli/arborist@npm:7.5.1"
   dependencies:
     "@isaacs/string-locale-compare": ^1.1.0
     "@npmcli/fs": ^3.1.0
@@ -3071,8 +3071,8 @@ __metadata:
     "@npmcli/node-gyp": ^3.0.0
     "@npmcli/package-json": ^5.1.0
     "@npmcli/query": ^3.1.0
-    "@npmcli/redact": ^1.1.0
-    "@npmcli/run-script": ^8.0.0
+    "@npmcli/redact": ^2.0.0
+    "@npmcli/run-script": ^8.1.0
     bin-links: ^4.0.1
     cacache: ^18.0.0
     common-ancestor-path: ^1.0.1
@@ -3084,7 +3084,7 @@ __metadata:
     npm-install-checks: ^6.2.0
     npm-package-arg: ^11.0.2
     npm-pick-manifest: ^9.0.0
-    npm-registry-fetch: ^16.2.1
+    npm-registry-fetch: ^17.0.0
     pacote: ^18.0.1
     parse-conflict-json: ^3.0.0
     proc-log: ^4.2.0
@@ -3098,7 +3098,7 @@ __metadata:
     walk-up-path: ^3.0.1
   bin:
     arborist: bin/index.js
-  checksum: 05963bf30ba0b1e2989dfe2a34baf6f5d8fc15b8a9cab7abf2f11e051fe9bc88ff044c904050a7b2940eb906bb0910a1558cee9b2836b85d4b2f891ea0c18739
+  checksum: 2a1c761f6b859c44c5e91df90aea6a3ec844cdcbab3098fc9aa8aa8a766427af3ffa197261a187e5375457b31f56122aba3d646e5ce3f3766ea017346ced986c
   languageName: node
   linkType: hard
 
@@ -3238,10 +3238,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@npmcli/redact@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@npmcli/redact@npm:1.1.0"
-  checksum: f200d40c485aea6fdf0487ddfed258ec13a217701261d9115f9c82b65f341403b3dfc7aaa1f5bd0b51b09f7dee03d89b86d99314356faed370bada8d0f000836
+"@npmcli/redact@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@npmcli/redact@npm:2.0.0"
+  checksum: 7ed760ab0f30c7199d1176b35619e226f6810d3606f75870551486493f4ba388f64dcf2fbcfb0ab2059ea8ed36e6733ebb9c92f883116c45b2e3fd80da7d7106
   languageName: node
   linkType: hard
 
@@ -3256,6 +3256,20 @@ __metadata:
     proc-log: ^4.0.0
     which: ^4.0.0
   checksum: 42eec17967a4f0d5d25562b4e92e53d35555e898f2420a6a7f913f28e38fa8fbef6ae4ffe0d80cf67172b7f47a993e81bcba6cd85c697fa51fcdddd0870cbc69
+  languageName: node
+  linkType: hard
+
+"@npmcli/run-script@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "@npmcli/run-script@npm:8.1.0"
+  dependencies:
+    "@npmcli/node-gyp": ^3.0.0
+    "@npmcli/package-json": ^5.0.0
+    "@npmcli/promise-spawn": ^7.0.0
+    node-gyp: ^10.0.0
+    proc-log: ^4.0.0
+    which: ^4.0.0
+  checksum: 21adfb308b9064041d6d2f7f0d53924be0e1466d558de1c9802fab9eb84850bd8e04fdd5695924f331e1a36565461500d912e187909f91c03188cc763a106986
   languageName: node
   linkType: hard
 
@@ -10920,11 +10934,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"npm-registry-fetch@npm:^16.2.1":
-  version: 16.2.1
-  resolution: "npm-registry-fetch@npm:16.2.1"
+"npm-registry-fetch@npm:^17.0.0":
+  version: 17.0.1
+  resolution: "npm-registry-fetch@npm:17.0.1"
   dependencies:
-    "@npmcli/redact": ^1.1.0
+    "@npmcli/redact": ^2.0.0
     make-fetch-happen: ^13.0.0
     minipass: ^7.0.2
     minipass-fetch: ^3.0.0
@@ -10932,7 +10946,7 @@ __metadata:
     minizlib: ^2.1.2
     npm-package-arg: ^11.0.0
     proc-log: ^4.0.0
-  checksum: 0c606dffcddecbccdc9539571ffbacd35b2d70c265841c9a4094042010c68de72c44915154d0a01038ce469ead2fec2ffb5c5225c8bb419a4824b050844d2fdb
+  checksum: 4a53e96969991f62fa6b5b0a47a6a0288282003ab41e6e752bc0c8ba34a284f216ae290952a032bf143fd6827faef0f204cec32f33e2d0cb348db850dd95d09d
   languageName: node
   linkType: hard
 
