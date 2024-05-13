@@ -12,8 +12,11 @@ describe('ImportAnnotations', () => {
   let fakeImportAnnotationsService;
   let fakeReadExportFile;
   let fakeStore;
+  let wrappers;
 
   beforeEach(() => {
+    wrappers = [];
+
     fakeReadExportFile = sinon.stub().rejects(new Error('Failed to read file'));
 
     fakeImportAnnotationsService = {
@@ -39,16 +42,19 @@ describe('ImportAnnotations', () => {
   });
 
   afterEach(() => {
+    wrappers.forEach(w => w.unmount());
     $imports.$restore();
   });
 
   function createImportAnnotations() {
-    return mount(
+    const wrapper = mount(
       <ImportAnnotations
         store={fakeStore}
         importAnnotationsService={fakeImportAnnotationsService}
       />,
     );
+    wrappers.push(wrapper);
+    return wrapper;
   }
 
   function getImportButton(wrapper) {
