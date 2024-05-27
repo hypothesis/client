@@ -11406,13 +11406,11 @@ __metadata:
   linkType: hard
 
 "preact-render-to-string@npm:^6.4.0":
-  version: 6.4.2
-  resolution: "preact-render-to-string@npm:6.4.2"
-  dependencies:
-    pretty-format: ^3.8.0
+  version: 6.5.3
+  resolution: "preact-render-to-string@npm:6.5.3"
   peerDependencies:
     preact: ">=10"
-  checksum: 4be4d773d9a08ab17727e738dabd439fa7a85ef9a41e86c0211d0711b870defd925a4a4b6353a4852c91de8aca52d2281960f89d67ce648cb31fa6d9bba9f903
+  checksum: fe83def31ce92b48cf22bc95ce660854c21f2083a19fef877c0a02ac0293e03449bb40cafc88f35acb20fdbe6165869d4557a33a887e4456e088fb1511a138a0
   languageName: node
   linkType: hard
 
@@ -11436,13 +11434,6 @@ __metadata:
   bin:
     prettier: bin/prettier.cjs
   checksum: 2ee4e1417572372afb7a13bb446b34f20f1bf1747db77cf6ccaf57a9be005f2f15c40f903d41a6b79eec3f57fff14d32a20fb6dee1f126da48908926fe43c311
-  languageName: node
-  linkType: hard
-
-"pretty-format@npm:^3.8.0":
-  version: 3.8.0
-  resolution: "pretty-format@npm:3.8.0"
-  checksum: 21a114d43ef06978f8f7f6212be4649b0b094f05d9b30e14e37550bf35c8ca24d8adbca9e5adc4cc15d9eaf7a1e7a30478a4dc37b30982bfdf0292a5b385484c
   languageName: node
   linkType: hard
 
