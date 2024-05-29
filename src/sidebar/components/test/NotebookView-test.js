@@ -36,7 +36,6 @@ describe('NotebookView', () => {
       annotationResultCount: sinon.stub().returns(0),
       setSortKey: sinon.stub(),
       hasFetchedProfile: sinon.stub().returns(true),
-      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     fakeStreamer = {
@@ -150,22 +149,6 @@ describe('NotebookView', () => {
   it('renders filters', () => {
     const wrapper = createComponent();
     assert.isTrue(wrapper.find('NotebookFilters').exists());
-  });
-
-  [true, false].forEach(pendingUpdatesNotificationEnabled => {
-    it('shows expected pending updates component', () => {
-      fakeStore.isFeatureEnabled.returns(pendingUpdatesNotificationEnabled);
-      const wrapper = createComponent();
-
-      assert.equal(
-        wrapper.exists('PendingUpdatesNotification'),
-        pendingUpdatesNotificationEnabled,
-      );
-      assert.equal(
-        wrapper.exists('PendingUpdatesButton'),
-        !pendingUpdatesNotificationEnabled,
-      );
-    });
   });
 
   describe('pagination', () => {

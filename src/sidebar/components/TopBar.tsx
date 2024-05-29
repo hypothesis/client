@@ -8,7 +8,6 @@ import { withServices } from '../service-context';
 import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
-import PendingUpdatesButton from './PendingUpdatesButton';
 import SortMenu from './SortMenu';
 import TopBarToggleButton from './TopBarToggleButton';
 import UserMenu from './UserMenu';
@@ -50,9 +49,6 @@ function TopBar({
   const store = useSidebarStore();
   const isLoggedIn = store.isLoggedIn();
   const hasFetchedProfile = store.hasFetchedProfile();
-  const pendingUpdatesNotification = store.isFeatureEnabled(
-    'pending_updates_notification',
-  );
 
   const toggleSharePanel = () => {
     store.toggleSidebarPanel('shareGroupAnnotations');
@@ -96,7 +92,6 @@ function TopBar({
         <div className="grow flex items-center justify-end">
           {isSidebar && (
             <>
-              {!pendingUpdatesNotification && <PendingUpdatesButton />}
               <SearchIconButton />
               <SortMenu />
               <TopBarToggleButton
