@@ -11,7 +11,6 @@ import { useSidebarStore } from '../store';
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
 import PaginatedThreadList from './PaginatedThreadList';
-import PendingUpdatesButton from './PendingUpdatesButton';
 import PendingUpdatesNotification from './PendingUpdatesNotification';
 import { useRootThread } from './hooks/use-root-thread';
 
@@ -34,9 +33,6 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
   const hasAppliedFilter = store.hasAppliedFilter();
   const isLoading = store.isLoading();
   const resultCount = store.annotationResultCount();
-  const pendingUpdatesNotification = store.isFeatureEnabled(
-    'pending_updates_notification',
-  );
 
   const { rootThread } = useRootThread();
 
@@ -143,14 +139,13 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
             'right-[4rem]',
           )}
         >
-          {pendingUpdatesNotification && <PendingUpdatesNotification />}
+          <PendingUpdatesNotification />
         </div>
       </div>
       <div className="justify-self-start">
         <NotebookFilters />
       </div>
       <div className="flex items-center lg:justify-self-end text-md font-medium">
-        {!pendingUpdatesNotification && <PendingUpdatesButton />}
         <NotebookResultCount
           forcedVisibleCount={forcedVisibleCount}
           isFiltered={hasAppliedFilter}
