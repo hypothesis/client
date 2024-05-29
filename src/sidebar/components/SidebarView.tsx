@@ -132,7 +132,9 @@ function SidebarView({
       <h2 className="sr-only">Annotations</h2>
       <div
         className={classnames(
-          'fixed z-1',
+          // z-10 ensures this appears over sidebar panels, which use the same
+          // z-index but render lower in the DOM
+          'fixed z-10',
           // Setting 9px to the right instead of some standard tailwind size,
           // so that it matches the padding of the sidebar's container.
           // DEFAULT `.container` padding is defined in tailwind.conf.js
