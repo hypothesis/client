@@ -11938,9 +11938,9 @@ __metadata:
   linkType: hard
 
 "reselect@npm:^5.0.1":
-  version: 5.1.0
-  resolution: "reselect@npm:5.1.0"
-  checksum: 5bc9c5d03d7caea00d0c0e24330bf23d91801227346fec1cef6a60988ab8d3dd7cee76e6994ca0915bc1c20845bb2bd929b95753763e0a9db74c0f9dff5cb845
+  version: 5.1.1
+  resolution: "reselect@npm:5.1.1"
+  checksum: 5d32d48be29071ddda21a775945c2210cf4ca3fccde1c4a0e1582ac3bf99c431c6c2330ef7ca34eae4c06feea617e7cb2c275c4b33ccf9a930836dfc98b49b13
   languageName: node
   linkType: hard
 
