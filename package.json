@@ -17,7 +17,7 @@
     "@hypothesis/frontend-shared": "^7.6.0",
     "@hypothesis/frontend-testing": "^1.2.0",
     "@npmcli/arborist": "^7.0.0",
-    "@octokit/rest": "^20.0.1",
+    "@octokit/rest": "^21.0.0",
     "@rollup/plugin-babel": "^6.0.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.0.0",
