@@ -7435,8 +7435,8 @@ __metadata:
   linkType: hard
 
 "fetch-mock@npm:10":
-  version: 10.0.5
-  resolution: "fetch-mock@npm:10.0.5"
+  version: 10.0.7
+  resolution: "fetch-mock@npm:10.0.7"
   dependencies:
     debug: ^4.1.1
     glob-to-regexp: ^0.4.0
@@ -7447,7 +7447,7 @@ __metadata:
   peerDependenciesMeta:
     node-fetch:
       optional: true
-  checksum: 8292b47370a5f1221147e94beb02e8ff59597c6f1a667c09cf6fd66dbf13acd5e34559ac9f7a9ae5227d7f0bb27f22883957a20f328dc0c0751410835cfc22a9
+  checksum: a2224f01c7e2bab063c24355ca0c1ea10865ea22359274528c771fc2becbff8c3b6e5506ca42c8b2259045665345b8f2532ebbc62e3f2695671a3313441bb99d
   languageName: node
   linkType: hard
 
