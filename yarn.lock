@@ -112,16 +112,16 @@ __metadata:
   linkType: hard
 
 "@aws-sdk/client-s3@npm:^3.504.0":
-  version: 3.598.0
-  resolution: "@aws-sdk/client-s3@npm:3.598.0"
+  version: 3.600.0
+  resolution: "@aws-sdk/client-s3@npm:3.600.0"
   dependencies:
     "@aws-crypto/sha1-browser": 5.2.0
     "@aws-crypto/sha256-browser": 5.2.0
     "@aws-crypto/sha256-js": 5.2.0
-    "@aws-sdk/client-sso-oidc": 3.598.0
-    "@aws-sdk/client-sts": 3.598.0
+    "@aws-sdk/client-sso-oidc": 3.600.0
+    "@aws-sdk/client-sts": 3.600.0
     "@aws-sdk/core": 3.598.0
-    "@aws-sdk/credential-provider-node": 3.598.0
+    "@aws-sdk/credential-provider-node": 3.600.0
     "@aws-sdk/middleware-bucket-endpoint": 3.598.0
     "@aws-sdk/middleware-expect-continue": 3.598.0
     "@aws-sdk/middleware-flexible-checksums": 3.598.0
@@ -173,19 +173,19 @@ __metadata:
     "@smithy/util-utf8": ^3.0.0
     "@smithy/util-waiter": ^3.0.1
     tslib: ^2.6.2
-  checksum: d9365cd92c94bcbf82bb0af0aed53e800da95ddbfe53900015a0bfffe9cdaa0a1ef4653d81d13bf69a4bcf12d17e83f6f8023002c59246cee890b82280d2cd95
+  checksum: be9940ac1a9bff2e8efbf6f0ac782b0bcd66ab229639dc46d60aa71e041b3ef16a327e37c92397691a16c982cf5e529ab2ffd60351a9d9730bf4947bb391ced4
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-sso-oidc@npm:3.598.0":
-  version: 3.598.0
-  resolution: "@aws-sdk/client-sso-oidc@npm:3.598.0"
+"@aws-sdk/client-sso-oidc@npm:3.600.0":
+  version: 3.600.0
+  resolution: "@aws-sdk/client-sso-oidc@npm:3.600.0"
   dependencies:
     "@aws-crypto/sha256-browser": 5.2.0
     "@aws-crypto/sha256-js": 5.2.0
-    "@aws-sdk/client-sts": 3.598.0
+    "@aws-sdk/client-sts": 3.600.0
     "@aws-sdk/core": 3.598.0
-    "@aws-sdk/credential-provider-node": 3.598.0
+    "@aws-sdk/credential-provider-node": 3.600.0
     "@aws-sdk/middleware-host-header": 3.598.0
     "@aws-sdk/middleware-logger": 3.598.0
     "@aws-sdk/middleware-recursion-detection": 3.598.0
@@ -221,7 +221,7 @@ __metadata:
     "@smithy/util-retry": ^3.0.1
     "@smithy/util-utf8": ^3.0.0
     tslib: ^2.6.2
-  checksum: cd651a7595b9739acf7063f1c1556960013ce351e42bc1d839ac16669517ea60262e16a8eea1eb6a7b2b4346e5035d55489bba4e602bbf096fe4dbe6d76bcf90
+  checksum: ef7a40ce69de30b25a8a7a5ee035f17e87edc1060c128b3b50f30f19b681aaa7b99b564ffc348cd74fe0e1079bd46087a6784674266d743c45564bcd4d5221b3
   languageName: node
   linkType: hard
 
@@ -271,15 +271,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-sts@npm:3.598.0":
-  version: 3.598.0
-  resolution: "@aws-sdk/client-sts@npm:3.598.0"
+"@aws-sdk/client-sts@npm:3.600.0":
+  version: 3.600.0
+  resolution: "@aws-sdk/client-sts@npm:3.600.0"
   dependencies:
     "@aws-crypto/sha256-browser": 5.2.0
     "@aws-crypto/sha256-js": 5.2.0
-    "@aws-sdk/client-sso-oidc": 3.598.0
+    "@aws-sdk/client-sso-oidc": 3.600.0
     "@aws-sdk/core": 3.598.0
-    "@aws-sdk/credential-provider-node": 3.598.0
+    "@aws-sdk/credential-provider-node": 3.600.0
     "@aws-sdk/middleware-host-header": 3.598.0
     "@aws-sdk/middleware-logger": 3.598.0
     "@aws-sdk/middleware-recursion-detection": 3.598.0
@@ -315,7 +315,7 @@ __metadata:
     "@smithy/util-retry": ^3.0.1
     "@smithy/util-utf8": ^3.0.0
     tslib: ^2.6.2
-  checksum: 288379398def285173ec0855bdfb530ce622d20810a70ccdc464d8e49617571d15d97d41093543c707f06c3b57e6ef65a7cef30b4d66200a944d54b813da821d
+  checksum: 47d6d145d481c8dc285b68baccf36ab76b92ed1fbf5a58a0900bbe913a7caf3eddc84414428b013e58c91242e7ffd5a55b0620217dc295c75c2729ccb89b9ae8
   languageName: node
   linkType: hard
 
@@ -384,9 +384,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/credential-provider-node@npm:3.598.0":
-  version: 3.598.0
-  resolution: "@aws-sdk/credential-provider-node@npm:3.598.0"
+"@aws-sdk/credential-provider-node@npm:3.600.0":
+  version: 3.600.0
+  resolution: "@aws-sdk/credential-provider-node@npm:3.600.0"
   dependencies:
     "@aws-sdk/credential-provider-env": 3.598.0
     "@aws-sdk/credential-provider-http": 3.598.0
@@ -400,7 +400,7 @@ __metadata:
     "@smithy/shared-ini-file-loader": ^3.1.1
     "@smithy/types": ^3.1.0
     tslib: ^2.6.2
-  checksum: 524abdfe19587ee30a7f8bc58aca4a27d6131710ee2c3910ccbb392e1db8a5433162b0995387d7cddf64725d7ed69920c3c98c028b4eec5540cc3dfa2a2cfa03
+  checksum: 480c7c36a8558667a25617e6f7f2292b4362b0e894bc204ce62f565dc8e8cc46c713dc04621321336ce715b493590b3b854b33dc6d5123ed39a17643158d94fc
   languageName: node
   linkType: hard
 
