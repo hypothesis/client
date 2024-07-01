@@ -79,7 +79,7 @@
     "karma-source-map-support": "^1.4.0",
     "katex": "^0.16.0",
     "lodash.debounce": "^4.0.3",
-    "mocha": "10.4.0",
+    "mocha": "10.5.2",
     "mustache": "^4.0.1",
     "mustache-express": "^1.3.0",
     "npm-packlist": "^8.0.0",
