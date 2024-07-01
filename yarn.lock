@@ -112,14 +112,14 @@ __metadata:
   linkType: hard
 
 "@aws-sdk/client-s3@npm:^3.504.0":
-  version: 3.600.0
-  resolution: "@aws-sdk/client-s3@npm:3.600.0"
+  version: 3.606.0
+  resolution: "@aws-sdk/client-s3@npm:3.606.0"
   dependencies:
     "@aws-crypto/sha1-browser": 5.2.0
     "@aws-crypto/sha256-browser": 5.2.0
     "@aws-crypto/sha256-js": 5.2.0
-    "@aws-sdk/client-sso-oidc": 3.600.0
-    "@aws-sdk/client-sts": 3.600.0
+    "@aws-sdk/client-sso-oidc": 3.606.0
+    "@aws-sdk/client-sts": 3.606.0
     "@aws-sdk/core": 3.598.0
     "@aws-sdk/credential-provider-node": 3.600.0
     "@aws-sdk/middleware-bucket-endpoint": 3.598.0
@@ -173,17 +173,16 @@ __metadata:
     "@smithy/util-utf8": ^3.0.0
     "@smithy/util-waiter": ^3.0.1
     tslib: ^2.6.2
-  checksum: be9940ac1a9bff2e8efbf6f0ac782b0bcd66ab229639dc46d60aa71e041b3ef16a327e37c92397691a16c982cf5e529ab2ffd60351a9d9730bf4947bb391ced4
+  checksum: e255f280ce8c57b7696cb7b3f182db025883840bfbba848f3eb8acd44b91ca59299f8853e4efce157aa3ba01a5b8ad4870f44c4d724b1aa38f8e7426f02c554e
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-sso-oidc@npm:3.600.0":
-  version: 3.600.0
-  resolution: "@aws-sdk/client-sso-oidc@npm:3.600.0"
+"@aws-sdk/client-sso-oidc@npm:3.606.0":
+  version: 3.606.0
+  resolution: "@aws-sdk/client-sso-oidc@npm:3.606.0"
   dependencies:
     "@aws-crypto/sha256-browser": 5.2.0
     "@aws-crypto/sha256-js": 5.2.0
-    "@aws-sdk/client-sts": 3.600.0
     "@aws-sdk/core": 3.598.0
     "@aws-sdk/credential-provider-node": 3.600.0
     "@aws-sdk/middleware-host-header": 3.598.0
@@ -221,7 +220,9 @@ __metadata:
     "@smithy/util-retry": ^3.0.1
     "@smithy/util-utf8": ^3.0.0
     tslib: ^2.6.2
-  checksum: ef7a40ce69de30b25a8a7a5ee035f17e87edc1060c128b3b50f30f19b681aaa7b99b564ffc348cd74fe0e1079bd46087a6784674266d743c45564bcd4d5221b3
+  peerDependencies:
+    "@aws-sdk/client-sts": ^3.606.0
+  checksum: 38d475e361c0207c4c1b74aa4bb34804e2f3971069a3f40590ce73d1d55b1bf9928aaa8a749899b1361e68118c05753df0f011bd948e2c8e7a948a6f5cae16a0
   languageName: node
   linkType: hard
 
@@ -271,13 +272,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-sts@npm:3.600.0":
-  version: 3.600.0
-  resolution: "@aws-sdk/client-sts@npm:3.600.0"
+"@aws-sdk/client-sts@npm:3.606.0":
+  version: 3.606.0
+  resolution: "@aws-sdk/client-sts@npm:3.606.0"
   dependencies:
     "@aws-crypto/sha256-browser": 5.2.0
     "@aws-crypto/sha256-js": 5.2.0
-    "@aws-sdk/client-sso-oidc": 3.600.0
+    "@aws-sdk/client-sso-oidc": 3.606.0
     "@aws-sdk/core": 3.598.0
     "@aws-sdk/credential-provider-node": 3.600.0
     "@aws-sdk/middleware-host-header": 3.598.0
@@ -315,7 +316,7 @@ __metadata:
     "@smithy/util-retry": ^3.0.1
     "@smithy/util-utf8": ^3.0.0
     tslib: ^2.6.2
-  checksum: 47d6d145d481c8dc285b68baccf36ab76b92ed1fbf5a58a0900bbe913a7caf3eddc84414428b013e58c91242e7ffd5a55b0620217dc295c75c2729ccb89b9ae8
+  checksum: f397902ffb1b19684f305493a31bf77346bcb0903a8932465e131477324dee16039118808ce9b55965b94b77543806dea9ce6d7a91125cec0edd5d22a2b9437c
   languageName: node
   linkType: hard
 
