@@ -39,7 +39,6 @@ const linksResponse = {
  * Fake `retryPromiseOperation` that does not wait between retries.
  */
 async function fakeRetryPromiseOperation(callback) {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
       const result = await callback();

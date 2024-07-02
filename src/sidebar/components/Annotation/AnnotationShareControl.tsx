@@ -97,7 +97,7 @@ function AnnotationShareControl({
     try {
       await copyPlainText(shareUri);
       toastMessenger.success('Copied share link to clipboard');
-    } catch (err) {
+    } catch {
       toastMessenger.error('Unable to copy link');
     }
   };

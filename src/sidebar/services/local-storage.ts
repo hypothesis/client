@@ -44,7 +44,7 @@ export class LocalStorageService {
       $window.localStorage.setItem(testKey, testKey);
       $window.localStorage.getItem(testKey);
       $window.localStorage.removeItem(testKey);
-    } catch (e) {
+    } catch {
       this._storage = new InMemoryStorage();
     }
   }

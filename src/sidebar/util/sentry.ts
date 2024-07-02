@@ -95,7 +95,7 @@ export function init(config: SentryConfig) {
             isTrusted: originalErr.isTrusted,
           });
         }
-      } catch (e) {
+      } catch {
         // If something went wrong serializing the data, just ignore it.
       }
 
@@ -105,7 +105,7 @@ export function init(config: SentryConfig) {
 
   try {
     Sentry.setExtra('host_config', parseConfigFragment(window.location.href));
-  } catch (e) {
+  } catch {
     // Ignore errors parsing configuration.
   }
 

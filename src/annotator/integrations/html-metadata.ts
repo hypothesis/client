@@ -182,7 +182,7 @@ export class HTMLMetadata {
       try {
         const href = this._absoluteUrl(link.href);
         links.push({ href, rel: link.rel, type: link.type });
-      } catch (e) {
+      } catch {
         // Ignore URIs which cannot be parsed.
       }
     }
@@ -197,7 +197,7 @@ export class HTMLMetadata {
               href: this._absoluteUrl(url),
               type: 'application/pdf',
             });
-          } catch (e) {
+          } catch {
             // Ignore URIs which cannot be parsed.
           }
         }
@@ -253,7 +253,7 @@ export class HTMLMetadata {
       if (['shortcut icon', 'icon'].includes(link.rel)) {
         try {
           favicon = this._absoluteUrl(link.href);
-        } catch (e) {
+        } catch {
           // Ignore URIs which cannot be parsed.
         }
       }

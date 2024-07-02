@@ -70,7 +70,7 @@ export async function fetchJSON(
   let data;
   try {
     data = await response.json();
-  } catch (err) {
+  } catch {
     throw new FetchError(url, response, 'Failed to parse response');
   }
 

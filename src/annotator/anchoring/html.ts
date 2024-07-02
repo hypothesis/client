@@ -126,7 +126,7 @@ export function describe(root: Element, range: Range) {
       if (anchor) {
         result.push(anchor.toSelector());
       }
-    } catch (error) {
+    } catch {
       // If resolving some anchor fails, we just want to skip it silently
     }
   }

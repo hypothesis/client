@@ -83,7 +83,7 @@ function GroupListItem({
     try {
       await copyPlainText(url);
       toastMessenger.success(`Copied link for "${group.name}"`);
-    } catch (err) {
+    } catch {
       toastMessenger.error('Unable to copy link');
     }
   };

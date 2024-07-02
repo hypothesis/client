@@ -467,7 +467,7 @@ export class Sidebar implements Destroyable {
 
     // Suppressing ban-types here because the functions are originally defined
     // as `Function` somewhere else. To be fixed when that is migrated to TS
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     const eventHandlers: Array<[SidebarToHostEvent, Function | undefined]> = [
       ['loginRequested', this.onLoginRequest],
       ['logoutRequested', this.onLogoutRequest],

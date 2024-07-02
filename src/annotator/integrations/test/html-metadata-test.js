@@ -342,9 +342,9 @@ describe('HTMLMetadata', () => {
       // location in tests, create a proxy object in front of our blank HTML
       // document.
       const fakeDocument = {
-        createElement: htmlDoc.createElement.bind(htmlDoc), // eslint-disable-line no-restricted-properties
+        createElement: htmlDoc.createElement.bind(htmlDoc),
         baseURI: baseURI ?? href,
-        querySelectorAll: htmlDoc.querySelectorAll.bind(htmlDoc), // eslint-disable-line no-restricted-properties
+        querySelectorAll: htmlDoc.querySelectorAll.bind(htmlDoc),
         location: {
           href,
         },

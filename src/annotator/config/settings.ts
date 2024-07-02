@@ -148,7 +148,7 @@ export function settingsFrom(window_: Window): SettingsGetters {
       if (queryFragmentMatch) {
         try {
           return decodeURIComponent(queryFragmentMatch[2]);
-        } catch (err) {
+        } catch {
           // URI Error should return the page unfiltered.
         }
       }

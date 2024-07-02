@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 
 /*
  * Disable @typescript-eslint/ban-types for the whole file, as changing the

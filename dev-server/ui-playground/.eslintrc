@@ -1,8 +1,0 @@
-{
-  "parserOptions": {
-    "sourceType": "module"
-  },
-  "rules": {
-    "react/prop-types": "off",
-  }
-}

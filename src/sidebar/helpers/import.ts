@@ -11,7 +11,7 @@ export async function readExportFile(file: File): Promise<APIAnnotationData[]> {
   let json;
   try {
     json = await readJSONFile(file);
-  } catch (err) {
+  } catch {
     throw new Error('Not a valid JSON file');
   }
 

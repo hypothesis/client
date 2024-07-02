@@ -435,7 +435,7 @@ describe('LoadAnnotationsService', () => {
         const svc = createService();
         try {
           await svc.loadThread('target_annotation');
-        } catch (e) {
+        } catch {
           assert.calledOnce(fakeStore.annotationFetchStarted);
           assert.calledOnce(fakeStore.annotationFetchFinished);
         }

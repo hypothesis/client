@@ -139,7 +139,7 @@ function AnnotationEditor({
     try {
       await annotationsService.save(annotation);
       toastMessenger.success(successMessage, { visuallyHidden: true });
-    } catch (err) {
+    } catch {
       toastMessenger.error('Saving annotation failed');
     }
   };
