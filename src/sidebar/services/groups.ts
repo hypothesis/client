@@ -325,7 +325,7 @@ export class GroupsService {
             directLinkedAnn.group,
           );
           featuredGroups.push(directLinkedAnnGroup);
-        } catch (e) {
+        } catch {
           this._toastMessenger.error(
             'Unable to fetch group for linked annotation',
           );

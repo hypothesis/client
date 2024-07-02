@@ -41,7 +41,7 @@ function VersionInfo({ toastMessenger, versionData }: VersionInfoProps) {
     try {
       await copyPlainText(versionData.asFormattedString());
       toastMessenger.success('Copied version info to clipboard');
-    } catch (err) {
+    } catch {
       toastMessenger.error('Unable to copy version info');
     }
   };

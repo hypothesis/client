@@ -65,7 +65,6 @@ function extractMath(content: string): {
   let pos = 0;
   let replacedContent = content;
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const blockMathStart = replacedContent.indexOf('$$', pos);
     const inlineMathStart = replacedContent.indexOf('\\(', pos);
@@ -134,7 +133,7 @@ function insertMath(html: string, mathBlocks: MathBlock[]) {
           displayMode: true,
         });
       }
-    } catch (err) {
+    } catch {
       renderedMath = escapeHtml(block.expression);
     }
     return html.replace(mathPlaceholder(block.id), renderedMath);

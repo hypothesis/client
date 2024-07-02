@@ -294,7 +294,7 @@ describe('SessionService', () => {
       const session = createService();
       try {
         await session.logout();
-      } catch (e) {
+      } catch {
         // Ignored.
       }
       assert.calledWith(fakeToastMessenger.error, 'Log out failed');

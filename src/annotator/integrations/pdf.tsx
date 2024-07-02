@@ -330,7 +330,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     // Wait for PDF to load.
     try {
       await this.uri();
-    } catch (e) {
+    } catch {
       return;
     }
 

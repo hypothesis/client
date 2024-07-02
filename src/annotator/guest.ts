@@ -667,7 +667,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
         // this anchor.
         const textRange = TextRange.fromRange(range);
         anchor = { annotation, target, range: textRange };
-      } catch (err) {
+      } catch {
         anchor = { annotation, target };
       }
       return anchor;

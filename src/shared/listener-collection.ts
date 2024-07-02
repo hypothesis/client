@@ -48,7 +48,6 @@ export class ListenerCollection {
     this._listeners.set(symbol, {
       eventTarget,
       eventType,
-      // eslint-disable-next-line object-shorthand
       listener: listener as EventListener,
       options,
     });

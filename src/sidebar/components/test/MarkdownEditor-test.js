@@ -384,7 +384,6 @@ describe('MarkdownEditor', () => {
     'should pass a11y checks',
     checkAccessibility([
       {
-        // eslint-disable-next-line react/display-name
         content: () => createComponent(),
       },
       {

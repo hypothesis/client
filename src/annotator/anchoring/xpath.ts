@@ -149,7 +149,7 @@ export function nodeFromXPath(
 ): Node | null {
   try {
     return evaluateSimpleXPath(xpath, root);
-  } catch (err) {
+  } catch {
     return document.evaluate(
       '.' + xpath,
       root,

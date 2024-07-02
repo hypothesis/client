@@ -281,7 +281,6 @@ describe('MenuItem', () => {
     'should pass a11y checks',
     checkAccessibility([
       {
-        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem label="Test item" />
@@ -290,7 +289,6 @@ describe('MenuItem', () => {
       },
       {
         name: 'menu radio button',
-        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem label="Test" isSelected={false} />
@@ -299,7 +297,6 @@ describe('MenuItem', () => {
       },
       {
         name: 'with link',
-        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem label="Test" href="https://foobar.com" />
@@ -308,7 +305,6 @@ describe('MenuItem', () => {
       },
       {
         name: 'with icon',
-        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem label="Test" icon="edit" />
@@ -317,7 +313,6 @@ describe('MenuItem', () => {
       },
       {
         name: 'with submenu',
-        // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
             <MenuItem

@@ -39,7 +39,7 @@ export function isBrowserSupported(): boolean {
 
   try {
     return checks.every(check => check());
-  } catch (err) {
+  } catch {
     return false;
   }
 }

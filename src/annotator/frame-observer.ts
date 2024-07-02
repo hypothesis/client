@@ -70,7 +70,7 @@ export class FrameObserver {
         this._removeFrame(frame);
       });
       this._onFrameAdded(frame);
-    } catch (e) {
+    } catch {
       console.warn(
         `Unable to inject the Hypothesis client (from '${document.location.href}' into a cross-origin frame '${frame.src}')`,
       );
