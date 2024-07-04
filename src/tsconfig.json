@@ -6,14 +6,14 @@
     "allowSyntheticDefaultImports": true,
 
     "checkJs": true,
-    "lib": ["es2020", "dom", "dom.iterable"],
+    "lib": ["es2021", "dom", "dom.iterable"],
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "module": "es2020",
     "moduleResolution": "node",
     "noEmit": true,
     "strict": true,
-    "target": "ES2020",
+    "target": "ES2021",
 
     // Let argument to catch statement be `any` rather than `unknown`.
     "useUnknownInCatchVariables": false,
