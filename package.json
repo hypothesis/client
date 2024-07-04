@@ -103,7 +103,7 @@
     "typescript": "^5.0.2",
     "wrap-text": "^1.0.7"
   },
-  "browserslist": "chrome 70, firefox 70, safari 11.1",
+  "browserslist": "chrome 92, firefox 90, safari 14.1",
   "prettier": {
     "arrowParens": "avoid",
     "singleQuote": true,
