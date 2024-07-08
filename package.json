@@ -44,7 +44,7 @@
     "autoprefixer": "^10.0.1",
     "axe-core": "^4.0.0",
     "babel-plugin-inject-args": "^1.0.0",
-    "babel-plugin-istanbul": "^6.0.0",
+    "babel-plugin-istanbul": "^7.0.0",
     "babel-plugin-mockable-imports": "^2.0.1",
     "babel-plugin-transform-async-to-promises": "^0.8.6",
     "chai": "^5.0.0",
