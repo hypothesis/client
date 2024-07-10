@@ -165,7 +165,9 @@ function ImportAnnotations({
           </label>
           <SelectNext
             value={selectedUser}
-            onChange={newValue => setSelectedUserId(newValue?.userid ?? null)}
+            onChange={(newValue: typeof selectedUser) =>
+              setSelectedUserId(newValue?.userid ?? null)
+            }
             buttonId={userSelectId}
             buttonContent={
               selectedUser ? (
