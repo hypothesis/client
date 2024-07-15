@@ -5895,9 +5895,9 @@ __metadata:
   linkType: hard
 
 "chance@npm:^1.0.13":
-  version: 1.1.11
-  resolution: "chance@npm:1.1.11"
-  checksum: 2e871fcc76584d274f860f0f25380b6ab547caf0d22d8b043a313be73d5c3db38941373241f83aeba049e7511f752f9746dc722a0f2b0182020d493c4e11da84
+  version: 1.1.12
+  resolution: "chance@npm:1.1.12"
+  checksum: e07a036cf8b0ddea853767695c359233ff056fb4272535fdb9ad05d26d1bb32618220f3608b4022edcfddf74323c135265c09c93aff3aab4aefab71ad68ae407
   languageName: node
   linkType: hard
 
