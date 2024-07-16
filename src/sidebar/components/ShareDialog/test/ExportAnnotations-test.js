@@ -1,4 +1,4 @@
-import { SelectNext } from '@hypothesis/frontend-shared';
+import { Select } from '@hypothesis/frontend-shared';
 import {
   checkAccessibility,
   mockImportedComponents,
@@ -99,14 +99,11 @@ describe('ExportAnnotations', () => {
     $imports.$restore();
   });
 
-  const waitForTestId = async (wrapper, testId) =>
-    waitForElement(wrapper, `[data-testid="${testId}"]`);
+  const waitForSelect = (wrapper, testId) =>
+    waitForElement(wrapper, `Select[data-testid="${testId}"]`);
 
   const selectExportFormat = async (wrapper, format) => {
-    const select = await waitForElement(
-      wrapper,
-      '[data-testid="export-format-select"]',
-    );
+    const select = await waitForSelect(wrapper, 'export-format-select');
     select.props().onChange({ value: format });
     wrapper.update();
   };
@@ -211,8 +208,8 @@ describe('ExportAnnotations', () => {
 
       const wrapper = createComponent();
 
-      const userList = await waitForTestId(wrapper, 'user-select');
-      const users = userList.find(SelectNext.Option);
+      const userList = await waitForSelect(wrapper, 'user-select');
+      const users = userList.find(Select.Option);
       assert.equal(users.length, userEntries.length);
 
       for (const [i, entry] of userEntries.entries()) {
@@ -254,7 +251,7 @@ describe('ExportAnnotations', () => {
       wrapper,
       '[data-testid="export-format-select"]',
     );
-    const options = select.find(SelectNext.Option);
+    const options = select.find(Select.Option);
     const optionText = (index, type) =>
       options.at(index).find(`[data-testid="format-${type}"]`).text();
 
@@ -284,8 +281,7 @@ describe('ExportAnnotations', () => {
   ].forEach(([format, expectedTitle]) => {
     it('displays format short title if defined', async () => {
       const wrapper = createComponent();
-      const getSelect = () =>
-        waitForElement(wrapper, '[data-testid="export-format-select"]');
+      const getSelect = () => waitForSelect(wrapper, 'export-format-select');
 
       const selectBefore = await getSelect();
       selectBefore.props().onChange(format);
@@ -386,7 +382,7 @@ describe('ExportAnnotations', () => {
       const wrapper = createComponent();
 
       // Select the user whose annotations we want to export
-      const userList = await waitForTestId(wrapper, 'user-select');
+      const userList = await waitForSelect(wrapper, 'user-select');
       act(() => {
         userList.prop('onChange')('acct:john@example.com');
       });
@@ -598,7 +594,7 @@ describe('ExportAnnotations', () => {
 
   it('should pass a11y checks', async () => {
     const wrapper = createComponent();
-    const select = await waitForTestId(wrapper, 'user-select');
+    const select = await waitForSelect(wrapper, 'user-select');
 
     await checkAccessibility({
       content: () => wrapper,

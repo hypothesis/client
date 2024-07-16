@@ -3,8 +3,8 @@ import {
   CardActions,
   Link,
   Input,
-  SelectNext,
   CopyIcon,
+  Select,
 } from '@hypothesis/frontend-shared';
 import { useCallback, useId, useMemo, useState } from 'preact/hooks';
 
@@ -279,7 +279,7 @@ function ExportAnnotations({
             <label htmlFor={userSelectId} className="font-medium">
               Select which user{"'"}s annotations to export:
             </label>
-            <SelectNext
+            <Select
               value={selectedUserId}
               onChange={setSelectedUserId}
               buttonId={userSelectId}
@@ -290,20 +290,17 @@ function ExportAnnotations({
               }
               data-testid="user-select"
             >
-              <SelectNext.Option value={undefined}>
+              <Select.Option value={undefined}>
                 <UserAnnotationsListItem
                   userAnnotations={allAnnotationsOption}
                 />
-              </SelectNext.Option>
+              </Select.Option>
               {userList.map(userInfo => (
-                <SelectNext.Option
-                  key={userInfo.userid}
-                  value={userInfo.userid}
-                >
+                <Select.Option key={userInfo.userid} value={userInfo.userid}>
                   <UserAnnotationsListItem userAnnotations={userInfo} />
-                </SelectNext.Option>
+                </Select.Option>
               ))}
-            </SelectNext>
+            </Select>
             <label
               data-testid="export-count"
               htmlFor={fileInputId}
@@ -325,7 +322,7 @@ function ExportAnnotations({
                 maxLength={250}
               />
               <div className="grow-0 ml-2 min-w-[5rem]">
-                <SelectNext
+                <Select
                   value={exportFormat}
                   onChange={setExportFormat}
                   buttonContent={exportFormat.shortTitle ?? exportFormat.title}
@@ -333,7 +330,7 @@ function ExportAnnotations({
                   right
                 >
                   {exportFormats.map(exportFormat => (
-                    <SelectNext.Option
+                    <Select.Option
                       key={exportFormat.value}
                       value={exportFormat}
                     >
@@ -345,9 +342,9 @@ function ExportAnnotations({
                           {exportFormat.description}
                         </div>
                       </div>
-                    </SelectNext.Option>
+                    </Select.Option>
                   ))}
-                </SelectNext>
+                </Select>
               </div>
             </div>
           </div>

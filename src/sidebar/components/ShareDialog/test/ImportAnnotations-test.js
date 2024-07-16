@@ -1,4 +1,4 @@
-import { SelectNext } from '@hypothesis/frontend-shared';
+import { Select } from '@hypothesis/frontend-shared';
 import {
   checkAccessibility,
   waitFor,
@@ -106,7 +106,7 @@ describe('ImportAnnotations', () => {
       },
     ];
     selectFile(wrapper, annotations);
-    const userList = await waitForElement(wrapper, SelectNext);
+    const userList = await waitForElement(wrapper, Select);
     assert.ok(userList.prop('value')); // Current user should be auto-selected
 
     // Import button should be disabled since we don't have the things we need
@@ -200,8 +200,8 @@ describe('ImportAnnotations', () => {
 
       selectFile(wrapper, annotations);
 
-      const userList = await waitForElement(wrapper, SelectNext);
-      const users = userList.find(SelectNext.Option);
+      const userList = await waitForElement(wrapper, Select);
+      const users = userList.find(Select.Option);
 
       assert.equal(users.length, userEntries.length);
 
@@ -241,7 +241,7 @@ describe('ImportAnnotations', () => {
     ];
     selectFile(wrapper, annotations);
 
-    const userList = await waitForElement(wrapper, SelectNext);
+    const userList = await waitForElement(wrapper, Select);
     assert.equal(userList.props().value.userid, 'acct:john@example.com');
   });
 
@@ -259,7 +259,7 @@ describe('ImportAnnotations', () => {
     ];
     selectFile(wrapper, annotations);
 
-    const userList = await waitForElement(wrapper, SelectNext);
+    const userList = await waitForElement(wrapper, Select);
     assert.equal(userList.prop('value'), null);
   });
 
@@ -297,9 +297,9 @@ describe('ImportAnnotations', () => {
 
     selectFile(wrapper, annotations);
 
-    const userList = await waitForElement(wrapper, SelectNext);
+    const userList = await waitForElement(wrapper, Select);
     const option = userList
-      .find(SelectNext.Option)
+      .find(Select.Option)
       .filterWhere(
         option => option.prop('value').userid === 'acct:brian@example.com',
       )
