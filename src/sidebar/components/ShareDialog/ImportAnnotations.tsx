@@ -1,9 +1,4 @@
-import {
-  Button,
-  CardActions,
-  Link,
-  SelectNext,
-} from '@hypothesis/frontend-shared';
+import { Button, CardActions, Link, Select } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useId, useMemo, useState } from 'preact/hooks';
 
 import type { APIAnnotationData } from '../../../types/api';
@@ -163,11 +158,9 @@ function ImportAnnotations({
           <label htmlFor={userSelectId} className="block font-medium">
             Select which user&apos;s annotations to import:
           </label>
-          <SelectNext
+          <Select
             value={selectedUser}
-            onChange={(newValue: typeof selectedUser) =>
-              setSelectedUserId(newValue?.userid ?? null)
-            }
+            onChange={newValue => setSelectedUserId(newValue?.userid ?? null)}
             buttonId={userSelectId}
             buttonContent={
               selectedUser ? (
@@ -178,11 +171,11 @@ function ImportAnnotations({
             }
           >
             {userList.map(userInfo => (
-              <SelectNext.Option key={userInfo.userid} value={userInfo}>
+              <Select.Option key={userInfo.userid} value={userInfo}>
                 <UserAnnotationsListItem userAnnotations={userInfo} />
-              </SelectNext.Option>
+              </Select.Option>
             ))}
-          </SelectNext>
+          </Select>
         </>
       )}
       {error && (

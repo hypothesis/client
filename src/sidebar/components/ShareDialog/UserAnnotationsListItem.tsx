@@ -5,7 +5,7 @@ export type UserAnnotationsListItemProps = {
 };
 
 /**
- * UserAnnotations representation to use inside `SelectNext.Option`.
+ * UserAnnotations representation to use inside `Select.Option`.
  */
 export function UserAnnotationsListItem({
   userAnnotations,
