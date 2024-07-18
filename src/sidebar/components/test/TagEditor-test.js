@@ -224,7 +224,10 @@ describe('TagEditor', () => {
       wrapper.find('input').instance().value = 'non-empty';
       typeInput(wrapper);
       assert.equal(wrapper.find('AutocompleteList').prop('open'), true);
-      document.body.dispatchEvent(new Event('focus'));
+      wrapper
+        .find('input[data-testid="input"]')
+        .getDOMNode()
+        .dispatchEvent(new Event('focusout'));
       wrapper.update();
       assert.equal(wrapper.find('AutocompleteList').prop('open'), false);
     });

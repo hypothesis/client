@@ -1,4 +1,8 @@
-import { useElementShouldClose } from '@hypothesis/frontend-shared';
+import {
+  useKeyPress,
+  useClickAway,
+  useFocusAway,
+} from '@hypothesis/frontend-shared';
 import { MenuExpandIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
@@ -145,7 +149,9 @@ export default function Menu({
 
   // Menu element should close via `closeMenu` whenever it's open and there
   // are user interactions outside of it (e.g. clicks) in the document
-  useElementShouldClose(menuRef, isOpen, closeMenu);
+  useClickAway(menuRef, closeMenu, { enabled: isOpen });
+  useFocusAway(menuRef, closeMenu, { enabled: isOpen });
+  useKeyPress(['Escape'], closeMenu, { enabled: isOpen });
 
   const stopPropagation = (e: Event) => e.stopPropagation();
 

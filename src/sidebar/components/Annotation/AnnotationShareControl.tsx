@@ -1,4 +1,8 @@
-import { useElementShouldClose } from '@hypothesis/frontend-shared';
+import {
+  useClickAway,
+  useFocusAway,
+  useKeyPress,
+} from '@hypothesis/frontend-shared';
 import {
   Card,
   IconButton,
@@ -62,8 +66,10 @@ function AnnotationShareControl({
   const toggleSharePanel = () => setOpen(!isOpen);
   const closePanel = () => setOpen(false);
 
-  // Interactions outside of the component when it is open should close it
-  useElementShouldClose(shareRef, isOpen, closePanel);
+  // Interactions outside the component when it is open should close it
+  useClickAway(shareRef, closePanel, { enabled: isOpen });
+  useFocusAway(shareRef, closePanel, { enabled: isOpen });
+  useKeyPress(['Escape'], closePanel, { enabled: isOpen });
 
   useEffect(() => {
     if (wasOpen.current !== isOpen) {
@@ -129,8 +135,8 @@ function AnnotationShareControl({
   return (
     // Make the container div focusable by setting a non-null `tabIndex`.
     // This prevents clicks on non-focusable contents from "leaking out" and
-    // focusing a focusable ancester. If something outside of the panel gains
-    // focus, `useElementShouldClose`'s focus listener will close the panel.
+    // focusing a focusable ancester. If something outside the panel gains
+    // focus, `useFocusAway`'s focus listener will close the panel.
     // "Catch focus" here to prevent this.
     // See https://github.com/hypothesis/client/issues/5196
     <div className="relative" ref={shareRef} tabIndex={-1}>

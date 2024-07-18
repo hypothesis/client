@@ -1,4 +1,8 @@
-import { useElementShouldClose } from '@hypothesis/frontend-shared';
+import {
+  useClickAway,
+  useFocusAway,
+  useKeyPress,
+} from '@hypothesis/frontend-shared';
 import { Input } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useRef, useState } from 'preact/hooks';
@@ -45,8 +49,14 @@ function TagEditor({
 
   // Set up callback to monitor outside click events to close the AutocompleteList
   const closeWrapperRef = useRef<HTMLDivElement>(null);
-  useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
-    setSuggestionsListOpen(false);
+  useClickAway(closeWrapperRef, () => setSuggestionsListOpen(false), {
+    enabled: suggestionsListOpen,
+  });
+  useFocusAway(inputEl, () => setSuggestionsListOpen(false), {
+    enabled: suggestionsListOpen,
+  });
+  useKeyPress(['Escape'], () => setSuggestionsListOpen(false), {
+    enabled: suggestionsListOpen,
   });
 
   /**
@@ -282,6 +292,7 @@ function TagEditor({
             // Larger font on touch devices
             'text-base touch:text-touch-base',
           )}
+          data-testid="input"
         />
         <AutocompleteList
           id={`${tagEditorId}-AutocompleteList`}
