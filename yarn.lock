@@ -3239,12 +3239,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-request-log@npm:^5.1.0":
-  version: 5.3.0
-  resolution: "@octokit/plugin-request-log@npm:5.3.0"
+"@octokit/plugin-request-log@npm:^5.3.1":
+  version: 5.3.1
+  resolution: "@octokit/plugin-request-log@npm:5.3.1"
   peerDependencies:
     "@octokit/core": ">=6"
-  checksum: 8c918b14f0687e8a3d9c7c81ef1092a49de07681940cc1aee0aeb7e3dd8ac64f69af5d65932eec32f6db4af3dca80541ad3bb13ac0fa44af3e2340ed91909272
+  checksum: a27e163282c8d0ba8feee4d3cbbd1b62e1aa89a892877f7a9876fc17ddde3e1e1af922e6664221a0cabae99b8a7a2a5215b9ec2ee5222edb50e06298e99022b0
   languageName: node
   linkType: hard
 
@@ -3281,14 +3281,14 @@ __metadata:
   linkType: hard
 
 "@octokit/rest@npm:^21.0.0":
-  version: 21.0.0
-  resolution: "@octokit/rest@npm:21.0.0"
+  version: 21.0.1
+  resolution: "@octokit/rest@npm:21.0.1"
   dependencies:
     "@octokit/core": ^6.1.2
     "@octokit/plugin-paginate-rest": ^11.0.0
-    "@octokit/plugin-request-log": ^5.1.0
+    "@octokit/plugin-request-log": ^5.3.1
     "@octokit/plugin-rest-endpoint-methods": ^13.0.0
-  checksum: 1d2c28dfce0c11de252d105e2c256690e66bb6c1ccf73fbc142dd4e5570aa7d9d77a8e443956bcc461709c83dc018c5a3999fd784ac2fb3f4514a3db29a3a1bf
+  checksum: 99a099a7fbb2c460955e941e0ab8d8aa7480988b9bcae80af752d8d6112aaf301f43916eac7be04e813ca97a3dd5ad5f27cc88812aa600f5bbf387dfbba2381c
   languageName: node
   linkType: hard
 
