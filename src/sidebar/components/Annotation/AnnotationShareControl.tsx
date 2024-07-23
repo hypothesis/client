@@ -62,7 +62,6 @@ function AnnotationShareControl({
   const toggleSharePanel = () => setOpen(!isOpen);
   const closePanel = () => setOpen(false);
 
-  // Interactions outside the component when it is open should close it
   usePopoverShouldClose(shareRef, closePanel, { enabled: isOpen });
 
   useEffect(() => {
