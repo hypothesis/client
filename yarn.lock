@@ -2713,15 +2713,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hypothesis/frontend-shared@npm:^7.14.0":
-  version: 7.14.0
-  resolution: "@hypothesis/frontend-shared@npm:7.14.0"
+"@hypothesis/frontend-shared@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@hypothesis/frontend-shared@npm:8.0.0"
   dependencies:
     highlight.js: ^11.6.0
     wouter-preact: ^3.0.0
   peerDependencies:
     preact: ^10.4.0
-  checksum: e5a21a08d4e23b9ca412320b03ddab07bc849a0962d608af7758c4c71aed5e9748fa9ae57ec0cf74f7deaa42a01d9960f11a1681b96b116503f53317e9f368e8
+  checksum: 12f945d2d667926bc52dcba15164fb988a1c9f6f50fecffd676f507d29e3fcc365ea244b784b5a18e9b536ca050df50c5a4304e0f0757caea88424baa3cee9fd
   languageName: node
   linkType: hard
 
@@ -8746,7 +8746,7 @@ __metadata:
     "@babel/preset-react": ^7.0.0
     "@babel/preset-typescript": ^7.16.7
     "@hypothesis/frontend-build": ^3.0.0
-    "@hypothesis/frontend-shared": ^7.14.0
+    "@hypothesis/frontend-shared": ^8.0.0
     "@hypothesis/frontend-testing": ^1.2.0
     "@npmcli/arborist": ^7.0.0
     "@octokit/rest": ^21.0.0
