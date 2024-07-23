@@ -88,7 +88,7 @@ describe('AnnotationShareControl', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '@hypothesis/frontend-shared': {
-        useElementShouldClose: sinon.stub(),
+        usePopoverShouldClose: sinon.stub(),
       },
       '../../helpers/annotation-sharing': {
         isShareableURI: fakeIsShareableURI,

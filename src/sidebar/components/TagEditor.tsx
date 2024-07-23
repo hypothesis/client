@@ -1,4 +1,4 @@
-import { useElementShouldClose } from '@hypothesis/frontend-shared';
+import { usePopoverShouldClose } from '@hypothesis/frontend-shared';
 import { Input } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useRef, useState } from 'preact/hooks';
@@ -45,8 +45,8 @@ function TagEditor({
 
   // Set up callback to monitor outside click events to close the AutocompleteList
   const closeWrapperRef = useRef<HTMLDivElement>(null);
-  useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
-    setSuggestionsListOpen(false);
+  usePopoverShouldClose(closeWrapperRef, () => setSuggestionsListOpen(false), {
+    enabled: suggestionsListOpen,
   });
 
   /**
