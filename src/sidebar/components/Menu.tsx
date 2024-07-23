@@ -1,4 +1,4 @@
-import { useElementShouldClose } from '@hypothesis/frontend-shared';
+import { usePopoverShouldClose } from '@hypothesis/frontend-shared';
 import { MenuExpandIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
@@ -145,7 +145,7 @@ export default function Menu({
 
   // Menu element should close via `closeMenu` whenever it's open and there
   // are user interactions outside of it (e.g. clicks) in the document
-  useElementShouldClose(menuRef, isOpen, closeMenu);
+  usePopoverShouldClose(menuRef, closeMenu, { enabled: isOpen });
 
   const stopPropagation = (e: Event) => e.stopPropagation();
 

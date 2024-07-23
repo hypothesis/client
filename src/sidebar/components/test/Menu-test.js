@@ -112,7 +112,6 @@ describe('Menu', () => {
     new Event('mousedown'),
     new Event('click'),
     ((e = new Event('keydown')), (e.key = 'Escape'), e),
-    new Event('focus'),
   ].forEach(event => {
     it(`closes when the user clicks or presses the mouse outside (${event.type})`, () => {
       const wrapper = createMenu({ defaultOpen: true });
@@ -124,6 +123,20 @@ describe('Menu', () => {
 
       assert.isFalse(isOpen(wrapper));
     });
+  });
+
+  it('closes when menu loses focus', () => {
+    const wrapper = createMenu({ defaultOpen: true });
+
+    act(() => {
+      wrapper
+        .find(menuSelector)
+        .getDOMNode()
+        .dispatchEvent(new Event('focusout'));
+    });
+    wrapper.update();
+
+    assert.isFalse(isOpen(wrapper));
   });
 
   it('does not close when user presses non-Escape key outside', () => {
