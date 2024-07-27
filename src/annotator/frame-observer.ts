@@ -69,6 +69,9 @@ export class FrameObserver {
       frameWindow!.addEventListener('unload', () => {
         this._removeFrame(frame);
       });
+      frame.addEventListener('load', () => {
+        this._addFrame(frame);
+      });
       this._onFrameAdded(frame);
     } catch (e) {
       console.warn(
