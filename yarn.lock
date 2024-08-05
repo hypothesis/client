@@ -7779,20 +7779,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fetch-mock@npm:10":
-  version: 10.0.7
-  resolution: "fetch-mock@npm:10.0.7"
+"fetch-mock@npm:11":
+  version: 11.0.0
+  resolution: "fetch-mock@npm:11.0.0"
   dependencies:
     debug: ^4.1.1
-    glob-to-regexp: ^0.4.0
+    dequal: ^2.0.3
+    globrex: ^0.1.2
     is-subset: ^0.1.1
-    lodash.isequal: ^4.5.0
-    path-to-regexp: ^2.2.1
-    querystring: ^0.2.1
+    regexparam: ^3.0.0
   peerDependenciesMeta:
     node-fetch:
       optional: true
-  checksum: a2224f01c7e2bab063c24355ca0c1ea10865ea22359274528c771fc2becbff8c3b6e5506ca42c8b2259045665345b8f2532ebbc62e3f2695671a3313441bb99d
+  checksum: 6654d5c0461a68bc5ec9322d9ff9d0ff534fd20d6752f99062f4cca88dbec9896d759267d4ee34cdb976ec0c20869a3404029dc8a9ade3bd1b47db2baaa5e166
   languageName: node
   linkType: hard
 
@@ -8293,13 +8292,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob-to-regexp@npm:^0.4.0":
-  version: 0.4.1
-  resolution: "glob-to-regexp@npm:0.4.1"
-  checksum: e795f4e8f06d2a15e86f76e4d92751cf8bbfcf0157cea5c2f0f35678a8195a750b34096b1256e436f0cebc1883b5ff0888c47348443e69546a5a87f9e1eb1167
-  languageName: node
-  linkType: hard
-
 "glob-watcher@npm:^6.0.0":
   version: 6.0.0
   resolution: "glob-watcher@npm:6.0.0"
@@ -8493,6 +8485,13 @@ __metadata:
     merge2: ^1.4.1
     slash: ^3.0.0
   checksum: b4be8885e0cfa018fc783792942d53926c35c50b3aefd3fdcfb9d22c627639dc26bd2327a40a0b74b074100ce95bb7187bfeae2f236856aa3de183af7a02aea6
+  languageName: node
+  linkType: hard
+
+"globrex@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "globrex@npm:0.1.2"
+  checksum: adca162494a176ce9ecf4dd232f7b802956bb1966b37f60c15e49d2e7d961b66c60826366dc2649093cad5a0d69970cfa8875bd1695b5a1a2f33dcd2aa88da3c
   languageName: node
   linkType: hard
 
@@ -8963,7 +8962,7 @@ __metadata:
     eslint-plugin-react-hooks: ^4.0.4
     express: ^4.14.1
     fancy-log: ^2.0.0
-    fetch-mock: 10
+    fetch-mock: 11
     focus-visible: ^5.0.0
     gulp: ^5.0.0
     gulp-changed: ^5.0.1
@@ -11626,13 +11625,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-to-regexp@npm:^2.2.1":
-  version: 2.4.0
-  resolution: "path-to-regexp@npm:2.4.0"
-  checksum: 581175bf2968e51452f2b8c71f10e75c995693668b4ecf7d0b48962fbe0c56830661ca5dd5fd6d8e2f0cc9a045ce07e89af504ab133e1d21887c2712df85b1f4
-  languageName: node
-  linkType: hard
-
 "path-to-regexp@npm:^6.2.1":
   version: 6.2.2
   resolution: "path-to-regexp@npm:6.2.2"
@@ -11937,13 +11929,6 @@ __metadata:
   dependencies:
     side-channel: ^1.0.4
   checksum: 6e1f29dd5385f7488ec74ac7b6c92f4d09a90408882d0c208414a34dd33badc1a621019d4c799a3df15ab9b1d0292f97c1dd71dc7c045e69f81a8064e5af7297
-  languageName: node
-  linkType: hard
-
-"querystring@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "querystring@npm:0.2.1"
-  checksum: 7b83b45d641e75fd39cd6625ddfd44e7618e741c61e95281b57bbae8fde0afcc12cf851924559e5cc1ef9baa3b1e06e22b164ea1397d65dd94b801f678d9c8ce
   languageName: node
   linkType: hard
 
