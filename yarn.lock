@@ -5570,9 +5570,9 @@ __metadata:
   linkType: hard
 
 "axe-core@npm:^4.0.0, axe-core@npm:^4.8.2":
-  version: 4.9.1
-  resolution: "axe-core@npm:4.9.1"
-  checksum: 41d9227871781f96c2952e2a777fca73624959dd0e98864f6d82806a77602f82b4fc490852082a7e524d8cd864e50d8b4d9931819b4a150112981d8c932110c5
+  version: 4.10.0
+  resolution: "axe-core@npm:4.10.0"
+  checksum: 7eca827fd8d98d7e4b561df65437be608155c613d8f262ae9e4a6ade02c156c7362dcbc3f71b4b526edce686f7c686280236bcff1d6725e2ef8327def72a8c41
   languageName: node
   linkType: hard
 
