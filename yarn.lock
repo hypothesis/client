@@ -3500,14 +3500,14 @@ __metadata:
   linkType: hard
 
 "@octokit/rest@npm:^21.0.0":
-  version: 21.0.1
-  resolution: "@octokit/rest@npm:21.0.1"
+  version: 21.0.2
+  resolution: "@octokit/rest@npm:21.0.2"
   dependencies:
     "@octokit/core": ^6.1.2
     "@octokit/plugin-paginate-rest": ^11.0.0
     "@octokit/plugin-request-log": ^5.3.1
     "@octokit/plugin-rest-endpoint-methods": ^13.0.0
-  checksum: 99a099a7fbb2c460955e941e0ab8d8aa7480988b9bcae80af752d8d6112aaf301f43916eac7be04e813ca97a3dd5ad5f27cc88812aa600f5bbf387dfbba2381c
+  checksum: 81dc98bbc27d4891a211628ea49ba40f087f986ee85d7e2f0579b66e4046dd6b6d63ffeb0eb011c9240dd61906798795e4b9e309af230f31df0a42db79ae20bc
   languageName: node
   linkType: hard
 
