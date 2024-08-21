@@ -83,7 +83,7 @@ export class GroupsService {
    * the site that the user is on.
    */
   private _mainURI(): string | null {
-    return this._store.mainFrame()?.uri ?? null;
+    return this._store.defaultContentFrame()?.uri ?? null;
   }
 
   /**

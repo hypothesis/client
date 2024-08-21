@@ -81,7 +81,7 @@ describe('GroupsService', () => {
         focusedGroup() {
           return this.getState().groups.focusedGroup;
         },
-        mainFrame() {
+        defaultContentFrame() {
           return this.getState().frames[0];
         },
         setDefault: sinon.stub(),
