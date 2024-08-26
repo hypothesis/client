@@ -4732,9 +4732,9 @@ __metadata:
   linkType: hard
 
 "@types/chai@npm:^4.3.12":
-  version: 4.3.17
-  resolution: "@types/chai@npm:4.3.17"
-  checksum: 56661c74c76df06547e3584be4a2b85eec60e7de4c0f6e7bbf7bf492a0ce96ce5bfc30f52a8889a7b35e24161d225e4a57041d4fa80f6e5592fea78e45dfd34c
+  version: 4.3.18
+  resolution: "@types/chai@npm:4.3.18"
+  checksum: 01840fdd85b7ccfcc145cf3ab294510d9294b00b9e5fa7096c1699e73f892314bbb8a0505ba38dad61a9ae7f2e38bd8af59cadd3e8fbe4962b39e3627d7104ea
   languageName: node
   linkType: hard
 
