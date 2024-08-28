@@ -81,7 +81,10 @@ gulp.task('build-fonts', () => {
   // Fonts are located in a subdirectory of `build/styles` so that we can reuse
   // KaTeX's CSS bundle directly without any URL rewriting.
   const fontsDir = 'build/styles/fonts';
-  return gulp.src(fontFiles).pipe(changed(fontsDir)).pipe(gulp.dest(fontsDir));
+  return gulp
+    .src(fontFiles, { encoding: false })
+    .pipe(changed(fontsDir))
+    .pipe(gulp.dest(fontsDir));
 });
 
 gulp.task(
