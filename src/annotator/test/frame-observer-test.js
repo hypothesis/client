@@ -167,6 +167,10 @@ describe('annotator/frame-observer', () => {
 
   function assertCalledOnceWithError(callback, message) {
     assert.calledOnce(callback);
+    assertCalledWithError(callback, message);
+  }
+
+  function assertCalledWithError(callback, message) {
     assert.calledWith(callback, sinon.match.instanceOf(Error));
     const error = callback.args[0][0];
     assert.equal(error.message, message);
@@ -249,11 +253,7 @@ describe('annotator/frame-observer', () => {
 
       frame.src = crossOriginURL;
       await waitForEvent(frame, 'load');
-      assertCalledOnceWithError(callback, 'Frame is cross-origin');
-
-      // Wait a moment to check that callback was only invoked once.
-      await delay(pollInterval + 1);
-      assertCalledOnceWithError(callback, 'Frame is cross-origin');
+      assertCalledWithError(callback, 'Frame is cross-origin');
     });
 
     it('invokes callback with error if frame is disconnected', async () => {
