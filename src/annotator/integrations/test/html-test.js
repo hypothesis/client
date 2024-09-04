@@ -215,9 +215,14 @@ describe('HTMLIntegration', () => {
     it('does not set left and right margins if there is not enough room to enable', () => {
       const integration = createIntegration();
 
-      // Minimum available content width for side-by-side is 480
-      // window.innerWidth (800) - 321 = 479 --> too small
-      integration.fitSideBySide({ expanded: true, width: 321 });
+      // Minimum content width for side-by-side to activate.
+      const minSideBySideWidth = 480;
+
+      // Create a sidebar width which leaves less than `minSideBySideWidth` px
+      // available for the content.
+      const sidebarWidth = window.innerWidth - minSideBySideWidth + 1;
+      assert.isAbove(sidebarWidth, 1);
+      integration.fitSideBySide({ expanded: true, width: sidebarWidth });
 
       assert.isFalse(integration.sideBySideActive());
       assert.deepEqual(getMargins(), [null, null]);
@@ -339,19 +344,19 @@ describe('HTMLIntegration', () => {
 
       it('may move the main content to the left to make room for sidebar', () => {
         const integration = createIntegration();
+        const [leftMargin, rightMargin] = getComputedMargins(document.body);
 
-        // Will result in right margin of 262 (250 + 12 padding)
-        integration.fitSideBySide({ expanded: true, width: 250 });
+        // Choose a sidebar width that doesn't require moving the main content.
+        assert.isAbove(rightMargin, 100);
+        integration.fitSideBySide({ expanded: true, width: 100 });
+        let [newLeftMargin] = getComputedMargins(document.body);
+        assert.equal(newLeftMargin, leftMargin);
 
-        // The amount of space available to the left of the body is now _less_
-        // than the original auto-left-margin. This is fine: let the auto
-        // margin re-adjust to the available amount of space (move to the left):
-        const updatedMargins = getComputedMargins(document.body);
-        const expectedLeftMargin = Math.floor(
-          window.innerWidth - bodyWidth - 262,
-        );
-        assert.equal(updatedMargins[0], expectedLeftMargin);
-        assert.isBelow(updatedMargins[0], autoMargin);
+        // Choose a sidebar width that does require moving the main content.
+        integration.fitSideBySide({ expanded: true, width: rightMargin });
+
+        [newLeftMargin] = getComputedMargins(document.body);
+        assert.isBelow(newLeftMargin, leftMargin);
       });
     });
 
