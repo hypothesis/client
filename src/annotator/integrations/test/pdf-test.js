@@ -233,6 +233,11 @@ describe('annotator/integrations/pdf', () => {
     });
 
     describe('#destroy', () => {
+      const sandbox = sinon.createSandbox();
+      afterEach(() => {
+        sandbox.restore();
+      });
+
       it('removes CSS classes to override PDF.js styles', () => {
         pdfIntegration = createPDFIntegration();
 
@@ -247,16 +252,25 @@ describe('annotator/integrations/pdf', () => {
       });
 
       it('undoes side-by-side layout changes', () => {
+        // Fix value to be a size at which side-by-side will activate.
+        sandbox.stub(window, 'innerWidth').value(800);
+
         pdfIntegration = createPDFIntegration();
         pdfIntegration.fitSideBySide({
           expanded: true,
           width: 100,
         });
-        assert.isTrue(pdfIntegration.sideBySideActive());
+        assert.isTrue(
+          pdfIntegration.sideBySideActive(),
+          'side-by-side was not activated',
+        );
 
         pdfIntegration.destroy();
 
-        assert.isFalse(pdfIntegration.sideBySideActive());
+        assert.isFalse(
+          pdfIntegration.sideBySideActive(),
+          'side-by-side was not deactivated',
+        );
       });
     });
 
