@@ -11985,11 +11985,11 @@ __metadata:
   linkType: hard
 
 "preact-render-to-string@npm:^6.4.0":
-  version: 6.5.9
-  resolution: "preact-render-to-string@npm:6.5.9"
+  version: 6.5.10
+  resolution: "preact-render-to-string@npm:6.5.10"
   peerDependencies:
     preact: ">=10"
-  checksum: d1eb59151a8cb27961d40534de838cd1fab0799d44f1b02e2ee69d7d4af1eaa6dc75636ebdae797f338ec25f19eacfe78da6a9b7789946d6bd809b58544a4149
+  checksum: c83003be92b87e1cd82c84d7b003eb26943e62f64bea82f24022ccaf8b9edf62fcbb4d8964773173e579be1430f056012e56ee9ec201a877fac7311ba8cdf82a
   languageName: node
   linkType: hard
 
