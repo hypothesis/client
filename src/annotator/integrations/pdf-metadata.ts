@@ -50,6 +50,23 @@ function pdfViewerInitialized(app: PDFViewerApplication): Promise<void> {
 }
 
 /**
+ * Wait for PDF to be downloaded.
+ *
+ * For PDF.js versions older than v4.5, we rely on
+ * `PDFViewerApplication.downloadComplete`.
+ * For newer PDF.js versions we wait for
+ * `PDFViewerApplication.pdfDocument.getDownloadInfo()` to resolve.
+ */
+async function isPDFDownloaded(app: PDFViewerApplication): Promise<boolean> {
+  if (app.downloadComplete !== undefined) {
+    return app.downloadComplete;
+  }
+
+  await app.pdfDocument.getDownloadInfo();
+  return true;
+}
+
+/**
  * PDFMetadata extracts metadata about a loading/loaded PDF document from a
  * PDF.js PDFViewerApplication object.
  *
@@ -70,9 +87,10 @@ export class PDFMetadata {
    * @param app - The `PDFViewerApplication` global from PDF.js
    */
   constructor(app: PDFViewerApplication) {
-    this._loaded = pdfViewerInitialized(app).then(() => {
+    this._loaded = pdfViewerInitialized(app).then(async () => {
       // Check if document has already loaded.
-      if (app.downloadComplete) {
+      const isDownloadComplete = await isPDFDownloaded(app);
+      if (isDownloadComplete) {
         return app;
       }
 
