@@ -66,6 +66,13 @@ export type PDFDocument = {
    */
   fingerprints?: [string, string | null];
   getMetadata(): Promise<PDFDocumentMetadata>;
+
+  /**
+   * @return A promise that is resolved when the document's data is loaded.
+   *         It is resolved with an {Object} that contains the `length` property
+   *         that indicates size of the PDF data in bytes.
+   */
+  getDownloadInfo(): Promise<{ length: number }>;
 };
 
 export type GetTextContentParameters = {
@@ -159,7 +166,16 @@ export type PDFViewerApplication = {
   eventBus?: EventBus;
   pdfDocument: PDFDocument;
   pdfViewer: PDFViewer;
-  downloadComplete: boolean;
+
+  /**
+   * Indicates the download of the PDF has completed.
+   * This prop is not set in PDF.js >=4.5, in which case you should use
+   * `PDFViewerApplication.pdfDocument.getDownloadInfo()` instead.
+   *
+   * @see {PDFDocument}
+   */
+  downloadComplete?: boolean;
+
   documentInfo: PDFDocumentInfo;
   metadata: Metadata;
   /**
