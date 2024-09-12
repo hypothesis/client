@@ -2,6 +2,7 @@ import { delay } from '@hypothesis/frontend-testing';
 
 import { matchQuote } from '../match-quote';
 import * as pdfAnchoring from '../pdf';
+import { isTextLayerRenderingDone } from '../pdf';
 import { TextRange } from '../text-range';
 import { FakePDFViewerApplication } from './fake-pdf-viewer-application';
 
@@ -721,6 +722,37 @@ describe('annotator/anchoring/pdf', () => {
       it('returns false if PDF does not have selectable text', async () => {
         initViewer(content);
         assert.isFalse(await pdfAnchoring.documentHasText());
+      });
+    });
+  });
+
+  describe('isTextLayerRenderingDone', () => {
+    [true, false].forEach(renderingDone => {
+      it('returns renderingDone if present', () => {
+        assert.equal(
+          isTextLayerRenderingDone({ renderingDone }),
+          renderingDone,
+        );
+      });
+    });
+
+    it('returns false if neither renderingDone nor the div are set', () => {
+      assert.isFalse(isTextLayerRenderingDone({}));
+    });
+
+    [
+      { element: null, expectedResult: false },
+      { element: {}, expectedResult: true },
+    ].forEach(({ element, expectedResult }) => {
+      it('returns true if the div contains an endOfContent element', () => {
+        assert.equal(
+          isTextLayerRenderingDone({
+            div: {
+              querySelector: () => element,
+            },
+          }),
+          expectedResult,
+        );
       });
     });
   });
