@@ -6,7 +6,7 @@ import type {
   TextQuoteSelector,
   Selector,
 } from '../../types/api';
-import type { PDFPageView, PDFViewer } from '../../types/pdfjs';
+import type { PDFPageView, PDFViewer, TextLayer } from '../../types/pdfjs';
 import { translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
@@ -260,6 +260,27 @@ function isSpace(char: string) {
 const isNotSpace = (char: string) => !isSpace(char);
 
 /**
+ * Determines if provided text layer is done rendering.
+ * It works on older PDF.js versions which expose a public renderingDone prop,
+ * and newer versions as well
+ */
+export function isTextLayerRenderingDone(textLayer: TextLayer): boolean {
+  if (textLayer.renderingDone !== undefined) {
+    return textLayer.renderingDone;
+  }
+
+  if (!textLayer.div) {
+    return false;
+  }
+
+  // When a Page is rendered, the div gets an element with the class
+  // endOfContent appended to it. If that element exists, we can consider the
+  // text layer is done rendering.
+  // See https://github.com/mozilla/pdf.js/blob/1ab9ab67eed886f27127bd801bc349949af5054e/web/text_layer_builder.js#L103-L107
+  return textLayer.div.querySelector('.endOfContent') !== null;
+}
+
+/**
  * Locate the DOM Range which a position selector refers to.
  *
  * If the page is off-screen it may be in an unrendered state, in which case
@@ -285,7 +306,7 @@ async function anchorByPosition(
   if (
     page.renderingState === RenderingStates.FINISHED &&
     page.textLayer &&
-    page.textLayer.renderingDone
+    isTextLayerRenderingDone(page.textLayer)
   ) {
     // The page has been rendered. Locate the position in the text layer.
     //

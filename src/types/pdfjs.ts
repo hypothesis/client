@@ -192,7 +192,11 @@ export type PDFViewerApplication = {
 };
 
 export type TextLayer = {
-  renderingDone: boolean;
+  /**
+   * This prop is private in PDF.js >=4.5, so we cannot safely trust it's
+   * publicly exposed
+   */
+  renderingDone?: boolean;
   /**
    * New name for root element of text layer in PDF.js >= v3.2.146
    */

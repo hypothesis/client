@@ -19,6 +19,7 @@ import {
   canDescribe,
   describe,
   documentHasText,
+  isTextLayerRenderingDone,
 } from '../anchoring/pdf';
 import { isInPlaceholder, removePlaceholder } from '../anchoring/placeholder';
 import { TextRange } from '../anchoring/text-range';
@@ -356,7 +357,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     const pageCount = this._pdfViewer.pagesCount;
     for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
       const page = this._pdfViewer.getPageView(pageIndex);
-      if (!page?.textLayer?.renderingDone) {
+      if (!page?.textLayer || !isTextLayerRenderingDone(page.textLayer)) {
         continue;
       }
 
