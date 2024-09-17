@@ -171,6 +171,7 @@ export type PDFViewerApplication = {
    * Indicates the download of the PDF has completed.
    * This prop is not set in PDF.js >=4.5, in which case you should use
    * `PDFViewerApplication.pdfDocument.getDownloadInfo()` instead.
+   * See https://github.com/mozilla/pdf.js/pull/18463/commits/64a4f0dc7e60e86a7c1da1dc903497fff71abe2c
    *
    * @see {PDFDocument}
    */
