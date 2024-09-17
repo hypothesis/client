@@ -741,18 +741,22 @@ describe('annotator/anchoring/pdf', () => {
     });
 
     [
-      { element: null, expectedResult: false },
-      { element: {}, expectedResult: true },
-    ].forEach(({ element, expectedResult }) => {
+      { div: document.createElement('div'), expectedResult: false },
+      {
+        div: (function () {
+          const div = document.createElement('div');
+
+          const endOfContent = document.createElement('div');
+          endOfContent.className = 'endOfContent';
+          div.append(endOfContent);
+
+          return div;
+        })(),
+        expectedResult: true,
+      },
+    ].forEach(({ div, expectedResult }) => {
       it('returns true if the div contains an endOfContent element', () => {
-        assert.equal(
-          isTextLayerRenderingDone({
-            div: {
-              querySelector: () => element,
-            },
-          }),
-          expectedResult,
-        );
+        assert.equal(isTextLayerRenderingDone({ div }), expectedResult);
       });
     });
   });
