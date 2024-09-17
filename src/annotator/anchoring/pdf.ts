@@ -261,7 +261,7 @@ const isNotSpace = (char: string) => !isSpace(char);
 
 /**
  * Determines if provided text layer is done rendering.
- * It works on older PDF.js versions which expose a public renderingDone prop,
+ * It works on older PDF.js versions which expose a public `renderingDone` prop,
  * and newer versions as well
  */
 export function isTextLayerRenderingDone(textLayer: TextLayer): boolean {
