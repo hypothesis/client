@@ -41,7 +41,7 @@ describe('sidebar/helpers/thread-annotations', () => {
       .callsFake(() => structuredClone(fixtures.emptyThread));
     fakeFilterAnnotations = sinon.stub();
     fakeQueryParser = {
-      parseFilterQuery: sinon.stub(),
+      parseFilterQuery: sinon.stub().returns({}),
     };
 
     $imports.$mock({
@@ -293,21 +293,29 @@ describe('sidebar/helpers/thread-annotations', () => {
 
       it('should filter annotations if a filter query is set', () => {
         fakeThreadState.selection.filterQuery = 'anything';
+        fakeQueryParser.parseFilterQuery.returns({
+          termA: { terms: ['bar'], filterReplies: true },
+          termB: { terms: ['foo'], filterReplies: false },
+        });
         const annotation = annotationFixtures.defaultAnnotation();
         fakeFilterAnnotations.returns([annotation]);
 
         threadAnnotations(fakeThreadState);
 
-        const filterFn = fakeBuildThread.args[0][1].filterFn;
-
-        assert.isFunction(filterFn);
         assert.calledOnce(fakeQueryParser.parseFilterQuery);
         assert.calledWith(
           fakeQueryParser.parseFilterQuery,
           fakeThreadState.selection.filterQuery,
           fakeThreadState.selection.filters,
         );
+
+        const filterFn = fakeBuildThread.args[0][1].filterFn;
+        assert.isFunction(filterFn);
         assert.isTrue(filterFn(annotation));
+
+        const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
+        assert.isFunction(threadFilterFn);
+        assert.isTrue(threadFilterFn({ annotation }));
       });
 
       it('should filter annotations if there is an applied focus filter', () => {
