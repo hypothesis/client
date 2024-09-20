@@ -2,9 +2,20 @@
  * Parse a page number or range into a `[start, end]` integer pair. The `start`
  * or `end` may be `null` if the range is open.
  *
+ * Ranges can be specified as:
+ *
+ *  - A single number. This is treated as a range that starts and ends on the
+ *    same page.
+ *  - A range that may be closed ("5-10"), half-open ("5-" or "-5") or fully
+ *    open ("-").
+ *
  * Returns `null` if the page range could not be parsed.
  */
 function parseRange(range: string): [number | null, number | null] | null {
+  if (!range) {
+    return null;
+  }
+
   const [start, end] = range.includes('-') ? range.split('-') : [range, range];
 
   let startInt = null;

@@ -92,6 +92,20 @@ describe('pageLabelInRange', () => {
       range: 'foo-bar',
       match: false,
     },
+
+    // Empty label
+    {
+      label: '',
+      range: '1-2',
+      match: false,
+    },
+
+    // Empty range
+    {
+      label: '1',
+      range: '',
+      match: false,
+    },
   ].forEach(({ label, range, match }) => {
     it('returns true if the label is in the page range', () => {
       assert.equal(pageLabelInRange(label, range), match);
