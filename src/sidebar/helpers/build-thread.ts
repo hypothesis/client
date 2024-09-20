@@ -317,7 +317,13 @@ export function buildThread(
     });
   } else if (options.threadFilterFn) {
     // Remove threads not matching thread-level filters
-    thread.children = thread.children.filter(options.threadFilterFn);
+    const threadFilterFn = options.threadFilterFn;
+    thread.children = thread.children.filter(thread => {
+      if (hasForcedVisible && options.forcedVisible.includes(thread.id)) {
+        return true;
+      }
+      return threadFilterFn(thread);
+    });
   }
 
   // Set visibility for threads.
