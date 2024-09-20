@@ -5,7 +5,7 @@ import { buildThread } from './build-thread';
 import type { Thread, BuildThreadOptions } from './build-thread';
 import { filterAnnotations } from './filter-annotations';
 import { parseFilterQuery } from './query-parser';
-import type { FilterField } from './query-parser';
+import type { FilterField, ParsedQuery } from './query-parser';
 import { tabForAnnotation } from './tabs';
 import { sorters } from './thread-sorters';
 
@@ -67,7 +67,27 @@ function threadAnnotationsImpl(
       selection.filterQuery || '',
       selection.filters,
     );
-    options.filterFn = ann => filterAnnotations([ann], filters).length > 0;
+
+    // Split filters into those which apply to both annotations and replies,
+    // and those which should only be applied to threads.
+    const annotationFilters: Partial<ParsedQuery> = {};
+    const threadFilters: Partial<ParsedQuery> = {};
+    for (const [field, facet] of Object.entries(filters)) {
+      if (facet.filterReplies) {
+        annotationFilters[field as FilterField] = facet;
+      } else {
+        threadFilters[field as FilterField] = facet;
+      }
+    }
+
+    options.filterFn = ann =>
+      filterAnnotations([ann], annotationFilters).length > 0;
+
+    if (Object.values(threadFilters).some(facet => facet.terms.length > 0)) {
+      options.threadFilterFn = thread =>
+        !!thread.annotation &&
+        filterAnnotations([thread.annotation], threadFilters).length > 0;
+    }
   }
 
   const rootThread = buildThread(threadState.annotations, options);

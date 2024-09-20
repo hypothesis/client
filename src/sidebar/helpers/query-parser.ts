@@ -134,6 +134,15 @@ export type Facet = {
    */
   operator: 'and' | 'or';
   terms: string[] | number[];
+
+  /**
+   * Whether this facet is relevant for replies.
+   *
+   * This is true for facets such as annotation bodies, which both annotations
+   * and replies have, but false for eg. page numbers, which only annotations
+   * have.
+   */
+  filterReplies: boolean;
 };
 
 export type ParsedQuery = Record<FilterField | 'any', Facet>;
@@ -236,38 +245,47 @@ export function parseFilterQuery(
     any: {
       terms: any,
       operator: 'and',
+      filterReplies: true,
     },
     cfi: {
       terms: cfi,
       operator: 'or',
+      filterReplies: false,
     },
     quote: {
       terms: quote,
       operator: 'and',
+      filterReplies: false,
     },
     page: {
       terms: page,
       operator: 'or',
+      filterReplies: false,
     },
     since: {
       terms: since,
       operator: 'and',
+      filterReplies: true,
     },
     tag: {
       terms: tag,
       operator: 'and',
+      filterReplies: true,
     },
     text: {
       terms: text,
       operator: 'and',
+      filterReplies: true,
     },
     uri: {
       terms: uri,
       operator: 'or',
+      filterReplies: false,
     },
     user: {
       terms: user,
       operator: 'or',
+      filterReplies: true,
     },
   };
 }

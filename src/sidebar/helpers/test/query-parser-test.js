@@ -117,6 +117,7 @@ describe('sidebar/helpers/query-parser', () => {
           any: {
             operator: 'and',
             terms: ['one', 'two', 'three'],
+            filterReplies: true,
           },
         },
       },
@@ -128,6 +129,7 @@ describe('sidebar/helpers/query-parser', () => {
           tag: {
             operator: 'and',
             terms: ['foo', 'bar'],
+            filterReplies: true,
           },
         },
       },
@@ -137,10 +139,12 @@ describe('sidebar/helpers/query-parser', () => {
           quote: {
             operator: 'and',
             terms: ['inthequote'],
+            filterReplies: false,
           },
           text: {
             operator: 'and',
             terms: ['inthetext'],
+            filterReplies: true,
           },
         },
       },
@@ -150,6 +154,7 @@ describe('sidebar/helpers/query-parser', () => {
           user: {
             operator: 'or',
             terms: ['john', 'james'],
+            filterReplies: true,
           },
         },
       },
@@ -159,6 +164,7 @@ describe('sidebar/helpers/query-parser', () => {
           uri: {
             operator: 'or',
             terms: ['https://example.org/article.html'],
+            filterReplies: false,
           },
         },
       },
@@ -168,6 +174,7 @@ describe('sidebar/helpers/query-parser', () => {
           page: {
             operator: 'or',
             terms: ['5-10'],
+            filterReplies: false,
           },
         },
       },
@@ -177,6 +184,7 @@ describe('sidebar/helpers/query-parser', () => {
           cfi: {
             operator: 'or',
             terms: ['/2-/4'],
+            filterReplies: false,
           },
         },
       },
@@ -188,6 +196,7 @@ describe('sidebar/helpers/query-parser', () => {
           any: {
             operator: 'and',
             terms: ['group:abcd'],
+            filterReplies: true,
           },
         },
       },
@@ -197,6 +206,7 @@ describe('sidebar/helpers/query-parser', () => {
           any: {
             operator: 'and',
             terms: ['any:foo'],
+            filterReplies: true,
           },
         },
       },
@@ -269,6 +279,7 @@ describe('sidebar/helpers/query-parser', () => {
           user: {
             operator: 'or',
             terms: ['fakeusername'],
+            filterReplies: true,
           },
         },
       },
@@ -278,6 +289,7 @@ describe('sidebar/helpers/query-parser', () => {
           page: {
             operator: 'or',
             terms: ['2-4'],
+            filterReplies: false,
           },
         },
       },
@@ -287,6 +299,7 @@ describe('sidebar/helpers/query-parser', () => {
           cfi: {
             operator: 'or',
             terms: ['/2/2-/2/6'],
+            filterReplies: false,
           },
         },
       },
@@ -298,6 +311,7 @@ describe('sidebar/helpers/query-parser', () => {
           user: {
             operator: 'or',
             terms: ['fakeusername', 'otheruser'],
+            filterReplies: true,
           },
         },
       },
@@ -308,10 +322,12 @@ describe('sidebar/helpers/query-parser', () => {
           any: {
             operator: 'and',
             terms: ['foo'],
+            filterReplies: true,
           },
           user: {
             operator: 'or',
             terms: ['fakeusername'],
+            filterReplies: true,
           },
         },
       },
@@ -322,6 +338,7 @@ describe('sidebar/helpers/query-parser', () => {
           page: {
             operator: 'or',
             terms: ['2-4', '6'],
+            filterReplies: false,
           },
         },
       },
@@ -332,6 +349,7 @@ describe('sidebar/helpers/query-parser', () => {
           cfi: {
             operator: 'or',
             terms: ['/2/2-/2/6', '/4/2-/4/4'],
+            filterReplies: false,
           },
         },
       },
