@@ -64,7 +64,7 @@ describe('sidebar/helpers/filter-annotations', () => {
 
       const result = filterAnnotations(annotations, filters);
 
-      assert.deepEqual(result, [1]);
+      assert.deepEqual(result, annotations.slice(0, 1));
     });
 
     it('requires at least one term to match for "or" operator', () => {
@@ -142,7 +142,7 @@ describe('sidebar/helpers/filter-annotations', () => {
 
       const result = filterAnnotations([annotation], filters);
 
-      assert.deepEqual(result, [1]);
+      assert.deepEqual(result, [annotation]);
     });
   });
 
@@ -171,7 +171,7 @@ describe('sidebar/helpers/filter-annotations', () => {
       ];
       const result = filterAnnotations(anns, userQuery('john'));
 
-      assert.deepEqual(result, [anns[0].id, anns[2].id]);
+      assert.deepEqual(result, [anns[0], anns[2]]);
     });
 
     it("matches user's display name if present", () => {
@@ -190,7 +190,7 @@ describe('sidebar/helpers/filter-annotations', () => {
       ];
       const result = filterAnnotations(anns, userQuery('james'));
 
-      assert.deepEqual(result, [anns[1].id, anns[2].id, anns[3].id]);
+      assert.deepEqual(result, [anns[1], anns[2], anns[3]]);
     });
 
     it('matches username and display name independently', () => {
@@ -219,7 +219,7 @@ describe('sidebar/helpers/filter-annotations', () => {
 
       const result = filterAnnotations([annotation], filters);
 
-      assert.deepEqual(result, [1]);
+      assert.deepEqual(result, [annotation]);
     });
 
     it('does not match if the annotation is older than the query', () => {
@@ -257,7 +257,7 @@ describe('sidebar/helpers/filter-annotations', () => {
     it('matches if annotation is in page range', () => {
       const filters = { page: { terms: ['4-6'], operator: 'or' } };
       const result = filterAnnotations([annotation], filters);
-      assert.deepEqual(result, [1]);
+      assert.deepEqual(result, [annotation]);
     });
 
     it('does not match if annotation is outside of page range', () => {
@@ -291,7 +291,7 @@ describe('sidebar/helpers/filter-annotations', () => {
       it('matches if annotation is in range', () => {
         const filters = { cfi: { terms: [range], operator: 'or' } };
         const result = filterAnnotations([annotation], filters);
-        assert.deepEqual(result, [1]);
+        assert.deepEqual(result, [annotation]);
       });
     });
 
@@ -331,13 +331,15 @@ describe('sidebar/helpers/filter-annotations', () => {
 
     const result = filterAnnotations([annotation], filters);
 
-    assert.deepEqual(result, [1]);
+    assert.deepEqual(result, [annotation]);
   });
 
-  it('ignores annotations (drafts) with no id', () => {
+  it('can match annotations (drafts) with no id', () => {
     const annotation = {
       tags: ['foo'],
       target: [{}],
+      text: '',
+      url: 'https://example.com',
     };
     const filters = {
       any: {
@@ -348,6 +350,6 @@ describe('sidebar/helpers/filter-annotations', () => {
 
     const result = filterAnnotations([annotation], filters);
 
-    assert.deepEqual(result, []);
+    assert.deepEqual(result, [annotation]);
   });
 });
