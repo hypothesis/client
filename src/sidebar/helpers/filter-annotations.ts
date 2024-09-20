@@ -153,13 +153,11 @@ const fieldMatchers: Record<string, Matcher | Matcher<number>> = {
 
 /**
  * Filter a set of annotations against a parsed query.
- *
- * @return IDs of matching annotations.
  */
 export function filterAnnotations(
   annotations: Annotation[],
   filters: Record<string, Facet>,
-): string[] {
+): Annotation[] {
   const makeTermFilter = <TermType>(field: string, term: TermType) =>
     new TermFilter(
       term,
@@ -191,9 +189,5 @@ export function filterAnnotations(
 
   const rootFilter = new BooleanOpFilter('and', fieldFilters);
 
-  return annotations
-    .filter(ann => {
-      return ann.id && rootFilter.matches(ann);
-    })
-    .map(ann => ann.id!);
+  return annotations.filter(ann => rootFilter.matches(ann));
 }
