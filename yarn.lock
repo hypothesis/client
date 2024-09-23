@@ -13604,8 +13604,8 @@ __metadata:
   linkType: hard
 
 "tailwindcss@npm:^3.0.2":
-  version: 3.4.11
-  resolution: "tailwindcss@npm:3.4.11"
+  version: 3.4.12
+  resolution: "tailwindcss@npm:3.4.12"
   dependencies:
     "@alloc/quick-lru": ^5.2.0
     arg: ^5.0.2
@@ -13632,7 +13632,7 @@ __metadata:
   bin:
     tailwind: lib/cli.js
     tailwindcss: lib/cli.js
-  checksum: 41d7ff8e4d7b8e2df925853b0eb43efa25459462fea29dce0be14fdf32370445c403a2f512e3357ecd800c30ad813dc01ef1ca592fe3c90a2a84d0a1b71e2ba6
+  checksum: 1f113cb8fef36088757d15efd29d9309f31a6106b276448bc8b54fd80815ebfb5bdab004a288f7268195410f9019b6d4f4ef2a9950d065e23e08941e3f13b8d1
   languageName: node
   linkType: hard
 
