@@ -4817,10 +4817,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:^4.3.12":
-  version: 4.3.19
-  resolution: "@types/chai@npm:4.3.19"
-  checksum: abd4d3239735054f3b6e8163e45bc6495f66469729fbcf4784c9f2b82361a6845d45ab9c518818c78eafa46d015e3a72306e9949d1333e10d7eaedf426af4261
+"@types/chai@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@types/chai@npm:5.0.0"
+  checksum: ae3d63d8e84b4fc7fce5b0e68d0000834e709e19378e569c9ab97503a1b38f582ff69db6299528a849ec336954690a905225cb0dd9648d823c291f53ae93b458
   languageName: node
   linkType: hard
 
@@ -9089,7 +9089,7 @@ __metadata:
     "@sentry/browser": ^8.2.1
     "@sentry/cli": ^2.0.2
     "@trivago/prettier-plugin-sort-imports": ^4.1.1
-    "@types/chai": ^4.3.12
+    "@types/chai": ^5.0.0
     "@types/dompurify": ^3.0.0
     "@types/escape-html": ^1.0.1
     "@types/hammerjs": ^2.0.41
