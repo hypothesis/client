@@ -9143,7 +9143,7 @@ __metadata:
     mocha: 10.7.3
     mustache: ^4.0.1
     mustache-express: ^1.3.0
-    npm-packlist: ^8.0.0
+    npm-packlist: ^9.0.0
     postcss: ^8.0.3
     preact: ^10.4.0
     preact-render-to-string: ^6.4.0
@@ -9197,6 +9197,15 @@ __metadata:
   dependencies:
     minimatch: ^9.0.0
   checksum: 8161bb3232eee92367049b186a02ad35e3a47edda2de0c0eb216aa89cf6183c33c46aef22b25e1bf5105c643bd2cc2bb722f474870a93a3c56ef8cca22eb64a1
+  languageName: node
+  linkType: hard
+
+"ignore-walk@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "ignore-walk@npm:7.0.0"
+  dependencies:
+    minimatch: ^9.0.0
+  checksum: 509a2a5f10e6ec17b24ae4d23bb774c9243a1590aee3795c8787fb3f2d94f3d6f83f3e6b15614a0c93f1a2f43c7d978a4e4f45ea83fe25dd81da395417bb19ea
   languageName: node
   linkType: hard
 
@@ -11220,6 +11229,15 @@ __metadata:
   dependencies:
     ignore-walk: ^6.0.4
   checksum: c75ae66b285503409e07878274d0580c1915e8db3a52539e7588a00d8c7c27b5c3c8459906d26142ffd772f0e8f291e9aa4ea076bb44a4ab0ba7e0f25b46423b
+  languageName: node
+  linkType: hard
+
+"npm-packlist@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "npm-packlist@npm:9.0.0"
+  dependencies:
+    ignore-walk: ^7.0.0
+  checksum: 1286dcec2e53503ce7133088f82fb0840405a623f035487eafcdaf0865dc1632c970ad3e24234eb13ccd33f41ba2b95d13585038ef76817dfd74dd93c1b73eae
   languageName: node
   linkType: hard
 
