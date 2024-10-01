@@ -1,11 +1,10 @@
-import { Link } from '@hypothesis/frontend-shared';
-import { useEffect, useMemo, useState } from 'preact/hooks';
-
 import {
+  Link,
   decayingInterval,
   formatRelativeDate,
-  formatDate,
-} from '../../util/time';
+  formatDateTime,
+} from '@hypothesis/frontend-shared';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 
 export type AnnotationTimestampProps = {
   annotationCreated: string;
@@ -44,7 +43,7 @@ export default function AnnotationTimestamps({
 
   const created = useMemo(() => {
     return {
-      absolute: formatDate(createdDate),
+      absolute: formatDateTime(createdDate, { includeWeekday: true }),
       relative: formatRelativeDate(createdDate, now),
     };
   }, [createdDate, now]);
@@ -54,7 +53,7 @@ export default function AnnotationTimestamps({
       return {};
     }
     return {
-      absolute: formatDate(updatedDate),
+      absolute: formatDateTime(updatedDate, { includeWeekday: true }),
       relative: formatRelativeDate(updatedDate, now),
     };
   }, [updatedDate, now]);

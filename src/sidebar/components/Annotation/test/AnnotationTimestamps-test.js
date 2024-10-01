@@ -23,13 +23,13 @@ describe('AnnotationTimestamps', () => {
     clock = sinon.useFakeTimers();
 
     fakeTime = {
-      formatDate: sinon.stub().returns('absolute date'),
+      formatDateTime: sinon.stub().returns('absolute date'),
       formatRelativeDate: sinon.stub().returns('fuzzy string'),
       decayingInterval: sinon.stub(),
     };
 
     $imports.$mock({
-      '../../util/time': fakeTime,
+      '@hypothesis/frontend-shared': fakeTime,
     });
   });
 
