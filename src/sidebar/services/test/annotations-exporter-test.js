@@ -4,7 +4,7 @@ import {
   newReply,
   publicAnnotation,
 } from '../../test/annotation-fixtures';
-import { formatDateTime } from '../../util/time';
+import { formatSortableDateTime } from '../../util/time';
 import { AnnotationsExporter } from '../annotations-exporter';
 
 describe('AnnotationsExporter', () => {
@@ -30,7 +30,7 @@ describe('AnnotationsExporter', () => {
 
   beforeEach(() => {
     now = new Date();
-    formattedNow = formatDateTime(now);
+    formattedNow = formatSortableDateTime(now);
     baseAnnotation = {
       ...newAnnotation(),
       ...publicAnnotation(),
