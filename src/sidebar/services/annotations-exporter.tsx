@@ -15,7 +15,7 @@ import { annotationDisplayName } from '../helpers/annotation-user';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
 import { renderMathAndMarkdown } from '../render-markdown';
-import { formatDateTime } from '../util/time';
+import { formatSortableDateTime } from '../util/time';
 
 export type JSONExportContent = {
   export_date: string;
@@ -91,7 +91,7 @@ export class AnnotationsExporter {
       const page = pageLabel(annotation);
       const annotationQuote = quote(annotation);
       const lines = [
-        `Created at: ${formatDateTime(new Date(annotation.created))}`,
+        `Created at: ${formatSortableDateTime(new Date(annotation.created))}`,
         `Author: ${extractUsername(annotation)}`,
         page ? `Page: ${page}` : undefined,
         `Type: ${annotationRole(annotation)}`,
@@ -108,7 +108,7 @@ export class AnnotationsExporter {
     });
 
     return trimAndDedent`
-      ${formatDateTime(now)}
+      ${formatSortableDateTime(now)}
       ${title}
       ${uri}
       Group: ${groupName}
@@ -135,7 +135,7 @@ export class AnnotationsExporter {
     });
     const annotationToRow = (annotation: APIAnnotationData) =>
       [
-        formatDateTime(new Date(annotation.created)),
+        formatSortableDateTime(new Date(annotation.created)),
         extractUsername(annotation),
         pageLabel(annotation) ?? '',
         uri,
@@ -192,7 +192,9 @@ export class AnnotationsExporter {
           <section>
             <h1>Summary</h1>
             <p>
-              <time dateTime={now.toISOString()}>{formatDateTime(now)}</time>
+              <time dateTime={now.toISOString()}>
+                {formatSortableDateTime(now)}
+              </time>
             </p>
             <p>
               <strong>{title}</strong>
@@ -253,7 +255,9 @@ export class AnnotationsExporter {
                         <td>Created at:</td>
                         <td>
                           <time dateTime={annotation.created}>
-                            {formatDateTime(new Date(annotation.created))}
+                            {formatSortableDateTime(
+                              new Date(annotation.created),
+                            )}
                           </time>
                         </td>
                       </tr>

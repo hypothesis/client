@@ -6,7 +6,9 @@ import AnnotationTimestamps, { $imports } from '../AnnotationTimestamps';
 
 describe('AnnotationTimestamps', () => {
   let clock;
-  let fakeTime;
+  let fakeFormatDateTime;
+  let fakeFormatRelativeDate;
+  let fakeDecayingInterval;
 
   const createComponent = props =>
     mount(
@@ -21,15 +23,16 @@ describe('AnnotationTimestamps', () => {
 
   beforeEach(() => {
     clock = sinon.useFakeTimers();
-
-    fakeTime = {
-      formatDateTime: sinon.stub().returns('absolute date'),
-      formatRelativeDate: sinon.stub().returns('fuzzy string'),
-      decayingInterval: sinon.stub(),
-    };
+    fakeFormatDateTime = sinon.stub().returns('absolute date');
+    fakeFormatRelativeDate = sinon.stub().returns('fuzzy string');
+    fakeDecayingInterval = sinon.stub();
 
     $imports.$mock({
-      '@hypothesis/frontend-shared': fakeTime,
+      '@hypothesis/frontend-shared': {
+        formatDateTime: fakeFormatDateTime,
+        formatRelativeDate: fakeFormatRelativeDate,
+        decayingInterval: fakeDecayingInterval,
+      },
     });
   });
 
@@ -58,7 +61,7 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('renders edited timestamp if `withEditedTimestamp` is true', () => {
-    fakeTime.formatRelativeDate.onCall(1).returns('another fuzzy string');
+    fakeFormatRelativeDate.onCall(1).returns('another fuzzy string');
 
     const wrapper = createComponent({ withEditedTimestamp: true });
 
@@ -68,7 +71,7 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('does not render edited relative date if equivalent to created relative date', () => {
-    fakeTime.formatRelativeDate.returns('equivalent fuzzy strings');
+    fakeFormatRelativeDate.returns('equivalent fuzzy strings');
 
     const wrapper = createComponent({ withEditedTimestamp: true });
 
@@ -78,12 +81,12 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('is updated after time passes', () => {
-    fakeTime.decayingInterval.callsFake((date, callback) => {
+    fakeDecayingInterval.callsFake((date, callback) => {
       const id = setTimeout(callback, 10);
       return () => clearTimeout(id);
     });
     const wrapper = createComponent();
-    fakeTime.formatRelativeDate.returns('60 jiffies');
+    fakeFormatRelativeDate.returns('60 jiffies');
 
     act(() => {
       clock.tick(1000);
