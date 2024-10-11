@@ -375,6 +375,13 @@ describe('PortRPC', () => {
 
     // Firefox 96
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:96.0) Gecko/20100101 Firefox/96.0',
+
+    // Safari >= 16
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15',
+
+    // WebKit user agent, but with major version of Safari missing.
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Safari/605.1.15',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_2) AppleWebKit/605.1.15 (KHTML, like Gecko)',
   ].forEach(userAgent => {
     it('does not use workaround in unaffected browsers', () => {
       sinon.stub(window, 'addEventListener');

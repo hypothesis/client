@@ -114,16 +114,36 @@ export function installPortCloseWorkaroundForSafari(
  * Test whether this browser needs the workaround for https://bugs.webkit.org/show_bug.cgi?id=231167.
  */
 function shouldUseSafariWorkaround(userAgent: string) {
+  // Test whether this is a WebKit-based browser.
   const webkitVersionMatch = userAgent.match(/\bAppleWebKit\/([0-9]+)\b/);
   if (!webkitVersionMatch) {
     return false;
   }
-  const version = parseInt(webkitVersionMatch[1]);
+  const webkitVersion = parseInt(webkitVersionMatch[1]);
 
   // Chrome's user agent contains the token "AppleWebKit/537.36", where the
   // version number is frozen. This corresponds to a version of Safari from 2013,
   // which is older than all supported Safari versions.
-  if (version <= 537) {
+  if (webkitVersion <= 537) {
+    return false;
+  }
+
+  // The bug was fixed in Safari 16, which according to
+  // https://github.com/mdn/browser-compat-data/blob/main/browsers/safari.json
+  // corresponds to WebKit 614.* and later. However, the WebKit version was
+  // frozen before then, so we instead need to check the `Version` token.
+  // This identifies the _browser_, not the engine.
+  const versionMatch = userAgent.match(/\bVersion\/([0-9]+)\b/);
+  if (!versionMatch) {
+    // If no version info, we guess that the browser is a new version of
+    // WebKit which is not affected.
+    return false;
+  }
+
+  const version = parseInt(versionMatch[1]);
+
+  // The bug was fixed in Safari 16.
+  if (version >= 16) {
     return false;
   }
 
