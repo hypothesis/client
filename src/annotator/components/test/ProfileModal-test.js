@@ -7,6 +7,7 @@ import ProfileModal from '../ProfileModal';
 describe('ProfileModal', () => {
   const profileURL = 'https://test.hypothes.is/user-profile';
 
+  let container;
   let components;
   let eventBus;
   let emitter;
@@ -19,12 +20,15 @@ describe('ProfileModal', () => {
         eventBus={eventBus}
         config={{ profileAppUrl: profileURL, ...config }}
       />,
+      { attachTo: container },
     );
     components.push(component);
     return component;
   };
 
   beforeEach(() => {
+    container = document.createElement('div');
+    document.body.append(container);
     components = [];
     eventBus = new EventBus();
     emitter = eventBus.createEmitter();
@@ -32,6 +36,7 @@ describe('ProfileModal', () => {
 
   afterEach(() => {
     components.forEach(component => component.unmount());
+    container.remove();
   });
 
   it('does not render anything while the modal is closed', () => {
@@ -42,7 +47,9 @@ describe('ProfileModal', () => {
   it('shows modal on "openProfile" event', () => {
     const wrapper = createComponent();
 
-    emitter.publish('openProfile');
+    act(() => {
+      emitter.publish('openProfile');
+    });
     wrapper.update();
 
     assert.isTrue(wrapper.find(outerSelector).exists());
@@ -54,7 +61,9 @@ describe('ProfileModal', () => {
   it("removes the modal's content on closing", () => {
     const wrapper = createComponent();
 
-    emitter.publish('openProfile');
+    act(() => {
+      emitter.publish('openProfile');
+    });
     wrapper.update();
 
     assert.isTrue(wrapper.find(outerSelector).exists());

@@ -8,6 +8,7 @@ import NotebookModal, { $imports } from '../NotebookModal';
 describe('NotebookModal', () => {
   const notebookURL = 'https://test.hypothes.is/notebook';
 
+  let container;
   let components;
   let eventBus;
   let emitter;
@@ -15,21 +16,20 @@ describe('NotebookModal', () => {
   const outerSelector = 'dialog[data-testid="notebook-outer"]';
 
   const createComponent = config => {
-    const attachTo = document.createElement('div');
-    document.body.appendChild(attachTo);
-
     const component = mount(
       <NotebookModal
         eventBus={eventBus}
         config={{ notebookAppUrl: notebookURL, ...config }}
       />,
-      { attachTo },
+      { attachTo: container },
     );
-    components.push([component, attachTo]);
+    components.push(component);
     return component;
   };
 
   beforeEach(() => {
+    container = document.createElement('div');
+    document.body.append(container);
     components = [];
     eventBus = new EventBus();
     emitter = eventBus.createEmitter();
@@ -46,10 +46,8 @@ describe('NotebookModal', () => {
   });
 
   afterEach(() => {
-    components.forEach(([component, container]) => {
-      component.unmount();
-      container.remove();
-    });
+    components.forEach(component => component.unmount());
+    container.remove();
     $imports.$restore();
   });
 
@@ -70,7 +68,9 @@ describe('NotebookModal', () => {
     assert.isFalse(outer.exists());
     assert.isFalse(wrapper.find('iframe').exists());
 
-    emitter.publish('openNotebook', 'myGroup');
+    act(() => {
+      emitter.publish('openNotebook', 'myGroup');
+    });
     wrapper.update();
 
     outer = wrapper.find(outerSelector);
@@ -86,7 +86,9 @@ describe('NotebookModal', () => {
   it('creates a new iframe element on every "openNotebook" event', () => {
     const wrapper = createComponent();
 
-    emitter.publish('openNotebook', '1');
+    act(() => {
+      emitter.publish('openNotebook', '1');
+    });
     wrapper.update();
 
     const iframe1 = wrapper.find('iframe');
@@ -95,7 +97,9 @@ describe('NotebookModal', () => {
       addConfigFragment(notebookURL, { group: '1' }),
     );
 
-    emitter.publish('openNotebook', '1');
+    act(() => {
+      emitter.publish('openNotebook', '1');
+    });
     wrapper.update();
 
     const iframe2 = wrapper.find('iframe');
@@ -105,7 +109,9 @@ describe('NotebookModal', () => {
     );
     assert.notEqual(iframe1.getDOMNode(), iframe2.getDOMNode());
 
-    emitter.publish('openNotebook', '2');
+    act(() => {
+      emitter.publish('openNotebook', '2');
+    });
     wrapper.update();
 
     const iframe3 = wrapper.find('iframe');
