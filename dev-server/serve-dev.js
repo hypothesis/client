@@ -144,7 +144,7 @@ export function serveDev(port, config) {
   // The optional suffix allows the same PDF to be accessed at different URLs.
   // This is helpful for testing that annotations/real-time updates etc. work
   // based on the document fingerprint as well as the URL.
-  app.get('/pdf/:pdf/:suffix?', (req, res, next) => {
+  app.get('/pdf/:pdf{/:suffix}', (req, res, next) => {
     const pdfPath = `${PDF_PATH}${req.params.pdf}.pdf`;
 
     if (fs.existsSync(pdfPath)) {
@@ -175,7 +175,7 @@ export function serveDev(port, config) {
   });
 
   // Serve UI component playground
-  app.get('/ui-playground/:path?', (req, res) => {
+  app.get('/ui-playground{/:path}', (req, res) => {
     res.render('ui-playground', {
       resourceRoot:
         'http://localhost:3001/hypothesis/1.0.0-dummy-version/build',
