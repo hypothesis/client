@@ -64,6 +64,8 @@ if (configFromSidebar.sentry && envOk) {
 disableOpenerForExternalLinks(document.body);
 
 /**
+ * Configure the Hypothesis API client.
+ *
  * @inject
  */
 function setupApi(api: APIService, streamer: StreamerService) {
@@ -71,19 +73,22 @@ function setupApi(api: APIService, streamer: StreamerService) {
 }
 
 /**
- * Perform the initial fetch of groups and user profile and then set the initial
- * route to match the current URL.
+ * Update the route in the store based on the initial URL.
  *
  * @inject
  */
-function setupRoute(
-  groups: GroupsService,
-  session: SessionService,
-  router: RouterService,
-) {
+function syncRoute(router: RouterService) {
+  router.sync();
+}
+
+/**
+ * Perform the initial fetch of groups and user profile.
+ *
+ * @inject
+ */
+function loadGroupsAndProfile(groups: GroupsService, session: SessionService) {
   groups.load();
   session.load();
-  router.sync();
 }
 
 /**
@@ -170,9 +175,14 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
     .register('settings', { value: settings });
 
   // Initialize services.
+  //
+  // We sync the route with the initial URL as the first step, because
+  // initialization of other services may depend on the route (eg. enabling
+  // sidebar-only behavior).
+  container.run(syncRoute);
   container.run(initServices);
   container.run(setupApi);
-  container.run(setupRoute);
+  container.run(loadGroupsAndProfile);
   container.run(startRPCServer);
   container.run(setupFrameSync);
 
