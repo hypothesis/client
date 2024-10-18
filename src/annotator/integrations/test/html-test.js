@@ -182,7 +182,7 @@ describe('HTMLIntegration', () => {
       const listeners = features.on.args;
       integration.destroy();
 
-      for (let [event, callback] of listeners) {
+      for (const [event, callback] of listeners) {
         assert.calledWith(features.off, event, callback);
       }
     });

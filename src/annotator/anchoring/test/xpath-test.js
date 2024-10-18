@@ -70,7 +70,7 @@ describe('annotator/anchoring/xpath', () => {
       },
     ].forEach(test => {
       it('produces the correct xpath for the provided node', () => {
-        let node = document.getElementById(test.id);
+        const node = document.getElementById(test.id);
         assert.equal(xpathFromNode(node, document.body), test.xpaths[0]);
       });
 

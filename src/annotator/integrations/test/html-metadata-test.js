@@ -82,7 +82,7 @@ describe('HTMLMetadata', () => {
         },
       ];
 
-      for (let source of sources) {
+      for (const source of sources) {
         const metadata = testDocument.getDocumentMetadata();
         assert.equal(metadata.title, source.value);
 

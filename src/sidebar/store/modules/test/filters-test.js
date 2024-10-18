@@ -4,7 +4,7 @@ import { selectionModule } from '../selection';
 
 describe('sidebar/store/modules/filters', () => {
   let store;
-  let fakeSettings = [{}, {}];
+  const fakeSettings = [{}, {}];
 
   const getFiltersState = () => {
     return store.getState().filters;

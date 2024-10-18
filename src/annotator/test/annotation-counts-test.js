@@ -34,7 +34,6 @@ describe('annotationCounts', () => {
 
   describe('listen for "publicAnnotationCountChanged" event', () => {
     const emitEvent = function () {
-      let crossFrameArgs;
       let evt;
       let fn;
 
@@ -42,7 +41,7 @@ describe('annotationCounts', () => {
       const args =
         2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-      crossFrameArgs = fakeCrossFrame.on.args;
+      const crossFrameArgs = fakeCrossFrame.on.args;
       for (let i = 0, len = crossFrameArgs.length; i < len; i++) {
         evt = crossFrameArgs[i][0];
         fn = crossFrameArgs[i][1];

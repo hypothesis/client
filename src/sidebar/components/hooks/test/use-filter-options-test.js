@@ -9,10 +9,10 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
   let lastUserOptions;
 
   // Mock `annotationDisplayName` as if it's returning display names
-  let fakeAnnotationUserDisplay = annotation =>
+  const fakeAnnotationUserDisplay = annotation =>
     annotation.user_info.display_name;
   // Mock `annotationDisplayName` as if it's returning usernames
-  let fakeAnnotationUserUsername = annotation => annotation.user;
+  const fakeAnnotationUserUsername = annotation => annotation.user;
 
   // Mount a dummy component to be able to use the hook
   function DummyComponent() {

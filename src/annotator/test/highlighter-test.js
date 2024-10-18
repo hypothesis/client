@@ -408,7 +408,7 @@ describe('annotator/highlighter', () => {
    * Returns all the highlight elements.
    */
   function createHighlights(root, cssClass = '') {
-    let highlights = [];
+    const highlights = [];
 
     for (let i = 0; i < 3; i++) {
       const span = document.createElement('span');

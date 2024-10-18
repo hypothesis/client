@@ -42,11 +42,10 @@ describe('sidebar/store/util', () => {
     });
 
     it('should wait for awaitStateChange to return a non-null value', () => {
-      let valPromise;
       const expected = 5;
 
       store.setState({ val: 2 });
-      valPromise = awaitStateChange(store, getValWhenGreaterThanTwo);
+      const valPromise = awaitStateChange(store, getValWhenGreaterThanTwo);
       store.setState({ val: 5 });
 
       return valPromise.then(actual => {

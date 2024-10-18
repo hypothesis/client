@@ -117,7 +117,7 @@ describe('annotator/util/normalize', () => {
       const end = start + 'bar'.length;
 
       const outStrs = ['', 'foo   b', 'fooba'];
-      for (let outStr of outStrs) {
+      for (const outStr of outStrs) {
         const [outStart, outEnd] = translateOffsets(
           inStr,
           outStr,

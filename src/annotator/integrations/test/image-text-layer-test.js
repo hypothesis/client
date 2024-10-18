@@ -299,7 +299,7 @@ describe('ImageTextLayer', () => {
 
       const tolerance = 0.01;
       assert.equal(originalBoxes.length, newBoxes.length);
-      for (let [i, originalBox] of originalBoxes.entries()) {
+      for (const [i, originalBox] of originalBoxes.entries()) {
         const newBox = newBoxes[i];
 
         const leftGap = originalBox.left - imageBox.left;

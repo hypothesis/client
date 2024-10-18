@@ -17,7 +17,7 @@ describe('sidebar/helpers/query-parser', () => {
       assert.isFalse(isEmptyFilter(parseHypothesisSearchQuery('some query')));
 
       // Now check various queries which should produce empty filters
-      for (let emptyQuery of ['', '""', "''", ' ']) {
+      for (const emptyQuery of ['', '""', "''", ' ']) {
         const result = parseHypothesisSearchQuery(emptyQuery);
         assert.isTrue(
           isEmptyFilter(result),

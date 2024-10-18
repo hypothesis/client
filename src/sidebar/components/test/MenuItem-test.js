@@ -11,7 +11,7 @@ import MenuItem, { $imports } from '../MenuItem';
 describe('MenuItem', () => {
   let containers = [];
   const createMenuItem = props => {
-    let newContainer = document.createElement('div');
+    const newContainer = document.createElement('div');
     containers.push(newContainer);
     document.body.appendChild(newContainer);
     return mount(<MenuItem label="Test item" {...props} />, {

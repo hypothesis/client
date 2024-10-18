@@ -250,7 +250,7 @@ describe('sidebar/cross-origin-rpc', () => {
 
     it("responds with an error if there's no method", () => {
       startServer(fakeStore, settings, fakeWindow);
-      let jsonRpcRequest = { jsonrpc: '2.0', id: 42 }; // No "method" member.
+      const jsonRpcRequest = { jsonrpc: '2.0', id: 42 }; // No "method" member.
 
       fakeWindow.emitter.emit('message', {
         origin: 'https://allowed1.com',

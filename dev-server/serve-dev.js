@@ -130,7 +130,7 @@ export function serveDev(port, config) {
     if (fs.existsSync(path)) {
       const content = fs.readFileSync(path, 'utf8');
       const headers = readCustomHeaderTags(content);
-      for (let [key, value] of headers) {
+      for (const [key, value] of headers) {
         res.set(key, value);
       }
       res.render(req.params.document, templateContext(config));
