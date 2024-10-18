@@ -77,7 +77,7 @@ describe('createAppConfig', () => {
       'onHelpRequest',
     ];
     const service = {};
-    for (let callback of callbacks) {
+    for (const callback of callbacks) {
       service[callback] = sinon.stub();
     }
 
@@ -87,7 +87,7 @@ describe('createAppConfig', () => {
     const sidebarConfig = createAppConfig(appURL, config);
     const sidebarServiceConfig = sidebarConfig.services[0];
 
-    for (let callback of callbacks) {
+    for (const callback of callbacks) {
       assert.equal(sidebarServiceConfig[callback + 'Provided'], true);
     }
   });

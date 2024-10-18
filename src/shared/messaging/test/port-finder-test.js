@@ -11,8 +11,6 @@ import {
 const requestId = 'abcdef';
 
 describe('PortFinder', () => {
-  let fakeGenerateHexString;
-
   const frame1 = 'guest';
   const type = 'offer';
   let portFinder;
@@ -36,7 +34,7 @@ describe('PortFinder', () => {
   }
 
   // Generate predictable IDs for port requests
-  fakeGenerateHexString = sinon.stub().returns(requestId);
+  const fakeGenerateHexString = sinon.stub().returns(requestId);
 
   beforeEach(() => {
     portFinders = [];

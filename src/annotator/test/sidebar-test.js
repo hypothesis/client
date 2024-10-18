@@ -52,7 +52,7 @@ describe('Sidebar', () => {
 
   const emitNthGuestEvent = (index = 1, event, ...args) => {
     const result = [];
-    for (let [evt, fn] of guestRPC(index).on.args) {
+    for (const [evt, fn] of guestRPC(index).on.args) {
       if (event === evt) {
         result.push(fn(...args));
       }
@@ -66,7 +66,7 @@ describe('Sidebar', () => {
 
   const emitSidebarEvent = (event, ...args) => {
     const result = [];
-    for (let [evt, fn] of sidebarRPC().on.args) {
+    for (const [evt, fn] of sidebarRPC().on.args) {
       if (event === evt) {
         result.push(fn(...args));
       }

@@ -7,7 +7,7 @@ import { selectionModule } from '../selection';
 
 describe('sidebar/store/modules/selection', () => {
   let store;
-  let fakeSettings = [{}, {}];
+  const fakeSettings = [{}, {}];
 
   const getSelectionState = () => {
     return store.getState().selection;

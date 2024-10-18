@@ -79,7 +79,7 @@ describe('Guest', () => {
   };
 
   const emitSidebarEvent = (event, ...args) => {
-    for (let [evt, fn] of sidebarRPC().on.args) {
+    for (const [evt, fn] of sidebarRPC().on.args) {
       if (event === evt) {
         fn(...args);
       }

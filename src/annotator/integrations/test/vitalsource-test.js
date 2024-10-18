@@ -379,7 +379,7 @@ describe('annotator/integrations/vitalsource', () => {
 
       const events = ['mouseup', 'mousedown', 'mouseout'];
 
-      for (let eventName of events) {
+      for (const eventName of events) {
         const listener = sinon.stub();
         document.addEventListener(eventName, listener);
 

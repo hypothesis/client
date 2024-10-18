@@ -1,9 +1,9 @@
-import hypothesis from 'eslint-config-hypothesis';
-import jsxA11y from 'eslint-plugin-jsx-a11y';
+import hypothesisBase from 'eslint-config-hypothesis/base';
+import hypothesisJSX from 'eslint-config-hypothesis/jsx';
+import hypothesisTS from 'eslint-config-hypothesis/ts';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+export default [
   {
     ignores: [
       '.tox/**/*',
@@ -16,41 +16,10 @@ export default tseslint.config(
       'dev-server/static/**/*.js',
     ],
   },
-  ...hypothesis,
-  ...tseslint.configs.recommended,
-  jsxA11y.flatConfigs.recommended,
-  {
-    rules: {
-      'prefer-arrow-callback': [
-        'error',
-        {
-          allowNamedFunctions: true,
-        },
-      ],
 
-      'object-shorthand': ['error', 'properties'],
-      'react/prop-types': 'off',
-      '@typescript-eslint/no-unused-vars': 'error',
-      'no-use-before-define': 'off',
-
-      '@typescript-eslint/no-use-before-define': [
-        'error',
-        {
-          functions: false,
-          typedefs: false,
-          ignoreTypeReferences: false,
-        },
-      ],
-
-      '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/no-this-alias': 'off',
-      '@typescript-eslint/consistent-type-assertions': 'error',
-      '@typescript-eslint/consistent-type-imports': 'error',
-    },
-  },
+  ...hypothesisBase,
+  ...hypothesisJSX,
+  ...hypothesisTS,
 
   // Annotator module
   {
@@ -85,4 +54,4 @@ export default tseslint.config(
       },
     },
   },
-);
+];

@@ -319,7 +319,7 @@ describe('MarkdownEditor', () => {
         .simulate('keydown', { key });
 
     function testArrowKeySequence(buttons) {
-      for (let button of buttons) {
+      for (const button of buttons) {
         pressKey('ArrowRight');
         const label =
           document.activeElement.getAttribute('title') ||

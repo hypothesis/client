@@ -11,7 +11,7 @@ describe('sidebar/store/modules/real-time-updates', () => {
   let fakeAnnotationExists;
   let fakeFocusedGroupId;
   let fakeRoute;
-  let fakeSettings = {};
+  const fakeSettings = {};
   let store;
 
   beforeEach(() => {

@@ -43,7 +43,7 @@ function getHighestVersionTag() {
  */
 async function* itemsInGitHubAPIResponse(octokit, options) {
   for await (const page of octokit.paginate.iterator(options)) {
-    for (let item of page.data) {
+    for (const item of page.data) {
       yield item;
     }
   }

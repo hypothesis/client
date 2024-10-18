@@ -40,7 +40,7 @@ describe('bootstrap', () => {
       return manifest;
     }, {});
 
-    let extraSettings = {};
+    const extraSettings = {};
     let bootApp;
     if (app === 'annotator') {
       bootApp = bootHypothesisClient;

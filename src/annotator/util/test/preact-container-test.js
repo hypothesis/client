@@ -44,7 +44,7 @@ describe('PreactContainer', () => {
   });
 
   it('should unmount and remove element when `destroy` is called', () => {
-    let label = 'foo';
+    const label = 'foo';
     const container = new PreactContainer('widget', () => (
       <Widget label={label} />
     ));

@@ -58,7 +58,7 @@ describe('sidebar/store/modules/groups', () => {
     };
 
     let allGroups = [];
-    for (let groups of Object.values(allLists)) {
+    for (const groups of Object.values(allLists)) {
       allGroups = allGroups.concat(groups);
     }
 

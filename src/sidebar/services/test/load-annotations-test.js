@@ -383,7 +383,7 @@ describe('LoadAnnotationsService', () => {
   });
 
   describe('#loadThread', () => {
-    let threadAnnotations = [
+    const threadAnnotations = [
       { id: 'parent_annotation_1' },
       { id: 'parent_annotation_2', references: ['parent_annotation_1'] },
       {

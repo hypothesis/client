@@ -11,7 +11,7 @@ import { $imports } from '../TagEditor';
 
 describe('TagEditor', () => {
   let containers = [];
-  let fakeTags = ['tag1', 'tag2'];
+  const fakeTags = ['tag1', 'tag2'];
   let fakeTagsService;
   let fakeServiceUrl;
   let fakeOnAddTag;
@@ -21,7 +21,7 @@ describe('TagEditor', () => {
   function createComponent(props) {
     // Use an array of containers so we can test more
     // than one component at a time.
-    let newContainer = document.createElement('div');
+    const newContainer = document.createElement('div');
     containers.push(newContainer);
     document.body.appendChild(newContainer);
     return mount(
