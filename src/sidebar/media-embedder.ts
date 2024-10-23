@@ -228,13 +228,6 @@ const embedGenerators: Array<(link: HTMLAnchorElement) => HTMLElement | null> =
       id => `https://player.vimeo.com/video/${id}`,
     ),
 
-    // Matches URLs like https://flipgrid.com/s/030475b8ceff
-    createEmbedGenerator(
-      'flipgrid.com',
-      /^\/s\/([^/]+)$/,
-      id => `https://flipgrid.com/s/${id}?embed=true`,
-    ),
-
     /**
      * Match Internet Archive URLs
      *
