@@ -187,7 +187,7 @@ loads.
       
       ``boolean``. A flag indicating whether users should be able to leave groups 
       of which they are a member. When `false`, the controls for users to leave
-      groups will not be provided. (Default: `true`).
+      groups will not be provided. (Default: `false`).
 
    .. option:: enableShareLinks
 
