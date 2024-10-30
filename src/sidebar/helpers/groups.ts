@@ -5,10 +5,10 @@ import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 
 /**
- * Should users be able to leave private groups of which they
- * are a member? Users may leave private groups unless
- * explicitly disallowed in the service configuration of the
- * `settings` object.
+ * Return true if users are allowed to leave groups.
+ *
+ * Third-party authorities currently have to opt-in to enabling this, since
+ * users may not have a way to rejoin a group after leaving.
  */
 function allowLeavingGroups(settings: SidebarSettings): boolean {
   const config = serviceConfig(settings);
@@ -42,19 +42,16 @@ export function combineGroups(
   const myGroupIds = userGroups.map(g => g.id);
   featuredGroups = featuredGroups.filter(g => !myGroupIds.includes(g.id));
 
-  // Set the isMember property indicating user membership.
+  // Set flag indicating whether user is a member of the group.
   featuredGroups.forEach(group => (group.isMember = false));
   userGroups.forEach(group => (group.isMember = true));
 
   const groups = userGroups.concat(featuredGroups);
 
-  // Set the `canLeave` property. Groups can be left if they are private unless
-  // the global `allowLeavingGroups` value is false in the config settings object.
-  groups.forEach(group => {
-    group.canLeave = !allowLeavingGroups(settings)
-      ? false
-      : group.type === 'private';
-  });
+  // Set flag indicating whether user can leave group.
+  for (const group of groups) {
+    group.canLeave = allowLeavingGroups(settings) && group.isMember;
+  }
 
   // Add isScopedToUri property indicating whether a group is within scope
   // of the given uri. If the scope check cannot be performed, isScopedToUri
