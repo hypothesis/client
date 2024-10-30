@@ -2,6 +2,7 @@ import { combineGroups, normalizeGroupIds, $imports } from '../groups';
 
 describe('sidebar/helpers/groups', () => {
   let fakeServiceConfig;
+
   describe('combineGroups', () => {
     beforeEach(() => {
       fakeServiceConfig = sinon.stub().returns(null);
@@ -22,54 +23,79 @@ describe('sidebar/helpers/groups', () => {
       assert.equal(groupA.isMember, true);
     });
 
-    it('sets `canLeave` to true if a group is private and `allowLeavingGroups` is null', () => {
-      const userGroups = [{ id: 'groupa', name: 'GroupA', type: 'private' }];
-      const featuredGroups = [{ id: 'groupb', name: 'GroupB', type: 'open' }];
-      const groups = combineGroups(
-        userGroups,
-        featuredGroups,
-        'https://foo.com/bar',
-      );
-      const groupA = groups.find(g => g.id === 'groupa');
-      const groupB = groups.find(g => g.id === 'groupb');
-      assert.equal(groupA.canLeave, true);
-      assert.equal(groupB.canLeave, false);
-    });
+    // `allowLeavingGroups` defaults to true for first party users and false
+    // for third-party users.
+    [null, { allowLeavingGroups: true }, { allowLeavingGroups: 1 }].forEach(
+      serviceConfig => {
+        it('sets `canLeave` to true if user is a member and leaving groups is enabled', () => {
+          fakeServiceConfig.returns(serviceConfig);
+          const userGroups = [
+            { id: 'groupa', name: 'GroupA', type: 'private' },
+            { id: 'groupc', name: 'GroupC', type: 'open' },
+            { id: 'groupd', name: 'GroupD', type: 'restricted' },
+          ];
+          const featuredGroups = [
+            { id: 'groupb', name: 'GroupB', type: 'open' },
+          ];
+          const groups = combineGroups(
+            userGroups,
+            featuredGroups,
+            'https://foo.com/bar',
+          );
 
-    it('sets `canLeave` to true if a group is private and `allowLeavingGroups` is not a boolean', () => {
-      fakeServiceConfig.returns({
-        allowLeavingGroups: () => {},
-      });
-      const userGroups = [{ id: 'groupa', name: 'GroupA', type: 'private' }];
-      const featuredGroups = [{ id: 'groupb', name: 'GroupB', type: 'open' }];
-      const groups = combineGroups(
-        userGroups,
-        featuredGroups,
-        'https://foo.com/bar',
-      );
-      const groupA = groups.find(g => g.id === 'groupa');
-      const groupB = groups.find(g => g.id === 'groupb');
+          const expected = [
+            {
+              id: 'groupa',
+              canLeave: true,
+            },
+            {
+              id: 'groupb',
+              canLeave: false,
+            },
+            {
+              id: 'groupc',
+              canLeave: true,
+            },
+            {
+              id: 'groupd',
+              canLeave: true,
+            },
+          ];
 
-      assert.equal(groupA.canLeave, true);
-      assert.equal(groupB.canLeave, false);
-    });
+          for (const { id, canLeave } of expected) {
+            const group = groups.find(g => g.id === id);
+            assert.strictEqual(
+              group.canLeave,
+              canLeave,
+              `incorrect canLeave for group ${id}`,
+            );
+          }
+        });
+      },
+    );
 
-    it('sets `canLeave` to false for all groups if `allowLeavingGroups` is false', () => {
-      fakeServiceConfig.returns({
-        allowLeavingGroups: false,
-      });
-      const userGroups = [{ id: 'groupa', name: 'GroupA', type: 'private' }];
-      const featuredGroups = [{ id: 'groupb', name: 'GroupB', type: 'open' }];
-      const groups = combineGroups(
-        userGroups,
-        featuredGroups,
-        'https://foo.com/bar',
-      );
-      const groupA = groups.find(g => g.id === 'groupa');
-      const groupB = groups.find(g => g.id === 'groupb');
-      assert.equal(groupA.canLeave, false);
-      assert.equal(groupB.canLeave, false);
-    });
+    [{}, { allowLeavingGroups: false }, { allowLeavingGroups: null }].forEach(
+      serviceConfig => {
+        it('sets `canLeave` to false for all groups if leaving groups is disabled', () => {
+          fakeServiceConfig.returns(serviceConfig);
+          const userGroups = [
+            { id: 'groupa', name: 'GroupA', type: 'private' },
+          ];
+          const featuredGroups = [
+            { id: 'groupb', name: 'GroupB', type: 'open' },
+          ];
+          const groups = combineGroups(
+            userGroups,
+            featuredGroups,
+            'https://foo.com/bar',
+          );
+          const groupA = groups.find(g => g.id === 'groupa');
+          const groupB = groups.find(g => g.id === 'groupb');
+          assert.equal(groupA.canLeave, false);
+          assert.equal(groupB.canLeave, false);
+        });
+      },
+    );
 
     it('combines groups from both lists uniquely', () => {
       const userGroups = [
