@@ -7487,19 +7487,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fetch-mock@npm:11":
-  version: 11.1.5
-  resolution: "fetch-mock@npm:11.1.5"
+"fetch-mock@npm:12":
+  version: 12.0.2
+  resolution: "fetch-mock@npm:12.0.2"
   dependencies:
     "@types/glob-to-regexp": ^0.4.4
     dequal: ^2.0.3
     glob-to-regexp: ^0.4.1
-    is-subset: ^0.1.1
+    is-subset-of: ^3.1.10
     regexparam: ^3.0.0
-  peerDependenciesMeta:
-    node-fetch:
-      optional: true
-  checksum: 3561c82ee6fe3125eb644ad757cb65ef6372642a4843e42c90a60751765908c608cfc9d56356e1105352f83271fd607f220916de0e57ebaebc03fbd5f0d9e8f9
+  checksum: 6de234c4a3e2e36dd1505a4cfc19138e75b7dd123665a33a85047d9a675cbe88309f995d0ec8a8df32d8d9b028c6607e6e1a275b2a5c04c420b21c22d88568d8
   languageName: node
   linkType: hard
 
@@ -8684,7 +8681,7 @@ __metadata:
     eslint-plugin-react-hooks: ^5.0.0
     express: ^5.0.1
     fancy-log: ^2.0.0
-    fetch-mock: 11
+    fetch-mock: 12
     focus-visible: ^5.0.0
     globals: ^15.11.0
     gulp: ^5.0.0
@@ -9247,6 +9244,15 @@ __metadata:
   dependencies:
     has-tostringtag: ^1.0.0
   checksum: 323b3d04622f78d45077cf89aab783b2f49d24dc641aa89b5ad1a72114cfeff2585efc8c12ef42466dff32bde93d839ad321b26884cf75e5a7892a938b089989
+  languageName: node
+  linkType: hard
+
+"is-subset-of@npm:^3.1.10":
+  version: 3.1.10
+  resolution: "is-subset-of@npm:3.1.10"
+  dependencies:
+    typedescriptor: 3.0.2
+  checksum: 98773fc775596dcfbb0f444e037e5ad101319a7932b82d85f706e77f6e53fe5b8bf19a3a8bea950269313c81c7f4ddec51fb107eedb9b51323b2d97a8dfb06c3
   languageName: node
   linkType: hard
 
@@ -13780,6 +13786,13 @@ __metadata:
     is-typed-array: ^1.1.13
     possible-typed-array-names: ^1.0.0
   checksum: f0315e5b8f0168c29d390ff410ad13e4d511c78e6006df4a104576844812ee447fcc32daab1f3a76c9ef4f64eff808e134528b5b2439de335586b392e9750e5c
+  languageName: node
+  linkType: hard
+
+"typedescriptor@npm:3.0.2":
+  version: 3.0.2
+  resolution: "typedescriptor@npm:3.0.2"
+  checksum: 90e637ece22df0687acae70e152e88dd07ec10d0f4c87de2752bbcb78e420c5f5c86c3fe5e41d9f315a741a1e379e197fc5cb52044f33aafe891be6c63825ef7
   languageName: node
   linkType: hard
 
