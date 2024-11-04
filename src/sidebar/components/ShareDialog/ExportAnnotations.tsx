@@ -329,6 +329,7 @@ function ExportAnnotations({
                   buttonContent={exportFormat.shortTitle ?? exportFormat.title}
                   data-testid="export-format-select"
                   alignListbox="right"
+                  listboxOverflow="wrap"
                 >
                   {exportFormats.map(exportFormat => (
                     <Select.Option
