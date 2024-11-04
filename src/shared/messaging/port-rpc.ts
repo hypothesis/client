@@ -236,7 +236,15 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
     // send the "close" event through the message channel when the window
     // containing the sending port is unloaded.
     if (!('onclose' in MessagePort.prototype) || forceUnloadListener) {
-      this._listeners.add(currentWindow, 'unload', () => {
+      this._listeners.add(currentWindow, 'unload', event => {
+        // Ignore custom events which use the same name. This works around an
+        // issue in VitalSource.
+        //
+        // See https://github.com/hypothesis/support/issues/161#issuecomment-2454560641.
+        if (event instanceof CustomEvent) {
+          return;
+        }
+
         if (this._port) {
           // Send "close" notification directly. This works in Chrome, Firefox and
           // Safari >= 16.
