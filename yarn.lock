@@ -4427,13 +4427,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/hammerjs@npm:^2.0.41":
-  version: 2.0.46
-  resolution: "@types/hammerjs@npm:2.0.46"
-  checksum: caba6ec788d19905c71092670b58514b3d1f5eee5382bf9205e8df688d51e7857b7994e2dd7aed57fac8977bdf0e456d67fbaf23440a4385b8ce25fe2af1ec39
-  languageName: node
-  linkType: hard
-
 "@types/json-schema@npm:^7.0.15":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
@@ -8373,13 +8366,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hammerjs@npm:^2.0.4":
-  version: 2.0.8
-  resolution: "hammerjs@npm:2.0.8"
-  checksum: b092da7d1565a165d7edb53ef0ce212837a8b11f897aa3cf81a7818b66686b0ab3f4747fbce8fc8a41d1376594639ce3a054b0fd4889ca8b5b136a29ca500e27
-  languageName: node
-  linkType: hard
-
 "has-bigints@npm:^1.0.1":
   version: 1.0.1
   resolution: "has-bigints@npm:1.0.1"
@@ -8694,7 +8680,6 @@ __metadata:
     "@types/chai": ^5.0.0
     "@types/dompurify": ^3.0.0
     "@types/escape-html": ^1.0.1
-    "@types/hammerjs": ^2.0.41
     "@types/katex": ^0.16.0
     "@types/retry": ^0.12.1
     "@types/scroll-into-view": ^1.16.0
@@ -8732,7 +8717,6 @@ __metadata:
     globals: ^15.11.0
     gulp: ^5.0.0
     gulp-changed: ^5.0.1
-    hammerjs: ^2.0.4
     karma: ^6.0.1
     karma-chrome-launcher: ^3.1.0
     karma-coverage-istanbul-reporter: ^3.0.2

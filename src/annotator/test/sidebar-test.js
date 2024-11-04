@@ -20,6 +20,8 @@ describe('Sidebar', () => {
   let containers;
   let sidebars;
 
+  let FakeDragHandler;
+  let fakeDragHandler;
   let FakePortRPC;
   let fakePortRPCs;
   let FakeBucketBar;
@@ -30,6 +32,8 @@ describe('Sidebar', () => {
   let fakeEmitter;
 
   before(() => {
+    // Make `requestAnimationFrame` invoke its callback synchronously. rAF is
+    // used to debounce some internal actions.
     sinon.stub(window, 'requestAnimationFrame').yields();
   });
 
@@ -119,6 +123,12 @@ describe('Sidebar', () => {
     return externalFrame;
   };
 
+  // Simulate a drag event on the sidebar toggle button.
+  const fireDragEvent = event => {
+    const { onDrag } = FakeDragHandler.getCall(0).args[0];
+    onDrag(event);
+  };
+
   beforeEach(() => {
     sidebars = [];
     containers = [];
@@ -140,6 +150,11 @@ describe('Sidebar', () => {
       update: sinon.stub(),
     };
     FakeBucketBar = sinon.stub().returns(fakeBucketBar);
+
+    fakeDragHandler = {
+      destroy: sinon.stub(),
+    };
+    FakeDragHandler = sinon.stub().returns(fakeDragHandler);
 
     fakeToolbar = {
       getWidth: sinon.stub().returns(100),
@@ -169,6 +184,7 @@ describe('Sidebar', () => {
       './toolbar': {
         ToolbarController: FakeToolbarController,
       },
+      './util/drag-handler': { DragHandler: FakeDragHandler },
     });
   });
 
@@ -598,67 +614,80 @@ describe('Sidebar', () => {
     });
   });
 
-  describe('pan gestures', () => {
+  describe('when the sidebar toggle button is dragged', () => {
     let sidebar;
 
     beforeEach(() => {
       sidebar = createSidebar();
     });
 
-    describe('panstart event', () => {
-      it('disables pointer events and transitions on the widget', () => {
-        sidebar._onPan({ type: 'panstart' });
+    /** Simulate the start of a drag of the sidebar's toggle button. */
+    function startDrag() {
+      // Set the initial size of the sidebar to the minimum size. If a drag
+      // resize would make it any smaller, it will snap closed.
+      sidebar.iframeContainer.style.marginLeft = `-${MIN_RESIZE}px`;
+      fireDragEvent({ type: 'dragstart' });
+    }
 
+    describe('when a drag starts', () => {
+      it('begins resize', () => {
+        startDrag();
+        assert.isTrue(sidebar.isResizing());
+      });
+
+      it('disables pointer events and transitions on the widget', () => {
+        startDrag();
         assert.isTrue(
           sidebar.iframeContainer.classList.contains('sidebar-no-transition'),
         );
         assert.equal(sidebar.iframeContainer.style.pointerEvents, 'none');
       });
-
-      it('captures the left margin as the gesture initial state', () => {
-        sandbox
-          .stub(window, 'getComputedStyle')
-          .returns({ marginLeft: '100px' });
-        sidebar._onPan({ type: 'panstart' });
-        assert.equal(sidebar._gestureState.initial, '100');
-      });
     });
 
-    describe('panend event', () => {
+    describe('when drag ends', () => {
+      it('ends resize', () => {
+        startDrag();
+        fireDragEvent({ type: 'dragend' });
+        assert.isFalse(sidebar.isResizing());
+      });
+
       it('enables pointer events and transitions on the widget', () => {
-        sidebar._gestureState = { final: 0 };
-        sidebar._onPan({ type: 'panend' });
+        startDrag();
+        fireDragEvent({ type: 'dragend' });
         assert.isFalse(
           sidebar.iframeContainer.classList.contains('sidebar-no-transition'),
         );
         assert.equal(sidebar.iframeContainer.style.pointerEvents, '');
       });
 
-      it('calls `open` if the widget is fully visible', () => {
-        sidebar._gestureState = { final: -500 };
-        const open = sandbox.stub(sidebar, 'open');
-        sidebar._onPan({ type: 'panend' });
-        assert.calledOnce(open);
+      it('opens sidebar if final width is above threshold', () => {
+        startDrag();
+        fireDragEvent({ type: 'dragmove', deltaX: 0 });
+        fireDragEvent({ type: 'dragend' });
+        assert.isTrue(sidebar.toolbar.sidebarOpen);
       });
 
-      it('calls `close` if the widget is not fully visible', () => {
-        sidebar._gestureState = { final: -100 };
-        const close = sandbox.stub(sidebar, 'close');
-        sidebar._onPan({ type: 'panend' });
-        assert.calledOnce(close);
+      it('closes sidebar if final width is below threshold', () => {
+        startDrag();
+        fireDragEvent({ type: 'dragmove', deltaX: 50 });
+        fireDragEvent({ type: 'dragend' });
+        assert.isFalse(sidebar.toolbar.sidebarOpen);
       });
     });
 
-    describe('panleft and panright events', () =>
-      it('shrinks or grows the widget to match the delta', () => {
-        sidebar._gestureState = { initial: -100 };
+    describe('when toolbar button is dragged', () => {
+      it('shrinks or grows the widget to match the delta', async () => {
+        startDrag();
 
-        sidebar._onPan({ type: 'panleft', deltaX: -50 });
-        assert.equal(sidebar._gestureState.final, -150);
+        fireDragEvent({ type: 'dragmove', deltaX: -50 });
+        const expected = `-${MIN_RESIZE + 50}px`;
+        assert.equal(sidebar.iframeContainer.style.marginLeft, expected);
 
-        sidebar._onPan({ type: 'panright', deltaX: 100 });
-        assert.equal(sidebar._gestureState.final, 0);
-      }));
+        fireDragEvent({ type: 'dragmove', deltaX: -20 });
+        const expected2 = `-${MIN_RESIZE + 20}px`;
+        assert.equal(sidebar.iframeContainer.style.marginLeft, expected2);
+      });
+    });
   });
 
   describe('when the sidebar application has loaded', () => {
@@ -946,19 +975,12 @@ describe('Sidebar', () => {
         );
       });
 
-      it('notifies when sidebar is panned left', () => {
-        sidebar._gestureState = { initial: -DEFAULT_WIDTH };
-        sidebar._onPan({ type: 'panleft', deltaX: -50 });
+      it('notifies when sidebar is drag-resized', async () => {
+        sidebar.iframeContainer.style.marginLeft = `-${DEFAULT_WIDTH}px`;
+        fireDragEvent({ type: 'dragstart' });
+        fireDragEvent({ type: 'dragmove', deltaX: -50 });
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           width: DEFAULT_WIDTH + 50 + fakeToolbar.getWidth(),
-        });
-      });
-
-      it('notifies when sidebar is panned right', () => {
-        sidebar._gestureState = { initial: -DEFAULT_WIDTH };
-        sidebar._onPan({ type: 'panright', deltaX: 50 });
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
-          width: DEFAULT_WIDTH - 50 + fakeToolbar.getWidth(),
         });
       });
     });
@@ -1018,12 +1040,9 @@ describe('Sidebar', () => {
         assert.notExists(sidebar.iframe.parentElement);
       });
 
-      it('ignores pan events', () => {
-        sandbox
-          .stub(window, 'getComputedStyle')
-          .returns({ marginLeft: '100px' });
-        sidebar._onPan({ type: 'panstart' });
-        assert.isNull(sidebar._gestureState.initial);
+      it('ignores sidebar drag events', () => {
+        fireDragEvent({ type: 'dragstart' });
+        assert.isFalse(sidebar.isResizing());
       });
     });
   });

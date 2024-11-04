@@ -1,6 +1,5 @@
 import type { ToastMessage } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import * as Hammer from 'hammerjs';
 import { render } from 'preact';
 
 import { addConfigFragment } from '../shared/config-fragment';
@@ -26,6 +25,8 @@ import { createAppConfig } from './config/app';
 import { FeatureFlags } from './features';
 import { sidebarTrigger } from './sidebar-trigger';
 import { ToolbarController } from './toolbar';
+import { DragHandler } from './util/drag-handler';
+import type { DragHandlerEvent } from './util/drag-handler';
 import type { Emitter, EventBus } from './util/emitter';
 import { createShadowRoot } from './util/shadow-root';
 
@@ -90,7 +91,7 @@ function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
   return sidebarFrame;
 }
 
-type GestureState = {
+type DragResizeState = {
   /** Initial position at the start of a drag/pan resize event (in pixels). */
   initial: number | null;
   /** Final position at end of drag resize event. */
@@ -104,10 +105,10 @@ type GestureState = {
 export class Sidebar implements Destroyable {
   private _emitter: Emitter;
   private _config: SidebarContainerConfig & SidebarConfig;
+  private _dragResizeHandler: DragHandler;
+  private _dragResizeState: DragResizeState;
   private _listeners: ListenerCollection;
-  private _gestureState: GestureState;
   private _layoutState: SidebarLayout;
-  private _hammerManager: HammerManager | undefined;
   private _hypothesisSidebar: HTMLElement | undefined;
   private _messagesElement: HTMLElement | undefined;
   private _toolbarWidth: number;
@@ -287,11 +288,14 @@ export class Sidebar implements Destroyable {
 
     this._listeners.add(window, 'resize', () => this._onResize());
 
-    this._gestureState = {
+    this._dragResizeState = {
       initial: null,
       final: null,
     };
-    this._setupGestures();
+    this._dragResizeHandler = new DragHandler({
+      target: this.toolbar.sidebarToggleButton,
+      onDrag: event => this._onDragSidebarToggleButton(event),
+    });
     this.close();
 
     // Publisher-provided callback functions
@@ -323,7 +327,7 @@ export class Sidebar implements Destroyable {
     this._sidebarRPC.destroy();
     this.bucketBar?.destroy();
     this._listeners.removeAll();
-    this._hammerManager?.destroy();
+    this._dragResizeHandler.destroy();
     if (this._hypothesisSidebar) {
       // Explicitly unmounting the "messages" element, to make sure effects are clean-up
       render(null, this._messagesElement!);
@@ -482,23 +486,8 @@ export class Sidebar implements Destroyable {
     });
   }
 
-  _resetGestureState() {
-    this._gestureState = { initial: null, final: null };
-  }
-
-  _setupGestures() {
-    const toggleButton = this.toolbar.sidebarToggleButton;
-    if (toggleButton) {
-      this._hammerManager = new Hammer.Manager(toggleButton);
-      this._hammerManager.on(
-        'panstart panend panleft panright',
-        /* istanbul ignore next */
-        event => this._onPan(event),
-      );
-      this._hammerManager.add(
-        new Hammer.Pan({ direction: Hammer.DIRECTION_HORIZONTAL }),
-      );
-    }
+  _resetDragResizeState() {
+    this._dragResizeState = { initial: null, final: null };
   }
 
   // Schedule any changes needed to update the sidebar layout.
@@ -513,10 +502,11 @@ export class Sidebar implements Destroyable {
       this._renderFrame = undefined;
 
       if (
-        this._gestureState.final !== this._gestureState.initial &&
+        typeof this._dragResizeState.final === 'number' &&
+        this._dragResizeState.final !== this._dragResizeState.initial &&
         this.iframeContainer
       ) {
-        const margin: number = this._gestureState.final!;
+        const margin = this._dragResizeState.final;
         const width = -margin;
         this.iframeContainer.style.marginLeft = `${margin}px`;
         if (width >= MIN_RESIZE) {
@@ -591,7 +581,7 @@ export class Sidebar implements Destroyable {
   }
 
   /**
-   *  On window resize events, update the marginLeft of the sidebar by calling hide/show methods.
+   * On window resize events, update the marginLeft of the sidebar by calling hide/show methods.
    */
   _onResize() {
     if (this.toolbar.sidebarOpen === true) {
@@ -603,15 +593,24 @@ export class Sidebar implements Destroyable {
     }
   }
 
-  _onPan(event: HammerInput) {
+  /** Return true if the user is currently resizing the sidebar. */
+  isResizing() {
+    return this._dragResizeState.initial !== null;
+  }
+
+  /**
+   * Event handler invoked when user drags the sidebar toggle button in order
+   * to resize the sidebar.
+   */
+  _onDragSidebarToggleButton(event: DragHandlerEvent) {
     const frame = this.iframeContainer;
     if (!frame) {
       return;
     }
 
     switch (event.type) {
-      case 'panstart':
-        this._resetGestureState();
+      case 'dragstart':
+        this._resetDragResizeState();
 
         // Disable animated transition of sidebar position
         frame.classList.add('sidebar-no-transition');
@@ -619,12 +618,12 @@ export class Sidebar implements Destroyable {
         // Disable pointer events on the iframe.
         frame.style.pointerEvents = 'none';
 
-        this._gestureState.initial = parseInt(
+        this._dragResizeState.initial = parseInt(
           getComputedStyle(frame).marginLeft,
         );
 
         break;
-      case 'panend':
+      case 'dragend':
         frame.classList.remove('sidebar-no-transition');
 
         // Re-enable pointer events on the iframe.
@@ -632,24 +631,23 @@ export class Sidebar implements Destroyable {
 
         // Snap open or closed.
         if (
-          this._gestureState.final === null ||
-          this._gestureState.final <= -MIN_RESIZE
+          this._dragResizeState.final === null ||
+          this._dragResizeState.final <= -MIN_RESIZE
         ) {
           this.open();
         } else {
           this.close();
         }
-        this._resetGestureState();
+        this._resetDragResizeState();
         break;
-      case 'panleft':
-      case 'panright': {
-        if (typeof this._gestureState.initial !== 'number') {
+      case 'dragmove': {
+        if (typeof this._dragResizeState.initial !== 'number') {
           return;
         }
 
-        const margin = this._gestureState.initial;
+        const margin = this._dragResizeState.initial;
         const delta = event.deltaX;
-        this._gestureState.final = Math.min(Math.round(margin + delta), 0);
+        this._dragResizeState.final = Math.min(Math.round(margin + delta), 0);
         this._updateLayout();
         break;
       }
