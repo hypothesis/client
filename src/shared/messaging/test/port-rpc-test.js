@@ -260,6 +260,25 @@ describe('PortRPC', () => {
     assert.calledWith(closeHandler);
   });
 
+  // See https://github.com/hypothesis/support/issues/161#issuecomment-2454560641
+  it('ignores "fake" window unload events', async () => {
+    const { port1, port2 } = new MessageChannel();
+    const sender = new PortRPC({ forceUnloadListener: true });
+    const receiver = new PortRPC();
+    const closeHandler = sinon.stub();
+
+    receiver.on('close', closeHandler);
+    receiver.connect(port2);
+    sender.connect(port1);
+    await waitForMessageDelivery();
+
+    assert.notCalled(closeHandler);
+    window.dispatchEvent(new CustomEvent('unload'));
+    await waitForMessageDelivery();
+
+    assert.notCalled(closeHandler);
+  });
+
   it('should send "close" event when MessagePort emits "close" event', async () => {
     const { port1, port2 } = new MessageChannel();
     const sender = new PortRPC();
