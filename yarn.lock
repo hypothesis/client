@@ -5231,13 +5231,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-transform-async-to-promises@npm:^0.8.6":
-  version: 0.8.18
-  resolution: "babel-plugin-transform-async-to-promises@npm:0.8.18"
-  checksum: dcc345359eb33f55c42c49894166c9a5c65635e1a6e0518a00beef4f1ead7dec3409f5b3050844c1870470627b21248b0947ee884835881961b731b638156377
-  languageName: node
-  linkType: hard
-
 "bach@npm:^2.0.1":
   version: 2.0.1
   resolution: "bach@npm:2.0.1"
@@ -8692,7 +8685,6 @@ __metadata:
     babel-plugin-inject-args: ^1.0.0
     babel-plugin-istanbul: ^7.0.0
     babel-plugin-mockable-imports: ^2.0.1
-    babel-plugin-transform-async-to-promises: ^0.8.6
     chai: ^5.0.0
     chance: ^1.0.13
     classnames: ^2.2.4
