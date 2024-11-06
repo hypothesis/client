@@ -154,15 +154,26 @@ describe('Sidebar', () => {
     fakeDragHandler = {
       destroy: sinon.stub(),
     };
-    FakeDragHandler = sinon.stub().returns(fakeDragHandler);
+    FakeDragHandler = sinon.stub().callsFake(options => {
+      assert.isNotNull(options.target);
+      assert.isFunction(options.onDrag);
+      return fakeDragHandler;
+    });
 
+    const toggleButton = document.createElement('button');
     fakeToolbar = {
       getWidth: sinon.stub().returns(100),
       useMinimalControls: false,
       sidebarOpen: false,
       newAnnotationType: 'note',
       highlightsVisible: false,
-      sidebarToggleButton: document.createElement('button'),
+      get sidebarToggleButton() {
+        if (this.useMinimalControls) {
+          return null;
+        } else {
+          return toggleButton;
+        }
+      },
     };
     FakeToolbarController = sinon.stub().returns(fakeToolbar);
 

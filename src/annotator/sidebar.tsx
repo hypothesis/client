@@ -105,7 +105,7 @@ type DragResizeState = {
 export class Sidebar implements Destroyable {
   private _emitter: Emitter;
   private _config: SidebarContainerConfig & SidebarConfig;
-  private _dragResizeHandler: DragHandler;
+  private _dragResizeHandler: DragHandler | undefined;
   private _dragResizeState: DragResizeState;
   private _listeners: ListenerCollection;
   private _layoutState: SidebarLayout;
@@ -292,10 +292,15 @@ export class Sidebar implements Destroyable {
       initial: null,
       final: null,
     };
-    this._dragResizeHandler = new DragHandler({
-      target: this.toolbar.sidebarToggleButton,
-      onDrag: event => this._onDragSidebarToggleButton(event),
-    });
+
+    const toggleButton = this.toolbar.sidebarToggleButton;
+    if (toggleButton) {
+      this._dragResizeHandler = new DragHandler({
+        target: toggleButton,
+        onDrag: event => this._onDragSidebarToggleButton(event),
+      });
+    }
+
     this.close();
 
     // Publisher-provided callback functions
@@ -327,7 +332,7 @@ export class Sidebar implements Destroyable {
     this._sidebarRPC.destroy();
     this.bucketBar?.destroy();
     this._listeners.removeAll();
-    this._dragResizeHandler.destroy();
+    this._dragResizeHandler?.destroy();
     if (this._hypothesisSidebar) {
       // Explicitly unmounting the "messages" element, to make sure effects are clean-up
       render(null, this._messagesElement!);
