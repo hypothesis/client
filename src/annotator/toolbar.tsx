@@ -27,7 +27,7 @@ export class ToolbarController {
   private _toggleSidebar: () => void;
   private _toggleHighlights: () => void;
   private _createAnnotation: () => void;
-  private _sidebarToggleButton: RefObject<HTMLElement>;
+  private _sidebarToggleButton: RefObject<HTMLButtonElement>;
 
   /**
    * @param container - Element into which the toolbar is rendered
@@ -52,7 +52,7 @@ export class ToolbarController {
     };
 
     /** Reference to the sidebar toggle button. */
-    this._sidebarToggleButton = createRef<HTMLElement>();
+    this._sidebarToggleButton = createRef();
 
     this.render();
   }
@@ -115,9 +115,11 @@ export class ToolbarController {
 
   /**
    * Return the DOM element that toggles the sidebar's visibility.
+   *
+   * This will be `null` if {@link useMinimalControls} is true.
    */
-  get sidebarToggleButton() {
-    return this._sidebarToggleButton.current as HTMLButtonElement;
+  get sidebarToggleButton(): HTMLButtonElement | null {
+    return this._sidebarToggleButton.current;
   }
 
   render() {
