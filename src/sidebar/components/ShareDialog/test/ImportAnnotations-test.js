@@ -62,7 +62,6 @@ describe('ImportAnnotations', () => {
       { attachTo: newContainer },
     );
     wrappers.push(wrapper);
-    containers.push(newContainer);
     return wrapper;
   }
 
