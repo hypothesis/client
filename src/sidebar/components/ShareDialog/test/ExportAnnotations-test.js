@@ -19,6 +19,7 @@ describe('ExportAnnotations', () => {
   let fakeCopyPlainText;
   let fakeCopyHTML;
   let wrappers;
+  let containers;
 
   const fakePrivateGroup = {
     type: 'private',
@@ -27,19 +28,26 @@ describe('ExportAnnotations', () => {
   };
 
   const createComponent = props => {
+    const newContainer = document.createElement('div');
+    containers.push(newContainer);
+    document.body.appendChild(newContainer);
+
     const wrapper = mount(
       <ExportAnnotations
         annotationsExporter={fakeAnnotationsExporter}
         toastMessenger={fakeToastMessenger}
         {...props}
       />,
+      { attachTo: newContainer },
     );
     wrappers.push(wrapper);
+    containers.push(newContainer);
     return wrapper;
   };
 
   beforeEach(() => {
     wrappers = [];
+    containers = [];
     fakeAnnotationsExporter = {
       buildJSONExportContent: sinon.stub().returns({}),
       buildTextExportContent: sinon.stub().returns(''),
@@ -96,11 +104,26 @@ describe('ExportAnnotations', () => {
 
   afterEach(() => {
     wrappers.forEach(w => w.unmount());
+    containers.forEach(c => c.remove());
     $imports.$restore();
   });
 
   const waitForSelect = (wrapper, testId) =>
     waitForElement(wrapper, `Select[data-testid="${testId}"]`);
+
+  /**
+   * Wait for a `Select` to be found, then opens it and wait for the listbox to
+   * be found.
+   * @return Promise<{ select: EnzymeWrapper; listbox: EnzymeWrapper }> -
+   *         The select and listbox wrappers
+   */
+  async function waitForOpenSelect(wrapper, testId) {
+    const select = await waitForSelect(wrapper, testId);
+    select.find('button').simulate('click');
+    const listbox = await waitForElement(wrapper, '[role="listbox"]');
+
+    return { select, listbox };
+  }
 
   const selectExportFormat = async (wrapper, format) => {
     const select = await waitForSelect(wrapper, 'export-format-select');
@@ -208,8 +231,8 @@ describe('ExportAnnotations', () => {
 
       const wrapper = createComponent();
 
-      const userList = await waitForSelect(wrapper, 'user-select');
-      const users = userList.find(Select.Option);
+      const { listbox } = await waitForOpenSelect(wrapper, 'user-select');
+      const users = listbox.find(Select.Option);
       assert.equal(users.length, userEntries.length);
 
       for (const [i, entry] of userEntries.entries()) {
@@ -247,11 +270,11 @@ describe('ExportAnnotations', () => {
 
   it('lists supported export formats', async () => {
     const wrapper = createComponent();
-    const select = await waitForElement(
+    const { listbox } = await waitForOpenSelect(
       wrapper,
-      '[data-testid="export-format-select"]',
+      'export-format-select',
     );
-    const options = select.find(Select.Option);
+    const options = listbox.find(Select.Option);
     const optionText = (index, type) =>
       options.at(index).find(`[data-testid="format-${type}"]`).text();
 
