@@ -13,9 +13,11 @@ describe('ImportAnnotations', () => {
   let fakeReadExportFile;
   let fakeStore;
   let wrappers;
+  let containers;
 
   beforeEach(() => {
     wrappers = [];
+    containers = [];
 
     fakeReadExportFile = sinon.stub().rejects(new Error('Failed to read file'));
 
@@ -43,17 +45,24 @@ describe('ImportAnnotations', () => {
 
   afterEach(() => {
     wrappers.forEach(w => w.unmount());
+    containers.forEach(c => c.remove());
     $imports.$restore();
   });
 
   function createImportAnnotations() {
+    const newContainer = document.createElement('div');
+    containers.push(newContainer);
+    document.body.appendChild(newContainer);
+
     const wrapper = mount(
       <ImportAnnotations
         store={fakeStore}
         importAnnotationsService={fakeImportAnnotationsService}
       />,
+      { attachTo: newContainer },
     );
     wrappers.push(wrapper);
+    containers.push(newContainer);
     return wrapper;
   }
 
@@ -79,6 +88,20 @@ describe('ImportAnnotations', () => {
 
   function importDisabled(wrapper) {
     return Boolean(getImportButton(wrapper).prop('disabled'));
+  }
+
+  /**
+   * Wait for a `Select` to be found, then opens it and wait for the listbox to
+   * be found.
+   * @return Promise<{ select: EnzymeWrapper; listbox: EnzymeWrapper }> -
+   *         The select and listbox wrappers
+   */
+  async function waitForOpenSelect(wrapper) {
+    const select = await waitForElement(wrapper, Select);
+    select.find('button').simulate('click');
+    const listbox = await waitForElement(wrapper, '[role="listbox"]');
+
+    return { select, listbox };
   }
 
   it('shows a notice if the user is not logged in', () => {
@@ -200,8 +223,8 @@ describe('ImportAnnotations', () => {
 
       selectFile(wrapper, annotations);
 
-      const userList = await waitForElement(wrapper, Select);
-      const users = userList.find(Select.Option);
+      const { listbox } = await waitForOpenSelect(wrapper);
+      const users = listbox.find(Select.Option);
 
       assert.equal(users.length, userEntries.length);
 
@@ -297,15 +320,15 @@ describe('ImportAnnotations', () => {
 
     selectFile(wrapper, annotations);
 
-    const userList = await waitForElement(wrapper, Select);
-    const option = userList
+    const { select, listbox } = await waitForOpenSelect(wrapper);
+    const option = listbox
       .find(Select.Option)
       .filterWhere(
         option => option.prop('value').userid === 'acct:brian@example.com',
       )
       .first();
 
-    userList.prop('onChange')(option.prop('value'));
+    select.prop('onChange')(option.prop('value'));
     wrapper.update();
 
     const importButton = getImportButton(wrapper).getDOMNode();
