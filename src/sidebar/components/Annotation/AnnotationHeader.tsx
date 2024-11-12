@@ -113,10 +113,10 @@ function AnnotationHeader({
 
   return (
     <header>
-      <div className="flex gap-x-1 items-baseline flex-wrap-reverse">
+      <div className="flex gap-x-1 items-center flex-wrap-reverse">
         {isPrivate(annotation.permissions) && !isEditing && (
           <LockIcon
-            className="w-[10px] h-[10px]"
+            className="w-[12px] h-[12px]"
             title="This annotation is visible only to you"
           />
         )}
