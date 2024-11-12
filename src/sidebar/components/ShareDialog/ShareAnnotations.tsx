@@ -94,7 +94,7 @@ function ShareAnnotations({ toastMessenger }: ShareAnnotationsProps) {
             )}{' '}
             <span>
               Private (
-              <LockIcon className="inline w-em h-em ml-0.5 -mt-0.5" />{' '}
+              <LockIcon className="inline w-[14px] h-[14px] -mt-0.5" />{' '}
               <em>Only Me</em>) annotations are only visible to you.
             </span>
           </p>
