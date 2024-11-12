@@ -2,11 +2,14 @@ import {
   confirm,
   CopyIcon,
   ExternalIcon,
+  GlobeAltIcon,
+  GlobeAltLockIcon,
   LeaveIcon,
+  LockIcon,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import type { Group } from '../../../types/api';
+import type { Group, GroupType } from '../../../types/api';
 import { orgName } from '../../helpers/group-list-item-common';
 import { withServices } from '../../service-context';
 import type { GroupsService } from '../../services/groups';
@@ -14,6 +17,27 @@ import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import { copyPlainText } from '../../util/copy-to-clipboard';
 import MenuItem from '../MenuItem';
+
+function GroupIcon({ type }: { type: GroupType }) {
+  const title =
+    type === 'open'
+      ? 'Public group'
+      : type === 'restricted'
+        ? 'Restricted group'
+        : 'Private group';
+
+  return (
+    <div
+      className="text-color-text-light"
+      title={title}
+      data-testid="group-icon"
+    >
+      {type === 'open' && <GlobeAltIcon />}
+      {type === 'restricted' && <GlobeAltLockIcon />}
+      {type === 'private' && <LockIcon />}
+    </div>
+  );
+}
 
 export type GroupListItemProps = {
   group: Group;
@@ -103,7 +127,12 @@ function GroupListItem({
       isExpanded={hasActionMenu ? isExpanded : false}
       isSelected={isSelected}
       isSubmenuVisible={hasActionMenu ? isExpanded : undefined}
-      label={group.name}
+      label={
+        <div className="grow flex items-center justify-between gap-x-2">
+          {group.name}
+          <GroupIcon type={group.type} />
+        </div>
+      }
       leftChannelContent={leftChannelContent}
       onClick={isSelectable ? focusGroup : toggleSubmenu}
       onToggleSubmenu={toggleSubmenu}

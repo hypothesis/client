@@ -151,23 +151,21 @@ describe('GroupList', () => {
       expectNewGroupButton: false,
     },
   ].forEach(({ userid, expectNewGroupButton }) => {
-    it('displays "New private group" button if user is logged in with first-party account', () => {
+    it('displays "Create new group" button if user is logged in with first-party account', () => {
       fakeStore.profile.returns({ userid });
       const wrapper = createGroupList();
-      const newGroupButton = wrapper.find(
-        'MenuItem[label="New private group"]',
-      );
+      const newGroupButton = wrapper.find('MenuItem[label="Create new group"]');
       assert.equal(newGroupButton.length, expectNewGroupButton ? 1 : 0);
     });
   });
 
-  it('opens new window at correct URL when "New private group" is clicked', () => {
+  it('opens new window at correct URL when "Create new group" is clicked', () => {
     fakeStore.getLink
       .withArgs('groups.new')
       .returns('https://example.com/groups/new');
     fakeStore.profile.returns({ userid: 'jsmith@hypothes.is' });
     const wrapper = createGroupList();
-    const newGroupButton = wrapper.find('MenuItem[label="New private group"]');
+    const newGroupButton = wrapper.find('MenuItem[label="Create new group"]');
     assert.equal(newGroupButton.props().href, 'https://example.com/groups/new');
   });
 

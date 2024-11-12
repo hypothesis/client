@@ -161,7 +161,7 @@ function GroupList({ settings }: GroupListProps) {
         <MenuItem
           icon={PlusIcon}
           href={newGroupLink}
-          label="New private group"
+          label="Create new group"
         />
       )}
     </Menu>

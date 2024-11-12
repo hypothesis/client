@@ -377,4 +377,35 @@ describe('GroupListItem', () => {
     assert.calledWith(fakeCopyPlainText, 'https://annotate.com/groups/groupid');
     assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
   });
+
+  [
+    {
+      type: 'private',
+      expectedIcon: 'LockIcon',
+      expectedTitle: 'Private group',
+    },
+    {
+      type: 'restricted',
+      expectedIcon: 'GlobeAltLockIcon',
+      expectedTitle: 'Restricted group',
+    },
+    {
+      type: 'open',
+      expectedIcon: 'GlobeAltIcon',
+      expectedTitle: 'Public group',
+    },
+  ].forEach(({ type, expectedIcon, expectedTitle }) => {
+    it('shows the right icon for the group type', () => {
+      const wrapper = createGroupListItem({ ...fakeGroup, type });
+      const label = mount(wrapper.find('MenuItem').prop('label'));
+      const groupIcon = label.find('[data-testid="group-icon"]');
+
+      try {
+        assert.equal(groupIcon.prop('title'), expectedTitle);
+        assert.isTrue(groupIcon.exists(expectedIcon));
+      } finally {
+        label.unmount();
+      }
+    });
+  });
 });

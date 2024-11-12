@@ -244,6 +244,8 @@ export type Profile = {
   user_info?: UserInfo;
 };
 
+export type GroupType = 'private' | 'restricted' | 'open';
+
 export type Organization = {
   name: string;
   logo: string;
@@ -261,7 +263,7 @@ export type Group = {
   id: string;
   /** Fully-qualified ID with authority. */
   groupid?: string;
-  type: 'private' | 'open';
+  type: GroupType;
   /**
    * Note: This field is nullable in the API, but we assign a default organization in the client.
    */
