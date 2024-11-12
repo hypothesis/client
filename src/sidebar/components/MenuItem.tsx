@@ -1,5 +1,5 @@
 import {
-  CaretUpIcon,
+  MenuCollapseIcon,
   MenuExpandIcon,
   Slider,
 } from '@hypothesis/frontend-shared';
@@ -21,9 +21,7 @@ function SubmenuToggle({
   isExpanded,
   onToggleSubmenu,
 }: SubmenuToggleProps) {
-  // FIXME: Use `MenuCollapseIcon` instead of `CaretUpIcon` once size
-  // disparities are addressed
-  const Icon = isExpanded ? CaretUpIcon : MenuExpandIcon;
+  const Icon = isExpanded ? MenuCollapseIcon : MenuExpandIcon;
   return (
     <div
       data-testid="submenu-toggle"
@@ -55,7 +53,7 @@ function SubmenuToggle({
       onClick={onToggleSubmenu}
       title={title}
     >
-      <Icon className="w-3 h-3" />
+      <Icon className="w-3 h-3" viewBox="0 0 16 16" />
     </div>
   );
 }
