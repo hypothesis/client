@@ -34,7 +34,7 @@ function GroupIcon({ type }: { type: GroupType }) {
     >
       {type === 'open' && <GlobeAltIcon />}
       {type === 'restricted' && <GlobeAltLockIcon />}
-      {type === 'private' && <LockIcon />}
+      {type === 'private' && <LockIcon width={16} />}
     </div>
   );
 }
