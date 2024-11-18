@@ -7,7 +7,7 @@ import type { SidebarSettings } from '../../types/config';
 import type { Service } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import { isReply } from '../helpers/annotation-metadata';
-import { combineGroups } from '../helpers/groups';
+import { combineGroups, PUBLIC_GROUP_ID } from '../helpers/groups';
 import type { SidebarStore } from '../store';
 import { awaitStateChange } from '../store/util';
 import { watch } from '../util/watch';
@@ -121,7 +121,7 @@ export class GroupsService {
     // If the main document URL has no groups associated with it, always show
     // the "Public" group.
     const pageHasAssociatedGroups = groups.some(
-      g => g.id !== '__world__' && g.isScopedToUri,
+      g => g.id !== PUBLIC_GROUP_ID && g.isScopedToUri,
     );
     if (!pageHasAssociatedGroups) {
       return groups;
@@ -130,14 +130,14 @@ export class GroupsService {
     // If directLinkedGroup or directLinkedAnnotationGroupId is the "Public" group,
     // always return groups.
     if (
-      directLinkedGroupId === '__world__' ||
-      directLinkedAnnotationGroupId === '__world__'
+      directLinkedGroupId === PUBLIC_GROUP_ID ||
+      directLinkedAnnotationGroupId === PUBLIC_GROUP_ID
     ) {
       return groups;
     }
 
     // Return non-world groups.
-    return groups.filter(g => g.id !== '__world__');
+    return groups.filter(g => g.id !== PUBLIC_GROUP_ID);
   }
 
   /**
