@@ -18,6 +18,8 @@ function allowLeavingGroups(settings: SidebarSettings): boolean {
   return !!config.allowLeavingGroups;
 }
 
+export const PUBLIC_GROUP_ID = '__world__';
+
 /**
  * Combine groups from multiple api calls together to form a unique list of groups.
  * Add an isMember property to each group indicating whether the logged in user is a member.
@@ -34,7 +36,7 @@ export function combineGroups(
   uri: string | null,
   settings: SidebarSettings,
 ) {
-  const worldGroup = featuredGroups.find(g => g.id === '__world__');
+  const worldGroup = featuredGroups.find(g => g.id === PUBLIC_GROUP_ID);
   if (worldGroup) {
     userGroups.unshift(worldGroup);
   }
@@ -50,7 +52,11 @@ export function combineGroups(
 
   // Set flag indicating whether user can leave group.
   for (const group of groups) {
-    group.canLeave = allowLeavingGroups(settings) && group.isMember;
+    group.canLeave =
+      allowLeavingGroups(settings) &&
+      group.isMember &&
+      // People should not be able to leave the "Public" group.
+      group.id !== PUBLIC_GROUP_ID;
   }
 
   // Add isScopedToUri property indicating whether a group is within scope
