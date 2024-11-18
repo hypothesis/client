@@ -18,6 +18,8 @@ function allowLeavingGroups(settings: SidebarSettings): boolean {
   return !!config.allowLeavingGroups;
 }
 
+export const WORLD_GROUP_ID = '__world__';
+
 /**
  * Combine groups from multiple api calls together to form a unique list of groups.
  * Add an isMember property to each group indicating whether the logged in user is a member.
@@ -34,7 +36,7 @@ export function combineGroups(
   uri: string | null,
   settings: SidebarSettings,
 ) {
-  const worldGroup = featuredGroups.find(g => g.id === '__world__');
+  const worldGroup = featuredGroups.find(g => g.id === WORLD_GROUP_ID);
   if (worldGroup) {
     userGroups.unshift(worldGroup);
   }
@@ -44,7 +46,7 @@ export function combineGroups(
 
   // Set flag indicating whether user is a member of the group.
   featuredGroups.forEach(group => (group.isMember = false));
-  userGroups.forEach(group => (group.isMember = true));
+  userGroups.forEach(group => (group.isMember = group.id !== WORLD_GROUP_ID));
 
   const groups = userGroups.concat(featuredGroups);
 

@@ -97,6 +97,40 @@ describe('sidebar/helpers/groups', () => {
       },
     );
 
+    it('sets `canLeave` to false for the `__world__` group', () => {
+      const userGroups = [
+        { id: '__world__', name: 'Public', type: 'open' },
+        { id: 'groupa', name: 'GroupA', type: 'private' },
+        { id: 'groupc', name: 'GroupC', type: 'open' },
+        { id: 'groupd', name: 'GroupD', type: 'restricted' },
+      ];
+      const groups = combineGroups(userGroups, [], 'https://foo.com/bar');
+
+      const expected = [
+        {
+          id: '__world__',
+          canLeave: false,
+        },
+        {
+          id: 'groupa',
+          canLeave: true,
+        },
+        {
+          id: 'groupc',
+          canLeave: true,
+        },
+        {
+          id: 'groupd',
+          canLeave: true,
+        },
+      ];
+
+      for (const { id, canLeave } of expected) {
+        const group = groups.find(g => g.id === id);
+        assert.strictEqual(group.canLeave, canLeave);
+      }
+    });
+
     it('combines groups from both lists uniquely', () => {
       const userGroups = [
         { id: 'groupa', name: 'GroupA' },
@@ -123,7 +157,7 @@ describe('sidebar/helpers/groups', () => {
       ];
 
       const expectedMembership = {
-        __world__: true,
+        __world__: false,
         groupa: true,
         groupb: false,
       };
