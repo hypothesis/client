@@ -1,31 +1,11 @@
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import ModalDialog from '../ModalDialog';
 
 describe('ModalDialog', () => {
-  let components;
-
   const createComponent = props => {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-
-    const component = mount(<ModalDialog open {...props} />, {
-      attachTo: container,
-    });
-    components.push([component, container]);
-    return component;
+    return mount(<ModalDialog open {...props} />, { connected: true });
   };
-
-  beforeEach(() => {
-    components = [];
-  });
-
-  afterEach(() => {
-    components.forEach(([component, container]) => {
-      component.unmount();
-      container.remove();
-    });
-  });
 
   context('when native modal dialog is not supported', () => {
     let fakeDocument;

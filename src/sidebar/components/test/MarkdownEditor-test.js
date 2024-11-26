@@ -2,7 +2,7 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { render } from 'preact';
 import { act } from 'preact/test-utils';
 
@@ -298,19 +298,12 @@ describe('MarkdownEditor', () => {
   });
 
   describe('keyboard navigation', () => {
-    let newContainer;
     let wrapper;
 
     beforeEach(() => {
-      newContainer = document.createElement('div');
-      document.body.appendChild(newContainer);
       wrapper = mount(<MarkdownEditor label="Test editor" text="test" />, {
-        attachTo: newContainer,
+        connected: true,
       });
-    });
-
-    afterEach(() => {
-      newContainer.remove();
     });
 
     const pressKey = key =>

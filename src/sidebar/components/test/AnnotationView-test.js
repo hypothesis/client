@@ -1,5 +1,5 @@
 import { mockImportedComponents, waitFor } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import AnnotationView, { $imports } from '../AnnotationView';
 

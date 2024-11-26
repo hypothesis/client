@@ -1,21 +1,13 @@
 import { checkAccessibility } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import FileInput from '../FileInput';
 
 describe('FileInput', () => {
-  let container;
   let fakeOnFileSelected;
 
   beforeEach(() => {
-    container = document.createElement('div');
-    document.body.appendChild(container);
-
     fakeOnFileSelected = sinon.stub();
-  });
-
-  afterEach(() => {
-    container.remove();
   });
 
   const createFile = name => new File([name], `${name}.json`);
@@ -37,7 +29,7 @@ describe('FileInput', () => {
   const createInput = (disabled = undefined) => {
     const wrapper = mount(
       <FileInput onFileSelected={fakeOnFileSelected} disabled={disabled} />,
-      { attachTo: container },
+      { connected: true },
     );
 
     // Stub "click" method on the native input, so it doesn't show a real file

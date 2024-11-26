@@ -3,19 +3,15 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import MenuItem, { $imports } from '../MenuItem';
 
 describe('MenuItem', () => {
-  let containers = [];
   const createMenuItem = props => {
-    const newContainer = document.createElement('div');
-    containers.push(newContainer);
-    document.body.appendChild(newContainer);
     return mount(<MenuItem label="Test item" {...props} />, {
-      attachTo: newContainer,
+      connected: true,
     });
   };
 
@@ -27,10 +23,6 @@ describe('MenuItem', () => {
 
   afterEach(() => {
     $imports.$restore();
-    containers.forEach(container => {
-      container.remove();
-    });
-    containers = [];
   });
 
   describe('link menu items', () => {

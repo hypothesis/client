@@ -1,24 +1,17 @@
 import { checkAccessibility } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import SearchIconButton, { $imports } from '../SearchIconButton';
 
 describe('SearchIconButton', () => {
   let fakeIsMacOS;
   let fakeStore;
-  let container;
-  let wrappers;
 
   const createSearchIconButton = () => {
-    const wrapper = mount(<SearchIconButton />, { attachTo: container });
-    wrappers.push(wrapper);
-    return wrapper;
+    return mount(<SearchIconButton />, { connected: true });
   };
 
   beforeEach(() => {
-    wrappers = [];
-    container = document.createElement('div');
-    document.body.appendChild(container);
     fakeIsMacOS = sinon.stub().returns(false);
     fakeStore = {
       isLoading: sinon.stub().returns(false),
@@ -36,8 +29,6 @@ describe('SearchIconButton', () => {
   });
 
   afterEach(() => {
-    wrappers.forEach(wrapper => wrapper.unmount());
-    container.remove();
     $imports.$restore();
   });
 
@@ -138,8 +129,37 @@ describe('SearchIconButton', () => {
     ['textarea', 'input'].forEach(elementName => {
       it('does not steal focus when "/" pressed if user is in an input field', () => {
         const input = document.createElement(elementName);
+        document.body.append(input);
+
+        try {
+          input.id = 'an-input';
+
+          createSearchIconButton();
+          input.focus();
+
+          assert.equal(document.activeElement, input);
+
+          input.dispatchEvent(
+            new KeyboardEvent('keydown', {
+              bubbles: true,
+              cancelable: true,
+              key: '/',
+            }),
+          );
+
+          assert.notCalled(fakeStore.openSidebarPanel);
+        } finally {
+          input.remove();
+        }
+      });
+    });
+
+    it('opens search panel if user is in an input field and presses "Ctrl-k"', () => {
+      fakeIsMacOS.returns(false);
+      const input = document.createElement('input');
+      document.body.append(input);
+      try {
         input.id = 'an-input';
-        container.append(input);
 
         createSearchIconButton();
         input.focus();
@@ -150,35 +170,15 @@ describe('SearchIconButton', () => {
           new KeyboardEvent('keydown', {
             bubbles: true,
             cancelable: true,
-            key: '/',
+            key: 'k',
+            ctrlKey: true,
           }),
         );
 
-        assert.notCalled(fakeStore.openSidebarPanel);
-      });
-    });
-
-    it('opens search panel if user is in an input field and presses "Ctrl-k"', () => {
-      fakeIsMacOS.returns(false);
-      const input = document.createElement('input');
-      input.id = 'an-input';
-      container.append(input);
-
-      createSearchIconButton();
-      input.focus();
-
-      assert.equal(document.activeElement, input);
-
-      input.dispatchEvent(
-        new KeyboardEvent('keydown', {
-          bubbles: true,
-          cancelable: true,
-          key: 'k',
-          ctrlKey: true,
-        }),
-      );
-
-      assert.calledWith(fakeStore.openSidebarPanel, 'searchAnnotations');
+        assert.calledWith(fakeStore.openSidebarPanel, 'searchAnnotations');
+      } finally {
+        input.remove();
+      }
     });
   });
 

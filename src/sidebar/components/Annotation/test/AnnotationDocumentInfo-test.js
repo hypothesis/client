@@ -1,5 +1,5 @@
 import { checkAccessibility } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import AnnotationDocumentInfo from '../AnnotationDocumentInfo';
 

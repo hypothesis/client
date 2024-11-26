@@ -1,4 +1,4 @@
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import { EventBus } from '../../util/emitter';
@@ -7,36 +7,24 @@ import ProfileModal from '../ProfileModal';
 describe('ProfileModal', () => {
   const profileURL = 'https://test.hypothes.is/user-profile';
 
-  let container;
-  let components;
   let eventBus;
   let emitter;
 
   const outerSelector = '[data-testid="profile-outer"]';
 
   const createComponent = config => {
-    const component = mount(
+    return mount(
       <ProfileModal
         eventBus={eventBus}
         config={{ profileAppUrl: profileURL, ...config }}
       />,
-      { attachTo: container },
+      { connected: true },
     );
-    components.push(component);
-    return component;
   };
 
   beforeEach(() => {
-    container = document.createElement('div');
-    document.body.append(container);
-    components = [];
     eventBus = new EventBus();
     emitter = eventBus.createEmitter();
-  });
-
-  afterEach(() => {
-    components.forEach(component => component.unmount());
-    container.remove();
   });
 
   it('does not render anything while the modal is closed', () => {

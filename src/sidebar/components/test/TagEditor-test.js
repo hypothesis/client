@@ -2,7 +2,7 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import AutocompleteList from '../AutocompleteList';
@@ -10,7 +10,6 @@ import TagEditor from '../TagEditor';
 import { $imports } from '../TagEditor';
 
 describe('TagEditor', () => {
-  let containers = [];
   const fakeTags = ['tag1', 'tag2'];
   let fakeTagsService;
   let fakeServiceUrl;
@@ -19,11 +18,6 @@ describe('TagEditor', () => {
   let fakeOnTagInput;
 
   function createComponent(props) {
-    // Use an array of containers so we can test more
-    // than one component at a time.
-    const newContainer = document.createElement('div');
-    containers.push(newContainer);
-    document.body.appendChild(newContainer);
     return mount(
       <TagEditor
         // props
@@ -36,7 +30,7 @@ describe('TagEditor', () => {
         tags={fakeTagsService}
         {...props}
       />,
-      { attachTo: newContainer },
+      { connected: true },
     );
   }
 
@@ -52,10 +46,6 @@ describe('TagEditor', () => {
   });
 
   afterEach(() => {
-    containers.forEach(container => {
-      container.remove();
-    });
-    containers = [];
     $imports.$restore();
   });
 

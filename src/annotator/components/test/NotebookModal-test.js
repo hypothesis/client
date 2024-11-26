@@ -1,4 +1,4 @@
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import { addConfigFragment } from '../../../shared/config-fragment';
@@ -8,29 +8,22 @@ import NotebookModal, { $imports } from '../NotebookModal';
 describe('NotebookModal', () => {
   const notebookURL = 'https://test.hypothes.is/notebook';
 
-  let container;
-  let components;
   let eventBus;
   let emitter;
 
   const outerSelector = 'dialog[data-testid="notebook-outer"]';
 
   const createComponent = config => {
-    const component = mount(
+    return mount(
       <NotebookModal
         eventBus={eventBus}
         config={{ notebookAppUrl: notebookURL, ...config }}
       />,
-      { attachTo: container },
+      { connected: true },
     );
-    components.push(component);
-    return component;
   };
 
   beforeEach(() => {
-    container = document.createElement('div');
-    document.body.append(container);
-    components = [];
     eventBus = new EventBus();
     emitter = eventBus.createEmitter();
 
@@ -46,8 +39,6 @@ describe('NotebookModal', () => {
   });
 
   afterEach(() => {
-    components.forEach(component => component.unmount());
-    container.remove();
     $imports.$restore();
   });
 

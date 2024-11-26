@@ -2,19 +2,15 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import MenuKeyboardNavigation, { $imports } from '../MenuKeyboardNavigation';
 
 describe('MenuKeyboardNavigation', () => {
   let fakeCloseMenu;
   let clock;
-  let containers = [];
 
   const createMenuItem = props => {
-    const newContainer = document.createElement('div');
-    containers.push(newContainer);
-    document.body.appendChild(newContainer);
     return mount(
       <MenuKeyboardNavigation
         closeMenu={fakeCloseMenu}
@@ -27,7 +23,7 @@ describe('MenuKeyboardNavigation', () => {
         <button role="menuitem">Item 3</button>
       </MenuKeyboardNavigation>,
       {
-        attachTo: newContainer,
+        connected: true,
       },
     );
   };
@@ -39,10 +35,6 @@ describe('MenuKeyboardNavigation', () => {
 
   afterEach(() => {
     $imports.$restore();
-    containers.forEach(container => {
-      container.remove();
-    });
-    containers = [];
   });
 
   it('renders the provided class name', () => {

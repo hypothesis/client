@@ -1,4 +1,4 @@
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { useReducer } from 'preact/hooks';
 import { act } from 'preact/test-utils';
 

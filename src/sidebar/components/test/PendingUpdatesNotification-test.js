@@ -1,4 +1,4 @@
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import sinon from 'sinon';
 
 import { promiseWithResolvers } from '../../../shared/promise-with-resolvers';
@@ -38,7 +38,7 @@ describe('PendingUpdatesNotification', () => {
     $imports.$restore();
   });
 
-  function createComponent(container) {
+  function createComponent() {
     return mount(
       <PendingUpdatesNotification
         streamer={fakeStreamer}
@@ -46,7 +46,7 @@ describe('PendingUpdatesNotification', () => {
         setTimeout_={fakeSetTimeout}
         clearTimeout_={fakeClearTimeout}
       />,
-      { attachTo: container },
+      { connected: true },
     );
   }
 
@@ -123,27 +123,16 @@ describe('PendingUpdatesNotification', () => {
   [true, false].forEach(hasPendingUpdates => {
     it('applies updates when "l" is pressed', () => {
       fakeStore.hasPendingUpdatesOrDeletions.returns(hasPendingUpdates);
-      let wrapper;
-      const container = document.createElement('div');
-      document.body.append(container);
 
-      try {
-        wrapper = createComponent(container);
+      createComponent();
 
-        assert.notCalled(fakeStreamer.applyPendingUpdates);
-        assert.notCalled(fakeAnalytics.trackEvent);
-        document.documentElement.dispatchEvent(
-          new KeyboardEvent('keydown', { key: 'l' }),
-        );
-        assert.equal(
-          fakeStreamer.applyPendingUpdates.called,
-          hasPendingUpdates,
-        );
-        assert.equal(fakeAnalytics.trackEvent.called, hasPendingUpdates);
-      } finally {
-        wrapper?.unmount();
-        container.remove();
-      }
+      assert.notCalled(fakeStreamer.applyPendingUpdates);
+      assert.notCalled(fakeAnalytics.trackEvent);
+      document.documentElement.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'l' }),
+      );
+      assert.equal(fakeStreamer.applyPendingUpdates.called, hasPendingUpdates);
+      assert.equal(fakeAnalytics.trackEvent.called, hasPendingUpdates);
     });
   });
 });

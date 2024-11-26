@@ -2,15 +2,13 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import Menu from '../Menu';
 import { $imports } from '../Menu';
 
 describe('Menu', () => {
-  let container;
-
   const menuSelector = '[data-testid="menu-container"]';
   const contentSelector = '[data-testid="menu-content"]';
   const toggleSelector = 'button[data-testid="menu-toggle-button"]';
@@ -19,13 +17,11 @@ describe('Menu', () => {
   const TestMenuItem = () => 'Test item';
 
   const createMenu = props => {
-    // Use `mount` rather than `shallow` rendering in order to supporting
-    // testing of clicking outside the element.
     return mount(
       <Menu {...props} label={<TestLabel />} title="Test menu">
         <TestMenuItem />
       </Menu>,
-      { attachTo: container },
+      { connected: true },
     );
   };
 
@@ -34,15 +30,11 @@ describe('Menu', () => {
   }
 
   beforeEach(() => {
-    container = document.createElement('div');
-    document.body.appendChild(container);
-
     $imports.$mock(mockImportedComponents());
   });
 
   afterEach(() => {
     $imports.$restore();
-    container.remove();
   });
 
   it('opens and closes when the toggle button is clicked', () => {

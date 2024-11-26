@@ -2,12 +2,11 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import ThreadCard, { $imports } from '../ThreadCard';
 
 describe('ThreadCard', () => {
-  let container;
   let fakeDebounce;
   let fakeFrameSync;
   let fakeStore;
@@ -18,14 +17,11 @@ describe('ThreadCard', () => {
   function createComponent(props) {
     return mount(
       <ThreadCard frameSync={fakeFrameSync} thread={fakeThread} {...props} />,
-      { attachTo: container },
+      { connected: true },
     );
   }
 
   beforeEach(() => {
-    container = document.createElement('div');
-    document.body.append(container);
-
     fakeDebounce = sinon.stub().returnsArg(0);
     fakeFrameSync = {
       hoverAnnotation: sinon.stub(),
@@ -53,7 +49,6 @@ describe('ThreadCard', () => {
 
   afterEach(() => {
     $imports.$restore();
-    container.remove();
   });
 
   it('renders a `Thread` for the passed `thread`', () => {
@@ -122,9 +117,8 @@ describe('ThreadCard', () => {
       it('does not focus thread if there is no matching focus request', () => {
         fakeStore.annotationFocusRequest.returns(focusRequest);
 
-        createComponent();
-
-        const threadCard = container.querySelector(threadCardSelector);
+        const wrapper = createComponent();
+        const threadCard = wrapper.find(threadCardSelector).getDOMNode();
 
         assert.notEqual(document.activeElement, threadCard);
         assert.notCalled(fakeStore.clearAnnotationFocusRequest);
@@ -134,9 +128,9 @@ describe('ThreadCard', () => {
     it('gives focus to the thread if there is a matching focus request', () => {
       fakeStore.annotationFocusRequest.returns('t1');
 
-      createComponent();
+      const wrapper = createComponent();
 
-      const threadCard = container.querySelector(threadCardSelector);
+      const threadCard = wrapper.find(threadCardSelector).getDOMNode();
       assert.equal(document.activeElement, threadCard);
       assert.called(fakeStore.clearAnnotationFocusRequest);
     });

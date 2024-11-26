@@ -1,5 +1,5 @@
 import { mockImportedComponents } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import MenuArrow, { $imports } from '../MenuArrow';
 
