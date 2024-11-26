@@ -1,3 +1,4 @@
+import { unmountAll } from '@hypothesis/frontend-testing';
 import { assert } from 'chai';
 import { configure } from 'enzyme';
 import { Adapter } from 'enzyme-adapter-preact-pure';
@@ -17,6 +18,11 @@ globalThis.sinon = sinon;
 
 // Configure Enzyme for UI tests.
 configure({ adapter: new Adapter() });
+
+// Unmount all UI components after each test.
+afterEach(() => {
+  unmountAll();
+});
 
 // Ensure that uncaught exceptions between tests result in the tests failing.
 // This works around an issue with mocha / karma-mocha, see
