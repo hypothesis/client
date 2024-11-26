@@ -3,7 +3,7 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import SidebarPanel, { $imports } from '../SidebarPanel';
 

@@ -2,7 +2,7 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import AnnotationShareControl, { $imports } from '../AnnotationShareControl';
@@ -18,8 +18,6 @@ describe('AnnotationShareControl', () => {
   let fakeIsIOS;
   let fakeStore;
 
-  let container;
-
   const getIconButton = (wrapper, iconName) => {
     return wrapper
       .find('IconButton')
@@ -34,7 +32,7 @@ describe('AnnotationShareControl', () => {
         shareUri={fakeShareUri}
         {...props}
       />,
-      { attachTo: container },
+      { connected: true },
     );
   }
 
@@ -53,11 +51,6 @@ describe('AnnotationShareControl', () => {
   }
 
   beforeEach(() => {
-    // This extra element is necessary to test automatic `focus`-ing
-    // of the component's `input` element
-    container = document.createElement('div');
-    document.body.appendChild(container);
-
     fakeAnnotation = {
       group: 'fakegroup',
       permissions: {},
@@ -102,7 +95,6 @@ describe('AnnotationShareControl', () => {
 
   afterEach(() => {
     $imports.$restore();
-    container.remove();
   });
 
   it('does not render component if annotation group is not available', () => {

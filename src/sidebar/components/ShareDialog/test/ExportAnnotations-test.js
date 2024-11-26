@@ -4,7 +4,7 @@ import {
   mockImportedComponents,
   waitForElement,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import * as fixtures from '../../../test/annotation-fixtures';
@@ -18,8 +18,6 @@ describe('ExportAnnotations', () => {
   let fakeSuggestedFilename;
   let fakeCopyPlainText;
   let fakeCopyHTML;
-  let wrappers;
-  let containers;
 
   const fakePrivateGroup = {
     type: 'private',
@@ -28,25 +26,17 @@ describe('ExportAnnotations', () => {
   };
 
   const createComponent = props => {
-    const newContainer = document.createElement('div');
-    containers.push(newContainer);
-    document.body.appendChild(newContainer);
-
-    const wrapper = mount(
+    return mount(
       <ExportAnnotations
         annotationsExporter={fakeAnnotationsExporter}
         toastMessenger={fakeToastMessenger}
         {...props}
       />,
-      { attachTo: newContainer },
+      { connected: true },
     );
-    wrappers.push(wrapper);
-    return wrapper;
   };
 
   beforeEach(() => {
-    wrappers = [];
-    containers = [];
     fakeAnnotationsExporter = {
       buildJSONExportContent: sinon.stub().returns({}),
       buildTextExportContent: sinon.stub().returns(''),
@@ -102,8 +92,6 @@ describe('ExportAnnotations', () => {
   });
 
   afterEach(() => {
-    wrappers.forEach(w => w.unmount());
-    containers.forEach(c => c.remove());
     $imports.$restore();
   });
 

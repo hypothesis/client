@@ -2,19 +2,15 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import SearchField, { $imports } from '../SearchField';
 
 describe('SearchField', () => {
   let fakeStore;
-  let container;
-  let wrappers;
 
   const createSearchField = (props = {}) => {
-    const wrapper = mount(<SearchField {...props} />, { attachTo: container });
-    wrappers.push(wrapper);
-    return wrapper;
+    return mount(<SearchField {...props} />, { connected: true });
   };
 
   function typeQuery(wrapper, query) {
@@ -28,9 +24,6 @@ describe('SearchField', () => {
   }
 
   beforeEach(() => {
-    wrappers = [];
-    container = document.createElement('div');
-    document.body.appendChild(container);
     fakeStore = { isLoading: sinon.stub().returns(false) };
 
     $imports.$mock(mockImportedComponents());
@@ -40,8 +33,6 @@ describe('SearchField', () => {
   });
 
   afterEach(() => {
-    wrappers.forEach(wrapper => wrapper.unmount());
-    container.remove();
     $imports.$restore();
   });
 

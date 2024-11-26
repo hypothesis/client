@@ -3,7 +3,7 @@ import {
   mockImportedComponents,
   waitFor,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import * as fixtures from '../../../test/annotation-fixtures';

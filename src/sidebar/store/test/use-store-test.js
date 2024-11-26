@@ -1,4 +1,4 @@
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import { createStore, createStoreModule } from '../create-store';

@@ -4,7 +4,7 @@ import {
   waitFor,
   waitForElement,
 } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 
 import ImportAnnotations, { $imports } from '../ImportAnnotations';
 
@@ -12,13 +12,8 @@ describe('ImportAnnotations', () => {
   let fakeImportAnnotationsService;
   let fakeReadExportFile;
   let fakeStore;
-  let wrappers;
-  let containers;
 
   beforeEach(() => {
-    wrappers = [];
-    containers = [];
-
     fakeReadExportFile = sinon.stub().rejects(new Error('Failed to read file'));
 
     fakeImportAnnotationsService = {
@@ -44,25 +39,17 @@ describe('ImportAnnotations', () => {
   });
 
   afterEach(() => {
-    wrappers.forEach(w => w.unmount());
-    containers.forEach(c => c.remove());
     $imports.$restore();
   });
 
   function createImportAnnotations() {
-    const newContainer = document.createElement('div');
-    containers.push(newContainer);
-    document.body.appendChild(newContainer);
-
-    const wrapper = mount(
+    return mount(
       <ImportAnnotations
         store={fakeStore}
         importAnnotationsService={fakeImportAnnotationsService}
       />,
-      { attachTo: newContainer },
+      { connected: true },
     );
-    wrappers.push(wrapper);
-    return wrapper;
   }
 
   function getImportButton(wrapper) {

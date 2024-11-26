@@ -1,4 +1,4 @@
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import EventEmitter from 'tiny-emitter';
 
 import { Emitter } from '../../util/emitter';

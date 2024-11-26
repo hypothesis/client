@@ -1,5 +1,5 @@
 import { checkAccessibility } from '@hypothesis/frontend-testing';
-import { mount } from 'enzyme';
+import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
 import Excerpt, { $imports } from '../Excerpt';
@@ -13,7 +13,6 @@ describe('Excerpt', () => {
   );
   const DEFAULT_CONTENT = <span className="the-content">default content</span>;
 
-  let container;
   let fakeObserveElementSize;
 
   function createExcerpt(props = {}, content = DEFAULT_CONTENT) {
@@ -27,15 +26,12 @@ describe('Excerpt', () => {
       >
         {content}
       </Excerpt>,
-      { attachTo: container },
+      { connected: true },
     );
   }
 
   beforeEach(() => {
     fakeObserveElementSize = sinon.stub();
-    container = document.createElement('div');
-    document.body.appendChild(container);
-
     $imports.$mock({
       '../util/observe-element-size': {
         observeElementSize: fakeObserveElementSize,
@@ -45,7 +41,6 @@ describe('Excerpt', () => {
 
   afterEach(() => {
     $imports.$restore();
-    container.remove();
   });
 
   function getExcerptHeight(wrapper) {
