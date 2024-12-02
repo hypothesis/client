@@ -360,7 +360,9 @@ function ExportAnnotations({
         <p data-testid="drafts-message">
           You have {draftCount} unsaved{' '}
           {pluralize(draftCount, 'draft', 'drafts')}
-          {exportableAnnotations.length > 0 && <> that will not be included</>}.
+          {exportableAnnotations.length > 0 && (
+            <> that will not be included</>
+          )}.
         </p>
       )}
       <CardActions>
