@@ -182,7 +182,7 @@ function TextArea({
   classes,
   containerRef,
   ...restProps
-}: TextAreaProps & JSX.HTMLAttributes<HTMLTextAreaElement>) {
+}: TextAreaProps & JSX.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       className={classnames(

@@ -21,7 +21,6 @@ export default function MenuArrow({
   const Icon = direction === 'up' ? PointerUpIcon : PointerDownIcon;
   return (
     <Icon
-      name="pointer"
       className={classnames(
         'absolute inline z-2 text-grey-3 fill-white',
         classes,
