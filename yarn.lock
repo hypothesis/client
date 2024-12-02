@@ -2436,14 +2436,14 @@ __metadata:
   linkType: hard
 
 "@hypothesis/frontend-shared@npm:^8.10.2":
-  version: 8.10.2
-  resolution: "@hypothesis/frontend-shared@npm:8.10.2"
+  version: 8.11.0
+  resolution: "@hypothesis/frontend-shared@npm:8.11.0"
   dependencies:
     highlight.js: ^11.6.0
     wouter-preact: ^3.0.0
   peerDependencies:
     preact: ^10.4.0
-  checksum: 819636ecb93d7a109903b5241a2553c28d3fd5e29862f6b1920270e03e0ad486e7686ee2125634d8e24858a61706624a6b8625aef388c4e551daaf039bfc56c9
+  checksum: d42d765e59ff658d5b4320b117e6ab74a1f007ee026d88395e2152b7c8f4aa84178f382062d641cde12049b8c9b61b3cca2634938f97e7e857d56a06f075d950
   languageName: node
   linkType: hard
 
