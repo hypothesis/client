@@ -1,4 +1,10 @@
-import { Button, IconButton, Link } from '@hypothesis/frontend-shared';
+import {
+  Button,
+  IconButton,
+  Link,
+  Popover,
+  useSyncedRef,
+} from '@hypothesis/frontend-shared';
 import {
   EditorLatexIcon,
   EditorQuoteIcon,
@@ -16,6 +22,7 @@ import classnames from 'classnames';
 import type { Ref, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
+import { ListenerCollection } from '../../shared/listener-collection';
 import { isMacOS } from '../../shared/user-agent';
 import {
   LinkType,
@@ -183,17 +190,102 @@ function TextArea({
   containerRef,
   ...restProps
 }: TextAreaProps & JSX.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const textareaRef = useSyncedRef(containerRef);
+  const anchorContainerRef = useRef<HTMLDivElement | null>(null);
+  const preAnchorRef = useRef<HTMLSpanElement | null>(null);
+  const anchorRef = useRef<HTMLSpanElement | null>(null);
+  const postAnchorRef = useRef<HTMLSpanElement | null>(null);
+  const [open, setPopoverOpen] = useState(false);
+
+  useEffect(() => {
+    const textarea = textareaRef.current!;
+    const anchorContainer = anchorContainerRef.current!;
+    const preAnchor = preAnchorRef.current!;
+    const anchor = anchorRef.current!;
+    const postAnchor = postAnchorRef.current!;
+    const listenerCollection = new ListenerCollection();
+
+    // Keep content in the anchor element in sync with the textarea
+    const keepContentInSync = (e: KeyboardEvent) => {
+      const typedKey = e.key;
+
+      // TODO
+      //  - When pressing backspace, check if we reach an at mention and open
+      //    popover if so
+      //  - When pressing backspace, check if we removed the at mention
+      //    entirely, and close popover if so
+      //  - Allow arrow-key navigation in suggestions, but without removing the
+      //    focus from the textarea
+
+      if (!open && typedKey === '@') {
+        // When '@' is typed while the popover was closed, sync content with the
+        // anchors and open popover
+        const value = textarea.value;
+        const atMentionStart = textarea.selectionStart - 1;
+        const atMentionEnd = atMentionStart + 1;
+
+        const contentBeforeAtMention = value.substring(0, atMentionStart - 1);
+        const atMention = value.substring(atMentionStart, atMentionEnd);
+        const contentAfterAtMention = value.substring(atMentionEnd + 1);
+
+        preAnchor.textContent = contentBeforeAtMention;
+        anchor.textContent = atMention;
+        postAnchor.textContent = contentAfterAtMention;
+
+        // Right before opening the popover, make scrolls match
+        anchorContainer.scrollTop = textarea.scrollTop;
+        setPopoverOpen(true);
+      } else if (open && (typedKey === ' ' || typedKey === 'Enter')) {
+        // Close popover as soon as an empty character is written
+        setPopoverOpen(false);
+      } else if (open) {
+        // When the popover is open, append written characters to the anchor
+        anchor.textContent = `${anchor.textContent}${typedKey}`;
+      }
+    };
+    listenerCollection.add(textarea, 'keydown', keepContentInSync);
+
+    return () => {
+      listenerCollection.removeAll();
+    };
+  }, [anchorContainerRef, anchorRef, open, textareaRef]);
+
   return (
-    <textarea
-      className={classnames(
-        'border rounded p-2',
-        'text-color-text-light bg-grey-0',
-        'focus:bg-white focus:outline-none focus:shadow-focus-inner',
-        classes,
-      )}
-      {...restProps}
-      ref={containerRef}
-    />
+    <>
+      <div className="relative">
+        <div
+          className={classnames(
+            // Consistent dimensions, font size and line height with textarea
+            'border p-2 text-base touch:text-touch-base',
+            'invisible absolute top-0 left-0 right-0 h-[calc(100%-2px)] -z-1',
+            'overflow-y-auto whitespace-pre-wrap break-words',
+          )}
+          ref={anchorContainerRef}
+        >
+          <span ref={preAnchorRef} />
+          <span ref={anchorRef} />
+          <span ref={postAnchorRef} />
+        </div>
+        <textarea
+          className={classnames(
+            'border rounded p-2',
+            'text-color-text-light bg-grey-0',
+            'focus:bg-white focus:outline-none focus:shadow-focus-inner',
+            classes,
+          )}
+          {...restProps}
+          ref={textareaRef}
+        />
+        <Popover
+          open={open}
+          anchorElementRef={anchorRef}
+          onClose={() => setPopoverOpen(false)}
+          classes="p-2"
+        >
+          Suggested users
+        </Popover>
+      </div>
+    </>
   );
 }
 
