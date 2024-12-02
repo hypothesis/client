@@ -8737,7 +8737,7 @@ __metadata:
     mocha: 10.8.2
     mustache: ^4.0.1
     mustache-express: ^1.3.2
-    npm-packlist: ^9.0.0
+    npm-packlist: ^10.0.0
     postcss: ^8.0.3
     preact: ^10.4.0
     preact-render-to-string: ^6.4.0
@@ -10933,6 +10933,15 @@ __metadata:
     semver: ^7.3.5
     validate-npm-package-name: ^6.0.0
   checksum: c2c0d8ebe1072c3226dcded0a59691804841c413802bed40f196fdcedfafbf1f00e87d77b373b3f31273a59ae815a9c9d234bd29d9e7d21786c3bf8ae421e871
+  languageName: node
+  linkType: hard
+
+"npm-packlist@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "npm-packlist@npm:10.0.0"
+  dependencies:
+    ignore-walk: ^7.0.0
+  checksum: 28eec1c9f8ef8129b7bd878d517c010138ebd24178cd260488cec2a1abdce554a44d9b9742ca93b5bccf04d67c5756beb5d28ad8f616579261c7ec3c8a2c5504
   languageName: node
   linkType: hard
 
