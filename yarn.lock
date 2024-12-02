@@ -112,8 +112,8 @@ __metadata:
   linkType: hard
 
 "@aws-sdk/client-s3@npm:^3.504.0":
-  version: 3.699.0
-  resolution: "@aws-sdk/client-s3@npm:3.699.0"
+  version: 3.703.0
+  resolution: "@aws-sdk/client-s3@npm:3.703.0"
   dependencies:
     "@aws-crypto/sha1-browser": 5.2.0
     "@aws-crypto/sha256-browser": 5.2.0
@@ -124,7 +124,7 @@ __metadata:
     "@aws-sdk/credential-provider-node": 3.699.0
     "@aws-sdk/middleware-bucket-endpoint": 3.696.0
     "@aws-sdk/middleware-expect-continue": 3.696.0
-    "@aws-sdk/middleware-flexible-checksums": 3.697.0
+    "@aws-sdk/middleware-flexible-checksums": 3.701.0
     "@aws-sdk/middleware-host-header": 3.696.0
     "@aws-sdk/middleware-location-constraint": 3.696.0
     "@aws-sdk/middleware-logger": 3.696.0
@@ -173,7 +173,7 @@ __metadata:
     "@smithy/util-utf8": ^3.0.0
     "@smithy/util-waiter": ^3.1.9
     tslib: ^2.6.2
-  checksum: 9eea17ada1c1e1dbaffa95e5efa1fcf1215734756a493180b0cdc3310c7ac2e69bf0740806b0866fb4a5aae99d8bce888b665684002e53b9560759e5d2f20ffe
+  checksum: 5f75efe96eaa28a0ca15428ee6c49bf35066c7b302a895d05607cdf765a5be970f04fce2407a44c170959f6be3b7f0c341f6de34ca6532813140b08327541897
   languageName: node
   linkType: hard
 
@@ -484,9 +484,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/middleware-flexible-checksums@npm:3.697.0":
-  version: 3.697.0
-  resolution: "@aws-sdk/middleware-flexible-checksums@npm:3.697.0"
+"@aws-sdk/middleware-flexible-checksums@npm:3.701.0":
+  version: 3.701.0
+  resolution: "@aws-sdk/middleware-flexible-checksums@npm:3.701.0"
   dependencies:
     "@aws-crypto/crc32": 5.2.0
     "@aws-crypto/crc32c": 5.2.0
@@ -501,7 +501,7 @@ __metadata:
     "@smithy/util-stream": ^3.3.1
     "@smithy/util-utf8": ^3.0.0
     tslib: ^2.6.2
-  checksum: b8991f8fee5896952d5201cebf8cabebfa21e94bab56cc57ed62530659a56cb7b5911272297bf76b86513e86500873be5ecab3c2d6e9174471a6fabc0af6f805
+  checksum: 30e992534d9c39c5c83e3e8d6cfee80969925c4993a686a8a4b1a4516e24360ad5cdef99be851aeb0af47085c365d3a3430c5c45352aaf12baf1ac5152703224
   languageName: node
   linkType: hard
 
