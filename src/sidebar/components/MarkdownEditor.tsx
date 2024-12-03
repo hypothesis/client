@@ -55,25 +55,92 @@ const SHORTCUT_KEYS: Record<Command, string> = {
   quote: 'q',
 };
 
+function getSelectionOffsets(element: HTMLElement) {
+  const selection = window.getSelection();
+  if (!selection?.rangeCount) {
+    return { selectionStart: 0, selectionEnd: 0 };
+  }
+
+  const range = selection.getRangeAt(0);
+  const preCaretRange = range.cloneRange();
+  preCaretRange.selectNodeContents(element);
+  preCaretRange.setEnd(range.startContainer, range.startOffset);
+  const selectionStart = preCaretRange.toString().length;
+
+  const postCaretRange = range.cloneRange();
+  postCaretRange.selectNodeContents(element);
+  postCaretRange.setEnd(range.endContainer, range.endOffset);
+  const selectionEnd = postCaretRange.toString().length;
+
+  return { selectionStart, selectionEnd };
+}
+
+function setSelectionRange(
+  element: HTMLElement,
+  {
+    selectionStart,
+    selectionEnd,
+  }: { selectionStart: number; selectionEnd: number },
+) {
+  const range = document.createRange();
+  const selection = window.getSelection();
+
+  // Find the text nodes within the contenteditable element
+  let charCount = 0;
+  let startNode: Node | null = null;
+  let endNode: Node | null = null;
+  let startOffset = 0;
+  let endOffset = 0;
+
+  function traverseNodes(node: Node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const textLength = node.textContent?.length ?? 0;
+
+      if (
+        charCount <= selectionStart &&
+        charCount + textLength >= selectionStart
+      ) {
+        startNode = node;
+        startOffset = selectionStart - charCount;
+      }
+
+      if (charCount <= selectionEnd && charCount + textLength >= selectionEnd) {
+        endNode = node;
+        endOffset = selectionEnd - charCount;
+      }
+
+      charCount += textLength;
+    } else {
+      for (let i = 0; i < node.childNodes.length; i++) {
+        traverseNodes(node.childNodes[i]);
+      }
+    }
+  }
+
+  traverseNodes(element);
+
+  if (startNode && endNode) {
+    range.setStart(startNode, startOffset);
+    range.setEnd(endNode, endOffset);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+}
+
 /**
  * Apply a toolbar command to an editor input field.
  */
-function handleToolbarCommand(
-  command: Command,
-  inputEl: HTMLInputElement | HTMLTextAreaElement,
-) {
+function handleToolbarCommand(command: Command, inputEl: HTMLDivElement) {
   const update = (newStateFn: (prevState: EditorState) => EditorState) => {
     // Apply the toolbar command to the current state of the input field.
-    const newState = newStateFn({
-      text: inputEl.value,
-      selectionStart: inputEl.selectionStart!,
-      selectionEnd: inputEl.selectionEnd!,
+    const { text, ...newSelection } = newStateFn({
+      text: inputEl.textContent ?? '',
+      ...getSelectionOffsets(inputEl),
     });
 
     // Update the input field to match the new state.
-    inputEl.value = newState.text;
-    inputEl.selectionStart = newState.selectionStart;
-    inputEl.selectionEnd = newState.selectionEnd;
+    inputEl.textContent = text;
+    setSelectionRange(inputEl, newSelection);
 
     // Restore input field focus which is lost when its contents are changed.
     inputEl.focus();
@@ -173,26 +240,27 @@ function ToolbarButton({
   );
 }
 
-type TextAreaProps = {
+type EditableAreaProps = {
   classes?: string;
-  containerRef?: Ref<HTMLTextAreaElement>;
+  containerRef?: Ref<HTMLDivElement>;
 };
 
-function TextArea({
+function EditableArea({
   classes,
   containerRef,
   ...restProps
-}: TextAreaProps & JSX.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+}: EditableAreaProps & JSX.HTMLAttributes<HTMLDivElement>) {
   return (
-    <textarea
+    <div
       className={classnames(
-        'border rounded p-2',
+        'border rounded p-2 cursor-text overflow-y-auto',
         'text-color-text-light bg-grey-0',
         'focus:bg-white focus:outline-none focus:shadow-focus-inner',
         classes,
       )}
       {...restProps}
       ref={containerRef}
+      contentEditable
     />
   );
 }
@@ -347,7 +415,7 @@ export default function MarkdownEditor({
   const [preview, setPreview] = useState(false);
 
   // The input element where the user inputs their comment.
-  const input = useRef<HTMLTextAreaElement>(null);
+  const input = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!preview) {
@@ -360,7 +428,7 @@ export default function MarkdownEditor({
   const handleCommand = (command: Command) => {
     if (input.current) {
       handleToolbarCommand(command, input.current);
-      onEditText(input.current.value);
+      onEditText(input.current.textContent ?? '');
     }
   };
 
@@ -392,12 +460,12 @@ export default function MarkdownEditor({
           style={textStyle}
         />
       ) : (
-        <TextArea
+        <EditableArea
           aria-label={label}
-          placeholder={label}
+          // placeholder={label}
           dir="auto"
           classes={classnames(
-            'w-full min-h-[8em] resize-y',
+            'w-full h-[8em] resize-y',
             // Turn off border-radius on top edges to align with toolbar above
             'rounded-t-none',
             // Larger font on touch devices
@@ -407,11 +475,12 @@ export default function MarkdownEditor({
           onClick={(e: Event) => e.stopPropagation()}
           onKeyDown={handleKeyDown}
           onInput={(e: Event) =>
-            onEditText((e.target as HTMLInputElement).value)
+            onEditText((e.target as HTMLDivElement).textContent ?? '')
           }
-          value={text}
           style={textStyle}
-        />
+        >
+          {text}
+        </EditableArea>
       )}
     </div>
   );
