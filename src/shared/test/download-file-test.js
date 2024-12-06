@@ -3,6 +3,7 @@ import { downloadFile } from '../download-file';
 describe('download-file', () => {
   let fakeLink;
   let fakeDocument;
+  let sandbox;
 
   beforeEach(() => {
     fakeLink = {
@@ -19,11 +20,19 @@ describe('download-file', () => {
       },
     };
 
-    sinon.spy(window, 'Blob');
+    sandbox = sinon.createSandbox();
+    sandbox.spy(window, 'Blob');
+
+    // We stub `URL.createObjectURL` both to control the returned URL but also
+    // because it can occassionally be slow if called in the middle of a large
+    // test run, leading to a slow test warning.
+    //
+    // Possibly relevant: https://issues.chromium.org/issues/40269900.
+    sandbox.stub(URL, 'createObjectURL').returns('blob:1234');
   });
 
   afterEach(() => {
-    window.Blob.restore();
+    sandbox.restore();
   });
 
   function assertDownloadHappened(filename, fileContent, type) {
@@ -32,12 +41,9 @@ describe('download-file', () => {
     assert.calledWith(fakeDocument.body.removeChild, fakeLink);
 
     assert.calledWith(window.Blob, [fileContent], { type });
+    assert.calledWith(URL.createObjectURL, window.Blob.returnValues[0]);
 
-    assert.calledWith(
-      fakeLink.setAttribute.firstCall,
-      'href',
-      sinon.match.string,
-    );
+    assert.calledWith(fakeLink.setAttribute.firstCall, 'href', 'blob:1234');
     assert.calledWith(fakeLink.setAttribute.secondCall, 'download', filename);
     assert.equal('hidden', fakeLink.style.visibility);
   }
