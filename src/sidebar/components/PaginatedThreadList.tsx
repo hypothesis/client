@@ -1,8 +1,8 @@
+import { Pagination } from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
 
 import type { Thread } from '../helpers/build-thread';
 import { countVisible } from '../helpers/thread';
-import PaginationNavigation from './PaginationNavigation';
 import ThreadList from './ThreadList';
 
 export type PaginatedThreadListProps = {
@@ -19,7 +19,7 @@ export type PaginatedThreadListProps = {
  *
  * Render the threads for the current page of results, and pagination controls.
  */
-function PaginatedThreadList({
+export default function PaginatedThreadList({
   currentPage,
   isLoading,
   onChangePage,
@@ -41,7 +41,7 @@ function PaginatedThreadList({
     <>
       <ThreadList threads={paginatedThreads} />
       {!isLoading && (
-        <PaginationNavigation
+        <Pagination
           currentPage={currentPage}
           onChangePage={onChangePage}
           totalPages={totalPages}
@@ -50,5 +50,3 @@ function PaginatedThreadList({
     </>
   );
 }
-
-export default PaginatedThreadList;
