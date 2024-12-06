@@ -107,7 +107,7 @@ describe('PaginatedThreadList', () => {
       const wrapper = createComponent(componentProps);
 
       assert.equal(
-        wrapper.find('PaginationNavigation').props().totalPages,
+        wrapper.find('Pagination').props().totalPages,
         testCase.pageCount,
       );
     });
@@ -121,7 +121,7 @@ describe('PaginatedThreadList', () => {
       });
 
       assert.equal(
-        wrapper.find('PaginationNavigation').props().currentPage,
+        wrapper.find('Pagination').props().currentPage,
         testCase.currentPage,
       );
     });
