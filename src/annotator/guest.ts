@@ -365,15 +365,24 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   _setupElementEvents() {
     // Hide the sidebar in response to a document click or tap, so it doesn't obscure
     // the document content.
-    //
-    // Hypothesis UI elements (`<hypothesis->`) have logic to prevent clicks in
-    // them from propagating out of their shadow roots, and hence clicking on
-    // elements in the sidebar's vertical toolbar or adder won't close the
-    // sidebar.
     const maybeCloseSidebar = (event: PointerEvent) => {
       // Don't hide the sidebar if event was disabled because the sidebar
       // doesn't overlap the content.
       if (this._sideBySideActive()) {
+        return;
+      }
+
+      // Don't hide the sidebar if clicking inside a `<hypothesis-*>` UI
+      // element. This includes the controls that open and close the sidebar.
+      if (
+        event
+          .composedPath()
+          .some(
+            target =>
+              target instanceof Element &&
+              target.localName.startsWith('hypothesis-'),
+          )
+      ) {
         return;
       }
 
