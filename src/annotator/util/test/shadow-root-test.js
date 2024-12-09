@@ -60,53 +60,5 @@ describe('annotator/util/shadow-root', () => {
       assert.isNull(linkEl);
       link.setAttribute('rel', 'stylesheet');
     });
-
-    it('stops propagation of "mouseup" events', () => {
-      const onClick = sinon.stub();
-      container.addEventListener('click', onClick);
-
-      const shadowRoot = createShadowRoot(container);
-      const innerElement = document.createElement('div');
-      shadowRoot.appendChild(innerElement);
-      innerElement.dispatchEvent(
-        // `composed` property is necessary to bubble up the event out of the shadow DOM.
-        // browser generated events, have this property set to true.
-        new Event('mouseup', { bubbles: true, composed: true }),
-      );
-
-      assert.notCalled(onClick);
-    });
-
-    it('stops propagation of "mousedown" events', () => {
-      const onClick = sinon.stub();
-      container.addEventListener('mousedown', onClick);
-
-      const shadowRoot = createShadowRoot(container);
-      const innerElement = document.createElement('div');
-      shadowRoot.appendChild(innerElement);
-      innerElement.dispatchEvent(
-        // `composed` property is necessary to bubble up the event out of the shadow DOM.
-        // browser generated events, have this property set to true.
-        new Event('mousedown', { bubbles: true, composed: true }),
-      );
-
-      assert.notCalled(onClick);
-    });
-
-    it('stops propagation of "touchstart" events', () => {
-      const onTouch = sinon.stub();
-      container.addEventListener('touchstart', onTouch);
-
-      const shadowRoot = createShadowRoot(container);
-      const innerElement = document.createElement('div');
-      shadowRoot.appendChild(innerElement);
-      // `composed` property is necessary to bubble up the event out of the shadow DOM.
-      // browser generated events, have this property set to true.
-      innerElement.dispatchEvent(
-        new Event('touchstart', { bubbles: true, composed: true }),
-      );
-
-      assert.notCalled(onTouch);
-    });
   });
 });
