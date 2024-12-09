@@ -710,6 +710,26 @@ describe('Guest', () => {
 
         assert.isFalse(sidebarClosed());
       });
+
+      it('does not hide sidebar if event is inside a `<hypothesis-*>` element', () => {
+        createGuest();
+
+        const hypothesisElement = document.createElement('hypothesis-sidebar');
+        const nonHypothesisElement = document.createElement('other-element');
+
+        try {
+          rootElement.append(hypothesisElement, nonHypothesisElement);
+
+          simulateClick(hypothesisElement);
+          assert.isFalse(sidebarClosed());
+
+          simulateClick(nonHypothesisElement);
+          assert.isTrue(sidebarClosed());
+        } finally {
+          hypothesisElement.remove();
+          nonHypothesisElement.remove();
+        }
+      });
     });
 
     it('does not reposition the adder if hidden when the window is resized', () => {
