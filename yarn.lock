@@ -3175,8 +3175,8 @@ __metadata:
   linkType: hard
 
 "@rollup/plugin-commonjs@npm:^28.0.0":
-  version: 28.0.1
-  resolution: "@rollup/plugin-commonjs@npm:28.0.1"
+  version: 28.0.2
+  resolution: "@rollup/plugin-commonjs@npm:28.0.2"
   dependencies:
     "@rollup/pluginutils": ^5.0.1
     commondir: ^1.0.1
@@ -3190,7 +3190,7 @@ __metadata:
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: b230b2733b7198fca1b585f6b237ab05f3305ef7a50083caff28baef0fd611c0e90399ea7548181f97a4d0b0372487ca27f81327e355db495396a0fb8934244d
+  checksum: b27a081a16df63f5f74d1aaa7f17a5ebb57ec73f5226f6e85044ec525b13023d8eb65349ddea415a5ef4ba093c71989c38df274e408cce4cb1c6f9aaea9d2de5
   languageName: node
   linkType: hard
 
@@ -3208,9 +3208,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-node-resolve@npm:^15.0.0":
-  version: 15.3.0
-  resolution: "@rollup/plugin-node-resolve@npm:15.3.0"
+"@rollup/plugin-node-resolve@npm:^16.0.0":
+  version: 16.0.0
+  resolution: "@rollup/plugin-node-resolve@npm:16.0.0"
   dependencies:
     "@rollup/pluginutils": ^5.0.1
     "@types/resolve": 1.20.2
@@ -3222,13 +3222,13 @@ __metadata:
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 90e4e94b173e7edd57e374ac0cc0a69cc6f1b4507e83731132ac6fa1747d96a5648a48441e4452728429b6db5e67561439b7b2f4d2c6a941a33d38be56d871b4
+  checksum: 44e348dd3c25ae9642d1a73b085ff0dc0258f74e98c9a21089354b244d9834db265952b9ff9e1d490e227cd8084f8d0fbb2dc6ccfb8bbc4dac3081a619e66660
   languageName: node
   linkType: hard
 
 "@rollup/plugin-replace@npm:^6.0.1":
-  version: 6.0.1
-  resolution: "@rollup/plugin-replace@npm:6.0.1"
+  version: 6.0.2
+  resolution: "@rollup/plugin-replace@npm:6.0.2"
   dependencies:
     "@rollup/pluginutils": ^5.0.1
     magic-string: ^0.30.3
@@ -3237,7 +3237,7 @@ __metadata:
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: fdb9a3c7596547d3fab763efe8ed0cec9c82bed7dadcc2dccbbae2b69651f04109b7d49498c54c3c9bb0df2375f0015927598c9d31c36c3366bd86bc2d0ff60a
+  checksum: ef1af8d8cfca3ecf95c85bbcccf6fea3619343f6fc7c48b23ece6485a21622b74ab093a971ffc177af04468aef45c278d3b8a82f7a426d2c25da1061923cf943
   languageName: node
   linkType: hard
 
@@ -8663,7 +8663,7 @@ __metadata:
     "@rollup/plugin-babel": ^6.0.0
     "@rollup/plugin-commonjs": ^28.0.0
     "@rollup/plugin-json": ^6.0.0
-    "@rollup/plugin-node-resolve": ^15.0.0
+    "@rollup/plugin-node-resolve": ^16.0.0
     "@rollup/plugin-replace": ^6.0.1
     "@rollup/plugin-terser": ^0.4.0
     "@rollup/plugin-virtual": ^3.0.0
