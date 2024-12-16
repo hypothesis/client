@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /**
  * Creates a GitHub release for the repository.
  *

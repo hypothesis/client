@@ -1,5 +1,4 @@
 /* global process */
-
 /**
  * This module provides dependency injection of services into React
  * components via React's "context" API [1].
