@@ -61,6 +61,7 @@ describe('AnnotationEditor', () => {
       setDefault: sinon.stub(),
       removeDraft: sinon.stub(),
       removeAnnotations: sinon.stub(),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     $imports.$mock(mockImportedComponents());
