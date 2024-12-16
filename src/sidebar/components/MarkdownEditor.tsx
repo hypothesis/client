@@ -1,4 +1,10 @@
-import { Button, IconButton, Link } from '@hypothesis/frontend-shared';
+import {
+  Button,
+  IconButton,
+  Link,
+  Popover,
+  useSyncedRef,
+} from '@hypothesis/frontend-shared';
 import {
   EditorLatexIcon,
   EditorQuoteIcon,
@@ -16,6 +22,7 @@ import classnames from 'classnames';
 import type { Ref, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
+import { ListenerCollection } from '../../shared/listener-collection';
 import { isMacOS } from '../../shared/user-agent';
 import {
   LinkType,
@@ -24,6 +31,7 @@ import {
   toggleSpanStyle,
 } from '../markdown-commands';
 import type { EditorState } from '../markdown-commands';
+import { termBeforePosition } from '../util/term-before-position';
 import MarkdownView from './MarkdownView';
 
 /**
@@ -176,24 +184,69 @@ function ToolbarButton({
 type TextAreaProps = {
   classes?: string;
   containerRef?: Ref<HTMLTextAreaElement>;
+  atMentionsEnabled: boolean;
 };
 
 function TextArea({
   classes,
   containerRef,
+  atMentionsEnabled,
   ...restProps
 }: TextAreaProps & JSX.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const textareaRef = useSyncedRef(containerRef);
+
+  useEffect(() => {
+    if (!atMentionsEnabled) {
+      return () => {};
+    }
+
+    const textarea = textareaRef.current!;
+    const listenerCollection = new ListenerCollection();
+
+    // We listen for `keyup` to make sure the text in the textarea reflects the
+    // just-pressed key when we evaluate it
+    listenerCollection.add(textarea, 'keyup', e => {
+      // `Esc` key is used to close the popover. Do nothing and let users close
+      // it that way, even if the caret is in a mention
+      if (e.key === 'Escape') {
+        return;
+      }
+      setPopoverOpen(
+        termBeforePosition(textarea.value, textarea.selectionStart).startsWith(
+          '@',
+        ),
+      );
+    });
+
+    return () => {
+      listenerCollection.removeAll();
+    };
+  }, [atMentionsEnabled, popoverOpen, textareaRef]);
+
   return (
-    <textarea
-      className={classnames(
-        'border rounded p-2',
-        'text-color-text-light bg-grey-0',
-        'focus:bg-white focus:outline-none focus:shadow-focus-inner',
-        classes,
+    <div className="relative">
+      <textarea
+        className={classnames(
+          'border rounded p-2',
+          'text-color-text-light bg-grey-0',
+          'focus:bg-white focus:outline-none focus:shadow-focus-inner',
+          classes,
+        )}
+        {...restProps}
+        ref={textareaRef}
+      />
+      {atMentionsEnabled && (
+        <Popover
+          open={popoverOpen}
+          onClose={() => setPopoverOpen(false)}
+          anchorElementRef={textareaRef}
+          classes="p-2"
+        >
+          Suggestions
+        </Popover>
       )}
-      {...restProps}
-      ref={containerRef}
-    />
+    </div>
   );
 }
 
@@ -322,6 +375,12 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }: ToolbarProps) {
 }
 
 export type MarkdownEditorProps = {
+  /**
+   * Whether the at-mentions feature ir enabled or not.
+   * Defaults to false.
+   */
+  atMentionsEnabled?: boolean;
+
   /** An accessible label for the input field */
   label: string;
 
@@ -338,6 +397,7 @@ export type MarkdownEditorProps = {
  * Viewer/editor for the body of an annotation in markdown format.
  */
 export default function MarkdownEditor({
+  atMentionsEnabled = false,
   label,
   onEditText = () => {},
   text,
@@ -411,6 +471,7 @@ export default function MarkdownEditor({
           }
           value={text}
           style={textStyle}
+          atMentionsEnabled={atMentionsEnabled}
         />
       )}
     </div>

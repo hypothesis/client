@@ -50,9 +50,18 @@ describe('MarkdownEditor', () => {
 
   function createComponent(props = {}, mountProps = {}) {
     return mount(
-      <MarkdownEditor label="Test editor" text="test" {...props} />,
+      <MarkdownEditor
+        label="Test editor"
+        text="test"
+        atMentionsEnabled={false}
+        {...props}
+      />,
       mountProps,
     );
+  }
+
+  function createConnectedComponent(props = {}) {
+    return createComponent(props, { connected: true });
   }
 
   const commands = [
@@ -371,6 +380,98 @@ describe('MarkdownEditor', () => {
     wrapper.update();
 
     assert.deepEqual(wrapper.find('MarkdownView').prop('style'), textStyle);
+  });
+
+  context('when @mentions are enabled', () => {
+    function typeInTextarea(wrapper, text, key = undefined) {
+      const textarea = wrapper.find('textarea');
+      const textareaDOMNode = textarea.getDOMNode();
+
+      textareaDOMNode.value = text;
+      act(() =>
+        textareaDOMNode.dispatchEvent(new KeyboardEvent('keyup', { key })),
+      );
+      wrapper.update();
+    }
+
+    [true, false].forEach(atMentionsEnabled => {
+      it('renders Popover if @mentions are enabled', () => {
+        const wrapper = createComponent({ atMentionsEnabled });
+        assert.equal(wrapper.exists('Popover'), atMentionsEnabled);
+      });
+    });
+
+    it('opens Popover when an @mention is typed in textarea', () => {
+      const wrapper = createConnectedComponent({ atMentionsEnabled: true });
+      typeInTextarea(wrapper, '@johndoe');
+
+      assert.isTrue(wrapper.find('Popover').prop('open'));
+    });
+
+    it('closes Popover when cursor moves away from @mention', () => {
+      const wrapper = createConnectedComponent({ atMentionsEnabled: true });
+
+      // Popover is open after typing the at-mention
+      typeInTextarea(wrapper, '@johndoe');
+      assert.isTrue(wrapper.find('Popover').prop('open'));
+
+      // Once a space is typed after the at-mention, the popover is closed
+      typeInTextarea(wrapper, '@johndoe ');
+      assert.isFalse(wrapper.find('Popover').prop('open'));
+    });
+
+    it('closes Popover when @mention is removed', () => {
+      const wrapper = createConnectedComponent({ atMentionsEnabled: true });
+
+      // Popover is open after typing the at-mention
+      typeInTextarea(wrapper, '@johndoe');
+      assert.isTrue(wrapper.find('Popover').prop('open'));
+
+      // Once the at-mention is removed, the popover is closed
+      typeInTextarea(wrapper, '');
+      assert.isFalse(wrapper.find('Popover').prop('open'));
+    });
+
+    it('opens Popover when cursor moves into an @mention', () => {
+      const text = '@johndoe ';
+      const wrapper = createConnectedComponent({
+        text,
+        atMentionsEnabled: true,
+      });
+
+      const textarea = wrapper.find('textarea');
+      const textareaDOMNode = textarea.getDOMNode();
+
+      // Popover is initially closed
+      assert.isFalse(wrapper.find('Popover').prop('open'));
+
+      // Move cursor to the left
+      textareaDOMNode.selectionStart = text.length - 1;
+      act(() => textareaDOMNode.dispatchEvent(new KeyboardEvent('keyup')));
+      wrapper.update();
+
+      assert.isTrue(wrapper.find('Popover').prop('open'));
+    });
+
+    it('closes Popover when onClose is called', () => {
+      const wrapper = createConnectedComponent({ atMentionsEnabled: true });
+
+      // Popover is initially open
+      typeInTextarea(wrapper, '@johndoe');
+      assert.isTrue(wrapper.find('Popover').prop('open'));
+
+      wrapper.find('Popover').props().onClose();
+      wrapper.update();
+      assert.isFalse(wrapper.find('Popover').prop('open'));
+    });
+
+    it('ignores `Escape` key press in textarea', () => {
+      const wrapper = createConnectedComponent({ atMentionsEnabled: true });
+
+      // Popover is still closed if the key is `Escape`
+      typeInTextarea(wrapper, '@johndoe', 'Escape');
+      assert.isFalse(wrapper.find('Popover').prop('open'));
+    });
   });
 
   it(

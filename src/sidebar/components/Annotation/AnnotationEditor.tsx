@@ -179,6 +179,7 @@ function AnnotationEditor({
         label={isReplyAnno ? 'Enter reply' : 'Enter comment'}
         text={text}
         onEditText={onEditText}
+        atMentionsEnabled={store.isFeatureEnabled('at_mentions')}
       />
       <TagEditor
         onAddTag={onAddTag}
