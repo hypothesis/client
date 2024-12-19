@@ -167,6 +167,9 @@ function AnnotationEditor({
 
   const textStyle = applyTheme(['annotationFontFamily'], settings);
 
+  const mentionsEnabled = store.isFeatureEnabled('at_mentions');
+  const usersWhoAnnotated = store.usersWhoAnnotated();
+
   return (
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
     <div
@@ -179,7 +182,8 @@ function AnnotationEditor({
         label={isReplyAnno ? 'Enter reply' : 'Enter comment'}
         text={text}
         onEditText={onEditText}
-        atMentionsEnabled={store.isFeatureEnabled('at_mentions')}
+        mentionsEnabled={mentionsEnabled}
+        usersForMentions={usersWhoAnnotated}
       />
       <TagEditor
         onAddTag={onAddTag}

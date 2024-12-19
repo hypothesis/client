@@ -2,7 +2,6 @@ import {
   Button,
   IconButton,
   Link,
-  Popover,
   useSyncedRef,
 } from '@hypothesis/frontend-shared';
 import {
@@ -20,9 +19,14 @@ import {
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 import type { Ref, JSX } from 'preact';
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
-import { ListenerCollection } from '../../shared/listener-collection';
 import { isMacOS } from '../../shared/user-agent';
 import {
   LinkType,
@@ -31,8 +35,12 @@ import {
   toggleSpanStyle,
 } from '../markdown-commands';
 import type { EditorState } from '../markdown-commands';
-import { termBeforePosition } from '../util/term-before-position';
+import {
+  getContainingWordOffsets,
+  termBeforePosition,
+} from '../util/term-before-position';
 import MarkdownView from './MarkdownView';
+import MentionPopover from './MentionPopover';
 
 /**
  * Toolbar commands that modify the editor state. This excludes the Help link
@@ -181,49 +189,96 @@ function ToolbarButton({
   );
 }
 
+export type UserItem = {
+  username: string;
+  displayName: string | null;
+};
+
 type TextAreaProps = {
   classes?: string;
   containerRef?: Ref<HTMLTextAreaElement>;
-  atMentionsEnabled: boolean;
+  mentionsEnabled: boolean;
+  usersForMentions: UserItem[];
+  onEditText: (text: string) => void;
 };
 
 function TextArea({
   classes,
   containerRef,
-  atMentionsEnabled,
+  mentionsEnabled,
+  usersForMentions,
+  onEditText,
+  onKeyDown,
   ...restProps
-}: TextAreaProps & JSX.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+}: TextAreaProps & JSX.TextareaHTMLAttributes) {
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [activeMention, setActiveMention] = useState<string>();
   const textareaRef = useSyncedRef(containerRef);
-
-  useEffect(() => {
-    if (!atMentionsEnabled) {
-      return () => {};
+  const [highlightedSuggestion, setHighlightedSuggestion] = useState(0);
+  const userSuggestions = useMemo(() => {
+    if (!mentionsEnabled || activeMention === undefined) {
+      return [];
     }
 
-    const textarea = textareaRef.current!;
-    const listenerCollection = new ListenerCollection();
-    const checkForMentionAtCaret = () => {
-      const term = termBeforePosition(textarea.value, textarea.selectionStart);
-      setPopoverOpen(term.startsWith('@'));
-    };
+    return usersForMentions
+      .filter(
+        u =>
+          // Match all users if the active mention is empty, which happens right
+          // after typing `@`
+          !activeMention ||
+          `${u.username} ${u.displayName ?? ''}`
+            .toLowerCase()
+            .match(activeMention.toLowerCase()),
+      )
+      .slice(0, 10);
+  }, [activeMention, mentionsEnabled, usersForMentions]);
 
-    // We listen for `keyup` to make sure the text in the textarea reflects the
-    // just-pressed key when we evaluate it
-    listenerCollection.add(textarea, 'keyup', e => {
-      // `Esc` key is used to close the popover. Do nothing and let users close
-      // it that way, even if the caret is in a mention
-      if (e.key !== 'Escape') {
-        checkForMentionAtCaret();
+  const checkForMentionAtCaret = useCallback(
+    (textarea: HTMLTextAreaElement) => {
+      if (!mentionsEnabled) {
+        return;
       }
-    });
 
-    // When clicking the textarea it's possible the caret is moved "into" a
-    // mention, so we check if the popover should be opened
-    listenerCollection.add(textarea, 'click', checkForMentionAtCaret);
+      const term = termBeforePosition(textarea.value, textarea.selectionStart);
+      const isAtMention = term.startsWith('@');
 
-    return () => listenerCollection.removeAll();
-  }, [atMentionsEnabled, popoverOpen, textareaRef]);
+      setPopoverOpen(isAtMention);
+      setActiveMention(isAtMention ? term.substring(1) : undefined);
+
+      // Reset highlighted suggestion when closing the popover
+      if (!isAtMention) {
+        setHighlightedSuggestion(0);
+      }
+    },
+    [mentionsEnabled],
+  );
+  const insertMention = useCallback(
+    (suggestion: UserItem) => {
+      const textarea = textareaRef.current!;
+      const { value } = textarea;
+      const { start, end } = getContainingWordOffsets(
+        value,
+        textarea.selectionStart,
+      );
+      const beforeMention = value.slice(0, start);
+      const beforeCaret = `${beforeMention}@${suggestion.username} `;
+      const afterMention = value.slice(end);
+
+      // Set textarea value directly, set new caret position and keep it focused.
+      textarea.value = `${beforeCaret}${afterMention}`;
+      textarea.selectionStart = beforeCaret.length;
+      textarea.selectionEnd = beforeCaret.length;
+      textarea.focus();
+      // Then update state to keep it in sync.
+      onEditText(textarea.value);
+
+      // Close popover and reset highlighted suggestion once the value is
+      // replaced
+      setPopoverOpen(false);
+      setHighlightedSuggestion(0);
+    },
+    [onEditText, textareaRef],
+  );
 
   return (
     <div className="relative">
@@ -234,18 +289,59 @@ function TextArea({
           'focus:bg-white focus:outline-none focus:shadow-focus-inner',
           classes,
         )}
+        onInput={(e: Event) => onEditText((e.target as HTMLInputElement).value)}
         {...restProps}
+        // We listen for `keyup` to make sure the text in the textarea reflects
+        // the just-pressed key when we evaluate it
+        onKeyUp={e => {
+          // `Esc` key is used to close the popover. Do nothing and let users
+          // close it that way, even if the caret is in a mention.
+          // `Enter` is handled on keydown. Do not handle it here.
+          if (!['Escape', 'Enter'].includes(e.key)) {
+            checkForMentionAtCaret(e.target as HTMLTextAreaElement);
+          }
+        }}
+        onKeyDown={e => {
+          // Invoke original handler if present
+          onKeyDown?.(e);
+
+          if (!popoverOpen || userSuggestions.length === 0) {
+            return;
+          }
+
+          // When vertical arrows are pressed while the popover is open with
+          // user suggestions, highlight the right one.
+          // When `Enter` is pressed, insert highlighted one.
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setHighlightedSuggestion(prev =>
+              Math.min(prev + 1, userSuggestions.length - 1),
+            );
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setHighlightedSuggestion(prev => Math.max(prev - 1, 0));
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            insertMention(userSuggestions[highlightedSuggestion]);
+          }
+        }}
+        onClick={e => {
+          e.stopPropagation();
+          // When clicking the textarea, it's possible the caret is moved "into" a
+          // mention, so we check if the popover should be opened
+          checkForMentionAtCaret(e.target as HTMLTextAreaElement);
+        }}
         ref={textareaRef}
       />
-      {atMentionsEnabled && (
-        <Popover
+      {mentionsEnabled && (
+        <MentionPopover
           open={popoverOpen}
           onClose={() => setPopoverOpen(false)}
           anchorElementRef={textareaRef}
-          classes="p-2"
-        >
-          Suggestions
-        </Popover>
+          users={userSuggestions}
+          highlightedSuggestion={highlightedSuggestion}
+          onSelectUser={insertMention}
+        />
       )}
     </div>
   );
@@ -380,7 +476,7 @@ export type MarkdownEditorProps = {
    * Whether the at-mentions feature ir enabled or not.
    * Defaults to false.
    */
-  atMentionsEnabled?: boolean;
+  mentionsEnabled?: boolean;
 
   /** An accessible label for the input field */
   label: string;
@@ -392,17 +488,27 @@ export type MarkdownEditorProps = {
   text: string;
 
   onEditText?: (text: string) => void;
+
+  /**
+   * Base list of users used to populate the @mentions suggestions, when
+   * `mentionsEnabled` is `true`.
+   * The list will be filtered and narrowed down based on the partial mention.
+   * The mention can still be set manually. It is not restricted to the items on
+   * this list.
+   */
+  usersForMentions: UserItem[];
 };
 
 /**
  * Viewer/editor for the body of an annotation in markdown format.
  */
 export default function MarkdownEditor({
-  atMentionsEnabled = false,
+  mentionsEnabled = false,
   label,
   onEditText = () => {},
   text,
   textStyle = {},
+  usersForMentions,
 }: MarkdownEditorProps) {
   // Whether the preview mode is currently active.
   const [preview, setPreview] = useState(false);
@@ -465,14 +571,12 @@ export default function MarkdownEditor({
             'text-base touch:text-touch-base',
           )}
           containerRef={input}
-          onClick={(e: Event) => e.stopPropagation()}
           onKeyDown={handleKeyDown}
-          onInput={(e: Event) =>
-            onEditText((e.target as HTMLInputElement).value)
-          }
+          onEditText={onEditText}
           value={text}
           style={textStyle}
-          atMentionsEnabled={atMentionsEnabled}
+          mentionsEnabled={mentionsEnabled}
+          usersForMentions={usersForMentions}
         />
       )}
     </div>

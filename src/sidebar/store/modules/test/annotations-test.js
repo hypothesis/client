@@ -543,4 +543,54 @@ describe('sidebar/store/modules/annotations', () => {
       });
     });
   });
+
+  describe('usersWhoAnnotated', () => {
+    it('returns expected list of unique and sorted users', () => {
+      const store = createTestStore();
+
+      // Add a few annotations assigned to duplicated unordered users
+      store.addAnnotations([
+        Object.assign(fixtures.defaultAnnotation(), {
+          id: 'a1',
+          user: 'acct:jondoe@hypothes.is',
+        }),
+        Object.assign(fixtures.defaultAnnotation(), {
+          id: 'a2',
+          user: 'acct:jondoe@hypothes.is',
+        }),
+        Object.assign(fixtures.defaultAnnotation(), {
+          id: 'a3',
+          user: 'acct:janedoe@hypothes.is',
+          user_info: {
+            display_name: 'Jane Doe',
+          },
+        }),
+        Object.assign(fixtures.defaultAnnotation(), {
+          id: 'a3',
+          user: 'acct:janedoe@hypothes.is',
+          user_info: {
+            display_name: 'Jane Doe',
+          },
+        }),
+      ]);
+
+      // Only one instance of every user should be returned, and they should be
+      // sorted by username
+      assert.deepEqual(
+        [
+          {
+            user: 'acct:janedoe@hypothes.is',
+            username: 'janedoe',
+            displayName: 'Jane Doe',
+          },
+          {
+            user: 'acct:jondoe@hypothes.is',
+            username: 'jondoe',
+            displayName: null,
+          },
+        ],
+        store.usersWhoAnnotated(),
+      );
+    });
+  });
 });
