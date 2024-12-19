@@ -181,20 +181,44 @@ function ToolbarButton({
   );
 }
 
+export type UserItem = {
+  username: string;
+  displayName: string | null;
+};
+
 type TextAreaProps = {
   classes?: string;
   containerRef?: Ref<HTMLTextAreaElement>;
   atMentionsEnabled: boolean;
+  usersWhoAnnotated: UserItem[];
 };
 
 function TextArea({
   classes,
   containerRef,
   atMentionsEnabled,
+  usersWhoAnnotated,
   ...restProps
 }: TextAreaProps & JSX.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [activeMention, setActiveMention] = useState<string>();
   const textareaRef = useSyncedRef(containerRef);
+  const [highlightedSuggestion, setHighlightedSuggestion] = useState(0);
+  const suggestions = useMemo(() => {
+    if (!atMentionsEnabled || activeMention === undefined) {
+      return [];
+    }
+
+    return usersWhoAnnotated
+      .filter(
+        u =>
+          // Match all users if the active mention is empty, which happens right
+          // after typing `@`
+          !activeMention ||
+          `${u.username} ${u.displayName ?? ''}`.match(activeMention),
+      )
+      .slice(0, 10);
+  }, [activeMention, atMentionsEnabled, usersWhoAnnotated]);
 
   useEffect(() => {
     if (!atMentionsEnabled) {
@@ -212,17 +236,46 @@ function TextArea({
       if (e.key === 'Escape') {
         return;
       }
-      setPopoverOpen(
-        termBeforePosition(textarea.value, textarea.selectionStart).startsWith(
-          '@',
-        ),
+
+      const termBeforeCaret = termBeforePosition(
+        textarea.value,
+        textarea.selectionStart,
       );
+      const isAtMention = termBeforeCaret.startsWith('@');
+
+      setPopoverOpen(isAtMention);
+      setActiveMention(isAtMention ? termBeforeCaret.substring(1) : undefined);
+    });
+
+    listenerCollection.add(textarea, 'keydown', e => {
+      if (
+        !popoverOpen ||
+        suggestions.length === 0 ||
+        !['ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)
+      ) {
+        return;
+      }
+
+      // When vertical arrows or Enter are pressed while the popover is open
+      // with suggestions, highlight or pick the right suggestion.
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (e.key === 'ArrowDown') {
+        setHighlightedSuggestion(prev =>
+          Math.min(prev + 1, suggestions.length),
+        );
+      } else if (e.key === 'ArrowUp') {
+        setHighlightedSuggestion(prev => Math.max(prev - 1, 0));
+      } else if (e.key === 'Enter') {
+        // TODO "Print" suggestion in textarea
+      }
     });
 
     return () => {
       listenerCollection.removeAll();
     };
-  }, [atMentionsEnabled, popoverOpen, textareaRef]);
+  }, [atMentionsEnabled, popoverOpen, suggestions.length, textareaRef]);
 
   return (
     <div className="relative">
@@ -241,9 +294,30 @@ function TextArea({
           open={popoverOpen}
           onClose={() => setPopoverOpen(false)}
           anchorElementRef={textareaRef}
-          classes="p-2"
+          classes="p-1"
         >
-          Suggestions
+          <ul className="flex-col gap-y-0.5">
+            {suggestions.map((s, index) => (
+              <li
+                key={s.username}
+                className={classnames(
+                  'flex justify-between items-center',
+                  'rounded p-2 hover:bg-grey-2',
+                  {
+                    'bg-grey-2': highlightedSuggestion === index,
+                  },
+                )}
+              >
+                <span className="truncate">{s.username}</span>
+                <span className="text-color-text-light">{s.displayName}</span>
+              </li>
+            ))}
+            {suggestions.length === 0 && (
+              <li className="italic p-2">
+                No matches. You can still write the username
+              </li>
+            )}
+          </ul>
         </Popover>
       )}
     </div>
@@ -391,6 +465,13 @@ export type MarkdownEditorProps = {
   text: string;
 
   onEditText?: (text: string) => void;
+
+  /**
+   * List of users who have annotated current document and belong to active group.
+   * This is used to populate the @mentions suggestions, when `atMentionsEnabled`
+   * is `true`.
+   */
+  usersWhoAnnotated: UserItem[];
 };
 
 /**
@@ -402,6 +483,7 @@ export default function MarkdownEditor({
   onEditText = () => {},
   text,
   textStyle = {},
+  usersWhoAnnotated,
 }: MarkdownEditorProps) {
   // Whether the preview mode is currently active.
   const [preview, setPreview] = useState(false);
@@ -472,6 +554,7 @@ export default function MarkdownEditor({
           value={text}
           style={textStyle}
           atMentionsEnabled={atMentionsEnabled}
+          usersWhoAnnotated={usersWhoAnnotated}
         />
       )}
     </div>
