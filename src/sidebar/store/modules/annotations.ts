@@ -8,6 +8,7 @@ import { createSelector } from 'reselect';
 import { hasOwn } from '../../../shared/has-own';
 import type { Annotation, SavedAnnotation } from '../../../types/api';
 import type { HighlightCluster } from '../../../types/shared';
+import { username as getUsername } from '../../helpers/account-id';
 import * as metadata from '../../helpers/annotation-metadata';
 import { isHighlight, isSaved } from '../../helpers/annotation-metadata';
 import { countIf, toTrueMap, trueKeys } from '../../util/collections';
@@ -32,6 +33,11 @@ type AnnotationStub = {
 
   /** Local-generated identifier */
   $tag?: string;
+};
+
+export type UserItem = {
+  user: string;
+  displayName: string | null;
 };
 
 const initialState = {
@@ -567,6 +573,41 @@ const savedAnnotations = createSelector(
   annotations => annotations.filter(ann => isSaved(ann)) as SavedAnnotation[],
 );
 
+/**
+ * Return the list of unique users who authored any annotation, ordered by username.
+ */
+const usersWhoAnnotated = createSelector(
+  (state: State) => state.annotations,
+  annotations => {
+    const usersMap = new Map<
+      string,
+      { user: string; username: string; displayName: string | null }
+    >();
+    annotations.forEach(anno => {
+      const { user } = anno;
+
+      // Keep a unique list of users
+      if (usersMap.has(user)) {
+        return;
+      }
+
+      const username = getUsername(user);
+      const displayName = anno.user_info?.display_name ?? null;
+      usersMap.set(user, { user, username, displayName });
+    });
+
+    // Sort users by username
+    return [...usersMap.values()].sort((a, b) => {
+      const aUsername = a.username;
+      const bUsername = b.username;
+
+      return aUsername.localeCompare(bUsername, undefined, {
+        sensitivity: 'base',
+      });
+    });
+  },
+);
+
 export const annotationsModule = createStoreModule(initialState, {
   namespace: 'annotations',
   reducers,
@@ -597,5 +638,6 @@ export const annotationsModule = createStoreModule(initialState, {
     noteCount,
     orphanCount,
     savedAnnotations,
+    usersWhoAnnotated,
   },
 });
