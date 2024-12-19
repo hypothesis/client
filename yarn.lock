@@ -4310,6 +4310,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mocha@npm:^10.0.10":
+  version: 10.0.10
+  resolution: "@types/mocha@npm:10.0.10"
+  checksum: 17a56add60a8cc8362d3c62cb6798be3f89f4b6ccd5b9abd12b46e31ff299be21ff2faebf5993de7e0099559f58ca5a3b49a505d302dfa5d65c5a4edfc089195
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 14.14.43
   resolution: "@types/node@npm:14.14.43"
@@ -8516,6 +8523,7 @@ __metadata:
     "@types/dompurify": ^3.0.0
     "@types/escape-html": ^1.0.1
     "@types/katex": ^0.16.0
+    "@types/mocha": ^10.0.10
     "@types/retry": ^0.12.1
     "@types/scroll-into-view": ^1.16.0
     "@types/shallowequal": ^1.1.1
