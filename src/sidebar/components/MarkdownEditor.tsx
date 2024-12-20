@@ -203,25 +203,26 @@ function TextArea({
 
     const textarea = textareaRef.current!;
     const listenerCollection = new ListenerCollection();
+    const checkForMentionAtCaret = () => {
+      const term = termBeforePosition(textarea.value, textarea.selectionStart);
+      setPopoverOpen(term.startsWith('@'));
+    };
 
     // We listen for `keyup` to make sure the text in the textarea reflects the
     // just-pressed key when we evaluate it
     listenerCollection.add(textarea, 'keyup', e => {
       // `Esc` key is used to close the popover. Do nothing and let users close
       // it that way, even if the caret is in a mention
-      if (e.key === 'Escape') {
-        return;
+      if (e.key !== 'Escape') {
+        checkForMentionAtCaret();
       }
-      setPopoverOpen(
-        termBeforePosition(textarea.value, textarea.selectionStart).startsWith(
-          '@',
-        ),
-      );
     });
 
-    return () => {
-      listenerCollection.removeAll();
-    };
+    // When clicking the textarea it's possible the caret is moved "into" a
+    // mention, so we check if the popover should be opened
+    listenerCollection.add(textarea, 'click', checkForMentionAtCaret);
+
+    return () => listenerCollection.removeAll();
   }, [atMentionsEnabled, popoverOpen, textareaRef]);
 
   return (

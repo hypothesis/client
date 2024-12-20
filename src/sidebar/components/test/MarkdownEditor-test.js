@@ -438,7 +438,6 @@ describe('MarkdownEditor', () => {
         text,
         atMentionsEnabled: true,
       });
-
       const textarea = wrapper.find('textarea');
       const textareaDOMNode = textarea.getDOMNode();
 
@@ -471,6 +470,26 @@ describe('MarkdownEditor', () => {
       // Popover is still closed if the key is `Escape`
       typeInTextarea(wrapper, '@johndoe', 'Escape');
       assert.isFalse(wrapper.find('Popover').prop('open'));
+    });
+
+    it('opens popover when clicking textarea and moving the caret to a mention', () => {
+      const text = 'text @johndoe more text';
+      const wrapper = createConnectedComponent({
+        text,
+        atMentionsEnabled: true,
+      });
+      const textarea = wrapper.find('textarea');
+      const textareaDOMNode = textarea.getDOMNode();
+
+      // Popover is initially closed
+      assert.isFalse(wrapper.find('Popover').prop('open'));
+
+      // Move cursor to overlap with the mention
+      textareaDOMNode.selectionStart = text.indexOf('@') + 1;
+      act(() => textareaDOMNode.dispatchEvent(new MouseEvent('click')));
+      wrapper.update();
+
+      assert.isTrue(wrapper.find('Popover').prop('open'));
     });
   });
 
