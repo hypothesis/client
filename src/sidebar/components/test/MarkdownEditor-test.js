@@ -2,7 +2,7 @@ import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
-import { mount } from '@hypothesis/frontend-testing';
+import { mount, unmountAll } from '@hypothesis/frontend-testing';
 import { render } from 'preact';
 import { act } from 'preact/test-utils';
 
@@ -23,12 +23,17 @@ describe('MarkdownEditor', () => {
   };
   let fakeIsMacOS;
   let MarkdownView;
+  let fakeStore;
 
   beforeEach(() => {
     fakeMarkdownCommands.convertSelectionToLink.resetHistory();
     fakeMarkdownCommands.toggleBlockStyle.resetHistory();
     fakeMarkdownCommands.toggleSpanStyle.resetHistory();
     fakeIsMacOS = sinon.stub().returns(false);
+
+    fakeStore = {
+      isFeatureEnabled: sinon.stub().returns(false),
+    };
 
     MarkdownView = function MarkdownView() {
       return null;
@@ -41,11 +46,13 @@ describe('MarkdownEditor', () => {
       '../../shared/user-agent': {
         isMacOS: fakeIsMacOS,
       },
+      '../store': { useSidebarStore: () => fakeStore },
     });
   });
 
   afterEach(() => {
     $imports.$restore();
+    unmountAll();
   });
 
   function createComponent(props = {}, mountProps = {}) {
