@@ -83,7 +83,7 @@
     "postcss": "^8.0.3",
     "preact": "^10.4.0",
     "preact-render-to-string": "^6.4.0",
-    "prettier": "3.4.1",
+    "prettier": "3.4.2",
     "redux": "^5.0.0",
     "redux-thunk": "^3.1.0",
     "reselect": "^5.0.1",
