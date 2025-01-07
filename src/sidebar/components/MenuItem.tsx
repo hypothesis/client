@@ -112,6 +112,7 @@ export type MenuItemProps = {
 
   onClick?: (e: Event) => void;
   onToggleSubmenu?: (e: Event) => void;
+
   /**
    * Contents of the submenu for this item.  This is typically a list of
    * `MenuItem` components with the `isSubmenuItem` prop set to `true`, but can
@@ -119,6 +120,12 @@ export type MenuItemProps = {
    * `isSubmenuVisible` is `true`.
    */
   submenu?: ComponentChildren;
+
+  /**
+   * Custom title for the submenu toggle button.
+   * Omit this prop if there is no submenu.
+   */
+  submenuToggleTitle?: string;
 };
 
 /**
@@ -150,6 +157,7 @@ export default function MenuItem({
   onClick,
   onToggleSubmenu,
   submenu,
+  submenuToggleTitle,
 }: MenuItemProps) {
   const menuItemRef = useRef<HTMLAnchorElement | HTMLDivElement | null>(null);
 
@@ -226,7 +234,12 @@ export default function MenuItem({
       )}
       {hasSubmenuVisible && (
         <SubmenuToggle
-          title={`Show actions for ${label}`}
+          title={
+            submenuToggleTitle ??
+            (typeof label === 'string'
+              ? `Show actions for ${label}`
+              : `Toggle submenu`)
+          }
           isExpanded={isSubmenuVisible}
           onToggleSubmenu={onToggleSubmenu}
         />

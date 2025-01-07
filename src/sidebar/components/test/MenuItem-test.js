@@ -267,6 +267,35 @@ describe('MenuItem', () => {
       }
       // no assert needed
     });
+
+    [
+      {
+        label: 'The label',
+        submenuToggleTitle: 'Explicit title',
+        expectedTitle: 'Explicit title',
+      },
+      {
+        label: <span>Rich label</span>,
+        submenuToggleTitle: 'Explicit title',
+        expectedTitle: 'Explicit title',
+      },
+      { label: 'The label', expectedTitle: 'Show actions for The label' },
+      { label: <span>Rich label</span>, expectedTitle: 'Toggle submenu' },
+    ].forEach(({ label, submenuToggleTitle, expectedTitle }) => {
+      it('shows right title in SubmenuToggle', () => {
+        const wrapper = createMenuItem({
+          label,
+          submenuToggleTitle,
+          isSubmenuVisible: true,
+          submenu: <div role="menuitem">Submenu content</div>,
+        });
+
+        assert.equal(
+          wrapper.find('SubmenuToggle').prop('title'),
+          expectedTitle,
+        );
+      });
+    });
   });
 
   it(
