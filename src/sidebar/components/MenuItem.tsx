@@ -101,7 +101,17 @@ export type MenuItemProps = {
    */
   isSubmenuVisible?: boolean;
 
-  label: ComponentChildren;
+  /**
+   * Main text of the menu item.
+   * This is also used as part of the submenu toggle's title, if any.
+   */
+  label: string;
+
+  /**
+   * An alternative to `label`, in case you need to render more complex/rich
+   * content in this item.
+   */
+  richLabel?: ComponentChildren;
 
   /**
    * Optional content to render into a left channel. This accommodates small
@@ -146,6 +156,7 @@ export default function MenuItem({
   isSubmenuItem,
   isSubmenuVisible,
   label,
+  richLabel = label,
   leftChannelContent,
   onClick,
   onToggleSubmenu,
@@ -214,7 +225,7 @@ export default function MenuItem({
         </div>
       )}
       <span className="flex items-center grow whitespace-nowrap px-1">
-        {label}
+        {richLabel}
       </span>
       {hasRightContent && (
         <div

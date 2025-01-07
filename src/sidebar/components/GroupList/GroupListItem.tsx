@@ -127,7 +127,8 @@ function GroupListItem({
       isExpanded={hasActionMenu ? isExpanded : false}
       isSelected={isSelected}
       isSubmenuVisible={hasActionMenu ? isExpanded : undefined}
-      label={
+      label={group.name}
+      richLabel={
         <div className="grow flex items-center justify-between gap-x-2">
           {group.name}
           <GroupIcon type={group.type} />
