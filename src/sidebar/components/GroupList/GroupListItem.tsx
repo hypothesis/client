@@ -136,6 +136,7 @@ function GroupListItem({
       leftChannelContent={leftChannelContent}
       onClick={isSelectable ? focusGroup : toggleSubmenu}
       onToggleSubmenu={toggleSubmenu}
+      submenuToggleTitle={`Show actions for ${group.name}`}
       submenu={
         <>
           <ul>
