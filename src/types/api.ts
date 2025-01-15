@@ -295,6 +295,34 @@ export type Group = {
 export type GroupIdentifier = NonNullable<Group['id'] | Group['groupid']>;
 
 /**
+ * Generic type for endpoints that return paginated lists of items.
+ */
+export type PaginatedResponse<Item> = {
+  meta: {
+    page: {
+      total: number;
+    };
+  };
+  data: Item[];
+};
+
+export type GroupMember = {
+  authority: string;
+  userid: string;
+  username: string;
+  display_name: string | null;
+  roles: string[];
+  actions: string[];
+  created: string;
+  updated: string;
+};
+
+/**
+ * Response to a GET /api/groups/{id}/members api call
+ */
+export type GroupMembers = PaginatedResponse<GroupMember>;
+
+/**
  * Query parameters for an `/api/search` API call.
  *
  * This type currently includes params that we've actually used.

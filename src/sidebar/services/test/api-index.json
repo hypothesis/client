@@ -30,6 +30,13 @@
           "desc": "Remove the current user from a group."
         }
       },
+      "members": {
+        "read": {
+          "url": "https://example.com/api/groups/:pubid/members",
+          "method": "GET",
+          "desc": "Fetch a list of all members of a group"
+        }
+      },
       "read": {
         "url": "https://example.com/api/groups/:id",
         "method": "GET",

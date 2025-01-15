@@ -2,7 +2,7 @@ import shallowEqual from 'shallowequal';
 
 // @ts-ignore - TS doesn't know about SVG files.
 import { default as logo } from '../../images/icons/logo.svg';
-import type { Group } from '../../types/api';
+import type { Group, GroupMember, GroupMembers } from '../../types/api';
 import type { SidebarSettings } from '../../types/config';
 import type { Service } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
@@ -22,6 +22,8 @@ const DEFAULT_ORGANIZATION = {
   name: '__DEFAULT__',
   logo: 'data:image/svg+xml;utf8,' + encodeURIComponent(logo),
 };
+
+export const MEMBERS_PAGE_SIZE = 100;
 
 /**
  * For any group that does not have an associated organization, populate with
@@ -60,6 +62,12 @@ export class GroupsService {
   private _toastMessenger: ToastMessengerService;
   private _serviceConfig: Service | null;
   private _reloadSetUp: boolean;
+
+  /**
+   * Tracks the loading of the focused group members.
+   * If this is null it means we are not loading members yet.
+   */
+  private _focusedMembersController: AbortController | null = null;
 
   constructor(
     store: SidebarStore,
@@ -450,6 +458,10 @@ export class GroupsService {
 
     const groupHasChanged = prevGroupId !== newGroupId && prevGroupId !== null;
     if (groupHasChanged && newGroupId) {
+      // Abort previous in-flight members loading if the group was different
+      // from the focused one
+      this._focusedMembersController?.abort();
+
       // Move any top-level new annotations to the newly-focused group.
       // Leave replies where they are.
       const updatedAnnotations = this._store
@@ -477,5 +489,72 @@ export class GroupsService {
       pubid: id,
       userid: 'me',
     });
+  }
+
+  /**
+   * Fetch members for a group from the API and load them into the store as the
+   * members of the focused group.
+   */
+  async loadFocusedGroupMembers(groupId: string): Promise<void> {
+    // Abort previous loading, if any
+    this._focusedMembersController?.abort();
+
+    this._focusedMembersController = new AbortController();
+    const { signal } = this._focusedMembersController;
+
+    const members = await this._fetchAllMembers(groupId, signal);
+    if (!signal?.aborted) {
+      this._store.loadFocusedGroupMembers(members);
+    }
+  }
+
+  private async _fetchAllMembers(
+    groupId: string,
+    signal?: AbortSignal,
+  ): Promise<GroupMember[]> {
+    // Fetch first page of members, to determine how many more pages there are
+    const firstPage = await this._fetchMembers({ groupId, signal });
+    const pages = Math.min(
+      Math.ceil(firstPage.meta.page.total / MEMBERS_PAGE_SIZE),
+      // Do not try to load more than 10 pages, to avoid long loading times and
+      // hitting the server too much
+      10,
+    );
+    let members = firstPage.data;
+
+    // Fetch remaining pages. Start at 2 to skip first one which was already
+    // loaded.
+    // TODO Consider parallelizing requests
+    for (let page = 2; page <= pages; page++) {
+      // Do not attempt any further request once the signal has been aborted
+      if (signal?.aborted) {
+        break;
+      }
+
+      const membersPage = await this._fetchMembers({ groupId, page, signal });
+      members = members.concat(membersPage.data);
+    }
+
+    return members;
+  }
+
+  private _fetchMembers({
+    groupId,
+    page = 1,
+    signal,
+  }: {
+    groupId: string;
+    page?: number;
+    signal?: AbortSignal;
+  }): Promise<GroupMembers> {
+    return this._api.group.members.read(
+      {
+        pubid: groupId,
+        'page[number]': page,
+        'page[size]': MEMBERS_PAGE_SIZE,
+      },
+      undefined,
+      signal,
+    );
   }
 }

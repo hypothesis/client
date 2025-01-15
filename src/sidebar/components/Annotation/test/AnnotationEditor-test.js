@@ -5,6 +5,7 @@ import {
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
+import sinon from 'sinon';
 
 import * as fixtures from '../../../test/annotation-fixtures';
 import AnnotationEditor, { $imports } from '../AnnotationEditor';
@@ -16,6 +17,7 @@ describe('AnnotationEditor', () => {
   let fakeTagsService;
   let fakeSettings;
   let fakeToastMessenger;
+  let fakeGroupsService;
 
   let fakeStore;
 
@@ -30,6 +32,7 @@ describe('AnnotationEditor', () => {
         settings={fakeSettings}
         tags={fakeTagsService}
         toastMessenger={fakeToastMessenger}
+        groups={fakeGroupsService}
         {...props}
       />,
     );
@@ -54,6 +57,9 @@ describe('AnnotationEditor', () => {
       error: sinon.stub(),
       success: sinon.stub(),
     };
+    fakeGroupsService = {
+      loadFocusedGroupMembers: sinon.stub().resolves(undefined),
+    };
 
     fakeStore = {
       createDraft: sinon.stub(),
@@ -63,6 +69,8 @@ describe('AnnotationEditor', () => {
       removeAnnotations: sinon.stub(),
       isFeatureEnabled: sinon.stub().returns(false),
       usersWhoAnnotated: sinon.stub().returns([]),
+      getFocusedGroupMembers: sinon.stub(),
+      focusedGroupId: sinon.stub().returns(null),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -403,6 +411,61 @@ describe('AnnotationEditor', () => {
         enableHelpPanel,
       );
     });
+  });
+
+  describe('loading focused group members', () => {
+    [
+      {
+        atMentionsEnabled: true,
+        focusedGroupMembers: null,
+        focusedGroupId: 'group_id',
+        shouldLoadMembers: true,
+      },
+      {
+        atMentionsEnabled: true,
+        focusedGroupMembers: null,
+        focusedGroupId: null,
+        shouldLoadMembers: false,
+      },
+      {
+        atMentionsEnabled: false,
+        focusedGroupMembers: null,
+        focusedGroupId: 'group_id',
+        shouldLoadMembers: false,
+      },
+      {
+        atMentionsEnabled: true,
+        focusedGroupMembers: [],
+        focusedGroupId: 'group_id',
+        shouldLoadMembers: false,
+      },
+      {
+        atMentionsEnabled: false,
+        focusedGroupMembers: [],
+        focusedGroupId: 'group_id',
+        shouldLoadMembers: false,
+      },
+    ].forEach(
+      ({
+        atMentionsEnabled,
+        focusedGroupMembers,
+        focusedGroupId,
+        shouldLoadMembers,
+      }) => {
+        it('loads focused group members when mounted', () => {
+          fakeStore.isFeatureEnabled.returns(atMentionsEnabled);
+          fakeStore.getFocusedGroupMembers.returns(focusedGroupMembers);
+          fakeStore.focusedGroupId.returns(focusedGroupId);
+
+          createComponent();
+
+          assert.equal(
+            fakeGroupsService.loadFocusedGroupMembers.called,
+            shouldLoadMembers,
+          );
+        });
+      },
+    );
   });
 
   it(
