@@ -1,7 +1,8 @@
 import { delay, waitFor } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import { fakeReduxStore } from '../../test/fake-redux-store';
-import { GroupsService, $imports } from '../groups';
+import { GroupsService, $imports, MEMBERS_PAGE_SIZE } from '../groups';
 
 /**
  * Generate a truth table containing every possible combination of a set of
@@ -89,6 +90,9 @@ describe('GroupsService', () => {
         clearDirectLinkedGroupFetchFailed: sinon.stub(),
         profile: sinon.stub().returns({ userid: null }),
         route: sinon.stub().returns('sidebar'),
+        isFeatureEnabled: sinon.stub().returns(false),
+        getFocusedGroupMembers: sinon.stub().returns(null),
+        loadFocusedGroupMembers: sinon.stub(),
       },
     );
     fakeApi = {
@@ -99,6 +103,9 @@ describe('GroupsService', () => {
       group: {
         member: {
           delete: sinon.stub().returns(Promise.resolve()),
+        },
+        members: {
+          read: sinon.stub().resolves({}),
         },
         read: sinon.stub().returns(Promise.resolve(new Error('404 Error'))),
       },
@@ -204,6 +211,92 @@ describe('GroupsService', () => {
       svc.focus('samegroup');
 
       assert.notCalled(fakeStore.setDefault);
+    });
+  });
+
+  describe('#loadFocusedGroupMembers', () => {
+    [
+      { totalMembers: 48, expectedApiCalls: 1 },
+      { totalMembers: 100, expectedApiCalls: 1 },
+      { totalMembers: 125, expectedApiCalls: 2 },
+      { totalMembers: 236, expectedApiCalls: 3 },
+      { totalMembers: 650, expectedApiCalls: 7 },
+      { totalMembers: 936, expectedApiCalls: 10 },
+
+      // We'll never load more than 10 pages
+      { totalMembers: 1_000, expectedApiCalls: 10 },
+      { totalMembers: 1_200, expectedApiCalls: 10 },
+      { totalMembers: 10_000, expectedApiCalls: 10 },
+    ].forEach(({ totalMembers, expectedApiCalls }) => {
+      it('calls members API as many times as needed, until all members are loaded', async () => {
+        for (let page = 1; page <= expectedApiCalls; page++) {
+          const itemsPerPage = Math.min(
+            totalMembers - MEMBERS_PAGE_SIZE * (page - 1),
+            MEMBERS_PAGE_SIZE,
+          );
+
+          fakeApi.group.members.read
+            .withArgs({
+              pubid: 'group',
+              'page[number]': page,
+              'page[size]': MEMBERS_PAGE_SIZE,
+            })
+            .resolves({
+              meta: {
+                page: { total: totalMembers },
+              },
+              data: Array.from({ length: itemsPerPage }, () => ({})),
+            });
+        }
+
+        const svc = createService();
+        await svc.loadFocusedGroupMembers('group');
+
+        assert.calledWith(
+          fakeStore.loadFocusedGroupMembers,
+          // This function should have been called with the members returned by
+          // all loaded pages combined
+          sinon.match(
+            members =>
+              Array.isArray(members) &&
+              members.length ===
+                Math.min(totalMembers, MEMBERS_PAGE_SIZE * expectedApiCalls),
+          ),
+        );
+        assert.callCount(fakeApi.group.members.read, expectedApiCalls);
+      });
+    });
+
+    it('stops loading pages if another group is focused', async () => {
+      let apiCallCount = 0;
+      const expectedApiCalls = 3;
+      const svc = createService();
+
+      fakeApi.group.members.read.callsFake(() => {
+        apiCallCount++;
+
+        // Focus another group after the third call. That will cancel subsequent
+        // calls
+        if (apiCallCount === expectedApiCalls) {
+          fakeStore.focusedGroupId.returns('another_group');
+          fakeStore.focusedGroupId.onFirstCall().returns('group');
+          svc.focus('another_group');
+        }
+
+        return {
+          meta: {
+            // This total should trigger 10 API calls in a normal situation,
+            // where the signal is not aborted
+            page: { total: 1_000 },
+          },
+          data: [],
+        };
+      });
+
+      await svc.loadFocusedGroupMembers('group');
+
+      assert.callCount(fakeApi.group.members.read, expectedApiCalls);
+      assert.notCalled(fakeStore.loadFocusedGroupMembers);
     });
   });
 

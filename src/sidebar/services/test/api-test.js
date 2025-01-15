@@ -124,6 +124,26 @@ describe('APIService', () => {
     return api.group.member.delete({ pubid: 'an-id', userid: 'me' });
   });
 
+  it('gets group members', () => {
+    const groupMembers = {
+      meta: {
+        page: { total: 0 },
+      },
+      data: [],
+    };
+    expectCall(
+      'get',
+      `groups/an-id/members?${encodeURIComponent('page[number]')}=1&${encodeURIComponent('page[size]')}=100`,
+      200,
+      groupMembers,
+    );
+    return api.group.members.read({
+      pubid: 'an-id',
+      'page[number]': 1,
+      'page[size]': 100,
+    });
+  });
+
   it('gets a group by provided group id', () => {
     const group = { id: 'group-id', name: 'Group' };
     expectCall('get', 'groups/group-id', 200, group);

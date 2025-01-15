@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
@@ -11,6 +11,7 @@ import {
 import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
+import type { GroupsService } from '../../services/groups';
 import type { TagsService } from '../../services/tags';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
@@ -28,6 +29,7 @@ type AnnotationEditorProps = {
 
   // Injected
   annotationsService: AnnotationsService;
+  groups: GroupsService;
   settings: SidebarSettings;
   toastMessenger: ToastMessengerService;
   tags: TagsService;
@@ -40,6 +42,7 @@ function AnnotationEditor({
   annotation,
   draft,
   annotationsService,
+  groups: groupsService,
   settings,
   tags: tagsService,
   toastMessenger,
@@ -174,6 +177,15 @@ function AnnotationEditor({
 
   const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const usersWhoAnnotated = store.usersWhoAnnotated();
+  const focusedGroupMembers = store.getFocusedGroupMembers();
+  const focusedGroupId = store.focusedGroupId();
+
+  useEffect(() => {
+    // Load members for focused group only if not yet loaded
+    if (mentionsEnabled && focusedGroupId && focusedGroupMembers === null) {
+      groupsService.loadFocusedGroupMembers(focusedGroupId);
+    }
+  }, [focusedGroupId, focusedGroupMembers, groupsService, mentionsEnabled]);
 
   return (
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
@@ -214,6 +226,7 @@ function AnnotationEditor({
 
 export default withServices(AnnotationEditor, [
   'annotationsService',
+  'groups',
   'settings',
   'tags',
   'toastMessenger',
