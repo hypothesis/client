@@ -4,6 +4,7 @@ import type {
   RouteMap,
   RouteMetadata,
   Profile,
+  GroupMembers,
 } from '../../types/api';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import type { SidebarStore } from '../store';
@@ -218,6 +219,17 @@ export class APIService {
     member: {
       delete: APICall<{ pubid: string; userid: string }>;
     };
+    members: {
+      read: APICall<
+        {
+          pubid: string;
+          'page[number]'?: number;
+          'page[size]'?: number;
+        },
+        void,
+        GroupMembers
+      >;
+    };
     read: APICall<{ id: string; expand: string[] }, void, Group>;
   };
   groups: {
@@ -286,6 +298,17 @@ export class APIService {
           pubid: string;
           userid: string;
         }>,
+      },
+      members: {
+        read: apiCall('group.members.read') as APICall<
+          {
+            pubid: string;
+            'page[number]'?: number;
+            'page[size]'?: number;
+          },
+          void,
+          GroupMembers
+        >,
       },
       read: apiCall('group.read') as APICall<
         { id: string; expand: string[] },

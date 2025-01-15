@@ -1,4 +1,5 @@
 import { delay, waitFor } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import { fakeReduxStore } from '../../test/fake-redux-store';
 import { GroupsService, $imports } from '../groups';
@@ -78,9 +79,7 @@ describe('GroupsService', () => {
         allGroups() {
           return this.getState().groups.groups;
         },
-        focusedGroup() {
-          return this.getState().groups.focusedGroup;
-        },
+        focusedGroup: sinon.stub().returns(null),
         defaultContentFrame() {
           return this.getState().frames[0];
         },
@@ -89,6 +88,9 @@ describe('GroupsService', () => {
         clearDirectLinkedGroupFetchFailed: sinon.stub(),
         profile: sinon.stub().returns({ userid: null }),
         route: sinon.stub().returns('sidebar'),
+        isFeatureEnabled: sinon.stub().returns(false),
+        getFocusedGroupMembers: sinon.stub().returns(null),
+        loadFocusedGroupMembers: sinon.stub(),
       },
     );
     fakeApi = {
@@ -99,6 +101,9 @@ describe('GroupsService', () => {
       group: {
         member: {
           delete: sinon.stub().returns(Promise.resolve()),
+        },
+        members: {
+          read: sinon.stub().resolves({}),
         },
         read: sinon.stub().returns(Promise.resolve(new Error('404 Error'))),
       },
@@ -204,6 +209,54 @@ describe('GroupsService', () => {
       svc.focus('samegroup');
 
       assert.notCalled(fakeStore.setDefault);
+    });
+
+    context('when at-mentions are enabled', () => {
+      beforeEach(() => {
+        fakeStore.isFeatureEnabled.withArgs('at_mentions').returns(true);
+      });
+
+      it('does not try to load group members when loaded group is open', async () => {
+        fakeStore.focusedGroup.returns({ type: 'open' });
+
+        const svc = createService();
+        svc.focus('newgroup');
+
+        // Wait, as loadFocusedGroupMembers gets called asynchronously
+        await waitFor(() => fakeStore.loadFocusedGroupMembers.calledWith([]));
+        assert.notCalled(fakeApi.group.members.read);
+      });
+
+      [
+        { totalMembers: 48, expectedApiCalls: 1 },
+        { totalMembers: 100, expectedApiCalls: 1 },
+        { totalMembers: 125, expectedApiCalls: 2 },
+        { totalMembers: 236, expectedApiCalls: 3 },
+        { totalMembers: 650, expectedApiCalls: 7 },
+        { totalMembers: 936, expectedApiCalls: 10 },
+
+        // We'll never load more than 10 pages
+        { totalMembers: 1_000, expectedApiCalls: 10 },
+        { totalMembers: 1_200, expectedApiCalls: 10 },
+        { totalMembers: 10_000, expectedApiCalls: 10 },
+      ].forEach(({ totalMembers, expectedApiCalls }) => {
+        it('calls members API as many times as needed, until all members are loaded', async () => {
+          fakeStore.focusedGroup.returns({ type: 'restricted' });
+          fakeApi.group.members.read.resolves({
+            meta: {
+              page: { total: totalMembers },
+            },
+            data: [],
+          });
+
+          const svc = createService();
+          svc.focus('newgroup');
+
+          // Wait, as loadFocusedGroupMembers gets called asynchronously
+          await waitFor(() => fakeStore.loadFocusedGroupMembers.called);
+          assert.callCount(fakeApi.group.members.read, expectedApiCalls);
+        });
+      });
     });
   });
 
