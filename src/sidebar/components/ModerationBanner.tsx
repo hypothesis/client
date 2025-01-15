@@ -68,6 +68,8 @@ function ModerationBanner({
     <div
       className={classnames(
         'flex gap-x-3 bg-grey-1 text-color-text font-semibold',
+        // Match the card's border radius and hide overflow
+        'rounded-t-lg overflow-hidden',
         // FIXME: Refactor margins: where possible manage them in a parent
         'mb-2 ',
         {
