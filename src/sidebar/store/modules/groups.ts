@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import type { Group } from '../../../types/api';
+import type { Group, GroupMember } from '../../../types/api';
 import { createStoreModule, makeAction } from '../create-store';
 import { sessionModule } from './session';
 import type { State as SessionState } from './session';
@@ -18,12 +18,16 @@ export type State = {
   groups: Group[];
   /** ID of currently selected group. */
   focusedGroupId: string | null;
+
+  /** Members of currently selected group */
+  focusedGroupMembers: GroupMember[] | null;
 };
 
 const initialState: State = {
   filteredGroupIds: null,
   groups: [],
   focusedGroupId: null,
+  focusedGroupMembers: null,
 };
 
 const reducers = {
@@ -62,7 +66,7 @@ const reducers = {
       );
       return {};
     }
-    return { focusedGroupId: action.id };
+    return { focusedGroupId: action.id, focusedGroupMembers: null };
   },
 
   LOAD_GROUPS(state: State, action: { groups: Group[] }) {
@@ -87,11 +91,24 @@ const reducers = {
     };
   },
 
+  LOAD_FOCUSED_GROUP_MEMBERS(
+    state: State,
+    action: { focusedGroupMembers: GroupMember[] },
+  ) {
+    if (!state.focusedGroupId) {
+      throw new Error('A group needs to be focused before loading its members');
+    }
+
+    const { focusedGroupMembers } = action;
+    return { focusedGroupMembers };
+  },
+
   CLEAR_GROUPS() {
     return {
       filteredGroupIds: null,
       focusedGroupId: null,
       groups: [],
+      focusedGroupMembers: null,
     };
   },
 };
@@ -119,6 +136,23 @@ function focusGroup(id: string) {
  */
 function loadGroups(groups: Group[]) {
   return makeAction(reducers, 'LOAD_GROUPS', { groups });
+}
+
+/**
+ * Update focused group members.
+ */
+function loadFocusedGroupMembers(focusedGroupMembers: GroupMember[]) {
+  return makeAction(reducers, 'LOAD_FOCUSED_GROUP_MEMBERS', {
+    focusedGroupMembers,
+  });
+}
+
+/**
+ * Return list of members for focused group.
+ * Null is returned if members are being loaded or a group is not focused.
+ */
+function getFocusedGroupMembers(state: State): GroupMember[] | null {
+  return state.focusedGroupMembers;
 }
 
 /**
@@ -229,6 +263,7 @@ export const groupsModule = createStoreModule(initialState, {
     filterGroups,
     focusGroup,
     loadGroups,
+    loadFocusedGroupMembers,
     clearGroups,
   },
   selectors: {
@@ -237,6 +272,7 @@ export const groupsModule = createStoreModule(initialState, {
     filteredGroupIds,
     focusedGroup,
     focusedGroupId,
+    getFocusedGroupMembers,
     getFeaturedGroups,
     getGroup,
     getInScopeGroups,

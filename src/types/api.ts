@@ -294,6 +294,26 @@ export type Group = {
  */
 export type GroupIdentifier = NonNullable<Group['id'] | Group['groupid']>;
 
+export type GroupMember = {
+  authority: string;
+  userid: string;
+  username: string;
+  display_name: string | null;
+  roles: string[];
+  actions: string[];
+  created: string;
+  updated: string;
+};
+
+export type GroupMembers = {
+  meta: {
+    page: {
+      total: number;
+    };
+  };
+  data: GroupMember[];
+};
+
 /**
  * Query parameters for an `/api/search` API call.
  *

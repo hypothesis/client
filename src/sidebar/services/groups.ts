@@ -2,7 +2,7 @@ import shallowEqual from 'shallowequal';
 
 // @ts-ignore - TS doesn't know about SVG files.
 import { default as logo } from '../../images/icons/logo.svg';
-import type { Group } from '../../types/api';
+import type { Group, GroupMember, GroupMembers } from '../../types/api';
 import type { SidebarSettings } from '../../types/config';
 import type { Service } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
@@ -22,6 +22,8 @@ const DEFAULT_ORGANIZATION = {
   name: '__DEFAULT__',
   logo: 'data:image/svg+xml;utf8,' + encodeURIComponent(logo),
 };
+
+const MEMBERS_PAGE_SIZE = 100;
 
 /**
  * For any group that does not have an associated organization, populate with
@@ -440,6 +442,8 @@ export class GroupsService {
    * Update the focused group. Update the store, then check to see if
    * there are any new (unsaved) annotations—if so, update those annotations
    * such that they are associated with the newly-focused group.
+   *
+   * Additionally, fetch focused group members and load them into the store.
    */
   focus(groupId: string) {
     const prevGroupId = this._store.focusedGroupId();
@@ -464,6 +468,15 @@ export class GroupsService {
       // Persist this group as the last focused group default
       this._store.setDefault('focusedGroup', newGroupId);
     }
+
+    if (
+      // For now, group members are going to be used for at-mentions only, so we
+      // can skip loading them if the feature is not enabled
+      this._store.isFeatureEnabled('at_mentions') &&
+      this._store.getFocusedGroupMembers() === null
+    ) {
+      this._loadFocusedGroupMembers(groupId).catch(e => console.error(e));
+    }
   }
 
   /**
@@ -476,6 +489,52 @@ export class GroupsService {
     return this._api.group.member.delete({
       pubid: id,
       userid: 'me',
+    });
+  }
+
+  /**
+   * Fetch members for focused group from the API and load them into the store.
+   */
+  private async _loadFocusedGroupMembers(groupId: string): Promise<void> {
+    // Open groups do not have members, so we can save the API calls
+    const members =
+      this._store.focusedGroup()?.type === 'open'
+        ? []
+        : await this._fetchAllMembers(groupId);
+    this._store.loadFocusedGroupMembers(members);
+  }
+
+  private async _fetchAllMembers(groupId: string): Promise<GroupMember[]> {
+    // Fetch first page of members, to determine how many more pages there are
+    const firstPage = await this._fetchMembers(groupId);
+    const remainingMembers = firstPage.meta.page.total - MEMBERS_PAGE_SIZE;
+    let members = firstPage.data;
+
+    if (remainingMembers <= 0) {
+      return members;
+    }
+
+    const pages = Math.min(
+      Math.ceil(remainingMembers / MEMBERS_PAGE_SIZE) + 1,
+      // Do not try to load more than 10 pages, to avoid long loading times and
+      // hitting the server too much
+      10,
+    );
+    // Start at 1 to skip loading first page
+    for (let i = 1; i < pages; i++) {
+      // TODO Consider parallelizing requests
+      const groupMembers = await this._fetchMembers(groupId, i + 1);
+      members = members.concat(groupMembers.data);
+    }
+
+    return members;
+  }
+
+  private _fetchMembers(groupId: string, page = 1): Promise<GroupMembers> {
+    return this._api.group.members.read({
+      pubid: groupId,
+      'page[number]': page,
+      'page[size]': MEMBERS_PAGE_SIZE,
     });
   }
 }
