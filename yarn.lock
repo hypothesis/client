@@ -4071,8 +4071,8 @@ __metadata:
   linkType: hard
 
 "@trivago/prettier-plugin-sort-imports@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "@trivago/prettier-plugin-sort-imports@npm:5.2.0"
+  version: 5.2.1
+  resolution: "@trivago/prettier-plugin-sort-imports@npm:5.2.1"
   dependencies:
     "@babel/generator": ^7.26.2
     "@babel/parser": ^7.26.2
@@ -4084,7 +4084,7 @@ __metadata:
     "@vue/compiler-sfc": 3.x
     prettier: 2.x - 3.x
     prettier-plugin-svelte: 3.x
-    svelte: 4.x
+    svelte: 4.x || 5.x
   peerDependenciesMeta:
     "@vue/compiler-sfc":
       optional: true
@@ -4092,7 +4092,7 @@ __metadata:
       optional: true
     svelte:
       optional: true
-  checksum: d67eb233f095b7d4abee7d5e70e2b5eedc31f9f8c81772d8f9e355f7183d1c8ea87b23dddd34c0f6b925786382badcae2a5381cafaef6555072c98d421fe3cb7
+  checksum: 6c6741a0fa15ca931e7bff48c0d79c2d8afc7ff2bb6d8450de993c7ff71ec985da617b18eac91cd4f67994bd7758e9caeb18a3fac39206f3f155c51c1c3efe68
   languageName: node
   linkType: hard
 
