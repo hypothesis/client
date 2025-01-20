@@ -1,6 +1,6 @@
+import { ListenerCollection as ListenerCollection_ } from '@hypothesis/frontend-shared';
 import { delay } from '@hypothesis/frontend-testing';
 
-import { ListenerCollection as ListenerCollection_ } from '../../listener-collection';
 import {
   PortFinder as PortFinder_,
   PortProvider as PortProvider_,

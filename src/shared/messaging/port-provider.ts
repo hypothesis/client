@@ -1,8 +1,8 @@
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 import { TinyEmitter } from 'tiny-emitter';
 
 import type { Destroyable } from '../../types/annotator';
 import { captureErrors, sendError } from '../frame-error-capture';
-import { ListenerCollection } from '../listener-collection';
 import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
 import type { Message } from './port-util';
 

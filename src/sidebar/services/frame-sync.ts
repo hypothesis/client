@@ -1,9 +1,9 @@
 import type { ToastMessage } from '@hypothesis/frontend-shared';
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
 import type { DebouncedFunction } from 'lodash.debounce';
 import shallowEqual from 'shallowequal';
 
-import { ListenerCollection } from '../../shared/listener-collection';
 import {
   PortFinder,
   PortRPC,

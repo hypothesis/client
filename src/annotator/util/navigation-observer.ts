@@ -1,5 +1,5 @@
 /* global Navigation */
-import { ListenerCollection } from '../../shared/listener-collection';
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 
 /**
  * Monkey-patch an object to observe calls to a method.

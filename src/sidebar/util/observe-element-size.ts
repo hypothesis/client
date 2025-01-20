@@ -1,4 +1,4 @@
-import { ListenerCollection } from '../../shared/listener-collection';
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 
 /**
  * Watch for changes in the size (`clientWidth` and `clientHeight`) of

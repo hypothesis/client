@@ -1,4 +1,5 @@
-import { ListenerCollection } from '../shared/listener-collection';
+import { ListenerCollection } from '@hypothesis/frontend-shared';
+
 import type { PortRPC } from '../shared/messaging';
 import type { Anchor, Destroyable } from '../types/annotator';
 import type {

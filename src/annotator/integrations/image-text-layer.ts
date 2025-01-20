@@ -1,7 +1,7 @@
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
 import type { DebouncedFunction } from 'lodash.debounce';
 
-import { ListenerCollection } from '../../shared/listener-collection';
 import {
   rectCenter,
   rectsOverlapHorizontally,

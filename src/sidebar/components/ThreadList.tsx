@@ -1,8 +1,8 @@
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 
-import { ListenerCollection } from '../../shared/listener-collection';
 import type { Annotation, EPUBContentSelector } from '../../types/api';
 import type { Thread } from '../helpers/build-thread';
 import {
