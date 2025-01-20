@@ -1,6 +1,6 @@
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 import { TinyEmitter } from 'tiny-emitter';
 
-import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
 import { matchShortcut } from '../shared/shortcut';

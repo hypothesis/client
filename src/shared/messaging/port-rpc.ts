@@ -1,5 +1,6 @@
+import { ListenerCollection } from '@hypothesis/frontend-shared';
+
 import type { Destroyable } from '../../types/annotator';
-import { ListenerCollection } from '../listener-collection';
 
 /*
   This module was adapted from `index.js` in https://github.com/substack/frame-rpc.

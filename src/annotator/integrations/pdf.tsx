@@ -1,7 +1,7 @@
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
 import { TinyEmitter } from 'tiny-emitter';
 
-import { ListenerCollection } from '../../shared/listener-collection';
 import type {
   Anchor,
   AnnotationData,

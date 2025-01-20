@@ -1,7 +1,7 @@
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 import { TinyEmitter } from 'tiny-emitter';
 
 import { documentCFI, stripCFIAssertions } from '../../shared/cfi';
-import { ListenerCollection } from '../../shared/listener-collection';
 import type {
   Anchor,
   AnnotationData,

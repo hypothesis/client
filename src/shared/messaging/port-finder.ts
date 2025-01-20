@@ -1,5 +1,6 @@
+import { ListenerCollection } from '@hypothesis/frontend-shared';
+
 import type { Destroyable } from '../../types/annotator';
-import { ListenerCollection } from '../listener-collection';
 import { generateHexString } from '../random';
 import { isMessage } from './port-util';
 import type { Frame } from './port-util';

@@ -1,10 +1,10 @@
 import type { ToastMessage } from '@hypothesis/frontend-shared';
+import { ListenerCollection } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { render } from 'preact';
 
 import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
-import { ListenerCollection } from '../shared/listener-collection';
 import { PortRPC } from '../shared/messaging';
 import type {
   AnchorPosition,

@@ -1,4 +1,5 @@
-import { ListenerCollection } from '../shared/listener-collection';
+import { ListenerCollection } from '@hypothesis/frontend-shared';
+
 import { selectedRange } from './range-util';
 
 /**
