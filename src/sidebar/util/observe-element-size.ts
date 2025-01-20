@@ -1,5 +1,3 @@
-import { ListenerCollection } from '@hypothesis/frontend-shared';
-
 /**
  * Watch for changes in the size (`clientWidth` and `clientHeight`) of
  * an element.
@@ -15,50 +13,9 @@ export function observeElementSize(
   element: Element,
   onSizeChanged: (width: number, height: number) => void,
 ): () => void {
-  if (typeof ResizeObserver !== 'undefined') {
-    const observer = new ResizeObserver(() =>
-      onSizeChanged(element.clientWidth, element.clientHeight),
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }
-  const listeners = new ListenerCollection();
-
-  // Fallback method which listens for the most common events that result in
-  // element size changes:
-  //
-  // - Window size change
-  // - Media loading and adjusting size to content
-  // - DOM changes
-  //
-  // This is not comprehensive but it is simple to implement and good-enough for
-  // our current use cases.
-
-  let prevWidth = element.clientWidth;
-  let prevHeight = element.clientHeight;
-
-  const check = () => {
-    if (
-      prevWidth !== element.clientWidth ||
-      prevHeight !== element.clientHeight
-    ) {
-      prevWidth = element.clientWidth;
-      prevHeight = element.clientHeight;
-      onSizeChanged(prevWidth, prevHeight);
-    }
-  };
-
-  listeners.add(element, 'load', check);
-  listeners.add(window, 'resize', check);
-  const observer = new MutationObserver(check);
-  observer.observe(element, {
-    characterData: true,
-    childList: true,
-    subtree: true,
-  });
-
-  return () => {
-    listeners.removeAll();
-    observer.disconnect();
-  };
+  const observer = new ResizeObserver(() =>
+    onSizeChanged(element.clientWidth, element.clientHeight),
+  );
+  observer.observe(element);
+  return () => observer.disconnect();
 }
