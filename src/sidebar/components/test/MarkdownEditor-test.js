@@ -61,6 +61,16 @@ describe('MarkdownEditor', () => {
     );
   }
 
+  function typeInTextarea(wrapper, text, key = undefined) {
+    const textarea = wrapper.find('textarea');
+    const textareaDOMNode = textarea.getDOMNode();
+
+    textareaDOMNode.value = text;
+    textareaDOMNode.selectionStart = text.length;
+
+    textarea.simulate('keyup', { key });
+  }
+
   const commands = [
     {
       command: 'Bold',
@@ -380,18 +390,6 @@ describe('MarkdownEditor', () => {
   });
 
   context('when @mentions are enabled', () => {
-    function typeInTextarea(wrapper, text, key = undefined) {
-      const textarea = wrapper.find('textarea');
-      const textareaDOMNode = textarea.getDOMNode();
-
-      textareaDOMNode.value = text;
-      textareaDOMNode.selectionStart = text.length;
-      act(() =>
-        textareaDOMNode.dispatchEvent(new KeyboardEvent('keyup', { key })),
-      );
-      wrapper.update();
-    }
-
     function keyDownInTextarea(wrapper, key) {
       const textarea = wrapper.find('textarea');
       textarea.simulate('keydown', { key });
@@ -637,6 +635,31 @@ describe('MarkdownEditor', () => {
             .find('button')
             .filterWhere(el => el.text() === 'Preview');
           previewButton.simulate('click');
+
+          return wrapper;
+        },
+      },
+      {
+        name: 'Suggestions popover',
+        content: () => {
+          $imports.$restore({
+            // We need to render MentionPopover, as some aria attributes
+            // reference elements rendered by it
+            './MentionPopover': true,
+          });
+
+          const wrapper = createComponent(
+            {
+              mentionsEnabled: true,
+              usersForMentions: [
+                { username: 'one', displayName: 'johndoe' },
+                { username: 'two', displayName: 'johndoe' },
+                { username: 'three', displayName: 'johndoe' },
+              ],
+            },
+            { connected: true },
+          );
+          typeInTextarea(wrapper, '@johndoe');
 
           return wrapper;
         },

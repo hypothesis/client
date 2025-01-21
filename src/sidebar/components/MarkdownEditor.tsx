@@ -22,6 +22,7 @@ import type { Ref, JSX } from 'preact';
 import {
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -280,6 +281,29 @@ function TextArea({
     [onEditText, textareaRef],
   );
 
+  const usersListboxId = useId();
+  const accessibilityAttributes = useMemo((): JSX.TextareaHTMLAttributes => {
+    if (!popoverOpen) {
+      return {};
+    }
+
+    const selectedSuggestion = userSuggestions[highlightedSuggestion];
+    const activeDescendant = selectedSuggestion
+      ? `${usersListboxId}-${selectedSuggestion.username}`
+      : undefined;
+
+    return {
+      // These attributes follow the MDN instructions for aria-autocomplete
+      // See https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-autocomplete
+      role: 'combobox',
+      'aria-controls': usersListboxId,
+      'aria-expanded': true,
+      'aria-autocomplete': 'list',
+      'aria-haspopup': 'listbox',
+      'aria-activedescendant': activeDescendant,
+    };
+  }, [highlightedSuggestion, usersListboxId, popoverOpen, userSuggestions]);
+
   return (
     <div className="relative">
       <textarea
@@ -332,6 +356,7 @@ function TextArea({
           checkForMentionAtCaret(e.target as HTMLTextAreaElement);
         }}
         ref={textareaRef}
+        {...accessibilityAttributes}
       />
       {mentionsEnabled && (
         <MentionPopover
@@ -341,6 +366,7 @@ function TextArea({
           users={userSuggestions}
           highlightedSuggestion={highlightedSuggestion}
           onSelectUser={insertMention}
+          usersListboxId={usersListboxId}
         />
       )}
     </div>
