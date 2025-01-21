@@ -17,6 +17,8 @@ export type MentionPopoverProps = Pick<
   highlightedSuggestion: number;
   /** Invoked when a user is selected */
   onSelectUser: (selectedSuggestion: UserItem) => void;
+  /** Element ID for the user suggestions listbox */
+  usersListboxId: string;
 };
 
 /**
@@ -26,6 +28,7 @@ export default function MentionPopover({
   users,
   onSelectUser,
   highlightedSuggestion,
+  usersListboxId,
   ...popoverProps
 }: MentionPopoverProps) {
   return (
@@ -34,6 +37,7 @@ export default function MentionPopover({
         className="flex-col gap-y-0.5"
         role="listbox"
         aria-orientation="vertical"
+        id={usersListboxId}
       >
         {users.map((u, index) => (
           // These options are indirectly handled via keyboard event
@@ -42,6 +46,7 @@ export default function MentionPopover({
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events
           <li
             key={u.username}
+            id={`${usersListboxId}-${u.username}`}
             className={classnames(
               'flex justify-between items-center',
               'rounded p-2 hover:bg-grey-2',
