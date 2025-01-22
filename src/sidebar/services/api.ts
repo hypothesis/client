@@ -26,7 +26,7 @@ type APICall<
   Params = Record<string, Param | Param[]>,
   Body = void,
   Result = void,
-> = (params: Params, data?: Body) => Promise<Result>;
+> = (params: Params, data?: Body, signal?: AbortSignal) => Promise<Result>;
 
 /**
  * Callbacks invoked at various points during an API call to get an access token etc.
@@ -99,7 +99,7 @@ function createAPICall(
     onRequestFinished,
   }: APIMethodCallbacks,
 ): APICall<Record<string, any>, Record<string, any> | void, unknown> {
-  return async (params, data) => {
+  return async (params, data, signal) => {
     onRequestStarted();
     try {
       const [linksMap, token] = await Promise.all([links, getAccessToken()]);
@@ -143,12 +143,12 @@ function createAPICall(
       // nb. Don't "simplify" the lines below to `return fetchJSON(...)` as this
       // would cause `onRequestFinished` to be called before the API response
       // is received.
-      const result = await fetchJSON(apiURL.toString(), {
+      return await fetchJSON(apiURL.toString(), {
         body: data ? JSON.stringify(stripInternalProperties(data)) : null,
         headers,
         method: descriptor.method,
+        signal,
       });
-      return result;
     } finally {
       onRequestFinished();
     }

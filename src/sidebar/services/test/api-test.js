@@ -354,4 +354,19 @@ describe('APIService', () => {
       assert.equal(error.message, 'Missing API route: profile.read');
     });
   });
+
+  it('passes abort signal to `fetch` if provided', async () => {
+    expectCall('post', 'analytics/events');
+
+    const { signal } = new AbortController();
+
+    await api.analytics.events.create(
+      {},
+      { event: 'client.realtime.apply_updates' },
+      signal,
+    );
+
+    const [, options] = fetchMock.lastCall();
+    assert.equal(options.signal, signal);
+  });
 });
