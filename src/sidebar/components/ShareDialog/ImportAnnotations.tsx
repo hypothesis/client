@@ -142,7 +142,7 @@ function ImportAnnotations({
         <Link
           variant="text-light"
           underline="always"
-          href="https://web.hypothes.is/help/exporting-and-importing-annotations-in-the-hypothesis-web-app/"
+          href="https://web.hypothes.is/help/exporting-and-importing-annotations/"
           target="_blank"
         >
           Learn more
