@@ -20,9 +20,25 @@ export type Service = {
    * replaced with a promise to represent the result.
    */
   groups?: string[] | Promise<string[]> | '$rpc:requestGroups';
+
+  /** Allow the user to flag annotations for moderation. */
   allowFlagging?: boolean;
+
+  /** Allow the user to leave groups. */
   allowLeavingGroups?: boolean;
+
+  /** Enable share links on annotation cards. */
   enableShareLinks?: boolean;
+
+  /** Enable or disable the Share / Import / Export panel. */
+  enableShareImportExportPanel?: boolean;
+
+  /** Enable or disable user account menu. */
+  enableAccountMenu?: boolean;
+
+  /** Enable or disable the Help / Version panel. */
+  enableHelpPanel?: boolean;
+
   onHelpRequest?: () => void;
   onHelpRequestProvided?: boolean;
   onLoginRequest?: () => void;
