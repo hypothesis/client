@@ -386,6 +386,25 @@ describe('AnnotationEditor', () => {
     assert.isFalse(wrapper.find('AnnotationLicense').exists());
   });
 
+  [true, false].forEach(enableHelpPanel => {
+    it('hides help links if Help panel is disabled', () => {
+      fakeSettings = {
+        services: [
+          {
+            enableHelpPanel,
+          },
+        ],
+      };
+
+      const wrapper = createComponent();
+
+      assert.equal(
+        wrapper.find('MarkdownEditor').prop('showHelpLink'),
+        enableHelpPanel,
+      );
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([
