@@ -32,6 +32,26 @@ export type TopBarProps = {
   settings: SidebarSettings;
 };
 
+type ControlName = 'share' | 'account' | 'help';
+
+function controlEnabled(settings: SidebarSettings, name: ControlName) {
+  const config = serviceConfig(settings);
+  if (!config) {
+    return true;
+  }
+  switch (name) {
+    case 'share':
+      return config.enableShareImportExportPanel ?? true;
+    case 'account':
+      return config.enableAccountMenu ?? true;
+    case 'help':
+      return config.enableHelpPanel ?? true;
+    /* istanbul ignore next: unused default */
+    default:
+      return true;
+  }
+}
+
 /**
  * The toolbar which appears at the top of the sidebar providing actions
  * to switch groups, view account information, sort/filter annotations etc.
@@ -94,26 +114,32 @@ function TopBar({
             <>
               <SearchIconButton />
               <SortMenu />
-              <TopBarToggleButton
-                icon={ShareIcon}
-                expanded={isAnnotationsPanelOpen}
-                pressed={isAnnotationsPanelOpen}
-                onClick={toggleSharePanel}
-                title="Share annotations on this page"
-                data-testid="share-icon-button"
-              />
+              {controlEnabled(settings, 'share') && (
+                <TopBarToggleButton
+                  icon={ShareIcon}
+                  expanded={isAnnotationsPanelOpen}
+                  pressed={isAnnotationsPanelOpen}
+                  onClick={toggleSharePanel}
+                  title="Share annotations on this page"
+                  data-testid="share-icon-button"
+                />
+              )}
             </>
           )}
-          <TopBarToggleButton
-            icon={HelpIcon}
-            expanded={isHelpPanelOpen}
-            pressed={isHelpPanelOpen}
-            onClick={requestHelp}
-            title="Help"
-            data-testid="help-icon-button"
-          />
+          {controlEnabled(settings, 'help') && (
+            <TopBarToggleButton
+              icon={HelpIcon}
+              expanded={isHelpPanelOpen}
+              pressed={isHelpPanelOpen}
+              onClick={requestHelp}
+              title="Help"
+              data-testid="help-icon-button"
+            />
+          )}
           {isLoggedIn ? (
-            <UserMenu onLogout={onLogout} />
+            controlEnabled(settings, 'account') && (
+              <UserMenu onLogout={onLogout} />
+            )
           ) : (
             <div
               className="flex items-center text-md font-medium space-x-1 pl-1"

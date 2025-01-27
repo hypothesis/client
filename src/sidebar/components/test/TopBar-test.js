@@ -25,7 +25,7 @@ describe('TopBar', () => {
       notifyHost: sinon.stub(),
     };
 
-    fakeServiceConfig = sinon.stub().returns({});
+    fakeServiceConfig = sinon.stub().returns(null);
 
     fakeStreamer = {
       applyPendingUpdates: sinon.stub(),
@@ -102,6 +102,13 @@ describe('TopBar', () => {
         });
       });
     });
+
+    it('hides Help control if disabled', () => {
+      fakeServiceConfig.returns({ enableHelpPanel: false });
+      const wrapper = createTopBar();
+      const helpButton = getButton(wrapper, 'help-icon-button');
+      assert.isFalse(helpButton.exists());
+    });
   });
 
   describe('login/account actions', () => {
@@ -146,6 +153,18 @@ describe('TopBar', () => {
       assert.isTrue(userMenu.exists());
       assert.include(userMenu.props(), { onLogout });
     });
+
+    it('hides user menu if disabled', () => {
+      fakeStore.hasFetchedProfile.returns(true);
+      fakeStore.isLoggedIn.returns(true);
+      fakeServiceConfig.returns({
+        enableAccountMenu: false,
+      });
+
+      const onLogout = sinon.stub();
+      const wrapper = createTopBar({ onLogout });
+      assert.isFalse(wrapper.exists('UserMenu'));
+    });
   });
 
   context('when using a first-party service', () => {
@@ -153,6 +172,15 @@ describe('TopBar', () => {
       const wrapper = createTopBar();
       assert.isTrue(wrapper.exists('[title="Share annotations on this page"]'));
     });
+  });
+
+  it('hides share menu if disabled', () => {
+    fakeServiceConfig.returns({
+      enableShareImportExportPanel: false,
+    });
+    const wrapper = createTopBar();
+    const shareButton = getButton(wrapper, 'share-icon-button');
+    assert.isFalse(shareButton.exists());
   });
 
   it('toggles the share annotations panel when "Share" is clicked', () => {
