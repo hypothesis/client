@@ -57,6 +57,19 @@ describe('sidebar/helpers/session', () => {
         settings: { services: [{ onHelpRequestProvided: true }] },
         expected: false,
       },
+      {
+        description: 'help panel is disabled',
+        isSidebar: true,
+        sessionState: {},
+        settings: {
+          services: [
+            {
+              enableHelpPanel: false,
+            },
+          ],
+        },
+        expected: false,
+      },
     ].forEach(fixture => {
       it(`should calculate auto-display to be ${fixture.expected} when ${fixture.description}`, () => {
         const shouldDisplay = sessionUtil.shouldAutoDisplayTutorial(

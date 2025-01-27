@@ -24,12 +24,21 @@ export function shouldAutoDisplayTutorial(
   profile: Profile,
   settings: SidebarSettings,
 ): boolean {
+  if (!isSidebar) {
+    return false;
+  }
+
   const shouldShowBasedOnProfile =
     typeof profile.preferences === 'object' &&
     !!profile.preferences.show_sidebar_tutorial;
+  if (!shouldShowBasedOnProfile) {
+    return false;
+  }
 
-  const service = serviceConfig(settings) || { onHelpRequestProvided: false };
-  return (
-    isSidebar && !service.onHelpRequestProvided && shouldShowBasedOnProfile
-  );
+  const config = serviceConfig(settings);
+  if (config?.onHelpRequestProvided || config?.enableHelpPanel === false) {
+    return false;
+  }
+
+  return true;
 }
