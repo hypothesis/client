@@ -3,7 +3,7 @@ import {
   CancelIcon,
   GlobeIcon,
   GroupsIcon,
-  LockIcon,
+  LockFilledIcon,
   MenuExpandIcon,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
@@ -116,7 +116,7 @@ function AnnotationPublishControl({
               onClick={() => onSetPrivate(false)}
             />
             <MenuItem
-              icon={LockIcon}
+              icon={LockFilledIcon}
               label="Only Me"
               isSelected={isPrivate}
               onClick={() => onSetPrivate(true)}

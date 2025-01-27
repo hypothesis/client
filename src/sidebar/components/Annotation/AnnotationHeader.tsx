@@ -1,7 +1,7 @@
 import {
   LinkButton,
   HighlightIcon,
-  LockIcon,
+  LockFilledIcon,
 } from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
 
@@ -115,7 +115,7 @@ function AnnotationHeader({
     <header>
       <div className="flex gap-x-1 items-center flex-wrap-reverse">
         {isPrivate(annotation.permissions) && !isEditing && (
-          <LockIcon
+          <LockFilledIcon
             className="w-[12px] h-[12px]"
             title="This annotation is visible only to you"
           />

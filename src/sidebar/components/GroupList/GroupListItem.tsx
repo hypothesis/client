@@ -2,10 +2,10 @@ import {
   confirm,
   CopyIcon,
   ExternalIcon,
-  GlobeAltIcon,
-  GlobeAltLockIcon,
+  GlobeIcon,
+  GlobeLockIcon,
   LeaveIcon,
-  LockIcon,
+  LockFilledIcon,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
@@ -32,9 +32,9 @@ function GroupIcon({ type }: { type: GroupType }) {
       title={title}
       data-testid="group-icon"
     >
-      {type === 'open' && <GlobeAltIcon />}
-      {type === 'restricted' && <GlobeAltLockIcon />}
-      {type === 'private' && <LockIcon />}
+      {type === 'open' && <GlobeIcon />}
+      {type === 'restricted' && <GlobeLockIcon />}
+      {type === 'private' && <LockFilledIcon />}
     </div>
   );
 }

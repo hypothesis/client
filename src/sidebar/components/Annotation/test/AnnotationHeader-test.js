@@ -104,7 +104,7 @@ describe('AnnotationHeader', () => {
 
       const wrapper = createAnnotationHeader();
 
-      assert.isTrue(wrapper.find('LockIcon').exists());
+      assert.isTrue(wrapper.find('LockFilledIcon').exists());
     });
 
     it('should not render an "Only Me" icon if the annotation is being edited', () => {
@@ -112,7 +112,7 @@ describe('AnnotationHeader', () => {
 
       const wrapper = createAnnotationHeader({ isEditing: true });
 
-      assert.isFalse(wrapper.find('LockIcon').exists());
+      assert.isFalse(wrapper.find('LockFilledIcon').exists());
     });
 
     it('should not render an "Only Me" icon if the annotation is not private', () => {

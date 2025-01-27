@@ -3,7 +3,7 @@ import {
   Input,
   InputGroup,
   IconButton,
-  LockIcon,
+  LockFilledIcon,
 } from '@hypothesis/frontend-shared';
 import { useCallback } from 'preact/hooks';
 
@@ -94,7 +94,7 @@ function ShareAnnotations({ toastMessenger }: ShareAnnotationsProps) {
             )}{' '}
             <span>
               Private (
-              <LockIcon className="inline w-[14px] h-[14px] -mt-0.5" />{' '}
+              <LockFilledIcon className="inline w-[14px] h-[14px] -mt-0.5" />{' '}
               <em>Only Me</em>) annotations are only visible to you.
             </span>
           </p>
