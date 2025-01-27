@@ -380,6 +380,8 @@ type ToolbarProps = {
   /** Callback invoked when a toolbar button is clicked */
   onCommand: (command: Command) => void;
 
+  showHelpLink: boolean;
+
   /** Callback invoked when the "Preview" toggle button is clicked */
   onTogglePreview: () => void;
 };
@@ -392,7 +394,12 @@ type ToolbarProps = {
  * Canonical example
  * https://www.w3.org/TR/wai-aria-practices/examples/toolbar/toolbar.html
  */
-function Toolbar({ isPreviewing, onCommand, onTogglePreview }: ToolbarProps) {
+function Toolbar({
+  isPreviewing,
+  onCommand,
+  onTogglePreview,
+  showHelpLink,
+}: ToolbarProps) {
   const toolbarContainer = useRef(null);
   useArrowKeyNavigation(toolbarContainer);
 
@@ -468,25 +475,27 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }: ToolbarProps) {
         title="Bulleted list"
       />
       <div className="grow flex justify-end">
-        <Link
-          classes="text-grey-7 hover:!text-grey-7"
-          href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
-          target="_blank"
-          title="Formatting help"
-          aria-label="Formatting help"
-          underline="none"
-          variant="custom"
-        >
-          <div
-            className={classnames(
-              'flex justify-center items-center',
-              'touch:h-touch-minimum touch:w-touch-minimum',
-              'px-2 py-2.5 touch:p-0',
-            )}
+        {showHelpLink && (
+          <Link
+            classes="text-grey-7 hover:!text-grey-7"
+            href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
+            target="_blank"
+            title="Formatting help"
+            aria-label="Formatting help"
+            underline="none"
+            variant="custom"
           >
-            <HelpIcon className="w-2.5 h-2.5" />
-          </div>
-        </Link>
+            <div
+              className={classnames(
+                'flex justify-center items-center',
+                'touch:h-touch-minimum touch:w-touch-minimum',
+                'px-2 py-2.5 touch:p-0',
+              )}
+            >
+              <HelpIcon className="w-2.5 h-2.5" />
+            </div>
+          </Link>
+        )}
 
         <ToolbarButton
           label={isPreviewing ? 'Write' : 'Preview'}
@@ -515,6 +524,9 @@ export type MarkdownEditorProps = {
 
   onEditText?: (text: string) => void;
 
+  /** Whether to display the formatting help link in the toolbar. */
+  showHelpLink?: boolean;
+
   /**
    * Base list of users used to populate the @mentions suggestions, when
    * `mentionsEnabled` is `true`.
@@ -534,6 +546,7 @@ export default function MarkdownEditor({
   onEditText = () => {},
   text,
   textStyle = {},
+  showHelpLink = true,
   usersForMentions,
 }: MarkdownEditorProps) {
   // Whether the preview mode is currently active.
@@ -577,6 +590,7 @@ export default function MarkdownEditor({
         onCommand={handleCommand}
         isPreviewing={preview}
         onTogglePreview={togglePreview}
+        showHelpLink={showHelpLink}
       />
       {preview ? (
         <MarkdownView

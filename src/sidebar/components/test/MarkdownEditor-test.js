@@ -389,6 +389,14 @@ describe('MarkdownEditor', () => {
     assert.deepEqual(wrapper.find('MarkdownView').prop('style'), textStyle);
   });
 
+  [true, false].forEach(showHelpLink => {
+    it('hides help menu when `showHelpLink` is false', () => {
+      const wrapper = createComponent({ showHelpLink });
+      const helpLink = wrapper.find('Link[aria-label="Formatting help"]');
+      assert.equal(helpLink.exists(), showHelpLink);
+    });
+  });
+
   context('when @mentions are enabled', () => {
     function keyDownInTextarea(wrapper, key) {
       const textarea = wrapper.find('textarea');

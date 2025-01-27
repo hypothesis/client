@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
+import { serviceConfig } from '../../config/service-config';
 import {
   annotationRole,
   isReply,
@@ -52,6 +53,10 @@ function AnnotationEditor({
 
   const shouldShowLicense =
     !draft.isPrivate && group && group.type !== 'private';
+
+  // When the Help panel is disabled, also hide other help links in the app
+  // which link to external websites.
+  const showHelpLink = serviceConfig(settings)?.enableHelpPanel ?? true;
 
   const tags = draft.tags;
   const text = draft.text;
@@ -184,6 +189,7 @@ function AnnotationEditor({
         onEditText={onEditText}
         mentionsEnabled={mentionsEnabled}
         usersForMentions={usersWhoAnnotated}
+        showHelpLink={showHelpLink}
       />
       <TagEditor
         onAddTag={onAddTag}
