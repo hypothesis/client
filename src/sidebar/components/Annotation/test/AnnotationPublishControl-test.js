@@ -1,4 +1,8 @@
-import { GlobeIcon, GroupsIcon, LockIcon } from '@hypothesis/frontend-shared';
+import {
+  GlobeIcon,
+  GroupsIcon,
+  LockFilledIcon,
+} from '@hypothesis/frontend-shared';
 import {
   checkAccessibility,
   mockImportedComponents,
@@ -175,7 +179,7 @@ describe('AnnotationPublishControl', () => {
         const wrapper = createAnnotationPublishControl();
         const privateMenuItem = wrapper.find('MenuItem').at(1);
 
-        assert.equal(privateMenuItem.prop('icon'), LockIcon);
+        assert.equal(privateMenuItem.prop('icon'), LockFilledIcon);
       });
 
       it('should have an "Only me" label', () => {

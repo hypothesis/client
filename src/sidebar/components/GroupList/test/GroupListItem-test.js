@@ -381,17 +381,17 @@ describe('GroupListItem', () => {
   [
     {
       type: 'private',
-      expectedIcon: 'LockIcon',
+      expectedIcon: 'LockFilledIcon',
       expectedTitle: 'Private group',
     },
     {
       type: 'restricted',
-      expectedIcon: 'GlobeAltLockIcon',
+      expectedIcon: 'GlobeLockIcon',
       expectedTitle: 'Restricted group',
     },
     {
       type: 'open',
-      expectedIcon: 'GlobeAltIcon',
+      expectedIcon: 'GlobeIcon',
       expectedTitle: 'Public group',
     },
   ].forEach(({ type, expectedIcon, expectedTitle }) => {
