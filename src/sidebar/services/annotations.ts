@@ -17,6 +17,20 @@ import type { AnnotationActivityService } from './annotation-activity';
 import type { APIService } from './api';
 
 /**
+ * Wrap all occurrences of @mentions in provided text into the corresponding
+ * special tag, unless they are already wrapped.
+ *
+ * For example: `@someuser` with the `hypothes.is` authority would become
+ *  `<a data-hyp-mention data-userid="acct:someuser@hypothes.is">@someuser</a>`
+ */
+function mentionsToTags(text: string, authority: string): string {
+  return text.replace(/(^|[^<a>])@(\w+)/g, (match, prefix, username) => {
+    const userid = `acct:${username}@${authority}`;
+    return ` <a data-hyp-mention data-userid="${userid}">@${username}</a>`;
+  });
+}
+
+/**
  * A service for creating, updating and persisting annotations both in the
  * local store and on the backend via the API.
  */
@@ -46,10 +60,11 @@ export class AnnotationsService {
   private _applyDraftChanges(annotation: Annotation): Annotation {
     const changes: Partial<Annotation> = {};
     const draft = this._store.getDraft(annotation);
+    const authority = this._settings.services?.[0]?.authority ?? 'hypothes.is';
 
     if (draft) {
       changes.tags = draft.tags;
-      changes.text = draft.text;
+      changes.text = mentionsToTags(draft.text, authority);
       changes.permissions = draft.isPrivate
         ? privatePermissions(annotation.user)
         : sharedPermissions(annotation.user, annotation.group);
