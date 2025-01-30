@@ -492,20 +492,23 @@ export class GroupsService {
   }
 
   /**
-   * Fetch members for a group from the API and load them into the store as the
-   * members of the focused group.
+   * Fetch members for focused group from the API and load them into the store.
    */
-  async loadFocusedGroupMembers(groupId: string): Promise<void> {
+  async loadFocusedGroupMembers(): Promise<void> {
+    const groupId = this._store.focusedGroupId();
+    if (!groupId) {
+      return;
+    }
+
     // Abort previous loading, if any
     this._focusedMembersController?.abort();
 
     this._focusedMembersController = new AbortController();
     const { signal } = this._focusedMembersController;
 
+    this._store.startLoadingFocusedGroupMembers();
     const members = await this._fetchAllMembers(groupId, signal);
-    if (!signal?.aborted) {
-      this._store.loadFocusedGroupMembers(members);
-    }
+    this._store.loadFocusedGroupMembers(signal?.aborted ? null : members);
   }
 
   private async _fetchAllMembers(

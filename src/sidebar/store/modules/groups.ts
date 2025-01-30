@@ -7,6 +7,13 @@ import type { State as SessionState } from './session';
 
 type GroupID = Group['id'];
 
+/**
+ * `null`: Members not yet loaded for currently focused group
+ * 'loading': Members being currently loaded
+ * GroupMember[]: Members already loaded
+ */
+type FocusedGroupMembers = null | 'loading' | GroupMember[];
+
 export type State = {
   /**
    * When there are entries, only `groups` with `id`s included in this list
@@ -20,7 +27,7 @@ export type State = {
   focusedGroupId: string | null;
 
   /** Members of currently selected group */
-  focusedGroupMembers: GroupMember[] | null;
+  focusedGroupMembers: FocusedGroupMembers;
 };
 
 const initialState: State = {
@@ -100,7 +107,7 @@ const reducers = {
 
   LOAD_FOCUSED_GROUP_MEMBERS(
     state: State,
-    action: { focusedGroupMembers: GroupMember[] },
+    action: { focusedGroupMembers: FocusedGroupMembers },
   ) {
     if (!state.focusedGroupId) {
       throw new Error('A group needs to be focused before loading its members');
@@ -146,9 +153,18 @@ function loadGroups(groups: Group[]) {
 }
 
 /**
+ * Indicate lading members for focused group has started.
+ */
+function startLoadingFocusedGroupMembers() {
+  return makeAction(reducers, 'LOAD_FOCUSED_GROUP_MEMBERS', {
+    focusedGroupMembers: 'loading',
+  });
+}
+
+/**
  * Update members for focused group.
  */
-function loadFocusedGroupMembers(focusedGroupMembers: GroupMember[]) {
+function loadFocusedGroupMembers(focusedGroupMembers: GroupMember[] | null) {
   return makeAction(reducers, 'LOAD_FOCUSED_GROUP_MEMBERS', {
     focusedGroupMembers,
   });
@@ -158,7 +174,7 @@ function loadFocusedGroupMembers(focusedGroupMembers: GroupMember[]) {
  * Return list of members for focused group.
  * Null is returned if members are being loaded or a group is not focused.
  */
-function getFocusedGroupMembers(state: State): GroupMember[] | null {
+function getFocusedGroupMembers(state: State): FocusedGroupMembers {
   return state.focusedGroupMembers;
 }
 
@@ -270,6 +286,7 @@ export const groupsModule = createStoreModule(initialState, {
     filterGroups,
     focusGroup,
     loadGroups,
+    startLoadingFocusedGroupMembers,
     loadFocusedGroupMembers,
     clearGroups,
   },

@@ -92,6 +92,7 @@ describe('GroupsService', () => {
         route: sinon.stub().returns('sidebar'),
         isFeatureEnabled: sinon.stub().returns(false),
         getFocusedGroupMembers: sinon.stub().returns(null),
+        startLoadingFocusedGroupMembers: sinon.stub(),
         loadFocusedGroupMembers: sinon.stub(),
       },
     );
@@ -215,6 +216,16 @@ describe('GroupsService', () => {
   });
 
   describe('#loadFocusedGroupMembers', () => {
+    it('does nothing if no group is currently focused', async () => {
+      fakeStore.focusedGroupId.returns(null);
+
+      const svc = createService();
+      await svc.loadFocusedGroupMembers();
+
+      assert.notCalled(fakeStore.startLoadingFocusedGroupMembers);
+      assert.notCalled(fakeStore.loadFocusedGroupMembers);
+    });
+
     [
       { totalMembers: 48, expectedApiCalls: 1 },
       { totalMembers: 100, expectedApiCalls: 1 },
@@ -229,6 +240,8 @@ describe('GroupsService', () => {
       { totalMembers: 10_000, expectedApiCalls: 10 },
     ].forEach(({ totalMembers, expectedApiCalls }) => {
       it('calls members API as many times as needed, until all members are loaded', async () => {
+        fakeStore.focusedGroupId.returns('group');
+
         for (let page = 1; page <= expectedApiCalls; page++) {
           const itemsPerPage = Math.min(
             totalMembers - MEMBERS_PAGE_SIZE * (page - 1),
@@ -250,8 +263,9 @@ describe('GroupsService', () => {
         }
 
         const svc = createService();
-        await svc.loadFocusedGroupMembers('group');
+        await svc.loadFocusedGroupMembers();
 
+        assert.called(fakeStore.startLoadingFocusedGroupMembers);
         assert.calledWith(
           fakeStore.loadFocusedGroupMembers,
           // This function should have been called with the members returned by
@@ -268,6 +282,10 @@ describe('GroupsService', () => {
     });
 
     it('stops loading pages if another group is focused', async () => {
+      let focusedGroup = 'group';
+      fakeStore.focusedGroupId.callsFake(() => focusedGroup);
+      fakeStore.focusGroup.callsFake(id => (focusedGroup = id));
+
       let apiCallCount = 0;
       const expectedApiCalls = 3;
       const svc = createService();
@@ -278,8 +296,6 @@ describe('GroupsService', () => {
         // Focus another group after the third call. That will cancel subsequent
         // calls
         if (apiCallCount === expectedApiCalls) {
-          fakeStore.focusedGroupId.returns('another_group');
-          fakeStore.focusedGroupId.onFirstCall().returns('group');
           svc.focus('another_group');
         }
 
@@ -293,10 +309,10 @@ describe('GroupsService', () => {
         };
       });
 
-      await svc.loadFocusedGroupMembers('group');
+      await svc.loadFocusedGroupMembers();
 
       assert.callCount(fakeApi.group.members.read, expectedApiCalls);
-      assert.notCalled(fakeStore.loadFocusedGroupMembers);
+      assert.calledWith(fakeStore.loadFocusedGroupMembers, null);
     });
   });
 

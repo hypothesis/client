@@ -178,14 +178,13 @@ function AnnotationEditor({
   const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const usersWhoAnnotated = store.usersWhoAnnotated();
   const focusedGroupMembers = store.getFocusedGroupMembers();
-  const focusedGroupId = store.focusedGroupId();
 
   useEffect(() => {
     // Load members for focused group only if not yet loaded
-    if (mentionsEnabled && focusedGroupId && focusedGroupMembers === null) {
-      groupsService.loadFocusedGroupMembers(focusedGroupId);
+    if (mentionsEnabled && focusedGroupMembers === null) {
+      groupsService.loadFocusedGroupMembers();
     }
-  }, [focusedGroupId, focusedGroupMembers, groupsService, mentionsEnabled]);
+  }, [focusedGroupMembers, groupsService, mentionsEnabled]);
 
   return (
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */

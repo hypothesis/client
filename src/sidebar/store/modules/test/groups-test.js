@@ -194,6 +194,24 @@ describe('sidebar/store/modules/groups', () => {
     });
   });
 
+  describe('startLoadingFocusedGroupMembers', () => {
+    it('throws if trying to set group members before focusing a group', () => {
+      assert.throws(
+        () => store.startLoadingFocusedGroupMembers(),
+        'A group needs to be focused before loading its members',
+      );
+    });
+
+    it('sets loading state of group members', () => {
+      store.loadGroups([privateGroup]);
+      store.focusGroup(privateGroup.id);
+
+      assert.isNull(store.getState().groups.focusedGroupMembers);
+      store.startLoadingFocusedGroupMembers();
+      assert.equal(store.getState().groups.focusedGroupMembers, 'loading');
+    });
+  });
+
   describe('loadFocusedGroupMembers', () => {
     it('throws if trying to set group members before focusing a group', () => {
       assert.throws(
@@ -205,8 +223,9 @@ describe('sidebar/store/modules/groups', () => {
     it('sets group members', () => {
       store.loadGroups([privateGroup]);
       store.focusGroup(privateGroup.id);
-      store.loadFocusedGroupMembers([]);
 
+      assert.isNull(store.getState().groups.focusedGroupMembers);
+      store.loadFocusedGroupMembers([]);
       assert.deepEqual(store.getState().groups.focusedGroupMembers, []);
     });
   });
