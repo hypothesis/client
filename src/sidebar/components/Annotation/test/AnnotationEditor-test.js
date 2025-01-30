@@ -70,7 +70,6 @@ describe('AnnotationEditor', () => {
       isFeatureEnabled: sinon.stub().returns(false),
       usersWhoAnnotated: sinon.stub().returns([]),
       getFocusedGroupMembers: sinon.stub(),
-      focusedGroupId: sinon.stub().returns(null),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -416,56 +415,38 @@ describe('AnnotationEditor', () => {
   describe('loading focused group members', () => {
     [
       {
-        atMentionsEnabled: true,
+        mentionsEnabled: true,
         focusedGroupMembers: null,
-        focusedGroupId: 'group_id',
         shouldLoadMembers: true,
       },
       {
-        atMentionsEnabled: true,
+        mentionsEnabled: false,
         focusedGroupMembers: null,
-        focusedGroupId: null,
         shouldLoadMembers: false,
       },
       {
-        atMentionsEnabled: false,
-        focusedGroupMembers: null,
-        focusedGroupId: 'group_id',
-        shouldLoadMembers: false,
-      },
-      {
-        atMentionsEnabled: true,
+        mentionsEnabled: true,
         focusedGroupMembers: [],
-        focusedGroupId: 'group_id',
         shouldLoadMembers: false,
       },
       {
-        atMentionsEnabled: false,
-        focusedGroupMembers: [],
-        focusedGroupId: 'group_id',
+        mentionsEnabled: true,
+        focusedGroupMembers: 'loading',
         shouldLoadMembers: false,
       },
-    ].forEach(
-      ({
-        atMentionsEnabled,
-        focusedGroupMembers,
-        focusedGroupId,
-        shouldLoadMembers,
-      }) => {
-        it('loads focused group members when mounted', () => {
-          fakeStore.isFeatureEnabled.returns(atMentionsEnabled);
-          fakeStore.getFocusedGroupMembers.returns(focusedGroupMembers);
-          fakeStore.focusedGroupId.returns(focusedGroupId);
+    ].forEach(({ mentionsEnabled, focusedGroupMembers, shouldLoadMembers }) => {
+      it('loads focused group members when mounted', () => {
+        fakeStore.isFeatureEnabled.returns(mentionsEnabled);
+        fakeStore.getFocusedGroupMembers.returns(focusedGroupMembers);
 
-          createComponent();
+        createComponent();
 
-          assert.equal(
-            fakeGroupsService.loadFocusedGroupMembers.called,
-            shouldLoadMembers,
-          );
-        });
-      },
-    );
+        assert.equal(
+          fakeGroupsService.loadFocusedGroupMembers.called,
+          shouldLoadMembers,
+        );
+      });
+    });
   });
 
   it(
