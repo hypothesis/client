@@ -10,11 +10,13 @@ import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import type { AuthService } from '../services/auth';
 import type { FrameSyncService } from '../services/frame-sync';
+import type { NostrSettingsService } from '../services/nostr-settings';
 import type { SessionService } from '../services/session';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import AnnotationView from './AnnotationView';
 import HelpPanel from './HelpPanel';
+import NostrConnectPanel from './NostrConnectPanel';
 import NotebookView from './NotebookView';
 import ProfileView from './ProfileView';
 import ShareDialog from './ShareDialog';
@@ -30,6 +32,7 @@ export type HypothesisAppProps = {
   settings: SidebarSettings;
   session: SessionService;
   toastMessenger: ToastMessengerService;
+  nostrSettings: NostrSettingsService;
 };
 
 /**
@@ -44,6 +47,7 @@ function HypothesisApp({
   settings,
   session,
   toastMessenger,
+  nostrSettings,
 }: HypothesisAppProps) {
   const store = useSidebarStore();
   const profile = store.profile();
@@ -66,6 +70,7 @@ function HypothesisApp({
 
   const isThirdParty = isThirdPartyService(settings);
 
+  // TODO: remove this once Nostr is fully implemented
   const login = async () => {
     if (serviceConfig(settings)) {
       // Let the host page handle the login request
@@ -84,6 +89,7 @@ function HypothesisApp({
     }
   };
 
+  // TODO: remove this once Nostr is fully implemented
   const signUp = () => {
     if (serviceConfig(settings)) {
       // Let the host page handle the signup request
@@ -111,6 +117,7 @@ function HypothesisApp({
         ' unsaved annotations.\n' +
         'Do you really want to discard these drafts?';
     }
+
     return confirm({
       title: 'Discard drafts?',
       message,
@@ -118,20 +125,14 @@ function HypothesisApp({
     });
   };
 
-  const logout = async () => {
+  const nostrLogout = async () => {
     if (!(await promptToLogout())) {
       return;
     }
-    store.clearGroups();
+
     store.removeAnnotations(store.unsavedAnnotations());
     store.discardAllDrafts();
-
-    if (serviceConfig(settings)) {
-      frameSync.notifyHost('logoutRequested');
-      return;
-    }
-
-    session.logout();
+    nostrSettings.setPrivateKey(null);
   };
 
   return (
@@ -155,9 +156,7 @@ function HypothesisApp({
     >
       {!isModalRoute && (
         <TopBar
-          onLogin={login}
-          onSignUp={signUp}
-          onLogout={logout}
+          onNostrLogout={nostrLogout}
           isSidebar={isSidebar}
         />
       )}
@@ -166,6 +165,12 @@ function HypothesisApp({
         <HelpPanel />
         <SearchPanel />
         <ShareDialog shareTab={!isThirdParty} />
+        <NostrConnectPanel
+          onClose={() => store.toggleSidebarPanel('nostrConnect')}
+          onSavePrivateKey={privateKey =>
+            nostrSettings.setPrivateKey(privateKey)
+          }
+        />
 
         {route && (
           <main>
@@ -189,4 +194,5 @@ export default withServices(HypothesisApp, [
   'session',
   'settings',
   'toastMessenger',
+  'nostrSettings',
 ]);

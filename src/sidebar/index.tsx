@@ -31,6 +31,10 @@ import { GroupsService } from './services/groups';
 import { ImportAnnotationsService } from './services/import-annotations';
 import { LoadAnnotationsService } from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
+import { NostrFetchHighlightsService } from './services/nostr-fetch-highlights';
+import { NostrProfileService } from './services/nostr-profile';
+import { NostrRelaysService } from './services/nostr-relays';
+import { NostrSettingsService } from './services/nostr-settings';
 import { PersistedDefaultsService } from './services/persisted-defaults';
 import { RouterService } from './services/router';
 import { ServiceURLService } from './services/service-url';
@@ -156,6 +160,10 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
     .register('loadAnnotationsService', LoadAnnotationsService)
     .register('localStorage', LocalStorageService)
     .register('persistedDefaults', PersistedDefaultsService)
+    .register('nostrRelays', NostrRelaysService)
+    .register('nostrProfile', NostrProfileService)
+    .register('nostrSettings', NostrSettingsService)
+    .register('nostrFetchHighlights', NostrFetchHighlightsService)
     .register('router', RouterService)
     .register('serviceURL', ServiceURLService)
     .register('session', SessionService)

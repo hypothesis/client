@@ -11,6 +11,7 @@ import { filtersModule } from './modules/filters';
 import { framesModule } from './modules/frames';
 import { groupsModule } from './modules/groups';
 import { linksModule } from './modules/links';
+import { nostrModule } from './modules/nostr';
 import { realTimeUpdatesModule } from './modules/real-time-updates';
 import { routeModule } from './modules/route';
 import { selectionModule } from './modules/selection';
@@ -55,7 +56,9 @@ export function createSidebarStore(settings: SidebarSettings) {
     sidebarPanelsModule,
     toastMessagesModule,
     viewerModule,
+    nostrModule,
   ] as const;
+
   return createStore(modules, [settings], middleware);
 }
 

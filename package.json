@@ -116,6 +116,7 @@
   "main": "./build/boot.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
+    "build:dev": "cross-env NODE_ENV=development gulp build",
     "lint": "eslint --cache .",
     "checkformatting": "prettier --cache --check '**/*.{js,scss,ts,tsx,d.ts}'",
     "format": "prettier --cache --list-different --write '**/*.{js,scss,ts,tsx,d.ts}'",
@@ -123,5 +124,9 @@
     "test:watch": "gulp test --live",
     "typecheck": "tsc --build tsconfig.json"
   },
-  "packageManager": "yarn@3.6.0"
+  "packageManager": "yarn@3.6.0",
+  "dependencies": {
+    "@noble/hashes": "^1.7.1",
+    "nostr-tools": "^2.10.4"
+  }
 }

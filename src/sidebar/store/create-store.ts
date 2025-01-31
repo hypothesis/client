@@ -163,7 +163,22 @@ export function createStore<
   // to mutate it, which indicates a bug since it is supposed to be immutable.
   if (process.env.NODE_ENV !== 'production') {
     const originalReducer = reducer;
-    reducer = (state, action) => immutable(originalReducer(state, action));
+    
+    reducer = (state, action) => {
+      const newState = originalReducer(state, action);
+      
+      // Skip freezing the nostr namespace to avoid issues with private key buffers
+      const stateToFreeze = { ...newState };
+      
+      if ('nostr' in stateToFreeze) {
+        delete stateToFreeze.nostr;
+      }
+      
+      return {
+        ...immutable(stateToFreeze),
+        nostr: newState.nostr,
+      };
+    };
   }
 
   const store = redux.createStore(reducer, initialState, enhancer);

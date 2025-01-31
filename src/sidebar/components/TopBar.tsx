@@ -1,4 +1,9 @@
-import { LinkButton, HelpIcon, ShareIcon } from '@hypothesis/frontend-shared';
+import {
+  HelpIcon,
+  ShareIcon,
+  LinkButton,
+  Spinner,
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../types/config';
@@ -8,9 +13,9 @@ import { withServices } from '../service-context';
 import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
+import NostrUserMenu from './NostrUserMenu';
 import SortMenu from './SortMenu';
 import TopBarToggleButton from './TopBarToggleButton';
-import UserMenu from './UserMenu';
 import SearchIconButton from './search/SearchIconButton';
 import StreamSearchInput from './search/StreamSearchInput';
 
@@ -18,14 +23,8 @@ export type TopBarProps = {
   /** Flag indicating whether the app is in a sidebar context */
   isSidebar: boolean;
 
-  /** Callback invoked when user clicks "Login" button */
-  onLogin: () => void;
-
-  /** Callback invoked when user clicks "Logout" action in account menu */
-  onLogout: () => void;
-
-  /** Callback invoked when user clicks "Sign up" button */
-  onSignUp: () => void;
+  /** Callback invoked when user clicks "Logout" action in Nostr account menu */
+  onNostrLogout: () => void;
 
   // injected
   frameSync: FrameSyncService;
@@ -38,17 +37,13 @@ export type TopBarProps = {
  */
 function TopBar({
   isSidebar,
-  onLogin,
-  onLogout,
-  onSignUp,
+  onNostrLogout,
   frameSync,
   settings,
 }: TopBarProps) {
-  const loginLinkStyle = applyTheme(['accentColor'], settings);
-
   const store = useSidebarStore();
-  const isLoggedIn = store.isLoggedIn();
-  const hasFetchedProfile = store.hasFetchedProfile();
+  const nostrProfile = store.getProfile();
+  const isNostrProfileLoading = store.isProfileLoading();
 
   const toggleSharePanel = () => {
     store.toggleSidebarPanel('shareGroupAnnotations');
@@ -58,6 +53,11 @@ function TopBar({
   const isAnnotationsPanelOpen = store.isSidebarPanelOpen(
     'shareGroupAnnotations',
   );
+
+  const toggleNostrConnectPanel = () => {
+    store.toggleSidebarPanel('nostrConnect');
+  };
+  const isNostrConnectPanelOpen = store.isSidebarPanelOpen('nostrConnect');
 
   /**
    * Open the help panel, or, if a service callback is configured to handle
@@ -112,36 +112,21 @@ function TopBar({
             title="Help"
             data-testid="help-icon-button"
           />
-          {isLoggedIn ? (
-            <UserMenu onLogout={onLogout} />
-          ) : (
-            <div
-              className="flex items-center text-md font-medium space-x-1 pl-1"
-              data-testid="login-links"
+          {!nostrProfile ? (
+            <LinkButton
+              onClick={toggleNostrConnectPanel}
+              expanded={isNostrConnectPanelOpen}
+              data-testid="nostr-connect-button"
+              style={applyTheme(['accentColor'], settings)}
             >
-              {!isLoggedIn && !hasFetchedProfile && <span>⋯</span>}
-              {!isLoggedIn && hasFetchedProfile && (
-                <>
-                  <LinkButton
-                    classes="inline"
-                    onClick={onSignUp}
-                    style={loginLinkStyle}
-                    underline="none"
-                  >
-                    Sign up
-                  </LinkButton>
-                  <div>/</div>
-                  <LinkButton
-                    classes="inline"
-                    onClick={onLogin}
-                    style={loginLinkStyle}
-                    underline="none"
-                  >
-                    Log in
-                  </LinkButton>
-                </>
-              )}
+              Log in with Nostr
+            </LinkButton>
+          ) : isNostrProfileLoading ? (
+            <div className="flex items-center px-3">
+              <Spinner />
             </div>
+          ) : (
+            <NostrUserMenu onNostrLogout={onNostrLogout} />
           )}
         </div>
       </div>
