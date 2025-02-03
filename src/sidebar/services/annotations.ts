@@ -18,13 +18,14 @@ import type { APIService } from './api';
 
 /**
  * Wrap all occurrences of @mentions in provided text into the corresponding
- * special tag, unless they are already wrapped.
+ * special tag, as long as they are surrounded by "empty" space (space, tab, new
+ * line, or beginning/end of the whole text).
  *
  * For example: `@someuser` with the `hypothes.is` authority would become
  *  `<a data-hyp-mention data-userid="acct:someuser@hypothes.is">@someuser</a>`
  */
 function mentionsToTags(text: string, authority: string): string {
-  return text.replace(/(^|[^<a>])@(\w+)/g, (match, prefix, username) => {
+  return text.replace(/(?:^|\s)@(\w+)(?=\s|$)/g, (match, username) => {
     const userid = `acct:${username}@${authority}`;
     return ` <a data-hyp-mention data-userid="${userid}">@${username}</a>`;
   });
@@ -119,6 +120,7 @@ export class AnnotationsService {
         hidden: false,
         links: {},
         document: { title: '' },
+        mentions: [],
       },
       annotationData,
     );
