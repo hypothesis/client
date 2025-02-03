@@ -538,6 +538,14 @@ export type MarkdownEditorProps = {
 };
 
 /**
+ * Replace all mentions wrapped in the special `<a data-hyp-mention />`tag with
+ * their corresponding plain-text representation
+ */
+function unwrapMentions(text: string) {
+  return text.replace(/<a[^>]*data-hyp-mention[^>]*>([^<]*)<\/a>/g, '$1');
+}
+
+/**
  * Viewer/editor for the body of an annotation in markdown format.
  */
 export default function MarkdownEditor({
@@ -554,6 +562,8 @@ export default function MarkdownEditor({
 
   // The input element where the user inputs their comment.
   const input = useRef<HTMLTextAreaElement>(null);
+
+  const textWithoutMentionTags = useMemo(() => unwrapMentions(text), [text]);
 
   useEffect(() => {
     if (!preview) {
@@ -613,7 +623,7 @@ export default function MarkdownEditor({
           containerRef={input}
           onKeyDown={handleKeyDown}
           onEditText={onEditText}
-          value={text}
+          value={textWithoutMentionTags}
           style={textStyle}
           mentionsEnabled={mentionsEnabled}
           usersForMentions={usersForMentions}
