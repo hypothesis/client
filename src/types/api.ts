@@ -158,6 +158,12 @@ export type UserInfo = {
   display_name: string | null;
 };
 
+export type Mention = UserInfo & {
+  userid: string;
+  username: string;
+  link: string;
+};
+
 /**
  * Represents an annotation as returned by the h API.
  * API docs: https://h.readthedocs.io/en/latest/api-reference/#tag/annotations
@@ -222,6 +228,8 @@ export type APIAnnotationData = {
    * current assignment, course etc. to annotations.
    */
   metadata?: object;
+
+  mentions: Mention[];
 };
 
 /**

@@ -151,7 +151,7 @@ function insertMath(html: string, mathBlocks: MathBlock[]) {
  */
 export function renderMathAndMarkdown(markdown: string): string {
   // KaTeX takes care of escaping its input, so we want to avoid passing its
-  // output through the HTML sanitizer. Therefore we first extract the math
+  // output through the HTML sanitizer. Therefore, we first extract the math
   // blocks from the input, render and sanitize the remaining markdown and then
   // render and re-insert the math blocks back into the output.
   const mathInfo = extractMath(markdown);

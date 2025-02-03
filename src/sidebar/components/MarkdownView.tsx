@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 
+import type { Mention } from '../../types/api';
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
 import StyledText from './StyledText';
@@ -9,7 +10,31 @@ export type MarkdownViewProps = {
   markdown: string;
   classes?: string;
   style?: Record<string, string>;
+  mentions?: Mention[];
 };
+
+function replaceMentionTags(element: HTMLElement, mentions: Mention[] = []) {
+  const mentionLinks = element.querySelectorAll('a[data-hyp-mention]');
+  for (const mentionLink of mentionLinks) {
+    const mentionUserId = (mentionLink as HTMLElement).dataset.userid;
+    const mention =
+      mentionUserId && mentions.find(m => m.userid === mentionUserId);
+
+    if (mention) {
+      // If the mention exists in the list of mentions, render it as a link to
+      // the user profile
+      mentionLink.setAttribute('href', mention.link);
+      mentionLink.setAttribute('target', '_blank');
+    } else {
+      // If it doesn't, convert it to "plain text"
+      const plainTextMention = document.createElement('span');
+      plainTextMention.textContent = mentionLink.textContent;
+      plainTextMention.style.fontStyle = 'italic';
+      plainTextMention.style.borderBottom = 'dotted';
+      mentionLink.parentElement?.replaceChild(plainTextMention, mentionLink);
+    }
+  }
+}
 
 /**
  * A component which renders markdown as HTML and replaces recognized links
@@ -19,6 +44,7 @@ export default function MarkdownView({
   markdown,
   classes,
   style,
+  mentions,
 }: MarkdownViewProps) {
   const html = useMemo(
     () => (markdown ? renderMathAndMarkdown(markdown) : ''),
@@ -34,6 +60,10 @@ export default function MarkdownView({
       className: 'w-full md:w-[380px]',
     });
   }, [markdown]);
+
+  useEffect(() => {
+    replaceMentionTags(content.current!, mentions);
+  }, [html, mentions]);
 
   // NB: The following could be implemented by setting attribute props directly
   // on `StyledText` (which renders a `div` itself), versus introducing a child
