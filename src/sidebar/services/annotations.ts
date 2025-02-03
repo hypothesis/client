@@ -61,7 +61,8 @@ export class AnnotationsService {
   private _applyDraftChanges(annotation: Annotation): Annotation {
     const changes: Partial<Annotation> = {};
     const draft = this._store.getDraft(annotation);
-    const authority = this._settings.services?.[0]?.authority ?? 'hypothes.is';
+    const authority =
+      this._settings.services?.[0]?.authority ?? this._store.defaultAuthority();
 
     if (draft) {
       changes.tags = draft.tags;
