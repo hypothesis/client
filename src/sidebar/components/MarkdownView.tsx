@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import type { Mention } from '../../types/api';
+import { renderMentionTags } from '../helpers/mentions';
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
 import StyledText from './StyledText';
@@ -14,39 +15,6 @@ export type MarkdownViewProps = {
   style?: Record<string, string>;
   mentions?: Mention[];
 };
-
-function replaceMentionTags(
-  element: HTMLElement,
-  mentions: Mention[] = [],
-): Array<[Mention, HTMLElement]> {
-  const mentionLinks = element.querySelectorAll('a[data-hyp-mention]');
-  const foundMentions: Array<[Mention, HTMLElement]> = [];
-
-  for (const mentionLink of mentionLinks) {
-    const htmlMentionLink = mentionLink as HTMLElement;
-    const mentionUserId = htmlMentionLink.dataset.userid;
-    const mention =
-      mentionUserId && mentions.find(m => m.userid === mentionUserId);
-
-    if (mention) {
-      // If the mention exists in the list of mentions, render it as a link to
-      // the user profile
-      mentionLink.setAttribute('href', mention.link);
-      mentionLink.setAttribute('target', '_blank');
-
-      foundMentions.push([mention, htmlMentionLink]);
-    } else {
-      // If it doesn't, convert it to "plain text"
-      const plainTextMention = document.createElement('span');
-      plainTextMention.textContent = mentionLink.textContent;
-      plainTextMention.style.fontStyle = 'italic';
-      plainTextMention.style.borderBottom = 'dotted';
-      mentionLink.parentElement?.replaceChild(plainTextMention, mentionLink);
-    }
-  }
-
-  return foundMentions;
-}
 
 /**
  * A component which renders markdown as HTML and replaces recognized links
@@ -79,9 +47,23 @@ export default function MarkdownView({
 
   useEffect(() => {
     const listenerCollection = new ListenerCollection();
-    const foundMentions = replaceMentionTags(content.current!, mentions);
+    const foundMentions = renderMentionTags(content.current!, mentions);
 
-    for (const [mention, element] of foundMentions) {
+    // listenerCollection.add(content.current!, 'mouseenter', ({ target }) => {
+    //   const element = target as HTMLElement;
+    //   const mention = foundMentions.get(element) ?? null;
+    //
+    //   if (mention) {
+    //     setActiveMention(mention);
+    //     mentionsPopoverAnchorRef.current = element;
+    //   }
+    // });
+    // listenerCollection.add(content.current!, 'mouseleave', () => {
+    //   setActiveMention(null);
+    //   mentionsPopoverAnchorRef.current = null;
+    // });
+
+    for (const [element, mention] of foundMentions.entries()) {
       listenerCollection.add(element, 'mouseenter', () => {
         setActiveMention(mention);
         mentionsPopoverAnchorRef.current = element;
