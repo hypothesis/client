@@ -7,6 +7,7 @@ import type {
 } from '../../types/api';
 import type { AnnotationEventType, SidebarSettings } from '../../types/config';
 import * as metadata from '../helpers/annotation-metadata';
+import { wrapMentions } from '../helpers/mentions';
 import {
   defaultPermissions,
   privatePermissions,
@@ -15,21 +16,6 @@ import {
 import type { SidebarStore } from '../store';
 import type { AnnotationActivityService } from './annotation-activity';
 import type { APIService } from './api';
-
-/**
- * Wrap all occurrences of @mentions in provided text into the corresponding
- * special tag, as long as they are surrounded by "empty" space (space, tab, new
- * line, or beginning/end of the whole text).
- *
- * For example: `@someuser` with the `hypothes.is` authority would become
- *  `<a data-hyp-mention data-userid="acct:someuser@hypothes.is">@someuser</a>`
- */
-function mentionsToTags(text: string, authority: string): string {
-  return text.replace(/(?:^|\s)@(\w+)(?=\s|$)/g, (match, username) => {
-    const userid = `acct:${username}@${authority}`;
-    return ` <a data-hyp-mention data-userid="${userid}">@${username}</a>`;
-  });
-}
 
 /**
  * A service for creating, updating and persisting annotations both in the
@@ -66,7 +52,7 @@ export class AnnotationsService {
 
     if (draft) {
       changes.tags = draft.tags;
-      changes.text = mentionsToTags(draft.text, authority);
+      changes.text = wrapMentions(draft.text, authority);
       changes.permissions = draft.isPrivate
         ? privatePermissions(annotation.user)
         : sharedPermissions(annotation.user, annotation.group);

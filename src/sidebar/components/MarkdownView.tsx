@@ -1,4 +1,5 @@
 import { ListenerCollection, Popover } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import type { Mention } from '../../types/api';
@@ -101,7 +102,13 @@ export default function MarkdownView({
   // a review in the future.
   return (
     <div className="w-full break-anywhere cursor-text">
-      <StyledText classes="relative">
+      <StyledText
+        classes={classnames(
+          // A `relative` wrapper around the `Popover` component is needed for
+          // when the native Popover API is not supported.
+          'relative',
+        )}
+      >
         <div
           className={classes}
           data-testid="markdown-text"

@@ -29,6 +29,7 @@ import {
 } from 'preact/hooks';
 
 import { isMacOS } from '../../shared/user-agent';
+import { unwrapMentions } from '../helpers/mentions';
 import {
   LinkType,
   convertSelectionToLink,
@@ -536,14 +537,6 @@ export type MarkdownEditorProps = {
    */
   usersForMentions: UserItem[];
 };
-
-/**
- * Replace all mentions wrapped in the special `<a data-hyp-mention />`tag with
- * their corresponding plain-text representation
- */
-function unwrapMentions(text: string) {
-  return text.replace(/<a[^>]*data-hyp-mention[^>]*>([^<]*)<\/a>/g, '$1');
-}
 
 /**
  * Viewer/editor for the body of an annotation in markdown format.
