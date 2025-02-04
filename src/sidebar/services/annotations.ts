@@ -6,6 +6,7 @@ import type {
   SavedAnnotation,
 } from '../../types/api';
 import type { AnnotationEventType, SidebarSettings } from '../../types/config';
+import { parseAccountID } from '../helpers/account-id';
 import * as metadata from '../helpers/annotation-metadata';
 import { wrapMentions } from '../helpers/mentions';
 import {
@@ -48,7 +49,8 @@ export class AnnotationsService {
     const changes: Partial<Annotation> = {};
     const draft = this._store.getDraft(annotation);
     const authority =
-      this._settings.services?.[0]?.authority ?? this._store.defaultAuthority();
+      parseAccountID(this._store.profile().userid)?.provider ??
+      this._store.defaultAuthority();
 
     if (draft) {
       changes.tags = draft.tags;
