@@ -40,6 +40,7 @@ import {
   getContainingWordOffsets,
   termBeforePosition,
 } from '../util/term-before-position';
+import { getCaretCoordinates } from '../util/textarea-caret-position';
 import MarkdownView from './MarkdownView';
 import MentionPopover from './MentionPopover';
 
@@ -216,6 +217,7 @@ function TextArea({
   const [activeMention, setActiveMention] = useState<string>();
   const textareaRef = useSyncedRef(containerRef);
   const [highlightedSuggestion, setHighlightedSuggestion] = useState(0);
+  const caretElementRef = useRef<HTMLDivElement>(null);
   const userSuggestions = useMemo(() => {
     if (!mentionsEnabled || activeMention === undefined) {
       return [];
@@ -240,9 +242,14 @@ function TextArea({
         return;
       }
 
+      // Re-position mention popover anchor element at the caret.
+      const { x, y } = getCaretCoordinates(textarea);
+      if (caretElementRef.current) {
+        caretElementRef.current.style.transform = `translate(${x}px, ${y}px)`;
+      }
+
       const term = termBeforePosition(textarea.value, textarea.selectionStart);
       const isAtMention = term.startsWith('@');
-
       setPopoverOpen(isAtMention);
       setActiveMention(isAtMention ? term.substring(1) : undefined);
 
@@ -358,11 +365,15 @@ function TextArea({
         ref={textareaRef}
         {...accessibilityAttributes}
       />
+      <div
+        ref={caretElementRef}
+        className="absolute top-0 left-0 w-0 h-0 pointer-events-none"
+      />
       {mentionsEnabled && (
         <MentionPopover
           open={popoverOpen}
           onClose={() => setPopoverOpen(false)}
-          anchorElementRef={textareaRef}
+          anchorElementRef={caretElementRef}
           users={userSuggestions}
           highlightedSuggestion={highlightedSuggestion}
           onSelectUser={insertMention}
