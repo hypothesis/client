@@ -49,30 +49,29 @@ export default function MarkdownView({
     const listenerCollection = new ListenerCollection();
     const foundMentions = renderMentionTags(content.current!, mentions);
 
-    // listenerCollection.add(content.current!, 'mouseenter', ({ target }) => {
-    //   const element = target as HTMLElement;
-    //   const mention = foundMentions.get(element) ?? null;
-    //
-    //   if (mention) {
-    //     setActiveMention(mention);
-    //     mentionsPopoverAnchorRef.current = element;
-    //   }
-    // });
-    // listenerCollection.add(content.current!, 'mouseleave', () => {
-    //   setActiveMention(null);
-    //   mentionsPopoverAnchorRef.current = null;
-    // });
+    listenerCollection.add(
+      content.current!,
+      'mouseenter',
+      ({ target }) => {
+        const element = target as HTMLElement;
+        const mention = foundMentions.get(element) ?? null;
 
-    for (const [element, mention] of foundMentions.entries()) {
-      listenerCollection.add(element, 'mouseenter', () => {
-        setActiveMention(mention);
-        mentionsPopoverAnchorRef.current = element;
-      });
-      listenerCollection.add(element, 'mouseleave', () => {
+        if (mention) {
+          setActiveMention(mention);
+          mentionsPopoverAnchorRef.current = element;
+        }
+      },
+      { capture: true },
+    );
+    listenerCollection.add(
+      content.current!,
+      'mouseleave',
+      () => {
         setActiveMention(null);
         mentionsPopoverAnchorRef.current = null;
-      });
-    }
+      },
+      { capture: true },
+    );
 
     return () => listenerCollection.removeAll();
   }, [html, mentions]);
