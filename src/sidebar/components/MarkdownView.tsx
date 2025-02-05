@@ -16,6 +16,17 @@ export type MarkdownViewProps = {
   mentions?: Mention[];
 };
 
+function MentionPopoverContent({ mention }: { mention: Mention }) {
+  return (
+    <div className="flex flex-col gap-y-1.5">
+      <div className="text-md font-bold">@{mention.username}</div>
+      {mention.display_name && (
+        <div className="text-color-text-light">{mention.display_name}</div>
+      )}
+    </div>
+  );
+}
+
 /**
  * A component which renders markdown as HTML and replaces recognized links
  * with embedded video/audio.
@@ -33,7 +44,9 @@ export default function MarkdownView({
   const content = useRef<HTMLDivElement | null>(null);
 
   const hasMentions = !!mentions?.length;
-  const [activeMention, setActiveMention] = useState<Mention | null>(null);
+  const [popoverContent, setPopoverContent] = useState<Mention | string | null>(
+    null,
+  );
   const mentionsPopoverAnchorRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -61,7 +74,7 @@ export default function MarkdownView({
         const mention = foundMentions.get(element) ?? null;
 
         if (mention) {
-          setActiveMention(mention);
+          setPopoverContent(mention);
           mentionsPopoverAnchorRef.current = element;
         }
       },
@@ -71,7 +84,7 @@ export default function MarkdownView({
       content.current!,
       'mouseleave',
       () => {
-        setActiveMention(null);
+        setPopoverContent(null);
         mentionsPopoverAnchorRef.current = null;
       },
       { capture: true },
@@ -103,20 +116,20 @@ export default function MarkdownView({
         />
         {hasMentions && (
           <Popover
-            open={!!activeMention}
-            onClose={() => setActiveMention(null)}
+            open={!!popoverContent}
+            onClose={() => setPopoverContent(null)}
             anchorElementRef={mentionsPopoverAnchorRef}
+            classes="px-3 py-2"
           >
-            <div className="flex flex-col gap-y-1.5 px-3 py-2">
-              <div className="text-md font-bold">
-                @{activeMention?.username}
-              </div>
-              {activeMention?.display_name && (
-                <div className="text-color-text-light">
-                  {activeMention.display_name}
-                </div>
-              )}
-            </div>
+            {typeof popoverContent === 'string' && (
+              <>
+                No user with username{' '}
+                <span className="font-bold">{popoverContent}</span> exists
+              </>
+            )}
+            {popoverContent !== null && typeof popoverContent === 'object' && (
+              <MentionPopoverContent mention={popoverContent} />
+            )}
           </Popover>
         )}
       </StyledText>
