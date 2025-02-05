@@ -36,13 +36,13 @@ export function unwrapMentions(text: string) {
 type InvalidUsername = string;
 
 /**
- * Searches for mention tags inside an HTML element, and tries to match them
- * with a provided list of mentions.
+ * Search for mention tags inside an HTML element, and try to match them with a
+ * provided list of mentions.
  * Those that are valid are rendered as links, and those that are not are styled
  * in a way that it's possible to visually identify them.
  *
- * @return - Map of HTML elements that matched, with their corresponding mention
- *           or invalid username
+ * @return - Map of HTML elements that matched a mention tag, with their
+ *           corresponding mention or invalid username
  */
 export function renderMentionTags(
   element: HTMLElement,
