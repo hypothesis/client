@@ -1,4 +1,9 @@
-import { parseAccountID, username, isThirdPartyUser } from '../account-id';
+import {
+  parseAccountID,
+  username,
+  isThirdPartyUser,
+  buildAccountID,
+} from '../account-id';
 
 describe('sidebar/helpers/account-id', () => {
   const term = 'acct:hacker@example.com';
@@ -13,6 +18,25 @@ describe('sidebar/helpers/account-id', () => {
 
     it('should return null if the ID is invalid', () => {
       assert.equal(parseAccountID('bogus'), null);
+    });
+  });
+
+  describe('buildAccountID', () => {
+    [
+      {
+        username: 'john',
+        provider: 'hypothes.is',
+        expectedAccountID: 'acct:john@hypothes.is',
+      },
+      {
+        username: 'jane',
+        provider: 'example.com',
+        expectedAccountID: 'acct:jane@example.com',
+      },
+    ].forEach(({ username, provider, expectedAccountID }) => {
+      it('builds userid for username and provider', () => {
+        assert.equal(buildAccountID(username, provider), expectedAccountID);
+      });
     });
   });
 

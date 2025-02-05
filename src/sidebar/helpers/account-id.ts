@@ -18,6 +18,14 @@ export function parseAccountID(user: string | null) {
 }
 
 /**
+ * Build H account names of the form 'acct:<username>@<provider>'
+ * from a username and provider.
+ */
+export function buildAccountID(username: string, provider: string): string {
+  return `acct:${username}@${provider}`;
+}
+
+/**
  * Returns the username part of an account ID or an empty string.
  */
 export function username(user: string | null) {
