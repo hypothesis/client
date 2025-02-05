@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import type { Mention } from '../../types/api';
+import type { InvalidUsername } from '../helpers/mentions';
 import { renderMentionTags } from '../helpers/mentions';
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
@@ -44,9 +45,9 @@ export default function MarkdownView({
   const content = useRef<HTMLDivElement | null>(null);
 
   const hasMentions = !!mentions?.length;
-  const [popoverContent, setPopoverContent] = useState<Mention | string | null>(
-    null,
-  );
+  const [popoverContent, setPopoverContent] = useState<
+    Mention | InvalidUsername | null
+  >(null);
   const mentionsPopoverAnchorRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {

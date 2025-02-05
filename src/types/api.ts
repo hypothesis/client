@@ -161,7 +161,14 @@ export type UserInfo = {
 export type Mention = UserInfo & {
   userid: string;
   username: string;
-  link: string;
+  link: string | null;
+
+  /**
+   * The userid at the moment the mention was created.
+   * If the user changes their username later, this can be used to still match
+   * the right mention tag in the annotation text.
+   */
+  original_userid: string;
 };
 
 /**
@@ -229,7 +236,10 @@ export type APIAnnotationData = {
    */
   metadata?: object;
 
-  mentions: Mention[];
+  /**
+   * List of unique users that were mentioned in the annotation text.
+   */
+  mentions?: Mention[];
 };
 
 /**

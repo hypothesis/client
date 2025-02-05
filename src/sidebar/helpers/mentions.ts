@@ -22,7 +22,7 @@ export function wrapMentions(text: string, authority: string): string {
 
 /**
  * Replace all mentions wrapped in the special `<a data-hyp-mention />` tag with
- * their corresponding plain-text representation
+ * their plain-text representation.
  */
 export function unwrapMentions(text: string) {
   const tmp = document.createElement('div');
@@ -33,7 +33,7 @@ export function unwrapMentions(text: string) {
   return tmp.innerHTML;
 }
 
-type InvalidUsername = string;
+export type InvalidUsername = string;
 
 /**
  * Search for mention tags inside an HTML element, and try to match them with a
@@ -58,8 +58,10 @@ export function renderMentionTags(
       mentionUserId && mentions.find(m => m.userid === mentionUserId);
 
     if (mention) {
+      // TODO If the link is null, convert the mention link into a different tag
+
       // If the mention exists in the list of mentions, render it as a link
-      mentionLink.setAttribute('href', mention.link);
+      mentionLink.setAttribute('href', mention.link ?? '');
       mentionLink.setAttribute('target', '_blank');
 
       foundMentions.set(htmlMentionLink, mention);
