@@ -158,6 +158,24 @@ export type UserInfo = {
   display_name: string | null;
 };
 
+export type Mention = {
+  /** Current userid for the user that was mentioned */
+  userid: string;
+  /** Current username for the user that was mentioned */
+  username: string;
+  /** Current display name for the user that was mentioned */
+  display_name: string | null;
+  /** Link to the user profile, if applicable */
+  link: string | null;
+
+  /**
+   * The userid at the moment the mention was created.
+   * If the user changes their username later, this can be used to match the
+   * right mention tag in the annotation text.
+   */
+  original_userid: string;
+};
+
 /**
  * Represents an annotation as returned by the h API.
  * API docs: https://h.readthedocs.io/en/latest/api-reference/#tag/annotations
