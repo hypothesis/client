@@ -46,6 +46,10 @@ export default function MarkdownView({
   }, [markdown]);
 
   useEffect(() => {
+    if (!hasMentions) {
+      return () => {};
+    }
+
     const listenerCollection = new ListenerCollection();
     const foundMentions = renderMentionTags(content.current!, mentions);
 
@@ -74,7 +78,7 @@ export default function MarkdownView({
     );
 
     return () => listenerCollection.removeAll();
-  }, [html, mentions]);
+  }, [hasMentions, html, mentions]);
 
   // NB: The following could be implemented by setting attribute props directly
   // on `StyledText` (which renders a `div` itself), versus introducing a child
@@ -102,9 +106,17 @@ export default function MarkdownView({
             open={!!activeMention}
             onClose={() => setActiveMention(null)}
             anchorElementRef={mentionsPopoverAnchorRef}
-            classes="p-2"
           >
-            {activeMention?.display_name ?? activeMention?.username}
+            <div className="flex flex-col gap-y-1.5 px-3 py-2">
+              <div className="text-md font-bold">
+                @{activeMention?.username}
+              </div>
+              {activeMention?.display_name && (
+                <div className="text-color-text-light">
+                  {activeMention.display_name}
+                </div>
+              )}
+            </div>
           </Popover>
         )}
       </StyledText>

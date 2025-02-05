@@ -37,13 +37,13 @@ export function unwrapMentions(text: string) {
  * Searches for mention tags inside an HTML element, and tries to match them
  * with a provided list of mentions.
  * Those that are valid are rendered as links, and those that are not are styled
- * so that it is possible to identify them.
+ * in a way that it's possible to visually identify them.
  *
  * @return - Map of HTML elements with their corresponding mention
  */
 export function renderMentionTags(
   element: HTMLElement,
-  mentions: Mention[] = [],
+  mentions: Mention[],
 ): Map<HTMLElement, Mention> {
   const mentionLinks = element.querySelectorAll('a[data-hyp-mention]');
   const foundMentions = new Map<HTMLElement, Mention>();
@@ -55,19 +55,18 @@ export function renderMentionTags(
       mentionUserId && mentions.find(m => m.userid === mentionUserId);
 
     if (mention) {
-      // If the mention exists in the list of mentions, render it as a link to
-      // the user profile
+      // If the mention exists in the list of mentions, render it as a link
       mentionLink.setAttribute('href', mention.link);
       mentionLink.setAttribute('target', '_blank');
 
       foundMentions.set(htmlMentionLink, mention);
     } else {
       // If it doesn't, convert it to "plain text"
-      const plainTextMention = document.createElement('span');
-      plainTextMention.textContent = mentionLink.textContent;
-      plainTextMention.style.fontStyle = 'italic';
-      plainTextMention.style.borderBottom = 'dotted';
-      mentionLink.parentElement?.replaceChild(plainTextMention, mentionLink);
+      const invalidMentionElement = document.createElement('span');
+      invalidMentionElement.textContent = mentionLink.textContent;
+      invalidMentionElement.style.fontStyle = 'italic';
+      invalidMentionElement.style.borderBottom = 'dotted';
+      mentionLink.replaceWith(invalidMentionElement);
     }
   }
 
