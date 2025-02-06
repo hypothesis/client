@@ -30,16 +30,16 @@ import {
 
 import { isMacOS } from '../../shared/user-agent';
 import {
+  getContainingMentionOffsets,
+  termBeforePosition,
+} from '../helpers/mentions';
+import {
   LinkType,
   convertSelectionToLink,
   toggleBlockStyle,
   toggleSpanStyle,
 } from '../markdown-commands';
 import type { EditorState } from '../markdown-commands';
-import {
-  getContainingWordOffsets,
-  termBeforePosition,
-} from '../util/term-before-position';
 import { getCaretCoordinates } from '../util/textarea-caret-position';
 import MarkdownView from './MarkdownView';
 import MentionPopover from './MentionPopover';
@@ -264,7 +264,7 @@ function TextArea({
     (suggestion: UserItem) => {
       const textarea = textareaRef.current!;
       const { value } = textarea;
-      const { start, end } = getContainingWordOffsets(
+      const { start, end } = getContainingMentionOffsets(
         value,
         textarea.selectionStart,
       );

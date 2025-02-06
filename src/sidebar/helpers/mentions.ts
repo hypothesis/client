@@ -1,6 +1,19 @@
 import type { Mention } from '../../types/api';
 import { buildAccountID } from './account-id';
 
+// Pattern that matches characters treated as the boundary of a mention.
+const BOUNDARY_CHARS = String.raw`[\s,.;:|?!'"\-()[\]{}]`;
+
+// Pattern that matches Hypothesis usernames.
+// See https://github.com/hypothesis/h/blob/797d9a4/h/models/user.py#L25
+const USERNAME_PAT = '[A-Za-z0-9_][A-Za-z0-9._]+[A-Za-z0-9_]';
+
+// Pattern that finds user mentions in text.
+const MENTIONS_PAT = new RegExp(
+  `(^|${BOUNDARY_CHARS})@(${USERNAME_PAT})(?=${BOUNDARY_CHARS}|$)`,
+  'g',
+);
+
 /**
  * Wrap all occurrences of @mentions in provided text into the corresponding
  * special tag, as long as they are surrounded by "empty" space (space, tab, new
@@ -10,22 +23,15 @@ import { buildAccountID } from './account-id';
  *  `<a data-hyp-mention data-userid="acct:someuser@hypothes.is">@someuser</a>`
  */
 export function wrapMentions(text: string, authority: string): string {
-  return text.replace(
-    // Capture both the potential empty character before the mention (space, tab
-    // or new line), and the term following the `@` character.
-    // When we build the mention tag, we need to prepend that empty character to
-    // avoid altering the spacing and structure of the text.
-    /(^|\s)@(\w+)(?=\s|$)/g,
-    (match, precedingWhitespace, username) => {
-      const tag = document.createElement('a');
+  return text.replace(MENTIONS_PAT, (match, precedingChar, username) => {
+    const tag = document.createElement('a');
 
-      tag.setAttribute('data-hyp-mention', '');
-      tag.setAttribute('data-userid', buildAccountID(username, authority));
-      tag.textContent = `@${username}`;
+    tag.setAttribute('data-hyp-mention', '');
+    tag.setAttribute('data-userid', buildAccountID(username, authority));
+    tag.textContent = `@${username}`;
 
-      return `${precedingWhitespace}${tag.outerHTML}`;
-    },
-  );
+    return `${precedingChar}${tag.outerHTML}`;
+  });
 }
 
 /**
@@ -114,4 +120,51 @@ export function renderMentionTags(
   }
 
   return foundMentions;
+}
+
+/**
+ * Returns the word at a specific position in a string, surrounded by empty
+ * characters or punctuation characters.
+ */
+export function termBeforePosition(text: string, position: number): string {
+  const { start } = getContainingMentionOffsets(text, position);
+  return text.slice(start, position);
+}
+
+export type WordOffsets = {
+  start: number;
+  end: number;
+};
+
+/**
+ * Returns the `start` and `end` positions for the word or mention that overlaps
+ * with provided reference position.
+ *
+ * For example, given the text "hello @hypothesis", and the reference position 9
+ * (which corresponds to the `y` character) it will return the start and end of
+ * the `@hypothesis` mention, hence { start: 6, end: 17 }.
+ *
+ * Useful to get the offsets of the mention matching the caret position in text
+ * inputs and textareas.
+ */
+export function getContainingMentionOffsets(
+  text: string,
+  referencePosition: number,
+): WordOffsets {
+  const precedingText = text.slice(0, referencePosition);
+  const matches = [...precedingText.matchAll(new RegExp(BOUNDARY_CHARS, 'g'))];
+  const precedingCharPos =
+    matches.length > 0 ? Math.max(...matches.map(match => match.index)) : -1;
+
+  const subsequentCharPos = text
+    .slice(referencePosition)
+    .search(new RegExp(BOUNDARY_CHARS));
+
+  return {
+    start: precedingCharPos + 1,
+    end:
+      subsequentCharPos === -1
+        ? text.length
+        : referencePosition + subsequentCharPos,
+  };
 }
