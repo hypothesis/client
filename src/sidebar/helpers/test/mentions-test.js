@@ -1,4 +1,10 @@
-import { renderMentionTags, unwrapMentions, wrapMentions } from '../mentions';
+import {
+  renderMentionTags,
+  unwrapMentions,
+  wrapMentions,
+  getContainingMentionOffsets,
+  termBeforePosition,
+} from '../mentions';
 
 const mentionTag = (username, authority) =>
   `<a data-hyp-mention="" data-userid="acct:${username}@${authority}">@${username}</a>`;
@@ -40,15 +46,34 @@ look at ${mentionTag('foo', 'example.com')} comment`,
   },
   // Multiple mentions
   {
-    text: 'Hey @jane look at this quote from @rob',
+    text: 'Hey @jane, look at this quote from @rob',
     authority: 'example.com',
-    textWithTags: `Hey ${mentionTag('jane', 'example.com')} look at this quote from ${mentionTag('rob', 'example.com')}`,
+    textWithTags: `Hey ${mentionTag('jane', 'example.com')}, look at this quote from ${mentionTag('rob', 'example.com')}`,
+  },
+  // Mentions wrapped in punctuation chars
+  {
+    text: '(@jane) {@rob} and @john?',
+    authority: 'example.com',
+    textWithTags: `(${mentionTag('jane', 'example.com')}) {${mentionTag('rob', 'example.com')}} and ${mentionTag('john', 'example.com')}?`,
+  },
+  // username-like patterns with invalid chars should be ignored
+  {
+    text: 'Hello @not+a/user=name',
+    authority: 'example.com',
+    textWithTags: `Hello @not+a/user=name`,
   },
   // Email addresses should be ignored
   {
     text: 'Ignore email: noreply@hypothes.is',
     authority: 'example.com',
     textWithTags: 'Ignore email: noreply@hypothes.is',
+  },
+  // Trailing dots should not be considered part of the mention, but dots
+  // in-between should
+  {
+    text: 'Hello @jane.doe.',
+    authority: 'example.com',
+    textWithTags: `Hello ${mentionTag('jane.doe', 'example.com')}.`,
   },
 ].forEach(({ text, authority, textWithTags }) => {
   describe('wrapMentions', () => {
@@ -117,5 +142,129 @@ describe('renderMentionTags', () => {
     assert.equal(fourthElement.tagName, 'SPAN');
     assert.isFalse(fourthElement.hasAttribute('data-hyp-mention'));
     assert.equal(fourthMention, '@user_id_missing');
+  });
+});
+
+// To make these tests more predictable, we place the `$` sign in the position
+// to be checked. That way it's easier to see what is the "word" preceding it.
+// The test will then get the `$` sign index and remove it from the text
+// before passing it to `termBeforePosition`.
+[
+  // First and last positions
+  {
+    text: '$Hello world',
+    expectedTerm: '',
+    expectedOffsets: { start: 0, end: 5 },
+  },
+  {
+    text: 'Hello world$',
+    expectedTerm: 'world',
+    expectedOffsets: { start: 6, end: 11 },
+  },
+
+  // Position in the middle of words
+  {
+    text: 'Hell$o world',
+    expectedTerm: 'Hell',
+    expectedOffsets: { start: 0, end: 5 },
+  },
+  {
+    text: 'Hello wor$ld',
+    expectedTerm: 'wor',
+    expectedOffsets: { start: 6, end: 11 },
+  },
+
+  // Position preceded by "empty space"
+  {
+    text: 'Hello $world',
+    expectedTerm: '',
+    expectedOffsets: { start: 6, end: 11 },
+  },
+  {
+    text: `Text with
+      multiple
+      $
+      lines
+      `,
+    expectedTerm: '',
+    expectedOffsets: { start: 31, end: 31 },
+  },
+
+  // Position preceded by/in the middle of a word for multi-line text
+  {
+    text: `Text with$
+      multiple
+
+      lines
+      `,
+    expectedTerm: 'with',
+    expectedOffsets: { start: 5, end: 9 },
+  },
+  {
+    text: `Text with
+      multiple
+
+      li$nes
+      `,
+    expectedTerm: 'li',
+    expectedOffsets: { start: 32, end: 37 },
+  },
+
+  // Including punctuation characters
+  ...[
+    ',',
+    '.',
+    ';',
+    ':',
+    '|',
+    '?',
+    '!',
+    "'",
+    '"',
+    '-',
+    '(',
+    ')',
+    '[',
+    ']',
+    '{',
+    '}',
+  ].flatMap(char => [
+    {
+      text: `Foo${char}$ bar`,
+      expectedTerm: '',
+      expectedOffsets: { start: 4, end: 4 },
+    },
+    {
+      text: `${char}Foo$ bar`,
+      expectedTerm: 'Foo',
+      expectedOffsets: { start: 1, end: 4 },
+    },
+    {
+      text: `hello ${char}fo$o${char} bar`,
+      expectedTerm: 'fo',
+      expectedOffsets: { start: 7, end: 10 },
+    },
+  ]),
+].forEach(({ text, expectedTerm, expectedOffsets }) => {
+  // Get the position of the `$` sign in the text, then remove it
+  const position = text.indexOf('$');
+  const textWithoutDollarSign = text.replace('$', '');
+
+  describe('termBeforePosition', () => {
+    it('returns the term right before provided position', () => {
+      assert.equal(
+        termBeforePosition(textWithoutDollarSign, position),
+        expectedTerm,
+      );
+    });
+  });
+
+  describe('getContainingMentionOffsets', () => {
+    it('returns expected offsets', () => {
+      assert.deepEqual(
+        getContainingMentionOffsets(textWithoutDollarSign, position),
+        expectedOffsets,
+      );
+    });
   });
 });
