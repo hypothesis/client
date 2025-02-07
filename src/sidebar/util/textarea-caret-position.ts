@@ -72,7 +72,7 @@ export function getCaretCoordinates(textarea: HTMLTextAreaElement): {
     // Adjust scroll position to match the textarea. For this to work, the
     // scrollable height of the mirror must be at least equal to the scrollable
     // height of the text area.
-    mirrorDiv.style.overflow = 'scroll';
+    mirrorDiv.style.overflowY = 'auto';
     mirrorDiv.scrollTop = textarea.scrollTop;
 
     // Capture caret position relative to top-left corner of textarea.
