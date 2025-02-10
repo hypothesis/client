@@ -6,7 +6,9 @@ import type {
   SavedAnnotation,
 } from '../../types/api';
 import type { AnnotationEventType, SidebarSettings } from '../../types/config';
+import { parseAccountID } from '../helpers/account-id';
 import * as metadata from '../helpers/annotation-metadata';
+import { wrapMentions } from '../helpers/mentions';
 import {
   defaultPermissions,
   privatePermissions,
@@ -46,10 +48,16 @@ export class AnnotationsService {
   private _applyDraftChanges(annotation: Annotation): Annotation {
     const changes: Partial<Annotation> = {};
     const draft = this._store.getDraft(annotation);
+    const authority =
+      parseAccountID(this._store.profile().userid)?.provider ??
+      this._store.defaultAuthority();
+    const mentionsEnabled = this._store.isFeatureEnabled('at_mentions');
 
     if (draft) {
       changes.tags = draft.tags;
-      changes.text = draft.text;
+      changes.text = mentionsEnabled
+        ? wrapMentions(draft.text, authority)
+        : draft.text;
       changes.permissions = draft.isPrivate
         ? privatePermissions(annotation.user)
         : sharedPermissions(annotation.user, annotation.group);
