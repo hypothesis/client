@@ -5,7 +5,9 @@ import {
 import { mount } from '@hypothesis/frontend-testing';
 import { render } from 'preact';
 import { act } from 'preact/test-utils';
+import sinon from 'sinon';
 
+import { wrapMentions } from '../../helpers/mentions';
 import { LinkType } from '../../markdown-commands';
 import MarkdownEditor, { $imports } from '../MarkdownEditor';
 
@@ -311,6 +313,14 @@ describe('MarkdownEditor', () => {
     const inputField = wrapper.find('textarea');
     assert.equal(inputField.prop('aria-label'), 'Enter comment');
     assert.equal(inputField.prop('placeholder'), 'Enter comment');
+  });
+
+  it('unwraps mention tags', () => {
+    const wrapper = createComponent({
+      text: wrapMentions('Hello @bob', 'hypothes.is'),
+    });
+
+    assert.equal(wrapper.find('TextArea').prop('value'), 'Hello @bob');
   });
 
   describe('keyboard navigation', () => {
