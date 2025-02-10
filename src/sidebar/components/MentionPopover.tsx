@@ -48,7 +48,7 @@ export default function MentionPopover({
             key={u.username}
             id={`${usersListboxId}-${u.username}`}
             className={classnames(
-              'flex justify-between items-center',
+              'flex justify-between items-center gap-x-2',
               'rounded p-2 hover:bg-grey-2',
               {
                 'bg-grey-2': highlightedSuggestion === index,
