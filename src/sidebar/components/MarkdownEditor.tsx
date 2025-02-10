@@ -32,6 +32,7 @@ import { isMacOS } from '../../shared/user-agent';
 import {
   getContainingMentionOffsets,
   termBeforePosition,
+  unwrapMentions,
 } from '../helpers/mentions';
 import {
   LinkType,
@@ -566,6 +567,8 @@ export default function MarkdownEditor({
   // The input element where the user inputs their comment.
   const input = useRef<HTMLTextAreaElement>(null);
 
+  const textWithoutMentionTags = useMemo(() => unwrapMentions(text), [text]);
+
   useEffect(() => {
     if (!preview) {
       input.current?.focus();
@@ -624,7 +627,7 @@ export default function MarkdownEditor({
           containerRef={input}
           onKeyDown={handleKeyDown}
           onEditText={onEditText}
-          value={text}
+          value={textWithoutMentionTags}
           style={textStyle}
           mentionsEnabled={mentionsEnabled}
           usersForMentions={usersForMentions}
