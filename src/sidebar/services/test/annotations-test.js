@@ -1,3 +1,5 @@
+import sinon from 'sinon';
+
 import * as fixtures from '../../test/annotation-fixtures';
 import { AnnotationsService, $imports } from '../annotations';
 
@@ -67,6 +69,8 @@ describe('AnnotationsService', () => {
       selectTab: sinon.stub(),
       setExpanded: sinon.stub(),
       updateFlagStatus: sinon.stub(),
+      defaultAuthority: sinon.stub().returns('hypothes.is'),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     setLoggedIn(true);
@@ -503,6 +507,40 @@ describe('AnnotationsService', () => {
         assert.notInclude(annotationWithChanges.permissions.read, [
           'group:__world__',
         ]);
+      });
+    });
+
+    [
+      {
+        profile: { userid: 'acct:foo@bar.com' },
+        mentionsEnabled: false,
+        expectedText: 'hello @bob',
+      },
+      {
+        profile: { userid: 'acct:foo@bar.com' },
+        mentionsEnabled: true,
+        expectedText:
+          'hello <a data-hyp-mention="" data-userid="acct:bob@bar.com">@bob</a>',
+      },
+      {
+        profile: { userid: 'acct:foo' },
+        mentionsEnabled: true,
+        expectedText:
+          'hello <a data-hyp-mention="" data-userid="acct:bob@hypothes.is">@bob</a>',
+      },
+    ].forEach(({ profile, mentionsEnabled, expectedText }) => {
+      it('wraps mentions in tags when feature is enabled', async () => {
+        fakeStore.isFeatureEnabled.returns(mentionsEnabled);
+        fakeStore.profile.returns(profile);
+        fakeStore.getDraft.returns({ text: 'hello @bob' });
+
+        await svc.save(fixtures.defaultAnnotation());
+
+        assert.calledWith(
+          fakeApi.annotation.create,
+          {},
+          sinon.match({ text: expectedText }),
+        );
       });
     });
 
