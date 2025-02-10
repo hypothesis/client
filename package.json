@@ -95,7 +95,7 @@
     "shallowequal": "^1.1.0",
     "showdown": "^2.0.0",
     "sinon": "^19.0.2",
-    "tailwindcss": "^3.0.2",
+    "tailwindcss": "^4.0.5",
     "tiny-emitter": "^2.0.2",
     "typescript": "^5.0.2",
     "typescript-eslint": "^8.10.0",
