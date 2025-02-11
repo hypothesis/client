@@ -240,6 +240,12 @@ export type APIAnnotationData = {
    * current assignment, course etc. to annotations.
    */
   metadata?: object;
+
+  /**
+   * List of unique users that were mentioned in the annotation text.
+   * This prop will be present only if `at_mentions` is enabled.
+   */
+  mentions?: Mention[];
 };
 
 /**

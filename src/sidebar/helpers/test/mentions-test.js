@@ -126,21 +126,25 @@ describe('renderMentionTags', () => {
       firstElement.getAttribute('href'),
       'http://example.com/janedoe',
     );
+    assert.equal(firstElement.dataset.hypMentionType, 'link');
     assert.equal(firstMention, mentions[0]);
 
     // Second element will render as a highlighted span
     assert.equal(secondElement.tagName, 'SPAN');
     assert.equal(secondElement.dataset.userid, 'acct:johndoe@hypothes.is');
-    assert.isTrue(secondElement.hasAttribute('data-hyp-mention'));
+    assert.equal(secondElement.dataset.hypMentionType, 'no-link');
+    assert.isTrue(secondElement.hasAttribute('data-userid'));
     assert.equal(secondMention, mentions[1]);
 
     // Third and fourth elements will be invalid mentions wrapping the invalid
     // username
     assert.equal(thirdElement.tagName, 'SPAN');
-    assert.isFalse(thirdElement.hasAttribute('data-hyp-mention'));
+    assert.isFalse(thirdElement.hasAttribute('data-userid'));
+    assert.equal(thirdElement.dataset.hypMentionType, 'invalid');
     assert.equal(thirdMention, '@invalid');
     assert.equal(fourthElement.tagName, 'SPAN');
-    assert.isFalse(fourthElement.hasAttribute('data-hyp-mention'));
+    assert.isFalse(fourthElement.hasAttribute('data-userid'));
+    assert.equal(fourthElement.dataset.hypMentionType, 'invalid');
     assert.equal(fourthMention, '@user_id_missing');
   });
 });

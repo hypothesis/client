@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 
+import type { Mention } from '../../types/api';
+import { renderMentionTags } from '../helpers/mentions';
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
 import StyledText from './StyledText';
@@ -9,6 +11,7 @@ export type MarkdownViewProps = {
   markdown: string;
   classes?: string;
   style?: Record<string, string>;
+  mentions?: Mention[];
 };
 
 /**
@@ -19,6 +22,7 @@ export default function MarkdownView({
   markdown,
   classes,
   style,
+  mentions,
 }: MarkdownViewProps) {
   const html = useMemo(
     () => (markdown ? renderMathAndMarkdown(markdown) : ''),
@@ -34,6 +38,10 @@ export default function MarkdownView({
       className: 'w-full md:w-[380px]',
     });
   }, [markdown]);
+
+  useEffect(() => {
+    renderMentionTags(content.current!, mentions ?? []);
+  }, [mentions]);
 
   // NB: The following could be implemented by setting attribute props directly
   // on `StyledText` (which renders a `div` itself), versus introducing a child

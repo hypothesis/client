@@ -105,6 +105,7 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
               'p-redacted-text': isHidden(annotation),
             })}
             style={textStyle}
+            mentions={annotation.mentions}
           />
         </Excerpt>
       )}

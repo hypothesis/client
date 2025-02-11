@@ -1,17 +1,20 @@
 import { checkAccessibility } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import MarkdownView, { $imports } from '../MarkdownView';
 
 describe('MarkdownView', () => {
   let fakeRenderMathAndMarkdown;
   let fakeReplaceLinksWithEmbeds;
+  let fakeRenderMentionTags;
 
   const markdownSelector = '[data-testid="markdown-text"]';
 
   beforeEach(() => {
     fakeRenderMathAndMarkdown = markdown => `rendered:${markdown}`;
     fakeReplaceLinksWithEmbeds = sinon.stub();
+    fakeRenderMentionTags = sinon.stub();
 
     $imports.$mock({
       '../render-markdown': {
@@ -19,6 +22,9 @@ describe('MarkdownView', () => {
       },
       '../media-embedder': {
         replaceLinksWithEmbeds: fakeReplaceLinksWithEmbeds,
+      },
+      '../helpers/mentions': {
+        renderMentionTags: fakeRenderMentionTags,
       },
     });
   });
@@ -66,6 +72,13 @@ describe('MarkdownView', () => {
     );
     assert.deepEqual(wrapper.find(markdownSelector).prop('style'), {
       fontFamily: 'serif',
+    });
+  });
+
+  [undefined, [{}]].forEach(mentions => {
+    it('renders mention tags based on provided mentions', () => {
+      mount(<MarkdownView mentions={mentions} />);
+      assert.calledWith(fakeRenderMentionTags, sinon.match.any, mentions ?? []);
     });
   });
 

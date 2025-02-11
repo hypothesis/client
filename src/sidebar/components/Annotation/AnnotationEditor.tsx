@@ -201,6 +201,7 @@ function AnnotationEditor({
         mentionsEnabled={mentionsEnabled}
         usersForMentions={usersWhoAnnotated}
         showHelpLink={showHelpLink}
+        mentions={annotation.mentions}
       />
       <TagEditor
         onAddTag={onAddTag}

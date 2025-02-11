@@ -29,6 +29,7 @@ import {
 } from 'preact/hooks';
 
 import { isMacOS } from '../../shared/user-agent';
+import type { Mention } from '../../types/api';
 import {
   getContainingMentionOffsets,
   termBeforePosition,
@@ -547,6 +548,9 @@ export type MarkdownEditorProps = {
    * this list.
    */
   usersForMentions: UserItem[];
+
+  /** List of mentions extracted from the annotation text. */
+  mentions?: Mention[];
 };
 
 /**
@@ -560,6 +564,7 @@ export default function MarkdownEditor({
   textStyle = {},
   showHelpLink = true,
   usersForMentions,
+  mentions,
 }: MarkdownEditorProps) {
   // Whether the preview mode is currently active.
   const [preview, setPreview] = useState(false);
@@ -611,6 +616,7 @@ export default function MarkdownEditor({
           markdown={text}
           classes="border bg-grey-1 p-2"
           style={textStyle}
+          mentions={mentions}
         />
       ) : (
         <TextArea
