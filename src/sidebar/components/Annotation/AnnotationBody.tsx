@@ -70,6 +70,7 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
   const store = useSidebarStore();
   const defaultAuthority = store.defaultAuthority();
   const draft = store.getDraft(annotation);
+  const mentionsEnabled = store.isFeatureEnabled('at_mentions');
 
   // If there is a draft use the tag and text from it.
   const tags = draft?.tags ?? annotation.tags;
@@ -106,6 +107,7 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
             })}
             style={textStyle}
             mentions={annotation.mentions}
+            mentionsEnabled={mentionsEnabled}
           />
         </Excerpt>
       )}
