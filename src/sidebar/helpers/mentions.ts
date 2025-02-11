@@ -58,11 +58,12 @@ function elementForMention(
   mentionLink: HTMLElement,
   mention?: Mention,
 ): [HTMLElement, Mention | InvalidUsername] {
-  // If the mention exists in the list of mentions, render it as a link
+  // If the mention exists in the list of mentions and contains a link, render
+  // it as an anchor pointing to that link
   if (mention && mention.link) {
-    mentionLink.setAttribute('href', mention.link ?? '');
+    mentionLink.setAttribute('href', mention.link);
     mentionLink.setAttribute('target', '_blank');
-    mentionLink.classList.add('font-bold');
+    mentionLink.setAttribute('data-hyp-mention-type', 'link');
 
     return [mentionLink, mention];
   }
@@ -73,9 +74,9 @@ function elementForMention(
   if (!mention) {
     const invalidMention = document.createElement('span');
 
+    invalidMention.setAttribute('data-hyp-mention', '');
+    invalidMention.setAttribute('data-hyp-mention-type', 'invalid');
     invalidMention.textContent = username;
-    invalidMention.style.fontStyle = 'italic';
-    invalidMention.style.borderBottom = 'dotted';
     mentionLink.replaceWith(invalidMention);
 
     return [invalidMention, username];
@@ -86,9 +87,10 @@ function elementForMention(
   const nonLinkMention = document.createElement('span');
 
   nonLinkMention.setAttribute('data-hyp-mention', '');
+  nonLinkMention.setAttribute('data-hyp-mention-type', 'no-link');
   nonLinkMention.setAttribute('data-userid', mentionLink.dataset.userid ?? '');
-  nonLinkMention.classList.add('text-brand', 'font-bold');
   nonLinkMention.textContent = username;
+  mentionLink.replaceWith(nonLinkMention);
 
   return [nonLinkMention, mention];
 }

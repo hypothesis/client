@@ -99,5 +99,25 @@
     blockquote {
       @apply border-l-[3px] italic px-[1em] text-color-text-light;
     }
+
+    // Un-processed mentions look like plain text
+    a[data-hyp-mention] {
+      @apply text-inherit no-underline;
+    }
+
+    // Valid processed mention with link
+    a[data-hyp-mention-type='link'] {
+      @apply text-brand font-bold underline;
+    }
+
+    // Valid processed mention without link
+    span[data-hyp-mention-type='no-link'] {
+      @apply text-brand font-bold;
+    }
+
+    // Invalid processed mention
+    span[data-hyp-mention-type='invalid'] {
+      @apply text-grey-6 font-bold underline decoration-wavy decoration-red-error;
+    }
   }
 }
