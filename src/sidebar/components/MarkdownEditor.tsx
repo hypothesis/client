@@ -617,6 +617,7 @@ export default function MarkdownEditor({
           classes="border bg-grey-1 p-2"
           style={textStyle}
           mentions={mentions}
+          mentionsEnabled={mentionsEnabled}
         />
       ) : (
         <TextArea

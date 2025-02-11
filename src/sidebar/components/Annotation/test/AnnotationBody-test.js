@@ -4,6 +4,7 @@ import {
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
+import sinon from 'sinon';
 
 import * as fixtures from '../../../test/annotation-fixtures';
 import AnnotationBody, { $imports } from '../AnnotationBody';
@@ -54,6 +55,7 @@ describe('AnnotationBody', () => {
       getLink: sinon
         .stub()
         .callsFake((linkPath, { tag }) => `http://www.example.com/${tag}`),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     $imports.$mock(mockImportedComponents());
