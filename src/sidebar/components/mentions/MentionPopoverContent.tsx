@@ -1,3 +1,5 @@
+import { formatDateTime } from '@hypothesis/frontend-shared';
+
 import type { Mention } from '../../../types/api';
 import type { InvalidUsername } from '../../helpers/mentions';
 
@@ -21,15 +23,25 @@ export default function MentionPopoverContent({
   }
 
   return (
-    <div className="flex flex-col gap-y-1.5">
-      <div data-testid="username" className="text-md font-bold">
-        @{content.username}
+    <div className="flex flex-col gap-y-4">
+      <div className="flex flex-col gap-y-1.5">
+        <div data-testid="username" className="text-md font-bold">
+          @{content.username}
+        </div>
+        {content.display_name && (
+          <div data-testid="display-name" className="text-color-text-light">
+            {content.display_name}
+          </div>
+        )}
       </div>
-      {content.display_name && (
-        <div data-testid="display-name" className="text-color-text-light">
-          {content.display_name}
+      {content.description && (
+        <div data-testid="description" className="line-clamp-2">
+          {content.description}
         </div>
       )}
+      <div data-testid="created" className="text-color-text-light">
+        Joined <b>{formatDateTime(content.joined, { includeTime: false })}</b>
+      </div>
     </div>
   );
 }

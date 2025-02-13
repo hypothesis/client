@@ -164,7 +164,7 @@ export default function MarkdownView(props: MarkdownViewProps) {
             open={!!popoverContent}
             onClose={() => setPopoverContentAfterDelay(null)}
             anchorElementRef={mentionsPopoverAnchorRef}
-            classes="px-3 py-2"
+            classes="px-3 py-2 !max-w-[75%]"
           >
             {popoverContent !== null && (
               <MentionPopoverContent content={popoverContent} />
