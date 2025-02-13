@@ -37,6 +37,9 @@ export type IndexResponse = {
  */
 export type LinksResponse = Record<string, string>;
 
+/** A date and time in ISO format (eg. "2024-12-09T07:17:52+00:00") */
+export type ISODateTime = string;
+
 /**
  * Selector which indicates the time range within a video or audio file that
  * an annotation refers to.
@@ -167,6 +170,10 @@ export type Mention = {
   display_name: string | null;
   /** Link to the user profile, if applicable */
   link: string | null;
+  /** The user description/bio */
+  description: string | null;
+  /** The date when the user joined, in ISO format */
+  joined: ISODateTime;
 
   /**
    * The userid at the moment the mention was created.
