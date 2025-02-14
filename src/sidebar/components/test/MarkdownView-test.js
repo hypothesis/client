@@ -11,7 +11,7 @@ import MarkdownView, { $imports } from '../MarkdownView';
 describe('MarkdownView', () => {
   let fakeRenderMathAndMarkdown;
   let fakeReplaceLinksWithEmbeds;
-  let fakeRenderMentionTags;
+  let fakeProcessAndReplaceMentionElements;
   let fakeClearTimeout;
 
   function createComponent(props = {}) {
@@ -33,7 +33,7 @@ describe('MarkdownView', () => {
   beforeEach(() => {
     fakeRenderMathAndMarkdown = markdown => `rendered:${markdown}`;
     fakeReplaceLinksWithEmbeds = sinon.stub();
-    fakeRenderMentionTags = sinon.stub();
+    fakeProcessAndReplaceMentionElements = sinon.stub();
     fakeClearTimeout = sinon.stub();
 
     $imports.$mock(mockImportedComponents());
@@ -45,7 +45,7 @@ describe('MarkdownView', () => {
         replaceLinksWithEmbeds: fakeReplaceLinksWithEmbeds,
       },
       '../helpers/mentions': {
-        renderMentionTags: fakeRenderMentionTags,
+        processAndReplaceMentionElements: fakeProcessAndReplaceMentionElements,
       },
     });
   });
@@ -101,7 +101,11 @@ describe('MarkdownView', () => {
   [undefined, [{}]].forEach(mentions => {
     it('renders mention tags based on provided mentions', () => {
       createComponent({ mentions });
-      assert.calledWith(fakeRenderMentionTags, sinon.match.any, mentions ?? []);
+      assert.calledWith(
+        fakeProcessAndReplaceMentionElements,
+        sinon.match.any,
+        mentions ?? [],
+      );
     });
   });
 
@@ -128,7 +132,7 @@ describe('MarkdownView', () => {
       secondMentionElement = document.createElement('span');
       secondMention = 'invalid';
       notMentionElement = document.createElement('span');
-      fakeRenderMentionTags.returns(
+      fakeProcessAndReplaceMentionElements.returns(
         new Map([
           [firstMentionElement, firstMention],
           [secondMentionElement, secondMention],

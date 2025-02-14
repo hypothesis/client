@@ -54,71 +54,71 @@ export function unwrapMentions(text: string) {
  */
 export type InvalidUsername = string;
 
-function elementForMention(
-  mentionLink: HTMLElement,
+/**
+ * Replace an unprocessed mention tag with another element that represents the
+ * proper type of mention ('link', 'no-link' or 'invalid').
+ */
+function processAndReplaceMention(
+  unprocessedMention: HTMLElement,
   mention?: Mention,
 ): [HTMLElement, Mention | InvalidUsername] {
-  // If the mention exists in the list of mentions and contains a link, render
-  // it as an anchor pointing to that link
-  if (mention && mention.link) {
-    mentionLink.setAttribute('href', mention.link);
-    mentionLink.setAttribute('target', '_blank');
-    mentionLink.setAttribute('data-hyp-mention-type', 'link');
+  const type =
+    mention && mention.link ? 'link' : mention ? 'no-link' : 'invalid';
+  const processedMention = document.createElement(
+    type === 'link' ? 'a' : 'span',
+  );
+  const username = unprocessedMention.textContent ?? '';
 
-    return [mentionLink, mention];
+  processedMention.setAttribute('data-hyp-mention', '');
+  processedMention.setAttribute('data-hyp-mention-type', type);
+  processedMention.textContent = username;
+
+  if (type === 'link') {
+    // If the mention exists in the list of mentions and contains a link, render
+    // it as an anchor pointing to that link
+    processedMention.setAttribute('href', mention?.link ?? '');
+    processedMention.setAttribute('target', '_blank');
   }
 
-  const username = mentionLink.textContent ?? '';
-
-  // If the mention doesn't exist, render a "plain text" element
-  if (!mention) {
-    const invalidMention = document.createElement('span');
-
-    invalidMention.setAttribute('data-hyp-mention', '');
-    invalidMention.setAttribute('data-hyp-mention-type', 'invalid');
-    invalidMention.textContent = username;
-    mentionLink.replaceWith(invalidMention);
-
-    return [invalidMention, username];
+  if (type !== 'invalid') {
+    processedMention.setAttribute(
+      'data-userid',
+      unprocessedMention.dataset.userid ?? '',
+    );
   }
 
-  // If the mention exists but has no link, render a "highlighted" element which
-  // is not a link
-  const nonLinkMention = document.createElement('span');
-
-  nonLinkMention.setAttribute('data-hyp-mention', '');
-  nonLinkMention.setAttribute('data-hyp-mention-type', 'no-link');
-  nonLinkMention.setAttribute('data-userid', mentionLink.dataset.userid ?? '');
-  nonLinkMention.textContent = username;
-  mentionLink.replaceWith(nonLinkMention);
-
-  return [nonLinkMention, mention];
+  unprocessedMention.replaceWith(processedMention);
+  return [processedMention, mention ?? username];
 }
 
 /**
  * Search for mention tags inside an HTML element, and try to match them with a
- * provided list of mentions.
- * Those that are valid are rendered as links, and those that are not are styled
- * in a way that it's possible to visually identify them.
+ * provided list of mentions. Every matched element will be replaced with
+ * another one that represents the proper type of mention ('link', 'no-link' or
+ * 'invalid').
  *
  * @return - Map of HTML elements that matched a mention tag, with their
  *           corresponding mention or invalid username
  */
-export function renderMentionTags(
+export function processAndReplaceMentionElements(
   element: HTMLElement,
   mentions: Mention[],
 ): Map<HTMLElement, Mention | InvalidUsername> {
-  const mentionLinks = element.querySelectorAll('a[data-hyp-mention]');
+  const unprocessedMentionTags = element.querySelectorAll(
+    'a[data-hyp-mention]:not([data-hyp-mention-type])',
+  );
   const foundMentions = new Map<HTMLElement, Mention | string>();
 
-  for (const mentionLink of mentionLinks) {
-    const htmlMentionLink = mentionLink as HTMLElement;
-    const mentionUserId = htmlMentionLink.dataset.userid;
+  for (const mentionTag of unprocessedMentionTags) {
+    const unprocessedMentionTag = mentionTag as HTMLElement;
+    const mentionUserId = unprocessedMentionTag.dataset.userid;
     const mention = mentionUserId
       ? mentions.find(m => m.userid === mentionUserId)
       : undefined;
 
-    foundMentions.set(...elementForMention(htmlMentionLink, mention));
+    foundMentions.set(
+      ...processAndReplaceMention(unprocessedMentionTag, mention),
+    );
   }
 
   return foundMentions;
