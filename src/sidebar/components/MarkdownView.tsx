@@ -10,7 +10,7 @@ import {
 
 import type { Mention } from '../../types/api';
 import type { InvalidUsername } from '../helpers/mentions';
-import { renderMentionTags } from '../helpers/mentions';
+import { processAndReplaceMentionElements } from '../helpers/mentions';
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
 import StyledText from './StyledText';
@@ -107,7 +107,10 @@ export default function MarkdownView(props: MarkdownViewProps) {
   }, [markdown]);
 
   useEffect(() => {
-    elementToMentionMap.current = renderMentionTags(content.current!, mentions);
+    elementToMentionMap.current = processAndReplaceMentionElements(
+      content.current!,
+      mentions,
+    );
   }, [mentions]);
 
   // NB: The following could be implemented by setting attribute props directly

@@ -1,5 +1,5 @@
 import {
-  renderMentionTags,
+  processAndReplaceMentionElements,
   unwrapMentions,
   wrapMentions,
   getContainingMentionOffsets,
@@ -89,7 +89,7 @@ look at ${mentionTag('foo', 'example.com')} comment`,
   });
 });
 
-describe('renderMentionTags', () => {
+describe('processAndReplaceMentionElements', () => {
   it('processes every mention tag based on provided list of mentions', () => {
     const mentions = [
       {
@@ -110,7 +110,7 @@ describe('renderMentionTags', () => {
       <p>Mention without ID: <a data-hyp-mention="">@user_id_missing</a></p>
     `;
 
-    const result = renderMentionTags(container, mentions);
+    const result = processAndReplaceMentionElements(container, mentions);
     assert.equal(result.size, 4);
 
     const [
