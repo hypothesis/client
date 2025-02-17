@@ -41,6 +41,9 @@ export function init(config: SentryConfig) {
     dsn: config.dsn,
     environment: config.environment,
 
+    // Instruct the Sentry backend to infer the IP address
+    sendDefaultPii: true,
+
     // Only report exceptions where the stack trace references a URL that is
     // part of our code. This reduces noise caused by third-party scripts which
     // may be injected by browser extensions.
