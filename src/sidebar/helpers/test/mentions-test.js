@@ -6,8 +6,29 @@ import {
   termBeforePosition,
 } from '../mentions';
 
+/**
+ * @param {string} username
+ * @param {string} [authority]
+ * @param {'link'|'no-link'|'invalid'} [type]
+ * @returns {HTMLAnchorElement}
+ */
+function mentionElement({ username, authority = 'hypothes.is', type }) {
+  const element = document.createElement('a');
+
+  element.setAttribute('data-hyp-mention', '');
+  element.setAttribute('data-userid', `acct:${username}@${authority}`);
+
+  if (type) {
+    element.setAttribute('data-hyp-mention-type', type);
+  }
+
+  element.textContent = `@${username}`;
+
+  return element;
+}
+
 const mentionTag = (username, authority) =>
-  `<a data-hyp-mention="" data-userid="acct:${username}@${authority}">@${username}</a>`;
+  mentionElement({ username, authority }).outerHTML;
 
 [
   // Mention at the end
@@ -146,6 +167,57 @@ describe('processAndReplaceMentionElements', () => {
     assert.isFalse(fourthElement.hasAttribute('data-userid'));
     assert.equal(fourthElement.dataset.hypMentionType, 'invalid');
     assert.equal(fourthMention, '@user_id_missing');
+  });
+
+  it('returns already-processed mention elements unchanged', () => {
+    const mentions = [
+      {
+        userid: 'acct:janedoe@hypothes.is',
+        link: 'http://example.com/janedoe',
+      },
+      {
+        userid: 'acct:johndoe@hypothes.is',
+        link: null,
+      },
+    ];
+
+    const container = document.createElement('div');
+    const correctProcessedMention = mentionElement({
+      username: 'janedoe',
+      type: 'link',
+    });
+    const nonLinkProcessedMention = mentionElement({
+      username: 'johndoe',
+      type: 'no-link',
+    });
+    const invalidProcessedMention = mentionElement({
+      username: 'invalid',
+      type: 'invalid',
+    });
+
+    container.append(
+      correctProcessedMention,
+      nonLinkProcessedMention,
+      invalidProcessedMention,
+    );
+
+    const result = processAndReplaceMentionElements(container, mentions);
+    assert.equal(result.size, 3);
+
+    const [
+      [firstElement, firstMention],
+      [secondElement, secondMention],
+      [thirdElement, thirdMention],
+    ] = [...result.entries()];
+
+    assert.equal(firstElement, correctProcessedMention);
+    assert.equal(firstMention, mentions[0]);
+
+    assert.equal(secondElement, nonLinkProcessedMention);
+    assert.equal(secondMention, mentions[1]);
+
+    assert.equal(thirdElement, invalidProcessedMention);
+    assert.equal(thirdMention, '@invalid');
   });
 });
 

@@ -62,12 +62,19 @@ function processAndReplaceMention(
   unprocessedMention: HTMLElement,
   mention?: Mention,
 ): [HTMLElement, Mention | InvalidUsername] {
+  const username = unprocessedMention.textContent ?? '';
+  const mentionOrUsername = mention ?? username;
+
+  // If this mention element has already been processed, return as is
+  if (unprocessedMention.hasAttribute('data-hyp-mention-type')) {
+    return [unprocessedMention, mentionOrUsername];
+  }
+
   const type =
     mention && mention.link ? 'link' : mention ? 'no-link' : 'invalid';
   const processedMention = document.createElement(
     type === 'link' ? 'a' : 'span',
   );
-  const username = unprocessedMention.textContent ?? '';
 
   processedMention.setAttribute('data-hyp-mention', '');
   processedMention.setAttribute('data-hyp-mention-type', type);
@@ -88,7 +95,7 @@ function processAndReplaceMention(
   }
 
   unprocessedMention.replaceWith(processedMention);
-  return [processedMention, mention ?? username];
+  return [processedMention, mentionOrUsername];
 }
 
 /**
@@ -104,21 +111,17 @@ export function processAndReplaceMentionElements(
   element: HTMLElement,
   mentions: Mention[],
 ): Map<HTMLElement, Mention | InvalidUsername> {
-  const unprocessedMentionTags = element.querySelectorAll(
-    'a[data-hyp-mention]:not([data-hyp-mention-type])',
-  );
+  const mentionElements = element.querySelectorAll('[data-hyp-mention]');
   const foundMentions = new Map<HTMLElement, Mention | string>();
 
-  for (const mentionTag of unprocessedMentionTags) {
-    const unprocessedMentionTag = mentionTag as HTMLElement;
-    const mentionUserId = unprocessedMentionTag.dataset.userid;
+  for (const mentionElement of mentionElements) {
+    const htmlMentionElement = mentionElement as HTMLElement;
+    const mentionUserId = htmlMentionElement.dataset.userid;
     const mention = mentionUserId
       ? mentions.find(m => m.userid === mentionUserId)
       : undefined;
 
-    foundMentions.set(
-      ...processAndReplaceMention(unprocessedMentionTag, mention),
-    );
+    foundMentions.set(...processAndReplaceMention(htmlMentionElement, mention));
   }
 
   return foundMentions;
