@@ -42,7 +42,6 @@ export default function CircularProgress({
           r={diameter / 2}
           fill="none"
           stroke="currentColor"
-          // eslint-disable-next-line
           stroke-width={strokeWidth}
           style={{
             // Stroke circle with a single dash, shortened by an offset that
