@@ -7251,9 +7251,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-hypothesis@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "eslint-config-hypothesis@npm:3.1.0"
+"eslint-config-hypothesis@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "eslint-config-hypothesis@npm:3.2.0"
   peerDependencies:
     eslint-plugin-jsx-a11y: ">=6.10.0"
     eslint-plugin-mocha: ">=10.4.0"
@@ -7270,7 +7270,7 @@ __metadata:
       optional: true
     typescript-eslint:
       optional: true
-  checksum: 12e17da643a306fec1c8121bf5f172f2132f816d85b2b6f626dc16d353f5cbac8bee0cce080a9df829c5eab3e4bcc007bb611ec6f5d9deebd627e530802c05f6
+  checksum: 7ba53dc87aead515952dc2c0e40f5c390fbd759aefabe9e282a807fdd8d6c315f1b64a0ba743907ce9f33d18dd060ed7010b91850b15df26edf89a3cb9db30dc
   languageName: node
   linkType: hard
 
@@ -8948,7 +8948,7 @@ __metadata:
     escape-html: ^1.0.3
     escape-string-regexp: ^4.0.0
     eslint: ^9.12.0
-    eslint-config-hypothesis: ^3.1.0
+    eslint-config-hypothesis: ^3.2.0
     eslint-plugin-jsx-a11y: ^6.10.0
     eslint-plugin-mocha: ^10.5.0
     eslint-plugin-react: ^7.37.1

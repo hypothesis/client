@@ -133,8 +133,6 @@ export default function MarkdownView(props: MarkdownViewProps) {
           ref={content}
           dangerouslySetInnerHTML={{ __html: html }}
           style={style}
-          // React types do not define `onMouseEnterCapture`, but preact does
-          // eslint-disable-next-line react/no-unknown-property
           onMouseEnterCapture={
             mentionsEnabled
               ? ({ target }) => {
@@ -148,8 +146,6 @@ export default function MarkdownView(props: MarkdownViewProps) {
                 }
               : undefined
           }
-          // React types do not define `onMouseLeaveCapture`, but preact does
-          // eslint-disable-next-line react/no-unknown-property
           onMouseLeaveCapture={
             mentionsEnabled
               ? () => {
