@@ -65,7 +65,7 @@
     "fancy-log": "^2.0.0",
     "fetch-mock": "11",
     "focus-visible": "^5.0.0",
-    "globals": "^15.11.0",
+    "globals": "^16.0.0",
     "gulp": "^5.0.0",
     "gulp-changed": "^5.0.1",
     "karma": "^6.0.1",
