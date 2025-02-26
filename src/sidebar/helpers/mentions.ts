@@ -44,7 +44,7 @@ export function unwrapMentions(text: string) {
   for (const node of tmp.querySelectorAll('a[data-hyp-mention]')) {
     node.replaceWith(node.textContent ?? '');
   }
-  return tmp.innerHTML;
+  return tmp.innerText;
 }
 
 /**
