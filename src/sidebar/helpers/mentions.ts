@@ -34,17 +34,24 @@ export function wrapMentions(text: string, authority: string): string {
   });
 }
 
+// Pattern that matches the special tag used to wrap mentions.
+//
+// Attempting to parse HTML with a regex is usually problematic, but we make
+// some assumptions about the tag content in order to be able to get away
+// with it. Specifically we assume that these tags will not contain `<` or
+// `>` in attribute values or the HTML content of the tag.
+const MENTION_TAG_RE = /<a[^>]\bdata-hyp-mention\b[^>]*>([^<]+)<\/a>/g;
+
 /**
  * Replace all mentions wrapped in the special `<a data-hyp-mention />` tag with
  * their plain-text representation.
  */
 export function unwrapMentions(text: string) {
-  const tmp = document.createElement('div');
-  tmp.innerHTML = text;
-  for (const node of tmp.querySelectorAll('a[data-hyp-mention]')) {
-    node.replaceWith(node.textContent ?? '');
-  }
-  return tmp.innerHTML;
+  // Use a regex rather than HTML parser to replace the mentions in order
+  // to avoid modifying any of the content outside of the replaced tags. This
+  // includes avoiding modifications such as encoding characters that will
+  // happen when parsing and re-serializing HTML via eg. `innerHTML`.
+  return text.replace(MENTION_TAG_RE, (match, mention) => mention);
 }
 
 /**

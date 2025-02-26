@@ -96,6 +96,19 @@ look at ${mentionTag('foo', 'example.com')} comment`,
     authority: 'example.com',
     textWithTags: `Hello ${mentionTag('jane.doe', 'example.com')}.`,
   },
+  // HTML chars should not be encoded
+  {
+    text: `> Quote
+Hello @jane.doe.`,
+    authority: 'example.com',
+    textWithTags: `> Quote
+Hello ${mentionTag('jane.doe', 'example.com')}.`,
+  },
+  {
+    text: `test <>&"' @jane.doe`,
+    authority: 'example.com',
+    textWithTags: `test <>&"' ${mentionTag('jane.doe', 'example.com')}`,
+  },
 ].forEach(({ text, authority, textWithTags }) => {
   describe('wrapMentions', () => {
     it('wraps every mention in a mention tag', () => {
