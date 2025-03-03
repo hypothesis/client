@@ -7743,19 +7743,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fetch-mock@npm:11":
-  version: 11.1.5
-  resolution: "fetch-mock@npm:11.1.5"
+"fetch-mock@npm:12":
+  version: 12.5.1
+  resolution: "fetch-mock@npm:12.5.1"
   dependencies:
     "@types/glob-to-regexp": ^0.4.4
     dequal: ^2.0.3
     glob-to-regexp: ^0.4.1
-    is-subset: ^0.1.1
     regexparam: ^3.0.0
-  peerDependenciesMeta:
-    node-fetch:
-      optional: true
-  checksum: 3561c82ee6fe3125eb644ad757cb65ef6372642a4843e42c90a60751765908c608cfc9d56356e1105352f83271fd607f220916de0e57ebaebc03fbd5f0d9e8f9
+  checksum: 5b2a8f9b6a0624e0b197cb19b06d923cf4c3959c94f4e49feb8fa0a62de52287733359b5878f8c8e9e17f93238999868cd8201fe2ba854ca4b347591e9f1f042
   languageName: node
   linkType: hard
 
@@ -8982,7 +8978,7 @@ __metadata:
     eslint-plugin-react-hooks: ^5.0.0
     express: ^5.0.1
     fancy-log: ^2.0.0
-    fetch-mock: 11
+    fetch-mock: 12
     focus-visible: ^5.0.0
     globals: ^15.11.0
     gulp: ^5.0.0
