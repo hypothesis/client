@@ -12,7 +12,7 @@ type GroupID = Group['id'];
  * 'loading': Members being currently loaded
  * GroupMember[]: Members already loaded
  */
-type FocusedGroupMembers = null | 'loading' | GroupMember[];
+export type FocusedGroupMembers = null | 'loading' | GroupMember[];
 
 export type State = {
   /**

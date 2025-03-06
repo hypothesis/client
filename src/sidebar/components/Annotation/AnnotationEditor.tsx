@@ -8,6 +8,7 @@ import {
   isReply,
   isSaved,
 } from '../../helpers/annotation-metadata';
+import { combineUsersForMentions } from '../../helpers/mention-suggestions';
 import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
@@ -178,6 +179,10 @@ function AnnotationEditor({
   const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const usersWhoAnnotated = store.usersWhoAnnotated();
   const focusedGroupMembers = store.getFocusedGroupMembers();
+  const usersForMentions = useMemo(
+    () => combineUsersForMentions(usersWhoAnnotated, focusedGroupMembers),
+    [focusedGroupMembers, usersWhoAnnotated],
+  );
 
   useEffect(() => {
     // Load members for focused group only if not yet loaded
@@ -199,7 +204,7 @@ function AnnotationEditor({
         text={text}
         onEditText={onEditText}
         mentionsEnabled={mentionsEnabled}
-        usersForMentions={usersWhoAnnotated}
+        usersForMentions={usersForMentions}
         showHelpLink={showHelpLink}
         mentions={annotation.mentions}
       />

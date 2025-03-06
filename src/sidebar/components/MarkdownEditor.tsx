@@ -30,6 +30,10 @@ import {
 
 import { isMacOS } from '../../shared/user-agent';
 import type { Mention } from '../../types/api';
+import type {
+  UserItem,
+  UsersForMentions,
+} from '../helpers/mention-suggestions';
 import {
   getContainingMentionOffsets,
   termBeforePosition,
@@ -193,16 +197,11 @@ function ToolbarButton({
   );
 }
 
-export type UserItem = {
-  username: string;
-  displayName: string | null;
-};
-
 type TextAreaProps = {
   classes?: string;
   containerRef?: Ref<HTMLTextAreaElement>;
   mentionsEnabled: boolean;
-  usersForMentions: UserItem[];
+  usersForMentions: UsersForMentions;
   onEditText: (text: string) => void;
 };
 
@@ -221,11 +220,15 @@ function TextArea({
   const [highlightedSuggestion, setHighlightedSuggestion] = useState(0);
   const caretElementRef = useRef<HTMLDivElement>(null);
   const userSuggestions = useMemo(() => {
-    if (!mentionsEnabled || activeMention === undefined) {
+    if (
+      !mentionsEnabled ||
+      activeMention === undefined ||
+      usersForMentions.status === 'loading'
+    ) {
       return [];
     }
 
-    return usersForMentions
+    return usersForMentions.users
       .filter(
         u =>
           // Match all users if the active mention is empty, which happens right
@@ -311,7 +314,7 @@ function TextArea({
       'aria-haspopup': 'listbox',
       'aria-activedescendant': activeDescendant,
     };
-  }, [highlightedSuggestion, usersListboxId, popoverOpen, userSuggestions]);
+  }, [highlightedSuggestion, popoverOpen, userSuggestions, usersListboxId]);
 
   return (
     <div className="relative">
@@ -376,6 +379,7 @@ function TextArea({
           open={popoverOpen}
           onClose={() => setPopoverOpen(false)}
           anchorElementRef={caretElementRef}
+          loadingUsers={usersForMentions.status === 'loading'}
           users={userSuggestions}
           highlightedSuggestion={highlightedSuggestion}
           onSelectUser={insertMention}
@@ -547,7 +551,7 @@ export type MarkdownEditorProps = {
    * The mention can still be set manually. It is not restricted to the items on
    * this list.
    */
-  usersForMentions: UserItem[];
+  usersForMentions: UsersForMentions;
 
   /** List of mentions extracted from the annotation text. */
   mentions?: Mention[];

@@ -11,6 +11,8 @@ export type MentionSuggestionsPopoverProps = Pick<
   PopoverProps,
   'open' | 'onClose' | 'anchorElementRef'
 > & {
+  /** Whether the list of users is currently being loaded */
+  loadingUsers: boolean;
   /** List of users to suggest */
   users: UserItem[];
   /** Index for currently highlighted suggestion */
@@ -25,6 +27,7 @@ export type MentionSuggestionsPopoverProps = Pick<
  * A Popover component that displays a list of user suggestions for @mentions.
  */
 export default function MentionSuggestionsPopover({
+  loadingUsers,
   users,
   onSelectUser,
   highlightedSuggestion,
@@ -39,36 +42,47 @@ export default function MentionSuggestionsPopover({
         aria-orientation="vertical"
         id={usersListboxId}
       >
-        {users.map((u, index) => (
-          // These options are indirectly handled via keyboard event
-          // handlers in the textarea, hence, we don't want to add keyboard
-          // event handlers here, but we want to handle click events.
-          // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+        {loadingUsers ? (
           <li
-            key={u.username}
-            id={`${usersListboxId}-${u.username}`}
-            className={classnames(
-              'flex justify-between items-center gap-x-2',
-              'rounded p-2 hover:bg-grey-2',
-              {
-                'bg-grey-2': highlightedSuggestion === index,
-              },
-            )}
-            onClick={e => {
-              e.stopPropagation();
-              onSelectUser(u);
-            }}
-            role="option"
-            aria-selected={highlightedSuggestion === index}
+            className="italic p-2"
+            data-testid="suggestions-loading-indicator"
           >
-            <span className="truncate">{u.username}</span>
-            <span className="text-color-text-light">{u.displayName}</span>
+            Loading suggestions…
           </li>
-        ))}
-        {users.length === 0 && (
-          <li className="italic p-2" data-testid="suggestions-fallback">
-            No matches. You can still write the username
-          </li>
+        ) : (
+          <>
+            {users.map((u, index) => (
+              // These options are indirectly handled via keyboard event
+              // handlers in the textarea, hence, we don't want to add keyboard
+              // event handlers here, but we want to handle click events.
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+              <li
+                key={u.username}
+                id={`${usersListboxId}-${u.username}`}
+                className={classnames(
+                  'flex justify-between items-center gap-x-2',
+                  'rounded p-2 hover:bg-grey-2',
+                  {
+                    'bg-grey-2': highlightedSuggestion === index,
+                  },
+                )}
+                onClick={e => {
+                  e.stopPropagation();
+                  onSelectUser(u);
+                }}
+                role="option"
+                aria-selected={highlightedSuggestion === index}
+              >
+                <span className="truncate">{u.username}</span>
+                <span className="text-color-text-light">{u.displayName}</span>
+              </li>
+            ))}
+            {users.length === 0 && (
+              <li className="italic p-2" data-testid="suggestions-fallback">
+                No matches. You can still write the username
+              </li>
+            )}
+          </>
         )}
       </ul>
     </Popover>
