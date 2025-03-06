@@ -44,7 +44,7 @@ import {
 import type { EditorState } from '../markdown-commands';
 import { getCaretCoordinates } from '../util/textarea-caret-position';
 import MarkdownView from './MarkdownView';
-import MentionPopover from './MentionPopover';
+import MentionSuggestionsPopover from './MentionSuggestionsPopover';
 
 /**
  * Toolbar commands that modify the editor state. This excludes the Help link
@@ -372,7 +372,7 @@ function TextArea({
         className="absolute top-0 left-0 w-0 h-0 pointer-events-none"
       />
       {mentionsEnabled && (
-        <MentionPopover
+        <MentionSuggestionsPopover
           open={popoverOpen}
           onClose={() => setPopoverOpen(false)}
           anchorElementRef={caretElementRef}

@@ -7,7 +7,7 @@ export type UserItem = {
   displayName: string | null;
 };
 
-export type MentionPopoverProps = Pick<
+export type MentionSuggestionsPopoverProps = Pick<
   PopoverProps,
   'open' | 'onClose' | 'anchorElementRef'
 > & {
@@ -24,13 +24,13 @@ export type MentionPopoverProps = Pick<
 /**
  * A Popover component that displays a list of user suggestions for @mentions.
  */
-export default function MentionPopover({
+export default function MentionSuggestionsPopover({
   users,
   onSelectUser,
   highlightedSuggestion,
   usersListboxId,
   ...popoverProps
-}: MentionPopoverProps) {
+}: MentionSuggestionsPopoverProps) {
   return (
     <Popover {...popoverProps} classes="p-1">
       <ul
