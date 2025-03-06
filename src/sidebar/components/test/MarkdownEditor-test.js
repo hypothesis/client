@@ -415,17 +415,22 @@ describe('MarkdownEditor', () => {
     }
 
     function getHighlightedSuggestion(wrapper) {
-      return wrapper.find('MentionPopover').prop('highlightedSuggestion');
+      return wrapper
+        .find('MentionSuggestionsPopover')
+        .prop('highlightedSuggestion');
     }
 
     function suggestionsPopoverIsOpen(wrapper) {
-      return wrapper.find('MentionPopover').prop('open');
+      return wrapper.find('MentionSuggestionsPopover').prop('open');
     }
 
     [true, false].forEach(mentionsEnabled => {
       it('renders Popover if @mentions are enabled', () => {
         const wrapper = createComponent({ mentionsEnabled });
-        assert.equal(wrapper.exists('MentionPopover'), mentionsEnabled);
+        assert.equal(
+          wrapper.exists('MentionSuggestionsPopover'),
+          mentionsEnabled,
+        );
 
         // Popover is opened after typing "@"
         typeInTextarea(wrapper, '@');
@@ -493,7 +498,7 @@ describe('MarkdownEditor', () => {
       typeInTextarea(wrapper, '@johndoe');
       assert.isTrue(suggestionsPopoverIsOpen(wrapper));
 
-      wrapper.find('MentionPopover').props().onClose();
+      wrapper.find('MentionSuggestionsPopover').props().onClose();
       wrapper.update();
       assert.isFalse(suggestionsPopoverIsOpen(wrapper));
     });
@@ -631,7 +636,7 @@ describe('MarkdownEditor', () => {
         typeInTextarea(wrapper, text);
 
         assert.equal(
-          wrapper.find('MentionPopover').prop('users').length,
+          wrapper.find('MentionSuggestionsPopover').prop('users').length,
           expectedSuggestions,
         );
       });
@@ -661,9 +666,9 @@ describe('MarkdownEditor', () => {
         name: 'Suggestions popover',
         content: () => {
           $imports.$restore({
-            // We need to render MentionPopover, as some aria attributes
-            // reference elements rendered by it
-            './MentionPopover': true,
+            // We need to render MentionSuggestionsPopover, as some aria
+            // attributes reference elements rendered by it
+            './MentionSuggestionsPopover': true,
           });
 
           const wrapper = createComponent(

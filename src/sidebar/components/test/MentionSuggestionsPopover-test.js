@@ -2,9 +2,9 @@ import { mount } from '@hypothesis/frontend-testing';
 import { useRef } from 'preact/hooks';
 import sinon from 'sinon';
 
-import MentionPopover from '../MentionPopover';
+import MentionSuggestionsPopover from '../MentionSuggestionsPopover';
 
-describe('MentionPopover', () => {
+describe('MentionSuggestionsPopover', () => {
   const defaultUsers = [
     { username: 'one', displayName: 'johndoe' },
     { username: 'two', displayName: 'johndoe' },
@@ -16,7 +16,7 @@ describe('MentionPopover', () => {
     return (
       <div>
         <div ref={anchorRef} />
-        <MentionPopover {...props} anchorElementRef={anchorRef} />
+        <MentionSuggestionsPopover {...props} anchorElementRef={anchorRef} />
       </div>
     );
   }
