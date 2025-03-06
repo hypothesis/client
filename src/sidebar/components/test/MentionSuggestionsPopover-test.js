@@ -24,6 +24,7 @@ describe('MentionSuggestionsPopover', () => {
   function createComponent(props) {
     return mount(
       <TestComponent
+        loadingUsers={false}
         users={defaultUsers}
         highlightedSuggestion={0}
         onSelectUser={sinon.stub()}
@@ -38,6 +39,13 @@ describe('MentionSuggestionsPopover', () => {
     return wrapper.find('[role="option"]').at(index);
   }
 
+  it('shows loading message when users are being loaded', () => {
+    const wrapper = createComponent({ loadingUsers: true });
+    assert.isTrue(
+      wrapper.exists('[data-testid="suggestions-loading-indicator"]'),
+    );
+  });
+
   [
     { users: [], shouldRenderFallback: true },
     { users: defaultUsers, shouldRenderFallback: false },
@@ -47,6 +55,9 @@ describe('MentionSuggestionsPopover', () => {
       assert.equal(
         wrapper.exists('[data-testid="suggestions-fallback"]'),
         shouldRenderFallback,
+      );
+      assert.isFalse(
+        wrapper.exists('[data-testid="suggestions-loading-indicator"]'),
       );
     });
   });

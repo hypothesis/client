@@ -51,13 +51,14 @@ describe('MarkdownEditor', () => {
   });
 
   function createComponent(props = {}, mountProps = {}) {
+    const { usersForMentions = {}, ...rest } = props;
     return mount(
       <MarkdownEditor
         label="Test editor"
         text="test"
         mentionsEnabled={false}
-        usersForMentions={[]}
-        {...props}
+        usersForMentions={{ status: 'loaded', users: [], ...usersForMentions }}
+        {...rest}
       />,
       mountProps,
     );
@@ -534,11 +535,14 @@ describe('MarkdownEditor', () => {
     it('allows changing highlighted suggestion via vertical arrow keys', () => {
       const wrapper = createComponent({
         mentionsEnabled: true,
-        usersForMentions: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
-        ],
+        usersForMentions: {
+          status: 'loaded',
+          users: [
+            { username: 'one', displayName: 'johndoe' },
+            { username: 'two', displayName: 'johndoe' },
+            { username: 'three', displayName: 'johndoe' },
+          ],
+        },
       });
 
       typeInTextarea(wrapper, '@johndoe');
@@ -572,11 +576,14 @@ describe('MarkdownEditor', () => {
       const wrapper = createComponent({
         onEditText,
         mentionsEnabled: true,
-        usersForMentions: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
-        ],
+        usersForMentions: {
+          status: 'loaded',
+          users: [
+            { username: 'one', displayName: 'johndoe' },
+            { username: 'two', displayName: 'johndoe' },
+            { username: 'three', displayName: 'johndoe' },
+          ],
+        },
       });
 
       typeInTextarea(wrapper, '@johndoe');
@@ -592,16 +599,23 @@ describe('MarkdownEditor', () => {
 
     [
       // With no users, there won't be any suggestions regardless of the text
-      { usersForMentions: [], text: '@', expectedSuggestions: 0 },
+      {
+        usersForMentions: { status: 'loaded', users: [] },
+        text: '@',
+        expectedSuggestions: 0,
+      },
 
       // With users, there won't be suggestions when none of them matches the
       // mention
       {
-        usersForMentions: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
-        ],
+        usersForMentions: {
+          status: 'loaded',
+          users: [
+            { username: 'one', displayName: 'johndoe' },
+            { username: 'two', displayName: 'johndoe' },
+            { username: 'three', displayName: 'johndoe' },
+          ],
+        },
         text: '@nothing_will_match',
         expectedSuggestions: 0,
       },
@@ -609,20 +623,26 @@ describe('MarkdownEditor', () => {
       // With users, there will be suggestions when any of them matches the
       // mention
       {
-        usersForMentions: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
-        ],
+        usersForMentions: {
+          status: 'loaded',
+          users: [
+            { username: 'one', displayName: 'johndoe' },
+            { username: 'two', displayName: 'johndoe' },
+            { username: 'three', displayName: 'johndoe' },
+          ],
+        },
         text: '@two',
         expectedSuggestions: 1,
       },
       {
-        usersForMentions: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
-        ],
+        usersForMentions: {
+          status: 'loaded',
+          users: [
+            { username: 'one', displayName: 'johndoe' },
+            { username: 'two', displayName: 'johndoe' },
+            { username: 'three', displayName: 'johndoe' },
+          ],
+        },
         text: '@johndoe',
         expectedSuggestions: 3,
       },
@@ -640,6 +660,17 @@ describe('MarkdownEditor', () => {
           expectedSuggestions,
         );
       });
+    });
+
+    it('sets users to "loading" if users for mentions are being loaded', () => {
+      const wrapper = createComponent({
+        mentionsEnabled: true,
+        usersForMentions: { status: 'loading' },
+      });
+      const popover = wrapper.find('MentionSuggestionsPopover');
+
+      assert.isEmpty(popover.prop('users'));
+      assert.isTrue(popover.prop('loadingUsers'));
     });
   });
 
@@ -674,11 +705,14 @@ describe('MarkdownEditor', () => {
           const wrapper = createComponent(
             {
               mentionsEnabled: true,
-              usersForMentions: [
-                { username: 'one', displayName: 'johndoe' },
-                { username: 'two', displayName: 'johndoe' },
-                { username: 'three', displayName: 'johndoe' },
-              ],
+              usersForMentions: {
+                status: 'loaded',
+                users: [
+                  { username: 'one', displayName: 'johndoe' },
+                  { username: 'two', displayName: 'johndoe' },
+                  { username: 'three', displayName: 'johndoe' },
+                ],
+              },
             },
             { connected: true },
           );
