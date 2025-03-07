@@ -22,13 +22,13 @@ export function combineUsersForMentions(
   usersWhoAnnotated: UserItem[],
   focusedGroupMembers: FocusedGroupMembers,
 ): UsersForMentions {
-  if (!Array.isArray(focusedGroupMembers)) {
+  if (focusedGroupMembers.status !== 'loaded') {
     return { status: 'loading' };
   }
 
   // Once group members are loaded, we can merge them with the users who
   // already annotated the document, then deduplicate and sort the result.
-  const focusedGroupUsers: UserItem[] = focusedGroupMembers.map(
+  const focusedGroupUsers: UserItem[] = focusedGroupMembers.members.map(
     ({ username, display_name: displayName }) => ({ username, displayName }),
   );
   const addedUsernames = new Set<string>();
