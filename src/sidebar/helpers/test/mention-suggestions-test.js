@@ -1,4 +1,7 @@
-import { combineUsersForMentions } from '../mention-suggestions';
+import {
+  combineUsersForMentions,
+  usersMatchingMention,
+} from '../mention-suggestions';
 
 describe('combineUsersForMentions', () => {
   [{ focusedGroupMembers: null }, { focusedGroupMembers: 'loading' }].forEach(
@@ -53,5 +56,124 @@ describe('combineUsersForMentions', () => {
         ],
       },
     );
+  });
+});
+
+describe('usersMatchingMention', () => {
+  [
+    // With no users, there won't be any suggestions regardless of the mention
+    {
+      usersForMentions: { status: 'loaded', users: [] },
+      mention: '',
+      expectedSuggestions: [],
+    },
+    {
+      usersForMentions: { status: 'loading' },
+      mention: '',
+      expectedSuggestions: [],
+    },
+
+    // With users, there won't be suggestions when none of them matches the
+    // mention
+    {
+      usersForMentions: {
+        status: 'loaded',
+        users: [
+          { username: 'one', displayName: 'johndoe' },
+          { username: 'two', displayName: 'johndoe' },
+          { username: 'three', displayName: 'johndoe' },
+        ],
+      },
+      mention: 'nothing_will_match',
+      expectedSuggestions: [],
+    },
+
+    // With users, there won't be suggestions when the mention is undefined
+    {
+      usersForMentions: {
+        status: 'loaded',
+        users: [
+          { username: 'one', displayName: 'johndoe' },
+          { username: 'two', displayName: 'johndoe' },
+          { username: 'three', displayName: 'johndoe' },
+        ],
+      },
+      mention: undefined,
+      expectedSuggestions: [],
+    },
+
+    // With users, there will be suggestions when any of them matches the
+    // mention
+    {
+      usersForMentions: {
+        status: 'loaded',
+        users: [
+          { username: 'one', displayName: 'johndoe' },
+          { username: 'two', displayName: 'johndoe' },
+          { username: 'three', displayName: 'johndoe' },
+        ],
+      },
+      mention: 'two',
+      expectedSuggestions: [{ username: 'two', displayName: 'johndoe' }],
+    },
+    {
+      usersForMentions: {
+        status: 'loaded',
+        users: [
+          { username: 'one', displayName: 'johndoe' },
+          { username: 'two', displayName: 'johndoe' },
+          { username: 'three', displayName: 'johndoe' },
+        ],
+      },
+      mention: 'johndoe',
+      expectedSuggestions: [
+        { username: 'one', displayName: 'johndoe' },
+        { username: 'two', displayName: 'johndoe' },
+        { username: 'three', displayName: 'johndoe' },
+      ],
+    },
+
+    // With users, all users will match empty mention
+    {
+      usersForMentions: {
+        status: 'loaded',
+        users: [
+          { username: 'one', displayName: 'johndoe' },
+          { username: 'two', displayName: 'johndoe' },
+          { username: 'three', displayName: 'johndoe' },
+        ],
+      },
+      mention: '',
+      expectedSuggestions: [
+        { username: 'one', displayName: 'johndoe' },
+        { username: 'two', displayName: 'johndoe' },
+        { username: 'three', displayName: 'johndoe' },
+      ],
+    },
+
+    // Matching users are cropped to a maximum
+    {
+      usersForMentions: {
+        status: 'loaded',
+        users: [
+          { username: 'one', displayName: 'johndoe' },
+          { username: 'two', displayName: 'johndoe' },
+          { username: 'three', displayName: 'johndoe' },
+        ],
+      },
+      mention: 'johndoe',
+      options: { maxUsers: 2 },
+      expectedSuggestions: [
+        { username: 'one', displayName: 'johndoe' },
+        { username: 'two', displayName: 'johndoe' },
+      ],
+    },
+  ].forEach(({ usersForMentions, mention, expectedSuggestions, options }) => {
+    it('suggests expected users for mention', () => {
+      assert.deepEqual(
+        usersMatchingMention(mention, usersForMentions, options),
+        expectedSuggestions,
+      );
+    });
   });
 });

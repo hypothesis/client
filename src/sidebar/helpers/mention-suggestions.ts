@@ -42,3 +42,33 @@ export function combineUsersForMentions(
 
   return { status: 'loaded', users };
 }
+
+export type UsersMatchingMentionOptions = {
+  /** Maximum amount of users to return. Defaults to 10 */
+  maxUsers?: number;
+};
+
+/**
+ * Finds the users that match a mention
+ */
+export function usersMatchingMention(
+  mentionToMatch: string | undefined,
+  usersForMentions: UsersForMentions,
+  options?: UsersMatchingMentionOptions,
+): UserItem[] {
+  if (mentionToMatch === undefined || usersForMentions.status === 'loading') {
+    return [];
+  }
+
+  return usersForMentions.users
+    .filter(
+      u =>
+        // Match all users if the active mention is empty, which happens right
+        // after typing `@`
+        !mentionToMatch ||
+        `${u.username} ${u.displayName ?? ''}`
+          .toLowerCase()
+          .match(mentionToMatch.toLowerCase()),
+    )
+    .slice(0, options?.maxUsers ?? 10);
+}
