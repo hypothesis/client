@@ -4,8 +4,8 @@ import {
 } from '../mention-suggestions';
 
 describe('combineUsersForMentions', () => {
-  [{ focusedGroupMembers: null }, { focusedGroupMembers: 'loading' }].forEach(
-    ({ focusedGroupMembers }) => {
+  [{ status: 'not-loaded' }, { status: 'loading' }].forEach(
+    focusedGroupMembers => {
       it('returns "loading" status if focused group members are not loaded yet', () => {
         assert.deepEqual(combineUsersForMentions([], focusedGroupMembers), {
           status: 'loading',
@@ -25,16 +25,19 @@ describe('combineUsersForMentions', () => {
         displayName: 'Cecelia Davenport',
       },
     ];
-    const focusedGroupMembers = [
-      {
-        username: 'janedoe',
-        display_name: 'Jane Doe',
-      },
-      {
-        username: 'albert',
-        display_name: 'Albert Banana',
-      },
-    ];
+    const focusedGroupMembers = {
+      status: 'loaded',
+      members: [
+        {
+          username: 'janedoe',
+          display_name: 'Jane Doe',
+        },
+        {
+          username: 'albert',
+          display_name: 'Albert Banana',
+        },
+      ],
+    };
 
     assert.deepEqual(
       combineUsersForMentions(usersWhoAnnotated, focusedGroupMembers),

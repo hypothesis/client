@@ -69,7 +69,7 @@ describe('AnnotationEditor', () => {
       removeAnnotations: sinon.stub(),
       isFeatureEnabled: sinon.stub().returns(false),
       usersWhoAnnotated: sinon.stub().returns([]),
-      getFocusedGroupMembers: sinon.stub(),
+      getFocusedGroupMembers: sinon.stub().returns({ status: 'not-loaded' }),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -416,22 +416,22 @@ describe('AnnotationEditor', () => {
     [
       {
         mentionsEnabled: true,
-        focusedGroupMembers: null,
+        focusedGroupMembers: { status: 'not-loaded' },
         shouldLoadMembers: true,
       },
       {
         mentionsEnabled: false,
-        focusedGroupMembers: null,
+        focusedGroupMembers: { status: 'not-loaded' },
         shouldLoadMembers: false,
       },
       {
         mentionsEnabled: true,
-        focusedGroupMembers: [],
+        focusedGroupMembers: { status: 'loaded', members: [] },
         shouldLoadMembers: false,
       },
       {
         mentionsEnabled: true,
-        focusedGroupMembers: 'loading',
+        focusedGroupMembers: { status: 'loading' },
         shouldLoadMembers: false,
       },
     ].forEach(({ mentionsEnabled, focusedGroupMembers, shouldLoadMembers }) => {
