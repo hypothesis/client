@@ -34,6 +34,7 @@ import type {
   UserItem,
   UsersForMentions,
 } from '../helpers/mention-suggestions';
+import { usersMatchingMention } from '../helpers/mention-suggestions';
 import {
   getContainingMentionOffsets,
   termBeforePosition,
@@ -219,27 +220,13 @@ function TextArea({
   const textareaRef = useSyncedRef(containerRef);
   const [highlightedSuggestion, setHighlightedSuggestion] = useState(0);
   const caretElementRef = useRef<HTMLDivElement>(null);
-  const userSuggestions = useMemo(() => {
-    if (
-      !mentionsEnabled ||
-      activeMention === undefined ||
-      usersForMentions.status === 'loading'
-    ) {
-      return [];
-    }
-
-    return usersForMentions.users
-      .filter(
-        u =>
-          // Match all users if the active mention is empty, which happens right
-          // after typing `@`
-          !activeMention ||
-          `${u.username} ${u.displayName ?? ''}`
-            .toLowerCase()
-            .match(activeMention.toLowerCase()),
-      )
-      .slice(0, 10);
-  }, [activeMention, mentionsEnabled, usersForMentions]);
+  const userSuggestions = useMemo(
+    () =>
+      mentionsEnabled
+        ? usersMatchingMention(activeMention, usersForMentions)
+        : [],
+    [activeMention, mentionsEnabled, usersForMentions],
+  );
 
   const checkForMentionAtCaret = useCallback(
     (textarea: HTMLTextAreaElement) => {
