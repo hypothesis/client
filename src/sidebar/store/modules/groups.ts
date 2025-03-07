@@ -7,12 +7,10 @@ import type { State as SessionState } from './session';
 
 type GroupID = Group['id'];
 
-/**
- * `null`: Members not yet loaded for currently focused group
- * 'loading': Members being currently loaded
- * GroupMember[]: Members already loaded
- */
-export type FocusedGroupMembers = null | 'loading' | GroupMember[];
+export type FocusedGroupMembers =
+  | { status: 'not-loaded' }
+  | { status: 'loading' }
+  | { status: 'loaded'; members: GroupMember[] };
 
 export type State = {
   /**
@@ -34,7 +32,9 @@ const initialState: State = {
   filteredGroupIds: null,
   groups: [],
   focusedGroupId: null,
-  focusedGroupMembers: null,
+  focusedGroupMembers: {
+    status: 'not-loaded' as const,
+  },
 };
 
 const reducers = {
@@ -80,7 +80,10 @@ const reducers = {
     }
 
     // Reset focused group members if focused group changed
-    return { focusedGroupId: action.id, focusedGroupMembers: null };
+    return {
+      focusedGroupId: action.id,
+      focusedGroupMembers: { status: 'not-loaded' as const },
+    };
   },
 
   LOAD_GROUPS(state: State, action: { groups: Group[] }) {
@@ -122,7 +125,7 @@ const reducers = {
       filteredGroupIds: null,
       focusedGroupId: null,
       groups: [],
-      focusedGroupMembers: null,
+      focusedGroupMembers: { status: 'not-loaded' as const },
     };
   },
 };
@@ -157,16 +160,22 @@ function loadGroups(groups: Group[]) {
  */
 function startLoadingFocusedGroupMembers() {
   return makeAction(reducers, 'LOAD_FOCUSED_GROUP_MEMBERS', {
-    focusedGroupMembers: 'loading',
+    focusedGroupMembers: { status: 'loading' },
   });
 }
 
 /**
  * Update members for focused group.
  */
-function loadFocusedGroupMembers(focusedGroupMembers: GroupMember[] | null) {
+function loadFocusedGroupMembers(members: GroupMember[] | null) {
   return makeAction(reducers, 'LOAD_FOCUSED_GROUP_MEMBERS', {
-    focusedGroupMembers,
+    focusedGroupMembers:
+      members === null
+        ? { status: 'not-loaded' }
+        : {
+            status: 'loaded',
+            members,
+          },
   });
 }
 

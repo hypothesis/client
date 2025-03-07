@@ -140,11 +140,15 @@ describe('sidebar/store/modules/groups', () => {
       // We need to initially focus a group so that we can set its members
       store.focusGroup(publicGroup.id);
       store.loadFocusedGroupMembers([]);
-      assert.isNotNull(store.getState().groups.focusedGroupMembers);
+      assert.notDeepEqual(store.getState().groups.focusedGroupMembers, {
+        status: 'not-loaded',
+      });
 
-      // Once we switch to focus another group, members are unset
+      // Once we switch to focus another group, members are reset
       store.focusGroup(privateGroup.id);
-      assert.isNull(store.getState().groups.focusedGroupMembers);
+      assert.deepEqual(store.getState().groups.focusedGroupMembers, {
+        status: 'not-loaded',
+      });
     });
 
     it('does not update focused group members if focused group is the same', () => {
@@ -206,9 +210,15 @@ describe('sidebar/store/modules/groups', () => {
       store.loadGroups([privateGroup]);
       store.focusGroup(privateGroup.id);
 
-      assert.isNull(store.getState().groups.focusedGroupMembers);
+      assert.equal(
+        store.getState().groups.focusedGroupMembers.status,
+        'not-loaded',
+      );
       store.startLoadingFocusedGroupMembers();
-      assert.equal(store.getState().groups.focusedGroupMembers, 'loading');
+      assert.equal(
+        store.getState().groups.focusedGroupMembers.status,
+        'loading',
+      );
     });
   });
 
@@ -224,9 +234,24 @@ describe('sidebar/store/modules/groups', () => {
       store.loadGroups([privateGroup]);
       store.focusGroup(privateGroup.id);
 
-      assert.isNull(store.getState().groups.focusedGroupMembers);
+      assert.equal(
+        store.getState().groups.focusedGroupMembers.status,
+        'not-loaded',
+      );
+
+      // When an array is provided, it sets members as loaded
       store.loadFocusedGroupMembers([]);
-      assert.deepEqual(store.getState().groups.focusedGroupMembers, []);
+      assert.deepEqual(
+        store.getState().groups.focusedGroupMembers.status,
+        'loaded',
+      );
+
+      // When null is provided, it sets members as not loaded
+      store.loadFocusedGroupMembers(null);
+      assert.equal(
+        store.getState().groups.focusedGroupMembers.status,
+        'not-loaded',
+      );
     });
   });
 
@@ -310,8 +335,10 @@ describe('sidebar/store/modules/groups', () => {
   });
 
   describe('getFocusedGroupMembers', () => {
-    it('returns `null` if no group members have been loaded', () => {
-      assert.equal(store.getFocusedGroupMembers(), null);
+    it('returns `not-loaded` if no group members have been loaded', () => {
+      assert.deepEqual(store.getFocusedGroupMembers(), {
+        status: 'not-loaded',
+      });
     });
 
     it('returns list of members if they have been loaded', () => {
@@ -319,7 +346,10 @@ describe('sidebar/store/modules/groups', () => {
       store.focusGroup(privateGroup.id);
       store.loadFocusedGroupMembers([]);
 
-      assert.deepEqual(store.getFocusedGroupMembers(), []);
+      assert.deepEqual(store.getFocusedGroupMembers(), {
+        status: 'loaded',
+        members: [],
+      });
     });
   });
 
