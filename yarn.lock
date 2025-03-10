@@ -4283,11 +4283,11 @@ __metadata:
   linkType: hard
 
 "@types/chai@npm:^5.0.0":
-  version: 5.0.1
-  resolution: "@types/chai@npm:5.0.1"
+  version: 5.2.0
+  resolution: "@types/chai@npm:5.2.0"
   dependencies:
     "@types/deep-eql": "*"
-  checksum: 53d813cbca3755c025381ad4ac8b51b17897df90316350247f9527bdba3adb48b3b1315308fbd717d9013d8e60375c0ab4bd004dc72330133486ff5db4cb0b2c
+  checksum: 57e1b3fe7b546a227702f1e417e0424edeb96f9f038b4e1949a73762f186986e8187811f9a47ab38ff37b6d2e237234c9eab99c8e350e05598725b358844e4fc
   languageName: node
   linkType: hard
 
