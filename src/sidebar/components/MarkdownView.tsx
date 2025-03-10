@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -15,6 +16,38 @@ import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
 import StyledText from './StyledText';
 import MentionPopoverContent from './mentions/MentionPopoverContent';
+
+/** Return true if the point (x, y) lies within `rect`. */
+function rectContainsPoint(rect: DOMRect, x: number, y: number): boolean {
+  return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+}
+
+/**
+ * Return the smallest rect that entirely contains `rect` and has integer
+ * coordinates.
+ */
+function roundRectCoords(rect: DOMRect): DOMRect {
+  const left = Math.floor(rect.x);
+  const top = Math.floor(rect.y);
+  const right = Math.ceil(rect.right);
+  const bottom = Math.ceil(rect.bottom);
+  return new DOMRect(left, top, right - left, bottom - top);
+}
+
+/** Return the smallest rect which contains both `a` and `b`. */
+function unionRect(a: DOMRect, b: DOMRect): DOMRect {
+  const left = Math.min(a.x, b.x);
+  const top = Math.min(a.y, b.y);
+  const right = Math.max(a.right, b.right);
+  const bottom = Math.max(a.bottom, b.bottom);
+
+  return DOMRect.fromRect({
+    x: left,
+    y: top,
+    width: right - left,
+    height: bottom - top,
+  });
+}
 
 export type MarkdownViewProps = {
   /** The string of markdown to display as HTML. */
@@ -58,6 +91,8 @@ export default function MarkdownView(props: MarkdownViewProps) {
   const content = useRef<HTMLDivElement | null>(null);
 
   const mentionsPopoverAnchorRef = useRef<HTMLElement | null>(null);
+  const mentionsPopoverRef = useRef<HTMLElement>(null);
+
   const elementToMentionMap = useRef(
     new Map<HTMLElement, Mention | InvalidUsername>(),
   );
@@ -113,6 +148,44 @@ export default function MarkdownView(props: MarkdownViewProps) {
     );
   }, [mentions]);
 
+  // Monitor mouse position when mentions popover is visible and hide when it
+  // goes outside the anchor or popover.
+  useLayoutEffect(() => {
+    const anchor = mentionsPopoverAnchorRef.current;
+    const popover = mentionsPopoverRef.current;
+    if (!anchor || !popover || !popoverContent) {
+      return () => {};
+    }
+
+    const maybeHidePopover = (e: MouseEvent) => {
+      // Element boxes may have fractional coordinates, but mouse event
+      // coordinates are integers (in Chrome at least). Expand the boxes to the
+      // smallest box with integer coordinates. This way a mouse event
+      // dispatched at the exact corner of one of the boxes will still be deemed
+      // "inside".
+      const anchorBox = roundRectCoords(anchor.getBoundingClientRect());
+      const popoverBox = roundRectCoords(popover.getBoundingClientRect());
+
+      // There may be a small gap between the anchor and popover. To avoid
+      // hiding the popover when the mouse moves across this gap, we only hide
+      // the popover when it moves outside the union of these two boxes.
+      const unionBox = unionRect(anchorBox, popoverBox);
+
+      if (!rectContainsPoint(unionBox, e.clientX, e.clientY)) {
+        setPopoverContentAfterDelay(null);
+        mentionsPopoverAnchorRef.current = null;
+      }
+    };
+
+    // Use a listener on the body because there isn't a single element that
+    // corresponds to the region which the mouse has to exit before we hide the
+    // popover.
+    document.body.addEventListener('mousemove', maybeHidePopover);
+    return () => {
+      document.body.removeEventListener('mousemove', maybeHidePopover);
+    };
+  }, [popoverContent, setPopoverContentAfterDelay]);
+
   // NB: The following could be implemented by setting attribute props directly
   // on `StyledText` (which renders a `div` itself), versus introducing a child
   // `div` as is done here. However, in initial testing, this interfered with
@@ -146,14 +219,22 @@ export default function MarkdownView(props: MarkdownViewProps) {
                 }
               : undefined
           }
-          onMouseLeaveCapture={
-            mentionsEnabled
-              ? () => {
-                  setPopoverContentAfterDelay(null);
-                  mentionsPopoverAnchorRef.current = null;
-                }
-              : undefined
-          }
+          onMouseLeaveCapture={({ target }) => {
+            // If the mouse leaves the mention before the popover has been
+            // shown, cancel the timer that shows the popover.
+            //
+            // Once the popover is shown, hiding it is handled by a separate
+            // effect that fires once the mouse leaves the area containing both
+            // the popover and the anchor.
+            const element = target as HTMLElement;
+            if (
+              mentionsPopoverAnchorRef.current === element &&
+              !popoverContent
+            ) {
+              setPopoverContentAfterDelay(null);
+              mentionsPopoverAnchorRef.current = null;
+            }
+          }}
         />
         {mentionsEnabled && (
           <Popover
@@ -161,6 +242,7 @@ export default function MarkdownView(props: MarkdownViewProps) {
             onClose={() => setPopoverContentAfterDelay(null)}
             anchorElementRef={mentionsPopoverAnchorRef}
             classes="px-3 py-2 !max-w-[75%]"
+            elementRef={mentionsPopoverRef}
           >
             {popoverContent !== null && (
               <MentionPopoverContent content={popoverContent} />

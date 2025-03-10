@@ -128,15 +128,29 @@ describe('MarkdownView', () => {
 
     beforeEach(() => {
       firstMentionElement = document.createElement('a');
+      firstMentionElement.textContent = 'first-mention';
       firstMention = {};
+
       secondMentionElement = document.createElement('span');
+      secondMentionElement.textContent = 'second-mention';
       secondMention = 'invalid';
+
       notMentionElement = document.createElement('span');
+      notMentionElement.textContent = 'not-a-mention';
+
       fakeProcessAndReplaceMentionElements.returns(
         new Map([
           [firstMentionElement, firstMention],
           [secondMentionElement, secondMention],
         ]),
+      );
+
+      // Add mentions to body so they have a non-zero area. This is needed
+      // for testing handling of mouse events inside mentions.
+      document.body.append(
+        firstMentionElement,
+        secondMentionElement,
+        notMentionElement,
       );
     });
 
@@ -167,6 +181,7 @@ describe('MarkdownView', () => {
         const wrapper = createComponentWithChildren();
 
         getElement().dispatchEvent(new MouseEvent('mouseenter'));
+
         // The popover is "eventually" open after some delay
         await waitFor(() => {
           wrapper.update();
@@ -177,9 +192,40 @@ describe('MarkdownView', () => {
           getExpectedMention(),
         );
 
+        // Before the popover is visible, a "mouseleave" event on the anchor
+        // will cause it not to be shown. After it becomes visible, a
+        // "mouseleave" event will not hide the popover.
         getElement().dispatchEvent(new MouseEvent('mouseleave'));
         wrapper.update();
-        // The popover is immediately closed
+        assert.isTrue(wrapper.find('Popover').prop('open'));
+
+        const moveMouse = (clientX, clientY) => {
+          getElement().dispatchEvent(
+            new MouseEvent('mousemove', {
+              bubbles: true,
+              clientX,
+              clientY,
+            }),
+          );
+          wrapper.update();
+        };
+
+        const anchorBox = getElement().getBoundingClientRect();
+        const popoverBox = wrapper
+          .find('[popover]')
+          .getDOMNode()
+          .getBoundingClientRect();
+
+        // Move mouse inside anchor. Popover should remain open.
+        moveMouse(anchorBox.x, anchorBox.y);
+        assert.isTrue(wrapper.find('Popover').prop('open'));
+
+        // Move mouse inside popover. Popover should remain open.
+        moveMouse(popoverBox.x, popoverBox.y);
+        assert.isTrue(wrapper.find('Popover').prop('open'));
+
+        // Move mouse outside popover and anchor. The popover should be closed.
+        moveMouse(popoverBox.x - 10, popoverBox.y);
         assert.isFalse(wrapper.find('Popover').prop('open'));
         assert.isFalse(wrapper.exists('MentionPopoverContent'));
       });
