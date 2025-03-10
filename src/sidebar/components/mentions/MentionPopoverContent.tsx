@@ -39,9 +39,11 @@ export default function MentionPopoverContent({
           {content.description}
         </div>
       )}
-      <div data-testid="created" className="text-color-text-light">
-        Joined <b>{formatDateTime(content.joined, { includeTime: false })}</b>
-      </div>
+      {content.joined && (
+        <div data-testid="joined" className="text-color-text-light">
+          Joined <b>{formatDateTime(content.joined, { includeTime: false })}</b>
+        </div>
+      )}
     </div>
   );
 }

@@ -173,7 +173,7 @@ export type Mention = {
   /** The user description/bio */
   description: string | null;
   /** The date when the user joined, in ISO format */
-  joined: ISODateTime;
+  joined: ISODateTime | null;
 
   /**
    * The userid at the moment the mention was created.
