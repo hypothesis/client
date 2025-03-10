@@ -71,6 +71,22 @@ describe('MentionPopoverContent', () => {
   });
 
   [
+    { joined: null, shouldRenderJoinedDate: false },
+    {
+      joined: '2008-02-29T13:00:00.000000+00:00',
+      shouldRenderJoinedDate: true,
+    },
+  ].forEach(({ joined, shouldRenderJoinedDate }) => {
+    it('shows join date only if set', () => {
+      const wrapper = createComponent({ username: 'janedoe', joined });
+      assert.equal(
+        wrapper.exists('[data-testid="joined"]'),
+        shouldRenderJoinedDate,
+      );
+    });
+  });
+
+  [
     '2025-01-23T15:36:52.100817+00:00',
     '2022-08-16T00:00:00.000000+00:00',
     '2008-02-29T13:00:00.000000+00:00',
@@ -78,7 +94,7 @@ describe('MentionPopoverContent', () => {
     it('formats created date', () => {
       const wrapper = createComponent({ username: 'janedoe', joined });
       assert.equal(
-        wrapper.find('[data-testid="created"]').text(),
+        wrapper.find('[data-testid="joined"]').text(),
         `Joined ${formatDateTime(joined, { includeTime: false })}`,
       );
     });
