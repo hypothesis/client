@@ -312,7 +312,12 @@ function TextArea({
           'focus:bg-white focus:outline-none focus:shadow-focus-inner',
           classes,
         )}
-        onInput={(e: Event) => onEditText((e.target as HTMLInputElement).value)}
+        onInput={(e: Event) => {
+          onEditText((e.target as HTMLInputElement).value);
+          // Reset highlighted suggestion every time text is edited, as that
+          // could affect the list of suggestions
+          setHighlightedSuggestion(0);
+        }}
         {...restProps}
         // We listen for `keyup` to make sure the text in the textarea reflects
         // the just-pressed key when we evaluate it
