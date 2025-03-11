@@ -607,6 +607,32 @@ describe('MarkdownEditor', () => {
       assert.isEmpty(popover.prop('users'));
       assert.isTrue(popover.prop('loadingUsers'));
     });
+
+    it('resets highlighted suggestion when editing textarea input', () => {
+      const wrapper = createComponent({
+        mentionsEnabled: true,
+        usersForMentions: {
+          status: 'loaded',
+          users: [
+            { username: 'one', displayName: 'johndoe' },
+            { username: 'two', displayName: 'johndoe' },
+            { username: 'three', displayName: 'johndoe' },
+          ],
+        },
+      });
+
+      typeInTextarea(wrapper, '@johndoe');
+
+      // Move highlighted suggestions down
+      keyDownInTextarea(wrapper, 'ArrowDown');
+      assert.equal(getHighlightedSuggestion(wrapper), 1);
+      keyDownInTextarea(wrapper, 'ArrowDown');
+      assert.equal(getHighlightedSuggestion(wrapper), 2);
+
+      // After input, first suggestion is highlighted again
+      wrapper.find('textarea').simulate('input');
+      assert.equal(getHighlightedSuggestion(wrapper), 0);
+    });
   });
 
   it(
