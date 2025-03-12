@@ -255,6 +255,33 @@ describe('sidebar/store/modules/groups', () => {
     });
   });
 
+  describe('focusedGroupMembersError', () => {
+    it('throws if trying to set error before focusing a group', () => {
+      assert.throws(
+        () => store.focusedGroupMembersError(new Error('Error')),
+        'A group needs to be focused before loading its members',
+      );
+    });
+
+    it('sets group members status to error', () => {
+      store.loadGroups([privateGroup]);
+      store.focusGroup(privateGroup.id);
+
+      assert.equal(
+        store.getState().groups.focusedGroupMembers.status,
+        'not-loaded',
+      );
+
+      const error = new Error('Error');
+      store.focusedGroupMembersError(error);
+
+      assert.deepEqual(store.getState().groups.focusedGroupMembers, {
+        status: 'error',
+        error,
+      });
+    });
+  });
+
   describe('clearGroups', () => {
     it('clears the list of groups', () => {
       store.loadGroups([publicGroup]);

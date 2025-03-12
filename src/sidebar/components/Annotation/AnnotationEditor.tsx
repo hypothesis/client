@@ -185,8 +185,12 @@ function AnnotationEditor({
   );
 
   useEffect(() => {
-    // Load members for focused group only if not yet loaded
-    if (mentionsEnabled && focusedGroupMembers.status === 'not-loaded') {
+    // Load members for focused group only if not yet loaded, or loading failed
+    // on previous attempt
+    if (
+      mentionsEnabled &&
+      ['not-loaded', 'error'].includes(focusedGroupMembers.status)
+    ) {
       groupsService.loadFocusedGroupMembers();
     }
   }, [focusedGroupMembers, groupsService, mentionsEnabled]);

@@ -94,6 +94,7 @@ describe('GroupsService', () => {
         getFocusedGroupMembers: sinon.stub().returns(null),
         startLoadingFocusedGroupMembers: sinon.stub(),
         loadFocusedGroupMembers: sinon.stub(),
+        focusedGroupMembersError: sinon.stub(),
       },
     );
     fakeApi = {
@@ -313,6 +314,19 @@ describe('GroupsService', () => {
 
       assert.callCount(fakeApi.group.members.read, expectedApiCalls);
       assert.calledWith(fakeStore.loadFocusedGroupMembers, null);
+    });
+
+    it('sets error status if loading group members fails', async () => {
+      fakeStore.focusedGroupId.returns('group');
+
+      const error = new Error('Failed!');
+      fakeApi.group.members.read.rejects(error);
+
+      const svc = createService();
+      await svc.loadFocusedGroupMembers();
+
+      assert.calledWith(fakeStore.focusedGroupMembersError, error);
+      assert.notCalled(fakeStore.loadFocusedGroupMembers);
     });
   });
 

@@ -10,7 +10,8 @@ type GroupID = Group['id'];
 export type FocusedGroupMembers =
   | { status: 'not-loaded' }
   | { status: 'loading' }
-  | { status: 'loaded'; members: GroupMember[] };
+  | { status: 'loaded'; members: GroupMember[] }
+  | { status: 'error'; error: unknown };
 
 export type State = {
   /**
@@ -179,6 +180,15 @@ function loadFocusedGroupMembers(members: GroupMember[] | null) {
   });
 }
 
+function focusedGroupMembersError(error: unknown) {
+  return makeAction(reducers, 'LOAD_FOCUSED_GROUP_MEMBERS', {
+    focusedGroupMembers: {
+      status: 'error',
+      error,
+    },
+  });
+}
+
 /**
  * Return list of members for focused group.
  * Null is returned if members are being loaded or a group is not focused.
@@ -297,6 +307,7 @@ export const groupsModule = createStoreModule(initialState, {
     loadGroups,
     startLoadingFocusedGroupMembers,
     loadFocusedGroupMembers,
+    focusedGroupMembersError,
     clearGroups,
   },
   selectors: {

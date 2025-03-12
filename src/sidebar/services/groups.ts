@@ -507,8 +507,12 @@ export class GroupsService {
     const { signal } = this._focusedMembersController;
 
     this._store.startLoadingFocusedGroupMembers();
-    const members = await this._fetchAllMembers(groupId, signal);
-    this._store.loadFocusedGroupMembers(signal?.aborted ? null : members);
+    try {
+      const members = await this._fetchAllMembers(groupId, signal);
+      this._store.loadFocusedGroupMembers(signal?.aborted ? null : members);
+    } catch (e) {
+      this._store.focusedGroupMembersError(e);
+    }
   }
 
   private async _fetchAllMembers(

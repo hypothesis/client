@@ -420,6 +420,11 @@ describe('AnnotationEditor', () => {
         shouldLoadMembers: true,
       },
       {
+        mentionsEnabled: true,
+        focusedGroupMembers: { status: 'error' },
+        shouldLoadMembers: true,
+      },
+      {
         mentionsEnabled: false,
         focusedGroupMembers: { status: 'not-loaded' },
         shouldLoadMembers: false,
