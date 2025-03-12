@@ -61,7 +61,10 @@ export default function MentionSuggestionsPopover({
                 id={`${usersListboxId}-${u.username}`}
                 className={classnames(
                   'flex justify-between items-center gap-x-2',
-                  'rounded p-2 leading-4 hover:bg-grey-2',
+                  'rounded p-2 hover:bg-grey-2',
+                  // Adjust line height relative to the font size. This avoids
+                  // vertically cropped usernames due to the use of `truncate`.
+                  'leading-tight',
                   {
                     'bg-grey-2': highlightedSuggestion === index,
                   },
