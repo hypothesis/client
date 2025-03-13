@@ -579,12 +579,12 @@ describe('sidebar/store/modules/annotations', () => {
       assert.deepEqual(
         [
           {
-            user: 'acct:janedoe@hypothes.is',
+            userid: 'acct:janedoe@hypothes.is',
             username: 'janedoe',
             displayName: 'Jane Doe',
           },
           {
-            user: 'acct:jondoe@hypothes.is',
+            userid: 'acct:jondoe@hypothes.is',
             username: 'jondoe',
             displayName: null,
           },

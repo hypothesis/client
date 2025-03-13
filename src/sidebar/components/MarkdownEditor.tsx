@@ -35,9 +35,11 @@ import type {
   UsersForMentions,
 } from '../helpers/mention-suggestions';
 import { usersMatchingMention } from '../helpers/mention-suggestions';
+import type { MentionMode } from '../helpers/mentions';
 import {
   getContainingMentionOffsets,
   termBeforePosition,
+  toPlainTextMention,
   unwrapMentions,
 } from '../helpers/mentions';
 import {
@@ -204,6 +206,7 @@ type TextAreaProps = {
   mentionsEnabled: boolean;
   usersForMentions: UsersForMentions;
   onEditText: (text: string) => void;
+  mentionMode: MentionMode;
 };
 
 function TextArea({
@@ -213,6 +216,7 @@ function TextArea({
   usersForMentions,
   onEditText,
   onKeyDown,
+  mentionMode,
   ...restProps
 }: TextAreaProps & JSX.TextareaHTMLAttributes) {
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -261,7 +265,7 @@ function TextArea({
         textarea.selectionStart,
       );
       const beforeMention = value.slice(0, start);
-      const beforeCaret = `${beforeMention}@${suggestion.username} `;
+      const beforeCaret = `${beforeMention}${toPlainTextMention(suggestion, mentionMode)} `;
       const afterMention = value.slice(end);
 
       // Set textarea value directly, set new caret position and keep it focused.
@@ -277,7 +281,7 @@ function TextArea({
       setPopoverOpen(false);
       setHighlightedSuggestion(0);
     },
-    [onEditText, textareaRef],
+    [mentionMode, onEditText, textareaRef],
   );
 
   const usersListboxId = useId();
@@ -376,6 +380,7 @@ function TextArea({
           highlightedSuggestion={highlightedSuggestion}
           onSelectUser={insertMention}
           usersListboxId={usersListboxId}
+          mentionMode={mentionMode}
         />
       )}
     </div>
@@ -547,6 +552,7 @@ export type MarkdownEditorProps = {
 
   /** List of mentions extracted from the annotation text. */
   mentions?: Mention[];
+  mentionMode: MentionMode;
 };
 
 /**
@@ -561,6 +567,7 @@ export default function MarkdownEditor({
   showHelpLink = true,
   usersForMentions,
   mentions,
+  mentionMode,
 }: MarkdownEditorProps) {
   // Whether the preview mode is currently active.
   const [preview, setPreview] = useState(false);
@@ -634,6 +641,7 @@ export default function MarkdownEditor({
           style={textStyle}
           mentionsEnabled={mentionsEnabled}
           usersForMentions={usersForMentions}
+          mentionMode={mentionMode}
         />
       )}
     </div>

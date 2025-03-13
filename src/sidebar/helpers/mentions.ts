@@ -1,5 +1,6 @@
 import type { Mention } from '../../types/api';
 import { buildAccountID } from './account-id';
+import type { UserItem } from './mention-suggestions';
 
 // Pattern that matches characters treated as the boundary of a mention.
 const BOUNDARY_CHARS = String.raw`[\s,.;:|?!'"\-()[\]{}]`;
@@ -179,4 +180,28 @@ export function getContainingMentionOffsets(
         ? text.length
         : referencePosition + subsequentCharPos,
   };
+}
+
+/**
+ * Whether mentions should be done via username (`@username`) or display name
+ * (`@[Display Name]`).
+ *
+ * This also affects the information displayed in suggestions, which will not
+ * include the username in the second case.
+ */
+export type MentionMode = 'username' | 'display-name';
+
+/**
+ * Converts provided user into a plain-text mention (not wrapped in a mention
+ * tag).
+ *
+ * Depending on the mention mode it will return `@username` or `@[Display Name]`.
+ */
+export function toPlainTextMention(
+  user: UserItem,
+  mentionMode: MentionMode,
+): string {
+  return mentionMode === 'display-name'
+    ? `@[${user.displayName ?? ''}]`
+    : `@${user.username}`;
 }

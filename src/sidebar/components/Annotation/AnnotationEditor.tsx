@@ -3,12 +3,14 @@ import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
 import { serviceConfig } from '../../config/service-config';
+import { isThirdPartyUser } from '../../helpers/account-id';
 import {
   annotationRole,
   isReply,
   isSaved,
 } from '../../helpers/annotation-metadata';
 import { combineUsersForMentions } from '../../helpers/mention-suggestions';
+import type { MentionMode } from '../../helpers/mentions';
 import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
@@ -176,6 +178,15 @@ function AnnotationEditor({
 
   const textStyle = applyTheme(['annotationFontFamily'], settings);
 
+  const defaultAuthority = store.defaultAuthority();
+  const mentionMode = useMemo(
+    (): MentionMode =>
+      isThirdPartyUser(annotation.user, defaultAuthority)
+        ? 'display-name'
+        : 'username',
+    [annotation.user, defaultAuthority],
+  );
+
   const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const usersWhoAnnotated = store.usersWhoAnnotated();
   const focusedGroupMembers = store.getFocusedGroupMembers();
@@ -207,6 +218,7 @@ function AnnotationEditor({
         usersForMentions={usersForMentions}
         showHelpLink={showHelpLink}
         mentions={annotation.mentions}
+        mentionMode={mentionMode}
       />
       <TagEditor
         onAddTag={onAddTag}

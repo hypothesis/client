@@ -17,10 +17,12 @@ describe('combineUsersForMentions', () => {
   it('merges, dedups and sorts users who already annotated with group members', () => {
     const usersWhoAnnotated = [
       {
+        userid: 'acct:janedoe@example.com',
         username: 'janedoe',
         displayName: 'Jane Doe',
       },
       {
+        userid: 'acct:cecilia92@example.com',
         username: 'cecilia92',
         displayName: 'Cecelia Davenport',
       },
@@ -29,10 +31,12 @@ describe('combineUsersForMentions', () => {
       status: 'loaded',
       members: [
         {
+          userid: 'acct:janedoe@example.com',
           username: 'janedoe',
           display_name: 'Jane Doe',
         },
         {
+          userid: 'acct:albert@example.com',
           username: 'albert',
           display_name: 'Albert Banana',
         },
@@ -45,14 +49,17 @@ describe('combineUsersForMentions', () => {
         status: 'loaded',
         users: [
           {
+            userid: 'acct:albert@example.com',
             username: 'albert',
             displayName: 'Albert Banana',
           },
           {
+            userid: 'acct:cecilia92@example.com',
             username: 'cecilia92',
             displayName: 'Cecelia Davenport',
           },
           {
+            userid: 'acct:janedoe@example.com',
             username: 'janedoe',
             displayName: 'Jane Doe',
           },
@@ -82,9 +89,21 @@ describe('usersMatchingMention', () => {
       usersForMentions: {
         status: 'loaded',
         users: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
+          {
+            userid: 'acct:one@example.com',
+            username: 'one',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:two@example.com',
+            username: 'two',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:three@example.com',
+            username: 'three',
+            displayName: 'johndoe',
+          },
         ],
       },
       mention: 'nothing_will_match',
@@ -96,9 +115,21 @@ describe('usersMatchingMention', () => {
       usersForMentions: {
         status: 'loaded',
         users: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
+          {
+            userid: 'acct:one@example.com',
+            username: 'one',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:two@example.com',
+            username: 'two',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:three@example.com',
+            username: 'three',
+            displayName: 'johndoe',
+          },
         ],
       },
       mention: undefined,
@@ -111,28 +142,70 @@ describe('usersMatchingMention', () => {
       usersForMentions: {
         status: 'loaded',
         users: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
+          {
+            userid: 'acct:one@example.com',
+            username: 'one',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:two@example.com',
+            username: 'two',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:three@example.com',
+            username: 'three',
+            displayName: 'johndoe',
+          },
         ],
       },
       mention: 'two',
-      expectedSuggestions: [{ username: 'two', displayName: 'johndoe' }],
+      expectedSuggestions: [
+        {
+          userid: 'acct:two@example.com',
+          username: 'two',
+          displayName: 'johndoe',
+        },
+      ],
     },
     {
       usersForMentions: {
         status: 'loaded',
         users: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
+          {
+            userid: 'acct:one@example.com',
+            username: 'one',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:two@example.com',
+            username: 'two',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:three@example.com',
+            username: 'three',
+            displayName: 'johndoe',
+          },
         ],
       },
       mention: 'johndoe',
       expectedSuggestions: [
-        { username: 'one', displayName: 'johndoe' },
-        { username: 'two', displayName: 'johndoe' },
-        { username: 'three', displayName: 'johndoe' },
+        {
+          userid: 'acct:one@example.com',
+          username: 'one',
+          displayName: 'johndoe',
+        },
+        {
+          userid: 'acct:two@example.com',
+          username: 'two',
+          displayName: 'johndoe',
+        },
+        {
+          userid: 'acct:three@example.com',
+          username: 'three',
+          displayName: 'johndoe',
+        },
       ],
     },
 
@@ -141,16 +214,40 @@ describe('usersMatchingMention', () => {
       usersForMentions: {
         status: 'loaded',
         users: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
+          {
+            userid: 'acct:one@example.com',
+            username: 'one',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:two@example.com',
+            username: 'two',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:three@example.com',
+            username: 'three',
+            displayName: 'johndoe',
+          },
         ],
       },
       mention: '',
       expectedSuggestions: [
-        { username: 'one', displayName: 'johndoe' },
-        { username: 'two', displayName: 'johndoe' },
-        { username: 'three', displayName: 'johndoe' },
+        {
+          userid: 'acct:one@example.com',
+          username: 'one',
+          displayName: 'johndoe',
+        },
+        {
+          userid: 'acct:two@example.com',
+          username: 'two',
+          displayName: 'johndoe',
+        },
+        {
+          userid: 'acct:three@example.com',
+          username: 'three',
+          displayName: 'johndoe',
+        },
       ],
     },
 
@@ -159,16 +256,36 @@ describe('usersMatchingMention', () => {
       usersForMentions: {
         status: 'loaded',
         users: [
-          { username: 'one', displayName: 'johndoe' },
-          { username: 'two', displayName: 'johndoe' },
-          { username: 'three', displayName: 'johndoe' },
+          {
+            userid: 'acct:one@example.com',
+            username: 'one',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:two@example.com',
+            username: 'two',
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:three@example.com',
+            username: 'three',
+            displayName: 'johndoe',
+          },
         ],
       },
       mention: 'johndoe',
       options: { maxUsers: 2 },
       expectedSuggestions: [
-        { username: 'one', displayName: 'johndoe' },
-        { username: 'two', displayName: 'johndoe' },
+        {
+          userid: 'acct:one@example.com',
+          username: 'one',
+          displayName: 'johndoe',
+        },
+        {
+          userid: 'acct:two@example.com',
+          username: 'two',
+          displayName: 'johndoe',
+        },
       ],
     },
   ].forEach(({ usersForMentions, mention, expectedSuggestions, options }) => {

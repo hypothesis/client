@@ -2,10 +2,62 @@ import { Popover } from '@hypothesis/frontend-shared';
 import type { PopoverProps } from '@hypothesis/frontend-shared/lib/components/feedback/Popover';
 import classnames from 'classnames';
 
-export type UserItem = {
-  username: string;
-  displayName: string | null;
+import type { UserItem } from '../helpers/mention-suggestions';
+import type { MentionMode } from '../helpers/mentions';
+
+type SuggestionItemProps = {
+  user: UserItem;
+  usersListboxId: string;
+  highlighted: boolean;
+  mentionMode: MentionMode;
+  onSelectUser: (user: UserItem) => void;
 };
+
+function SuggestionItem({
+  user,
+  usersListboxId,
+  highlighted,
+  mentionMode,
+  onSelectUser,
+}: SuggestionItemProps) {
+  const showUsername = mentionMode === 'username';
+
+  return (
+    // These options are indirectly handled via keyboard event
+    // handlers in the textarea, hence, we don't want to add keyboard
+    // event handlers here, but we want to handle click events.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+    <li
+      key={user.username}
+      id={`${usersListboxId}-${user.username}`}
+      className={classnames(
+        'flex justify-between items-center gap-x-2',
+        'rounded p-2 hover:bg-grey-2',
+        // Adjust line height relative to the font size. This avoids
+        // vertically cropped usernames due to the use of `truncate`.
+        'leading-tight',
+        {
+          'bg-grey-2': highlighted,
+        },
+      )}
+      onClick={e => {
+        e.stopPropagation();
+        onSelectUser(user);
+      }}
+      role="option"
+      aria-selected={highlighted}
+    >
+      {showUsername && (
+        <span className="truncate" data-testid={`username-${user.username}`}>
+          {user.username}
+        </span>
+      )}
+      <span className={classnames({ 'text-color-text-light': showUsername })}>
+        {user.displayName}
+      </span>
+    </li>
+  );
+}
 
 export type MentionSuggestionsPopoverProps = Pick<
   PopoverProps,
@@ -21,6 +73,8 @@ export type MentionSuggestionsPopoverProps = Pick<
   onSelectUser: (selectedSuggestion: UserItem) => void;
   /** Element ID for the user suggestions listbox */
   usersListboxId: string;
+  /** Determines what information to display in suggestions */
+  mentionMode: MentionMode;
 };
 
 /**
@@ -32,6 +86,7 @@ export default function MentionSuggestionsPopover({
   onSelectUser,
   highlightedSuggestion,
   usersListboxId,
+  mentionMode,
   ...popoverProps
 }: MentionSuggestionsPopoverProps) {
   return (
@@ -52,33 +107,14 @@ export default function MentionSuggestionsPopover({
         ) : (
           <>
             {users.map((u, index) => (
-              // These options are indirectly handled via keyboard event
-              // handlers in the textarea, hence, we don't want to add keyboard
-              // event handlers here, but we want to handle click events.
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-              <li
+              <SuggestionItem
                 key={u.username}
-                id={`${usersListboxId}-${u.username}`}
-                className={classnames(
-                  'flex justify-between items-center gap-x-2',
-                  'rounded p-2 hover:bg-grey-2',
-                  // Adjust line height relative to the font size. This avoids
-                  // vertically cropped usernames due to the use of `truncate`.
-                  'leading-tight',
-                  {
-                    'bg-grey-2': highlightedSuggestion === index,
-                  },
-                )}
-                onClick={e => {
-                  e.stopPropagation();
-                  onSelectUser(u);
-                }}
-                role="option"
-                aria-selected={highlightedSuggestion === index}
-              >
-                <span className="truncate">{u.username}</span>
-                <span className="text-color-text-light">{u.displayName}</span>
-              </li>
+                user={u}
+                highlighted={highlightedSuggestion === index}
+                mentionMode={mentionMode}
+                usersListboxId={usersListboxId}
+                onSelectUser={onSelectUser}
+              />
             ))}
             {users.length === 0 && (
               <li className="italic p-2" data-testid="suggestions-fallback">

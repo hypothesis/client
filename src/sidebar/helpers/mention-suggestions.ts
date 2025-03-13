@@ -1,6 +1,8 @@
 import type { FocusedGroupMembers } from '../store/modules/groups';
 
 export type UserItem = {
+  /** User ID in the form of acct:[username]@[authority] */
+  userid: string;
   username: string;
   displayName: string | null;
 };
@@ -29,13 +31,17 @@ export function combineUsersForMentions(
   // Once group members are loaded, we can merge them with the users who
   // already annotated the document, then deduplicate and sort the result.
   const focusedGroupUsers: UserItem[] = focusedGroupMembers.members.map(
-    ({ username, display_name: displayName }) => ({ username, displayName }),
+    ({ userid, username, display_name: displayName }) => ({
+      userid,
+      username,
+      displayName,
+    }),
   );
-  const addedUsernames = new Set<string>();
+  const addedUserIds = new Set<string>();
   const users = [...usersWhoAnnotated, ...focusedGroupUsers]
-    .filter(({ username }) => {
-      const usernameAlreadyAdded = addedUsernames.has(username);
-      addedUsernames.add(username);
+    .filter(({ userid }) => {
+      const usernameAlreadyAdded = addedUserIds.has(userid);
+      addedUserIds.add(userid);
       return !usernameAlreadyAdded;
     })
     .sort((a, b) => a.username.localeCompare(b.username));

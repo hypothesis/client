@@ -35,11 +35,6 @@ type AnnotationStub = {
   $tag?: string;
 };
 
-export type UserItem = {
-  user: string;
-  displayName: string | null;
-};
-
 const initialState = {
   annotations: [],
   highlighted: {},
@@ -581,19 +576,19 @@ const usersWhoAnnotated = createSelector(
   annotations => {
     const usersMap = new Map<
       string,
-      { user: string; username: string; displayName: string | null }
+      { userid: string; username: string; displayName: string | null }
     >();
     annotations.forEach(anno => {
-      const { user } = anno;
+      const { user: userid } = anno;
 
       // Keep a unique list of users
-      if (usersMap.has(user)) {
+      if (usersMap.has(userid)) {
         return;
       }
 
-      const username = getUsername(user);
+      const username = getUsername(userid);
       const displayName = anno.user_info?.display_name ?? null;
-      usersMap.set(user, { user, username, displayName });
+      usersMap.set(userid, { userid, username, displayName });
     });
 
     // Sort users by username
