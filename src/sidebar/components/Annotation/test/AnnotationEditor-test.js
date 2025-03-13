@@ -70,6 +70,7 @@ describe('AnnotationEditor', () => {
       isFeatureEnabled: sinon.stub().returns(false),
       usersWhoAnnotated: sinon.stub().returns([]),
       getFocusedGroupMembers: sinon.stub().returns({ status: 'not-loaded' }),
+      defaultAuthority: sinon.stub().returns(''),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -446,6 +447,33 @@ describe('AnnotationEditor', () => {
           shouldLoadMembers,
         );
       });
+    });
+  });
+
+  [
+    {
+      defaultAuthority: 'example.com',
+      expectedMentionMode: 'username',
+    },
+    {
+      defaultAuthority: 'foo.com',
+      expectedMentionMode: 'display-name',
+    },
+  ].forEach(({ defaultAuthority, expectedMentionMode }) => {
+    it('sets expected mention mode based on annotation author', () => {
+      fakeStore.defaultAuthority.returns(defaultAuthority);
+
+      const wrapper = createComponent({
+        annotation: {
+          ...fixtures.defaultAnnotation(),
+          user: 'acct:username@example.com',
+        },
+      });
+
+      assert.equal(
+        wrapper.find('MarkdownEditor').prop('mentionMode'),
+        expectedMentionMode,
+      );
     });
   });
 

@@ -1,4 +1,4 @@
-import { mount } from '@hypothesis/frontend-testing';
+import { checkAccessibility, mount } from '@hypothesis/frontend-testing';
 import { useRef } from 'preact/hooks';
 import sinon from 'sinon';
 
@@ -28,6 +28,7 @@ describe('MentionSuggestionsPopover', () => {
         users={defaultUsers}
         highlightedSuggestion={0}
         onSelectUser={sinon.stub()}
+        mentionMode="username"
         {...props}
         open
       />,
@@ -90,4 +91,39 @@ describe('MentionSuggestionsPopover', () => {
       assert.calledWith(onSelectUser, defaultUsers[index]);
     });
   });
+
+  [
+    {
+      mentionMode: 'username',
+      shouldShowUsernames: true,
+    },
+    {
+      mentionMode: 'display-name',
+      shouldShowUsernames: false,
+    },
+  ].forEach(({ mentionMode, shouldShowUsernames }) => {
+    it('renders expected suggestions according to mention mode', () => {
+      const wrapper = createComponent({ mentionMode });
+
+      assert.equal(
+        wrapper.exists('[data-testid="username-one"]'),
+        shouldShowUsernames,
+      );
+      assert.equal(
+        wrapper.exists('[data-testid="username-two"]'),
+        shouldShowUsernames,
+      );
+      assert.equal(
+        wrapper.exists('[data-testid="username-three"]'),
+        shouldShowUsernames,
+      );
+    });
+  });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent(),
+    }),
+  );
 });

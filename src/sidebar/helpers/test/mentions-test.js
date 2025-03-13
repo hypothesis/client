@@ -4,6 +4,7 @@ import {
   wrapMentions,
   getContainingMentionOffsets,
   termBeforePosition,
+  toPlainTextMention,
 } from '../mentions';
 
 /**
@@ -354,6 +355,29 @@ describe('processAndReplaceMentionElements', () => {
         getContainingMentionOffsets(textWithoutDollarSign, position),
         expectedOffsets,
       );
+    });
+  });
+});
+
+describe('toPlainTextMention', () => {
+  [
+    {
+      mentionMode: 'username',
+      expectedMention: '@jane_doe',
+    },
+    {
+      mentionMode: 'display-name',
+      expectedMention: '@[Jane Doe]',
+    },
+  ].forEach(({ expectedMention, mentionMode }) => {
+    it('returns expected format', () => {
+      const user = {
+        userid: 'acct:jane_doe@foo.com',
+        username: 'jane_doe',
+        displayName: 'Jane Doe',
+      };
+
+      assert.equal(toPlainTextMention(user, mentionMode), expectedMention);
     });
   });
 });
