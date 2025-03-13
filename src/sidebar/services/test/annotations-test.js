@@ -69,8 +69,8 @@ describe('AnnotationsService', () => {
       selectTab: sinon.stub(),
       setExpanded: sinon.stub(),
       updateFlagStatus: sinon.stub(),
-      defaultAuthority: sinon.stub().returns('hypothes.is'),
       isFeatureEnabled: sinon.stub().returns(false),
+      currentUserAuthority: sinon.stub().returns(''),
     };
 
     setLoggedIn(true);
@@ -512,26 +512,26 @@ describe('AnnotationsService', () => {
 
     [
       {
-        profile: { userid: 'acct:foo@bar.com' },
+        currentUserAuthority: 'bar.com',
         mentionsEnabled: false,
         expectedText: 'hello @bob',
       },
       {
-        profile: { userid: 'acct:foo@bar.com' },
+        currentUserAuthority: 'bar.com',
         mentionsEnabled: true,
         expectedText:
           'hello <a data-hyp-mention="" data-userid="acct:bob@bar.com">@bob</a>',
       },
       {
-        profile: { userid: 'acct:foo' },
+        currentUserAuthority: 'hypothes.is',
         mentionsEnabled: true,
         expectedText:
           'hello <a data-hyp-mention="" data-userid="acct:bob@hypothes.is">@bob</a>',
       },
-    ].forEach(({ profile, mentionsEnabled, expectedText }) => {
+    ].forEach(({ currentUserAuthority, mentionsEnabled, expectedText }) => {
       it('wraps mentions in tags when feature is enabled', async () => {
         fakeStore.isFeatureEnabled.returns(mentionsEnabled);
-        fakeStore.profile.returns(profile);
+        fakeStore.currentUserAuthority.returns(currentUserAuthority);
         fakeStore.getDraft.returns({ text: 'hello @bob' });
 
         await svc.save(fixtures.defaultAnnotation());

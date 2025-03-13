@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 
 import type { Profile } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
+import { parseAccountID } from '../../helpers/account-id';
 import { createStoreModule, makeAction } from '../create-store';
 
 export type State = {
@@ -74,6 +75,16 @@ function defaultAuthority(state: State) {
 }
 
 /**
+ * Return current user's authority, or the default authority if a user is not
+ * logged in
+ */
+function currentUserAuthority(state: State) {
+  return (
+    parseAccountID(state.profile.userid)?.provider ?? state.defaultAuthority
+  );
+}
+
+/**
  * Return true if a user is logged in and false otherwise.
  */
 function isLoggedIn(state: State) {
@@ -140,6 +151,7 @@ export const sessionModule = createStoreModule(initialState, {
 
   selectors: {
     defaultAuthority,
+    currentUserAuthority,
     features,
     hasFetchedProfile,
     isFeatureEnabled,

@@ -27,6 +27,33 @@ describe('sidebar/store/modules/session', () => {
     });
   });
 
+  describe('#currentUserAuthority', () => {
+    it('returns the default authority if a user is not logged in', () => {
+      fakeSettings.authDomain = 'foo.com';
+      store = createStore([sessionModule], [fakeSettings]);
+
+      assert.equal(store.currentUserAuthority(), 'foo.com');
+    });
+
+    it('returns the default authority if if current user provider could not be resolved', () => {
+      fakeSettings.authDomain = 'foo.com';
+      store = createStore([sessionModule], [fakeSettings]);
+
+      store.updateProfile({ userid: 'acct:johndoe' });
+
+      assert.equal(store.currentUserAuthority(), 'foo.com');
+    });
+
+    it('returns the logged-in user authority', () => {
+      fakeSettings.authDomain = 'foo.com';
+      store = createStore([sessionModule], [fakeSettings]);
+
+      store.updateProfile({ userid: 'acct:johndoe@example.com' });
+
+      assert.equal(store.currentUserAuthority(), 'example.com');
+    });
+  });
+
   describe('#isLoggedIn', () => {
     [
       { userid: 'john', expectedIsLoggedIn: true },
