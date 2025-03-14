@@ -9,30 +9,85 @@ const BOUNDARY_CHARS = String.raw`[\s,.;:|?!'"\-()[\]{}]`;
 // See https://github.com/hypothesis/h/blob/797d9a4/h/models/user.py#L25
 const USERNAME_PAT = '[A-Za-z0-9_][A-Za-z0-9._]+[A-Za-z0-9_]';
 
-// Pattern that finds user mentions in text.
-const MENTIONS_PAT = new RegExp(
+// Pattern that finds username-based mentions in text.
+const USERNAME_MENTIONS_PAT = new RegExp(
   `(^|${BOUNDARY_CHARS})@(${USERNAME_PAT})(?=${BOUNDARY_CHARS}|$)`,
   'g',
 );
 
+// Pattern that matches display names.
+// Display names can have any amount of characters, except opening or closing
+// square brackets, which are used to delimit the display name itself.
+const DISPLAY_NAME_PAT = String.raw`[^\]^[]*`;
+
+// Pattern that finds display-name-based mentions in text.
+const DISPLAY_NAME_MENTIONS_PAT = new RegExp(
+  `(^|${BOUNDARY_CHARS})@\\[(${DISPLAY_NAME_PAT})](?=${BOUNDARY_CHARS}|$)`,
+  'g',
+);
+
 /**
- * Wrap all occurrences of @mentions in provided text into the corresponding
- * special tag, as long as they are surrounded by "empty" space (space, tab, new
- * line, or beginning/end of the whole text).
+ * Create a mention tag for provided userid and content.
+ *
+ * `<a data-hyp-mention="" data-userid={userid}>{content}</a>`
+ */
+function buildMentionTag(userid: string, content: string): string {
+  const tag = document.createElement('a');
+
+  tag.setAttribute('data-hyp-mention', '');
+  tag.setAttribute('data-userid', userid);
+  tag.textContent = content;
+
+  return tag.outerHTML;
+}
+
+/**
+ * Wrap all occurrences of @mention in provided text into the corresponding
+ * special tag, as long as they are surrounded by boundary chars.
  *
  * For example: `@someuser` with the `hypothes.is` authority would become
  *  `<a data-hyp-mention data-userid="acct:someuser@hypothes.is">@someuser</a>`
  */
 export function wrapMentions(text: string, authority: string): string {
-  return text.replace(MENTIONS_PAT, (match, precedingChar, username) => {
-    const tag = document.createElement('a');
+  return text.replace(
+    USERNAME_MENTIONS_PAT,
+    (match, precedingChar, username) => {
+      const mentionTag = buildMentionTag(
+        buildAccountID(username, authority),
+        `@${username}`,
+      );
+      return `${precedingChar}${mentionTag}`;
+    },
+  );
+}
 
-    tag.setAttribute('data-hyp-mention', '');
-    tag.setAttribute('data-userid', buildAccountID(username, authority));
-    tag.textContent = `@${username}`;
+/**
+ * Wrap all occurrences of @[Display Name] in provided text into the
+ * corresponding mention tag, as long as they are surrounded by boundary chars.
+ *
+ * Every matched plain-text mention will need a corresponding entry in the
+ * users map to produce a valid mention tag.
+ * Non-matching ones will be kept as plain-text.
+ */
+export function wrapDisplayNameMentions(
+  text: string,
+  usersMap: Map<string, UserItem>,
+): string {
+  return text.replace(
+    DISPLAY_NAME_MENTIONS_PAT,
+    (match, precedingChar, displayName) => {
+      const suggestion = usersMap.get(displayName);
 
-    return `${precedingChar}${tag.outerHTML}`;
-  });
+      // TODO Should we still build a mention tag so that it renders as an
+      //      invalid mention instead of plain text?
+      if (!suggestion) {
+        return `${precedingChar}@[${displayName}]`;
+      }
+
+      const mentionTag = buildMentionTag(suggestion.userid, `@${displayName}`);
+      return `${precedingChar}${mentionTag}`;
+    },
+  );
 }
 
 // Pattern that matches the special tag used to wrap mentions.
@@ -46,13 +101,23 @@ const MENTION_TAG_RE = /<a[^>]\bdata-hyp-mention\b[^>]*>([^<]+)<\/a>/g;
 /**
  * Replace all mentions wrapped in the special `<a data-hyp-mention />` tag with
  * their plain-text representation.
+ * The plain-text representation depends on the mention mode:
+ * - `username`: @username
+ * - `display-name`: @[Display Name]
  */
-export function unwrapMentions(text: string) {
+export function unwrapMentions(text: string, mentionMode: MentionMode) {
   // Use a regex rather than HTML parser to replace the mentions in order
   // to avoid modifying any of the content outside of the replaced tags. This
   // includes avoiding modifications such as encoding characters that will
   // happen when parsing and re-serializing HTML via eg. `innerHTML`.
-  return text.replace(MENTION_TAG_RE, (match, mention) => mention);
+  return text.replace(MENTION_TAG_RE, (match, mention) => {
+    if (mentionMode === 'username') {
+      return mention;
+    }
+
+    const [atChar, ...rest] = mention;
+    return `${atChar}[${rest.join('')}]`;
+  });
 }
 
 /**

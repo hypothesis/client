@@ -477,6 +477,150 @@ describe('AnnotationEditor', () => {
     });
   });
 
+  function insertMentionSuggestion(wrapper, user) {
+    wrapper.find('MarkdownEditor').props().onInsertMentionSuggestion(user);
+  }
+
+  context('when annotation author is a third party user', () => {
+    it('initializes display names map with annotation mentions', () => {
+      const mentions = [
+        {
+          userid: 'acct:ignored@example.com',
+        },
+        {
+          userid: 'acct:foo@example.com',
+          display_name: 'Foo',
+          username: 'foo',
+        },
+        {
+          userid: 'acct:bar@example.com',
+          display_name: 'Bar',
+          username: 'bar',
+        },
+      ];
+      const annotation = {
+        ...fixtures.defaultAnnotation(),
+        mentions,
+        user: 'acct:username@example.com', // Third party user
+      };
+      const wrapper = createComponent({ annotation });
+
+      wrapper.find('AnnotationPublishControl').props().onSave();
+
+      assert.calledWith(
+        fakeAnnotationsService.save,
+        annotation,
+        sinon.match({
+          mentionMode: 'display-name',
+          usersMap: new Map([
+            [
+              'Foo',
+              {
+                userid: 'acct:foo@example.com',
+                displayName: 'Foo',
+                username: 'foo',
+              },
+            ],
+            [
+              'Bar',
+              {
+                userid: 'acct:bar@example.com',
+                displayName: 'Bar',
+                username: 'bar',
+              },
+            ],
+          ]),
+        }),
+      );
+    });
+
+    it('tracks user info for inserted mention suggestions', () => {
+      const annotation = {
+        ...fixtures.defaultAnnotation(),
+        mentions: [],
+        user: 'acct:username@example.com', // Third party user
+      };
+      const wrapper = createComponent({ annotation });
+
+      insertMentionSuggestion(wrapper, {
+        userid: 'acct:jane_doe@example.com',
+        displayName: 'Jane Doe',
+        username: 'jane_doe',
+      });
+      insertMentionSuggestion(wrapper, {
+        userid: 'acct:johndoe@example.com',
+        displayName: 'John Doe',
+        username: 'johndoe',
+      });
+
+      // Users without displayName are ignored
+      insertMentionSuggestion(wrapper, {
+        userid: 'acct:ignored@example.com',
+        username: 'ignored',
+      });
+
+      wrapper.find('AnnotationPublishControl').props().onSave();
+
+      assert.calledWith(
+        fakeAnnotationsService.save,
+        annotation,
+        sinon.match({
+          mentionMode: 'display-name',
+          usersMap: new Map([
+            [
+              'Jane Doe',
+              {
+                userid: 'acct:jane_doe@example.com',
+                displayName: 'Jane Doe',
+                username: 'jane_doe',
+              },
+            ],
+            [
+              'John Doe',
+              {
+                userid: 'acct:johndoe@example.com',
+                displayName: 'John Doe',
+                username: 'johndoe',
+              },
+            ],
+          ]),
+        }),
+      );
+    });
+  });
+
+  context('when annotation author is a first party user', () => {
+    it('does not track user info for inserted suggestions', () => {
+      fakeStore.defaultAuthority.returns('hypothes.is');
+
+      const annotation = {
+        ...fixtures.defaultAnnotation(),
+        mentions: [],
+        user: 'acct:username@hypothes.is', // First party user
+      };
+      const wrapper = createComponent({ annotation });
+
+      insertMentionSuggestion(wrapper, {
+        userid: 'acct:jane_doe@example.com',
+        displayName: 'Jane Doe',
+        username: 'jane_doe',
+      });
+      insertMentionSuggestion(wrapper, {
+        userid: 'acct:johndoe@example.com',
+        displayName: 'John Doe',
+        username: 'johndoe',
+      });
+
+      wrapper.find('AnnotationPublishControl').props().onSave();
+
+      assert.calledWith(
+        fakeAnnotationsService.save,
+        annotation,
+        sinon.match({ mentionMode: 'username' }),
+      );
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

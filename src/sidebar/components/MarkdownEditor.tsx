@@ -207,6 +207,7 @@ type TextAreaProps = {
   usersForMentions: UsersForMentions;
   onEditText: (text: string) => void;
   mentionMode: MentionMode;
+  onInsertMentionSuggestion?: (user: UserItem) => void;
 };
 
 function TextArea({
@@ -217,6 +218,7 @@ function TextArea({
   onEditText,
   onKeyDown,
   mentionMode,
+  onInsertMentionSuggestion,
   ...restProps
 }: TextAreaProps & JSX.TextareaHTMLAttributes) {
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -276,12 +278,15 @@ function TextArea({
       // Then update state to keep it in sync.
       onEditText(textarea.value);
 
+      // Additionally, notify that a mention was inserted from a suggestion
+      onInsertMentionSuggestion?.(suggestion);
+
       // Close popover and reset highlighted suggestion once the value is
       // replaced
       setPopoverOpen(false);
       setHighlightedSuggestion(0);
     },
-    [mentionMode, onEditText, textareaRef],
+    [mentionMode, onEditText, onInsertMentionSuggestion, textareaRef],
   );
 
   const usersListboxId = useId();
@@ -553,6 +558,9 @@ export type MarkdownEditorProps = {
   /** List of mentions extracted from the annotation text. */
   mentions?: Mention[];
   mentionMode: MentionMode;
+
+  /** Invoked when a mention is inserted from a suggestion */
+  onInsertMentionSuggestion?: (suggestion: UserItem) => void;
 };
 
 /**
@@ -568,6 +576,7 @@ export default function MarkdownEditor({
   usersForMentions,
   mentions,
   mentionMode,
+  onInsertMentionSuggestion,
 }: MarkdownEditorProps) {
   // Whether the preview mode is currently active.
   const [preview, setPreview] = useState(false);
@@ -575,7 +584,10 @@ export default function MarkdownEditor({
   // The input element where the user inputs their comment.
   const input = useRef<HTMLTextAreaElement>(null);
 
-  const textWithoutMentionTags = useMemo(() => unwrapMentions(text), [text]);
+  const textWithoutMentionTags = useMemo(
+    () => unwrapMentions(text, mentionMode),
+    [mentionMode, text],
+  );
 
   useEffect(() => {
     if (!preview) {
@@ -642,6 +654,7 @@ export default function MarkdownEditor({
           mentionsEnabled={mentionsEnabled}
           usersForMentions={usersForMentions}
           mentionMode={mentionMode}
+          onInsertMentionSuggestion={onInsertMentionSuggestion}
         />
       )}
     </div>

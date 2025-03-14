@@ -514,35 +514,70 @@ describe('AnnotationsService', () => {
       {
         profile: { userid: 'acct:foo@bar.com' },
         mentionsEnabled: false,
+        text: 'hello @bob',
         expectedText: 'hello @bob',
+        mentionMode: 'username',
+      },
+      {
+        profile: { userid: 'acct:foo@bar.com' },
+        mentionsEnabled: false,
+        text: 'hello @[John Doe]',
+        expectedText: 'hello @[John Doe]',
+        mentionMode: 'display-name',
       },
       {
         profile: { userid: 'acct:foo@bar.com' },
         mentionsEnabled: true,
+        text: 'hello @bob',
         expectedText:
           'hello <a data-hyp-mention="" data-userid="acct:bob@bar.com">@bob</a>',
+        mentionMode: 'username',
+      },
+      {
+        profile: { userid: 'acct:foo@bar.com' },
+        mentionsEnabled: true,
+        text: 'hello @[John Doe]',
+        expectedText:
+          'hello <a data-hyp-mention="" data-userid="acct:john_doe@hypothes.is">@John Doe</a>',
+        mentionMode: 'display-name',
       },
       {
         profile: { userid: 'acct:foo' },
         mentionsEnabled: true,
+        text: 'hello @bob',
         expectedText:
           'hello <a data-hyp-mention="" data-userid="acct:bob@hypothes.is">@bob</a>',
+        mentionMode: 'username',
       },
-    ].forEach(({ profile, mentionsEnabled, expectedText }) => {
-      it('wraps mentions in tags when feature is enabled', async () => {
-        fakeStore.isFeatureEnabled.returns(mentionsEnabled);
-        fakeStore.profile.returns(profile);
-        fakeStore.getDraft.returns({ text: 'hello @bob' });
+      {
+        profile: { userid: 'acct:foo@bar.com' },
+        mentionsEnabled: true,
+        text: 'hello @[Unknown Display Name]',
+        expectedText: 'hello @[Unknown Display Name]',
+        mentionMode: 'display-name',
+      },
+    ].forEach(
+      ({ profile, mentionsEnabled, text, expectedText, mentionMode }) => {
+        it('wraps mentions in tags when feature is enabled', async () => {
+          fakeStore.isFeatureEnabled.returns(mentionsEnabled);
+          fakeStore.profile.returns(profile);
+          fakeStore.getDraft.returns({ text });
 
-        await svc.save(fixtures.defaultAnnotation());
+          await svc.save(fixtures.defaultAnnotation(), {
+            mentionMode,
+            usersMap: new Map([
+              ['John Doe', { userid: 'acct:john_doe@hypothes.is' }],
+            ]),
+          });
 
-        assert.calledWith(
-          fakeApi.annotation.create,
-          {},
-          sinon.match({ text: expectedText }),
-        );
-      });
-    });
+          assert.calledWith(
+            fakeApi.annotation.create,
+            {},
+            sinon.match({ text: expectedText }),
+          );
+        });
+      },
+    );
 
     context('successful save', () => {
       it('copies over internal app-specific keys to the annotation object', () => {

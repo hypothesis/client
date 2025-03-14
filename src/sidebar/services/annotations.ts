@@ -8,7 +8,8 @@ import type {
 import type { AnnotationEventType, SidebarSettings } from '../../types/config';
 import { parseAccountID } from '../helpers/account-id';
 import * as metadata from '../helpers/annotation-metadata';
-import { wrapMentions } from '../helpers/mentions';
+import type { UserItem } from '../helpers/mention-suggestions';
+import { wrapDisplayNameMentions, wrapMentions } from '../helpers/mentions';
 import {
   defaultPermissions,
   privatePermissions,
@@ -17,6 +18,19 @@ import {
 import type { SidebarStore } from '../store';
 import type { AnnotationActivityService } from './annotation-activity';
 import type { APIService } from './api';
+
+export type MentionsOptions =
+  | {
+      mentionMode: 'username';
+    }
+  | {
+      mentionMode: 'display-name';
+      /**
+       * A display-name/user-info map so that mention tags can be generated from
+       * display-name mentions
+       */
+      usersMap: Map<string, UserItem>;
+    };
 
 /**
  * A service for creating, updating and persisting annotations both in the
@@ -45,7 +59,10 @@ export class AnnotationsService {
    * Apply changes for the given `annotation` from its draft in the store (if
    * any) and return a new object with those changes integrated.
    */
-  private _applyDraftChanges(annotation: Annotation): Annotation {
+  private _applyDraftChanges(
+    annotation: Annotation,
+    mentionsOptions: MentionsOptions,
+  ): Annotation {
     const changes: Partial<Annotation> = {};
     const draft = this._store.getDraft(annotation);
     const authority =
@@ -54,10 +71,15 @@ export class AnnotationsService {
     const mentionsEnabled = this._store.isFeatureEnabled('at_mentions');
 
     if (draft) {
+      const textWrapper = !mentionsEnabled
+        ? (text: string) => text
+        : mentionsOptions.mentionMode === 'display-name'
+          ? (text: string) =>
+              wrapDisplayNameMentions(text, mentionsOptions.usersMap)
+          : (text: string) => wrapMentions(text, authority);
+
       changes.tags = draft.tags;
-      changes.text = mentionsEnabled
-        ? wrapMentions(draft.text, authority)
-        : draft.text;
+      changes.text = textWrapper(draft.text);
       changes.permissions = draft.isPrivate
         ? privatePermissions(annotation.user)
         : sharedPermissions(annotation.user, annotation.group);
@@ -232,11 +254,17 @@ export class AnnotationsService {
    * the annotation's `Draft` will be removed and the annotation added
    * to the store.
    */
-  async save(annotation: Annotation) {
+  async save(
+    annotation: Annotation,
+    mentionsOptions: MentionsOptions = { mentionMode: 'username' },
+  ) {
     let saved: Promise<Annotation>;
     let eventType: AnnotationEventType;
 
-    const annotationWithChanges = this._applyDraftChanges(annotation);
+    const annotationWithChanges = this._applyDraftChanges(
+      annotation,
+      mentionsOptions,
+    );
 
     if (!metadata.isSaved(annotation)) {
       saved = this._api.annotation.create({}, annotationWithChanges);
