@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
@@ -9,6 +15,7 @@ import {
   isReply,
   isSaved,
 } from '../../helpers/annotation-metadata';
+import type { UserItem } from '../../helpers/mention-suggestions';
 import { combineUsersForMentions } from '../../helpers/mention-suggestions';
 import type { MentionMode } from '../../helpers/mentions';
 import { applyTheme } from '../../helpers/theme';
@@ -137,6 +144,44 @@ function AnnotationEditor({
     [annotation, draft, isReplyAnno, store],
   );
 
+  const defaultAuthority = store.defaultAuthority();
+  const mentionMode = useMemo(
+    (): MentionMode =>
+      isThirdPartyUser(annotation.user, defaultAuthority)
+        ? 'display-name'
+        : 'username',
+    [annotation.user, defaultAuthority],
+  );
+  // Map to track users that have been mentioned, based on their display name,
+  // so that we can wrap user-name mentions in mention tags when the annotation
+  // is eventually saved.
+  const displayNameToUserMap = useRef<Map<string, UserItem>>(
+    new Map(
+      mentionMode === 'username'
+        ? []
+        : // If the annotation is being edited, it may have mentions. Use them to
+          // initialize the display names map
+          annotation.mentions
+            ?.filter(mention => !!mention.display_name)
+            .map(({ userid, username, display_name: displayName }) => [
+              displayName!,
+              { userid, username, displayName },
+            ]),
+    ),
+  );
+  const onInsertMentionSuggestion = useCallback(
+    (user: UserItem) => {
+      const { displayName } = user;
+      // We need to track the user info for every mention in display-name
+      // mode, so that it is possible to wrap those mentions in tags
+      // afterward.
+      if (displayName && mentionMode === 'display-name') {
+        displayNameToUserMap.current.set(displayName, user);
+      }
+    },
+    [mentionMode],
+  );
+
   const onSave = async () => {
     // If there is any content in the tag editor input field that has
     // not been committed as a tag, go ahead and add it as a tag
@@ -148,8 +193,14 @@ function AnnotationEditor({
       isSaved(annotation) ? 'updated' : 'saved'
     }`;
     try {
-      await annotationsService.save(annotation);
+      await annotationsService.save(
+        annotation,
+        mentionMode === 'username'
+          ? { mentionMode }
+          : { mentionMode, usersMap: displayNameToUserMap.current },
+      );
       toastMessenger.success(successMessage, { visuallyHidden: true });
+      displayNameToUserMap.current = new Map();
     } catch {
       toastMessenger.error('Saving annotation failed');
     }
@@ -158,6 +209,7 @@ function AnnotationEditor({
   // Revert changes to this annotation
   const onCancel = useCallback(() => {
     store.removeDraft(annotation);
+    displayNameToUserMap.current = new Map();
     if (!isSaved(annotation)) {
       store.removeAnnotations([annotation]);
     }
@@ -177,15 +229,6 @@ function AnnotationEditor({
   };
 
   const textStyle = applyTheme(['annotationFontFamily'], settings);
-
-  const defaultAuthority = store.defaultAuthority();
-  const mentionMode = useMemo(
-    (): MentionMode =>
-      isThirdPartyUser(annotation.user, defaultAuthority)
-        ? 'display-name'
-        : 'username',
-    [annotation.user, defaultAuthority],
-  );
 
   const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const usersWhoAnnotated = store.usersWhoAnnotated();
@@ -219,6 +262,7 @@ function AnnotationEditor({
         showHelpLink={showHelpLink}
         mentions={annotation.mentions}
         mentionMode={mentionMode}
+        onInsertMentionSuggestion={onInsertMentionSuggestion}
       />
       <TagEditor
         onAddTag={onAddTag}

@@ -5,15 +5,22 @@ import {
   getContainingMentionOffsets,
   termBeforePosition,
   toPlainTextMention,
+  wrapDisplayNameMentions,
 } from '../mentions';
 
 /**
  * @param {string} username
- * @param {string} [authority]
+ * @param {string} [authority] - Defaults to 'hypothes.is'
+ * @param {string} [content] - Defaults to `@${username}`
  * @param {'link'|'no-link'|'invalid'} [type]
  * @returns {HTMLAnchorElement}
  */
-function mentionElement({ username, authority = 'hypothes.is', type }) {
+function mentionElement({
+  username,
+  authority = 'hypothes.is',
+  content = `@${username}`,
+  type,
+}) {
   const element = document.createElement('a');
 
   element.setAttribute('data-hyp-mention', '');
@@ -23,13 +30,21 @@ function mentionElement({ username, authority = 'hypothes.is', type }) {
     element.setAttribute('data-hyp-mention-type', type);
   }
 
-  element.textContent = `@${username}`;
+  element.textContent = content;
 
   return element;
 }
 
 const mentionTag = (username, authority) =>
   mentionElement({ username, authority }).outerHTML;
+
+/**
+ * @param {string} displayName
+ * @param {string} username
+ * @param {string} [authority]
+ */
+const displayNameMentionTag = (displayName, username, authority) =>
+  mentionElement({ content: `@${displayName}`, username, authority }).outerHTML;
 
 [
   // Mention at the end
@@ -72,7 +87,7 @@ look at ${mentionTag('foo', 'example.com')} comment`,
     authority: 'example.com',
     textWithTags: `Hey ${mentionTag('jane', 'example.com')}, look at this quote from ${mentionTag('rob', 'example.com')}`,
   },
-  // Mentions wrapped in punctuation chars
+  // Mentions wrapped in boundary chars
   {
     text: '(@jane) {@rob} and @john?',
     authority: 'example.com',
@@ -117,9 +132,86 @@ Hello ${mentionTag('jane.doe', 'example.com')}.`,
     });
   });
 
-  describe('unwrapMentions', () => {
+  describe('unwrapMentions - `username` mode', () => {
     it('removes wrapping mention tags', () => {
-      assert.equal(unwrapMentions(textWithTags), text);
+      assert.equal(unwrapMentions(textWithTags, 'username'), text);
+    });
+  });
+});
+
+[
+  // Mention at the end
+  {
+    text: 'Hello @[John Doe]',
+    usersMap: new Map([['John Doe', { userid: 'acct:john_doe@hypothes.is' }]]),
+    textWithTags: `Hello ${displayNameMentionTag('John Doe', 'john_doe')}`,
+  },
+  // Mention at the beginning
+  {
+    text: '@[Jane Doe] look at this',
+    usersMap: new Map([['Jane Doe', { userid: 'acct:jane_doe@hypothes.is' }]]),
+    textWithTags: `${displayNameMentionTag('Jane Doe', 'jane_doe')} look at this`,
+  },
+  // Mention not found in users map
+  {
+    text: '@[Jane Doe] look at this',
+    usersMap: new Map(),
+    textWithTags: `@[Jane Doe] look at this`,
+  },
+  // Mention in the middle
+  {
+    text: 'foo @[Jane Doe] bar',
+    usersMap: new Map([['Jane Doe', { userid: 'acct:jane_doe@hypothes.is' }]]),
+    textWithTags: `foo ${displayNameMentionTag('Jane Doe', 'jane_doe')} bar`,
+  },
+  // Multi-line mentions
+  {
+    text: `@[Albert Banana] hello
+  @[Someone Else] how are you
+  look at @[Foo] comment`,
+    usersMap: new Map([
+      ['Albert Banana', { userid: 'acct:username@example.com' }],
+      ['Someone Else', { userid: 'acct:another@example.com' }],
+      ['Foo', { userid: 'acct:foo@example.com' }],
+    ]),
+    textWithTags: `${displayNameMentionTag('Albert Banana', 'username', 'example.com')} hello
+  ${displayNameMentionTag('Someone Else', 'another', 'example.com')} how are you
+  look at ${displayNameMentionTag('Foo', 'foo', 'example.com')} comment`,
+  },
+  // No mentions
+  {
+    text: 'Just some text',
+    usersMap: new Map(),
+    textWithTags: 'Just some text',
+  },
+  // Mentions wrapped in boundary chars
+  {
+    text: '(@[Albert Banana]), {@[Jane Doe]} and [@[Someone Else]]',
+    usersMap: new Map([
+      ['Albert Banana', { userid: 'acct:username@hypothes.is' }],
+      ['Jane Doe', { userid: 'acct:jane_doe@hypothes.is' }],
+      ['Someone Else', { userid: 'acct:another@hypothes.is' }],
+    ]),
+    textWithTags: `(${displayNameMentionTag('Albert Banana', 'username')}), {${displayNameMentionTag('Jane Doe', 'jane_doe')}} and [${displayNameMentionTag('Someone Else', 'another')}]`,
+  },
+  // Mentions containing boundary chars
+  {
+    text: 'Hello @[Dwayne "The Rock" Johnson]',
+    usersMap: new Map([
+      ['Dwayne "The Rock" Johnson', { userid: 'acct:djohnson@hypothes.is' }],
+    ]),
+    textWithTags: `Hello ${displayNameMentionTag('Dwayne "The Rock" Johnson', 'djohnson')}`,
+  },
+].forEach(({ text, usersMap, textWithTags }) => {
+  describe('wrapDisplayNameMentions', () => {
+    it('wraps every display-name mention in a mention tag', () => {
+      assert.equal(wrapDisplayNameMentions(text, usersMap), textWithTags);
+    });
+  });
+
+  describe('unwrapMentions - `display-name` mode', () => {
+    it('removes wrapping mention tags', () => {
+      assert.equal(unwrapMentions(textWithTags, 'display-name'), text);
     });
   });
 });
@@ -300,7 +392,7 @@ describe('processAndReplaceMentionElements', () => {
     expectedOffsets: { start: 32, end: 37 },
   },
 
-  // Including punctuation characters
+  // Including boundary characters
   ...[
     ',',
     '.',

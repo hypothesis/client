@@ -58,6 +58,7 @@ describe('MarkdownEditor', () => {
         text="test"
         mentionsEnabled={false}
         usersForMentions={{ status: 'loaded', users: [], ...usersForMentions }}
+        mentionMode="username"
         {...rest}
       />,
       mountProps,
@@ -573,8 +574,10 @@ describe('MarkdownEditor', () => {
 
     it('applies highlighted suggestion when `Enter` is pressed', () => {
       const onEditText = sinon.stub();
+      const onInsertMentionSuggestion = sinon.stub();
       const wrapper = createComponent({
         onEditText,
+        onInsertMentionSuggestion,
         mentionsEnabled: true,
         usersForMentions: {
           status: 'loaded',
@@ -595,6 +598,11 @@ describe('MarkdownEditor', () => {
 
       // The textarea should include the username for second suggestion
       assert.calledWith(onEditText, '@two ');
+      // Selected mention should have been passed to onInsertMentionSuggestion
+      assert.calledWith(
+        onInsertMentionSuggestion,
+        sinon.match({ username: 'two', displayName: 'johndoe' }),
+      );
     });
 
     it('sets users to "loading" if users for mentions are being loaded', () => {
