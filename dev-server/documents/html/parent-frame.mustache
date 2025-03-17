@@ -24,9 +24,13 @@
       annotatable.
     </p>
 
-    <button class="js-toggle-button">Toggle frame</button>
+    <div class="toolbar">
+      <button class="js-toggle-button">Toggle frame</button>
+      <button id="prev-page" disabled>Prev page</button>
+      <button id="next-page">Next page</button>
+    </div>
 
-    <iframe enable-annotation src="/document/injectable-frame"></iframe>
+    <iframe enable-annotation src="/document/injectable-frame?page=1"></iframe>
     {{{hypothesisScript}}}
 
     <script type="module">
@@ -42,6 +46,25 @@
           document.body.append(newFrame);
         }
       };
+
+      const prevPageButton = document.querySelector('#prev-page');
+      const nextPageButton = document.querySelector('#next-page');
+
+      const stepPage = (step) => {
+        const iframe = document.querySelector('iframe[enable-annotation]');
+        const maxPage = 5;
+        const url = new URL(iframe.src);
+        const currentPage = parseInt(url.searchParams.get('page')) || 1;
+        const nextPage = Math.max(1, Math.min(currentPage + step, maxPage));
+        url.searchParams.set('page', nextPage);
+        iframe.src = url.toString();
+
+        prevPageButton.disabled = nextPage === 1;
+        nextPageButton.disabled = nextPage === maxPage;
+      };
+
+      prevPageButton.onclick = () => stepPage(-1);
+      nextPageButton.onclick = () => stepPage(1);
     </script>
   </body>
 </html>
