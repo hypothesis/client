@@ -15071,9 +15071,9 @@ __metadata:
   linkType: hard
 
 "wrap-text@npm:^1.0.7":
-  version: 1.0.9
-  resolution: "wrap-text@npm:1.0.9"
-  checksum: 390f5e2bf2de4c993a33ebca2735e8c2fa82cdee2f2c6daa973362188a0d43be2559571239fbd3df469da86bc7219ef3287883fd9865595ffc84887df39c347f
+  version: 1.0.10
+  resolution: "wrap-text@npm:1.0.10"
+  checksum: 425e273f8092f03ebcc56d1a84a456638378150c0bb78760a1f63a37c0b56068b313bb3447d5682e329985bea2315ecdb6628eb4c19087387a058ed144fc4955
   languageName: node
   linkType: hard
 
