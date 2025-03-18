@@ -234,8 +234,13 @@ function AnnotationEditor({
   const usersWhoAnnotated = store.usersWhoAnnotated();
   const focusedGroupMembers = store.getFocusedGroupMembers();
   const usersForMentions = useMemo(
-    () => combineUsersForMentions(usersWhoAnnotated, focusedGroupMembers),
-    [focusedGroupMembers, usersWhoAnnotated],
+    () =>
+      combineUsersForMentions(
+        usersWhoAnnotated,
+        focusedGroupMembers,
+        mentionMode,
+      ),
+    [focusedGroupMembers, mentionMode, usersWhoAnnotated],
   );
 
   useEffect(() => {

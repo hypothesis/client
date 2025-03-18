@@ -1,4 +1,5 @@
 import type { FocusedGroupMembers } from '../store/modules/groups';
+import type { MentionMode } from './mentions';
 
 export type UserItem = {
   /** User ID in the form of acct:[username]@[authority] */
@@ -16,6 +17,11 @@ export type UsersForMentions =
  * The list includes both users who already annotated the document, and members
  * of the currently focused group.
  *
+ * The list is sorted differently depending on the mentionMode:
+ * - `username`: By username only, as it's a unique field
+ * - `display-name`: By display name first, then by username, in case of same
+ *                   display name
+ *
  * We won't return any users if the group members are being loaded, preventing a
  * mix of some already-fetched users and a loading indicator from being shown at
  * the same time.
@@ -23,6 +29,7 @@ export type UsersForMentions =
 export function combineUsersForMentions(
   usersWhoAnnotated: UserItem[],
   focusedGroupMembers: FocusedGroupMembers,
+  mentionMode: MentionMode,
 ): UsersForMentions {
   if (focusedGroupMembers.status !== 'loaded') {
     return { status: 'loading' };
@@ -44,7 +51,21 @@ export function combineUsersForMentions(
       addedUserIds.add(userid);
       return !usernameAlreadyAdded;
     })
-    .sort((a, b) => a.username.localeCompare(b.username));
+    .sort((a, b) => {
+      if (mentionMode === 'username') {
+        return a.username.localeCompare(b.username);
+      }
+
+      const displayNameA = a.displayName ?? '';
+      const displayNameB = b.displayName ?? '';
+
+      // For display-name mentions, sort by display name first, then by username
+      return (
+        displayNameA.localeCompare(displayNameB, undefined, {
+          sensitivity: 'base',
+        }) || a.username.localeCompare(b.username)
+      );
+    });
 
   return { status: 'loaded', users };
 }
