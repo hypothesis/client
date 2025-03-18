@@ -14,7 +14,7 @@ describe('combineUsersForMentions', () => {
     },
   );
 
-  it('merges, dedups and sorts users who already annotated with group members', () => {
+  it('merges and dedups users who already annotated with group members', () => {
     const usersWhoAnnotated = [
       {
         userid: 'acct:janedoe@example.com',
@@ -44,7 +44,11 @@ describe('combineUsersForMentions', () => {
     };
 
     assert.deepEqual(
-      combineUsersForMentions(usersWhoAnnotated, focusedGroupMembers),
+      combineUsersForMentions(
+        usersWhoAnnotated,
+        focusedGroupMembers,
+        'username',
+      ),
       {
         status: 'loaded',
         users: [
@@ -66,6 +70,95 @@ describe('combineUsersForMentions', () => {
         ],
       },
     );
+  });
+
+  [
+    {
+      mentionMode: 'username',
+      expectedUsers: [
+        {
+          userid: 'acct:accent@example.com',
+          username: 'accent',
+          displayName: 'á',
+        },
+        {
+          userid: 'acct:cecilia1@example.com',
+          username: 'cecilia1',
+          displayName: 'Cecelia Davenport',
+        },
+        {
+          userid: 'acct:cecilia92@example.com',
+          username: 'cecilia92',
+          displayName: 'Cecelia Davenport',
+        },
+        {
+          userid: 'acct:no_accent@example.com',
+          username: 'no_accent',
+          displayName: 'a',
+        },
+      ],
+    },
+    {
+      mentionMode: 'display-name',
+      expectedUsers: [
+        {
+          userid: 'acct:accent@example.com',
+          username: 'accent',
+          displayName: 'á',
+        },
+        {
+          userid: 'acct:no_accent@example.com',
+          username: 'no_accent',
+          displayName: 'a',
+        },
+        {
+          userid: 'acct:cecilia1@example.com',
+          username: 'cecilia1',
+          displayName: 'Cecelia Davenport',
+        },
+        {
+          userid: 'acct:cecilia92@example.com',
+          username: 'cecilia92',
+          displayName: 'Cecelia Davenport',
+        },
+      ],
+    },
+  ].forEach(({ mentionMode, expectedUsers }) => {
+    it('sorts users differently based on mention mode', () => {
+      const usersWhoAnnotated = [
+        {
+          userid: 'acct:accent@example.com',
+          username: 'accent',
+          displayName: 'á',
+        },
+        {
+          userid: 'acct:no_accent@example.com',
+          username: 'no_accent',
+          displayName: 'a',
+        },
+        {
+          userid: 'acct:cecilia92@example.com',
+          username: 'cecilia92',
+          displayName: 'Cecelia Davenport',
+        },
+        {
+          userid: 'acct:cecilia1@example.com',
+          username: 'cecilia1',
+          displayName: 'Cecelia Davenport',
+        },
+      ];
+      assert.deepEqual(
+        combineUsersForMentions(
+          usersWhoAnnotated,
+          { status: 'loaded', members: [] },
+          mentionMode,
+        ),
+        {
+          status: 'loaded',
+          users: expectedUsers,
+        },
+      );
+    });
   });
 });
 
