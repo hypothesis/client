@@ -70,20 +70,25 @@ export class AnnotationsService {
       this._store.defaultAuthority();
     const mentionsEnabled = this._store.isFeatureEnabled('at_mentions');
 
-    if (draft) {
-      const textWrapper = !mentionsEnabled
-        ? (text: string) => text
-        : mentionsOptions.mentionMode === 'display-name'
-          ? (text: string) =>
-              wrapDisplayNameMentions(text, mentionsOptions.usersMap)
-          : (text: string) => wrapMentions(text, authority);
-
-      changes.tags = draft.tags;
-      changes.text = textWrapper(draft.text);
-      changes.permissions = draft.isPrivate
-        ? privatePermissions(annotation.user)
-        : sharedPermissions(annotation.user, annotation.group);
+    if (!draft) {
+      return { ...annotation };
     }
+
+    if (!mentionsEnabled) {
+      changes.text = draft.text;
+    } else if (mentionsOptions.mentionMode === 'username') {
+      changes.text = wrapMentions(draft.text, authority);
+    } else {
+      changes.text = wrapDisplayNameMentions(
+        draft.text,
+        mentionsOptions.usersMap,
+      );
+    }
+
+    changes.tags = draft.tags;
+    changes.permissions = draft.isPrivate
+      ? privatePermissions(annotation.user)
+      : sharedPermissions(annotation.user, annotation.group);
 
     // Integrate changes from draft into object to be persisted
     return { ...annotation, ...changes };
