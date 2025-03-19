@@ -81,7 +81,7 @@ export function wrapDisplayNameMentions(
       // TODO Should we still build a mention tag so that it renders as an
       //      invalid mention instead of plain text?
       if (!suggestion) {
-        return `${precedingChar}@[${displayName}]`;
+        return `${precedingChar}${displayNameMention(displayName)}`;
       }
 
       const mentionTag = buildMentionTag(suggestion.userid, `@${displayName}`);
@@ -145,7 +145,7 @@ export function unwrapMentions({
       : // Using || rather than ?? for the display name, to avoid setting an
         // empty string if the user used to have a display name and has been
         // removed since the mention was created
-        `@[${mention?.display_name || tagContent}]`;
+        displayNameMention(mention?.display_name || tagContent);
   });
 }
 
@@ -296,6 +296,18 @@ export function toPlainTextMention(
   mentionMode: MentionMode,
 ): string {
   return mentionMode === 'display-name'
-    ? `@[${user.displayName ?? ''}]`
+    ? displayNameMention(user.displayName ?? '')
     : `@${user.username}`;
+}
+
+/**
+ * Convert a display name into a plain-text mention.
+ * `Display Name` -> `@[Display Name]`
+ *
+ * Square brackets are removed from it, as they are reserved to delimit the
+ * beginning and end of the display name itself.
+ * `Foo [Bar]` -> `@[Foo Bar]`
+ */
+function displayNameMention(displayName: string): string {
+  return `@[${displayName.replace(/[[\]]/g, '')}]`;
 }
