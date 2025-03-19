@@ -585,8 +585,8 @@ export default function MarkdownEditor({
   const input = useRef<HTMLTextAreaElement>(null);
 
   const textWithoutMentionTags = useMemo(
-    () => unwrapMentions(text, mentionMode),
-    [mentionMode, text],
+    () => unwrapMentions({ text, mentionMode, mentions }),
+    [mentionMode, mentions, text],
   );
 
   useEffect(() => {

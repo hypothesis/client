@@ -96,27 +96,56 @@ export function wrapDisplayNameMentions(
 // some assumptions about the tag content in order to be able to get away
 // with it. Specifically we assume that these tags will not contain `<` or
 // `>` in attribute values or the HTML content of the tag.
-const MENTION_TAG_RE = /<a[^>]\bdata-hyp-mention\b[^>]*>([^<]+)<\/a>/g;
+const MENTION_TAG_RE = /<a[^>]\bdata-hyp-mention\b[^>]*>@([^<]+)<\/a>/g;
+
+export type UnwrapMentionsOptions = {
+  text: string;
+  mentionMode: MentionMode;
+  mentions?: Mention[];
+};
 
 /**
  * Replace all mentions wrapped in the special `<a data-hyp-mention />` tag with
  * their plain-text representation.
+ *
  * The plain-text representation depends on the mention mode:
  * - `username`: @username
  * - `display-name`: @[Display Name]
+ *
+ * If a list of mentions is provided, the tag's userid will be matched against
+ * it, so that the plain-text version uses the most recent username or display
+ * name, in case they have changed since the mention was created.
+ * If a list is not provided or the mention is not found, the tag's content will
+ * be used as username or display name.
  */
-export function unwrapMentions(text: string, mentionMode: MentionMode) {
+export function unwrapMentions({
+  text,
+  mentionMode,
+  mentions = [],
+}: UnwrapMentionsOptions) {
   // Use a regex rather than HTML parser to replace the mentions in order
   // to avoid modifying any of the content outside of the replaced tags. This
   // includes avoiding modifications such as encoding characters that will
   // happen when parsing and re-serializing HTML via eg. `innerHTML`.
-  return text.replace(MENTION_TAG_RE, (match, mention) => {
-    if (mentionMode === 'username') {
-      return mention;
-    }
+  return text.replace(MENTION_TAG_RE, (match, tagContent) => {
+    // Even though we need to capture the tag content via a regex for the
+    // reasons explained above, we can use regular DOM APIs to get the userid
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = match;
+    const userid = tempElement
+      .querySelector('a[data-hyp-mention]')
+      ?.getAttribute('data-userid');
 
-    const [atChar, ...rest] = mention;
-    return `${atChar}[${rest.join('')}]`;
+    const mention = mentions.find(
+      ({ original_userid }) => original_userid === userid,
+    );
+
+    return mentionMode === 'username'
+      ? `@${mention?.username ?? tagContent}`
+      : // Using || rather than ?? for the display name, to avoid setting an
+        // empty string if the user used to have a display name and has been
+        // removed since the mention was created
+        `@[${mention?.display_name || tagContent}]`;
   });
 }
 
