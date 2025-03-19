@@ -556,4 +556,17 @@ describe('toPlainTextMention', () => {
       assert.equal(toPlainTextMention(user, mentionMode), expectedMention);
     });
   });
+
+  it('removes square brackets in display-name mode', () => {
+    const user = {
+      userid: 'acct:jane_doe@foo.com',
+      username: 'jane_doe',
+      displayName: 'Jane [Doe] [More Brackets]',
+    };
+
+    assert.equal(
+      toPlainTextMention(user, 'display-name'),
+      '@[Jane Doe More Brackets]',
+    );
+  });
 });
