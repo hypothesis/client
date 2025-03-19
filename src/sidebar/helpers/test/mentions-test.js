@@ -134,7 +134,10 @@ Hello ${mentionTag('jane.doe', 'example.com')}.`,
 
   describe('unwrapMentions - `username` mode', () => {
     it('removes wrapping mention tags', () => {
-      assert.equal(unwrapMentions(textWithTags, 'username'), text);
+      assert.equal(
+        unwrapMentions({ text: textWithTags, mentionMode: 'username' }),
+        text,
+      );
     });
   });
 });
@@ -211,7 +214,88 @@ Hello ${mentionTag('jane.doe', 'example.com')}.`,
 
   describe('unwrapMentions - `display-name` mode', () => {
     it('removes wrapping mention tags', () => {
-      assert.equal(unwrapMentions(textWithTags, 'display-name'), text);
+      assert.equal(
+        unwrapMentions({ text: textWithTags, mentionMode: 'display-name' }),
+        text,
+      );
+    });
+  });
+});
+
+describe('unwrapMentions', () => {
+  [
+    // Mention not found. Tag content kept
+    {
+      mentionMode: 'username',
+      mentions: [],
+      text: `Hello ${mentionTag('jane_doe')}`,
+      expectedResult: 'Hello @jane_doe',
+    },
+    {
+      mentionMode: 'display-name',
+      mentions: [],
+      text: `Hello ${displayNameMentionTag('Jane Doe', 'jane_doe')}`,
+      expectedResult: 'Hello @[Jane Doe]',
+    },
+
+    // Mention found with a new username
+    {
+      mentionMode: 'username',
+      mentions: [
+        {
+          original_userid: 'acct:jane_doe@hypothes.is',
+          username: 'jane_edited',
+        },
+      ],
+      text: `Hello ${mentionTag('jane_doe')}`,
+      expectedResult: 'Hello @jane_edited',
+    },
+
+    // Mention found with a new display name
+    {
+      mentionMode: 'display-name',
+      mentions: [
+        {
+          original_userid: 'acct:jane_doe@hypothes.is',
+          display_name: 'My new name',
+        },
+      ],
+      text: `Hello ${displayNameMentionTag('Jane Doe', 'jane_doe')}`,
+      expectedResult: 'Hello @[My new name]',
+    },
+
+    // Mention found with a now empty display name
+    {
+      mentionMode: 'display-name',
+      mentions: [
+        {
+          original_userid: 'acct:jane_doe@hypothes.is',
+          display_name: '',
+        },
+      ],
+      text: `Hello ${displayNameMentionTag('Jane Doe', 'jane_doe')}`,
+      expectedResult: 'Hello @[Jane Doe]',
+    },
+
+    // data-userid not present
+    {
+      mentionMode: 'username',
+      mentions: [],
+      text: 'Hello <a data-hyp-mention="">@user_id_missing</a>',
+      expectedResult: 'Hello @user_id_missing',
+    },
+    {
+      mentionMode: 'display-name',
+      mentions: [],
+      text: 'Hello <a data-hyp-mention="">@User ID Missing</a>',
+      expectedResult: 'Hello @[User ID Missing]',
+    },
+  ].forEach(({ text, mentionMode, mentions, expectedResult }) => {
+    it('replaces mention tag with current username or display name', () => {
+      assert.equal(
+        unwrapMentions({ text, mentionMode, mentions }),
+        expectedResult,
+      );
     });
   });
 });
