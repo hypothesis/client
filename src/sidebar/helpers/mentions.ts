@@ -77,9 +77,6 @@ export function wrapDisplayNameMentions(
     DISPLAY_NAME_MENTIONS_PAT,
     (match, precedingChar, displayName) => {
       const suggestion = usersMap.get(displayName);
-
-      // TODO Should we still build a mention tag so that it renders as an
-      //      invalid mention instead of plain text?
       if (!suggestion) {
         return `${precedingChar}${displayNameMention(displayName)}`;
       }
@@ -150,11 +147,11 @@ export function unwrapMentions({
 }
 
 /**
- * A username for a mention that the backend "discarded" as invalid. Possible
- * reasons are: the user does not exist, belongs to a different group, is
- * nipsa'd, etc.
+ * The content of a mention tag that the backend "discarded" as invalid.
+ * Possible reasons are: the user does not exist, belongs to a different group,
+ * is nipsa'd, etc.
  */
-export type InvalidUsername = string;
+export type InvalidMentionContent = string;
 
 /**
  * Replace an unprocessed mention tag with another element that represents the
@@ -162,14 +159,15 @@ export type InvalidUsername = string;
  */
 function processAndReplaceMention(
   unprocessedMention: HTMLElement,
-  mention?: Mention,
-): [HTMLElement, Mention | InvalidUsername] {
-  const username = unprocessedMention.textContent ?? '';
-  const mentionOrUsername = mention ?? username;
+  mention: Mention | undefined,
+  mentionMode: MentionMode,
+): [HTMLElement, Mention | InvalidMentionContent] {
+  const originalTagContent = unprocessedMention.textContent ?? '';
+  const mentionOrInvalidContent = mention ?? originalTagContent;
 
   // If this mention element has already been processed, return as is
   if (unprocessedMention.hasAttribute('data-hyp-mention-type')) {
-    return [unprocessedMention, mentionOrUsername];
+    return [unprocessedMention, mentionOrInvalidContent];
   }
 
   const type =
@@ -180,7 +178,20 @@ function processAndReplaceMention(
 
   processedMention.setAttribute('data-hyp-mention', '');
   processedMention.setAttribute('data-hyp-mention-type', type);
-  processedMention.textContent = username;
+
+  // For valid mentions, resolve the most recent username or display name, in
+  // case it has changed since the mention was created.
+  // The only exception is when a valid mention with an empty display name is
+  // resolved, in which case we fall back to the original tag content.
+  if (!mention) {
+    processedMention.textContent = originalTagContent;
+  } else if (mentionMode === 'username') {
+    processedMention.textContent = `@${mention.username}`;
+  } else {
+    processedMention.textContent = mention.display_name
+      ? `@${mention.display_name}`
+      : originalTagContent;
+  }
 
   if (type === 'link') {
     // If the mention exists in the list of mentions and contains a link, render
@@ -197,7 +208,7 @@ function processAndReplaceMention(
   }
 
   unprocessedMention.replaceWith(processedMention);
-  return [processedMention, mentionOrUsername];
+  return [processedMention, mentionOrInvalidContent];
 }
 
 /**
@@ -212,7 +223,8 @@ function processAndReplaceMention(
 export function processAndReplaceMentionElements(
   element: HTMLElement,
   mentions: Mention[],
-): Map<HTMLElement, Mention | InvalidUsername> {
+  mentionMode: MentionMode,
+): Map<HTMLElement, Mention | InvalidMentionContent> {
   const mentionElements = element.querySelectorAll('[data-hyp-mention]');
   const foundMentions = new Map<HTMLElement, Mention | string>();
 
@@ -223,7 +235,9 @@ export function processAndReplaceMentionElements(
       ? mentions.find(m => m.userid === mentionUserId)
       : undefined;
 
-    foundMentions.set(...processAndReplaceMention(htmlMentionElement, mention));
+    foundMentions.set(
+      ...processAndReplaceMention(htmlMentionElement, mention, mentionMode),
+    );
   }
 
   return foundMentions;

@@ -10,7 +10,7 @@ import {
 } from 'preact/hooks';
 
 import type { Mention } from '../../types/api';
-import type { InvalidUsername } from '../helpers/mentions';
+import type { InvalidMentionContent, MentionMode } from '../helpers/mentions';
 import { processAndReplaceMentionElements } from '../helpers/mentions';
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
@@ -55,6 +55,7 @@ export type MarkdownViewProps = {
   classes?: string;
   style?: Record<string, string>;
   mentions?: Mention[];
+  mentionMode: MentionMode;
 
   /**
    * Whether the at-mentions feature ir enabled or not.
@@ -67,7 +68,7 @@ export type MarkdownViewProps = {
   clearTimeout_?: typeof clearTimeout;
 };
 
-type PopoverContent = Mention | InvalidUsername | null;
+type PopoverContent = Mention | InvalidMentionContent | null;
 
 /**
  * A component which renders markdown as HTML, replaces recognized links with
@@ -81,6 +82,7 @@ export default function MarkdownView(props: MarkdownViewProps) {
     style,
     mentions = [],
     mentionsEnabled = false,
+    mentionMode,
     setTimeout_ = setTimeout,
     clearTimeout_ = clearTimeout,
   } = props;
@@ -94,7 +96,7 @@ export default function MarkdownView(props: MarkdownViewProps) {
   const mentionsPopoverRef = useRef<HTMLElement>(null);
 
   const elementToMentionMap = useRef(
-    new Map<HTMLElement, Mention | InvalidUsername>(),
+    new Map<HTMLElement, Mention | InvalidMentionContent>(),
   );
   const [popoverContent, setPopoverContent] = useState<PopoverContent>(null);
   const popoverContentTimeout = useRef<ReturnType<typeof setTimeout> | null>();
@@ -145,8 +147,9 @@ export default function MarkdownView(props: MarkdownViewProps) {
     elementToMentionMap.current = processAndReplaceMentionElements(
       content.current!,
       mentions,
+      mentionMode,
     );
-  }, [mentions]);
+  }, [mentionMode, mentions]);
 
   // Monitor mouse position when mentions popover is visible and hide when it
   // goes outside the anchor or popover.

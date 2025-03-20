@@ -1,10 +1,10 @@
 import { formatDateTime } from '@hypothesis/frontend-shared';
 
 import type { Mention } from '../../../types/api';
-import type { InvalidUsername } from '../../helpers/mentions';
+import type { InvalidMentionContent } from '../../helpers/mentions';
 
 export type MentionPopoverContent = {
-  content: Mention | InvalidUsername;
+  content: Mention | InvalidMentionContent;
 };
 
 /**

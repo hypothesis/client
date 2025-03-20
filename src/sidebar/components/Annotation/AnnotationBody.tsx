@@ -6,6 +6,7 @@ import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
 import { isThirdPartyUser } from '../../helpers/account-id';
 import { isHidden } from '../../helpers/annotation-metadata';
+import type { MentionMode } from '../../helpers/mentions';
 import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
@@ -80,10 +81,13 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
 
   const textStyle = applyTheme(['annotationFontFamily'], settings);
 
-  const shouldLinkTags = useMemo(
-    () => annotation && !isThirdPartyUser(annotation?.user, defaultAuthority),
+  const authorIsThirdParty = useMemo(
+    () => isThirdPartyUser(annotation.user, defaultAuthority),
     [annotation, defaultAuthority],
   );
+  const mentionMode: MentionMode = authorIsThirdParty
+    ? 'display-name'
+    : 'username';
 
   const createTagSearchURL = (tag: string) => {
     return store.getLink('search.tag', { tag });
@@ -108,6 +112,7 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
             style={textStyle}
             mentions={annotation.mentions}
             mentionsEnabled={mentionsEnabled}
+            mentionMode={mentionMode}
           />
         </Excerpt>
       )}
@@ -122,7 +127,9 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
                       key={tag}
                       tag={tag}
                       href={
-                        shouldLinkTags ? createTagSearchURL(tag) : undefined
+                        !authorIsThirdParty
+                          ? createTagSearchURL(tag)
+                          : undefined
                       }
                     />
                   );
