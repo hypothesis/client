@@ -37,7 +37,7 @@ function SuggestionItem({
         // vertically cropped usernames due to the use of `truncate`.
         'leading-tight',
         {
-          'bg-grey-2': highlighted,
+          'ring-2 z-10 relative': highlighted,
         },
       )}
       onClick={e => {
