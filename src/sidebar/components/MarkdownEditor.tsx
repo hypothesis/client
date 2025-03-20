@@ -383,6 +383,7 @@ function TextArea({
           loadingUsers={usersForMentions.status === 'loading'}
           users={userSuggestions}
           highlightedSuggestion={highlightedSuggestion}
+          onHighlightSuggestion={setHighlightedSuggestion}
           onSelectUser={insertMention}
           usersListboxId={usersListboxId}
           mentionMode={mentionMode}
