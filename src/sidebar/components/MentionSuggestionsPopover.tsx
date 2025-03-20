@@ -10,7 +10,8 @@ type SuggestionItemProps = {
   usersListboxId: string;
   highlighted: boolean;
   mentionMode: MentionMode;
-  onSelectUser: (user: UserItem) => void;
+  onSelect: () => void;
+  onHighlight: () => void;
 };
 
 function SuggestionItem({
@@ -18,7 +19,8 @@ function SuggestionItem({
   usersListboxId,
   highlighted,
   mentionMode,
-  onSelectUser,
+  onSelect,
+  onHighlight,
 }: SuggestionItemProps) {
   const showUsername = mentionMode === 'username';
 
@@ -31,8 +33,7 @@ function SuggestionItem({
       key={user.username}
       id={`${usersListboxId}-${user.username}`}
       className={classnames(
-        'flex justify-between items-center gap-x-2',
-        'rounded p-2 hover:bg-grey-2',
+        'flex justify-between items-center gap-x-2 rounded p-2',
         // Adjust line height relative to the font size. This avoids
         // vertically cropped usernames due to the use of `truncate`.
         'leading-tight',
@@ -42,8 +43,13 @@ function SuggestionItem({
       )}
       onClick={e => {
         e.stopPropagation();
-        onSelectUser(user);
+        onSelect();
       }}
+      // Using onMouseMove instead of onMouseEnter, so that if the mouse is
+      // already hovering this item, and then we change the highlighted
+      // suggestion via arrow keys, when the mouse is moved again, this item
+      // becomes highlighted without having to first leave it and enter again.
+      onMouseMove={onHighlight}
       role="option"
       aria-selected={highlighted}
     >
@@ -69,6 +75,8 @@ export type MentionSuggestionsPopoverProps = Pick<
   users: UserItem[];
   /** Index for currently highlighted suggestion */
   highlightedSuggestion: number;
+  /** Invoked when currently highlighted suggestion index is changed */
+  onHighlightSuggestion: (index: number) => void;
   /** Invoked when a user is selected */
   onSelectUser: (selectedSuggestion: UserItem) => void;
   /** Element ID for the user suggestions listbox */
@@ -85,6 +93,7 @@ export default function MentionSuggestionsPopover({
   users,
   onSelectUser,
   highlightedSuggestion,
+  onHighlightSuggestion,
   usersListboxId,
   mentionMode,
   ...popoverProps
@@ -113,7 +122,8 @@ export default function MentionSuggestionsPopover({
                 highlighted={highlightedSuggestion === index}
                 mentionMode={mentionMode}
                 usersListboxId={usersListboxId}
-                onSelectUser={onSelectUser}
+                onSelect={() => onSelectUser(u)}
+                onHighlight={() => onHighlightSuggestion(index)}
               />
             ))}
             {users.length === 0 && (

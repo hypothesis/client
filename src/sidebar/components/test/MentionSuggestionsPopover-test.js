@@ -90,6 +90,17 @@ describe('MentionSuggestionsPopover', () => {
 
       assert.calledWith(onSelectUser, defaultUsers[index]);
     });
+
+    it('sets suggestion as highlighted when hovering over it', () => {
+      const onHighlightSuggestion = sinon.stub();
+      const wrapper = createComponent({ onHighlightSuggestion });
+      const hoverSuggestion = i =>
+        wrapper.find('li').at(i).simulate('mousemove');
+
+      hoverSuggestion(index);
+
+      assert.calledWith(onHighlightSuggestion, index);
+    });
   });
 
   [
