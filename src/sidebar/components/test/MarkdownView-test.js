@@ -18,6 +18,7 @@ describe('MarkdownView', () => {
     return mount(
       <MarkdownView
         markdown=""
+        mentionMode="username"
         {...props}
         setTimeout_={callback => setTimeout(callback, 0)}
         clearTimeout_={fakeClearTimeout}
@@ -98,13 +99,17 @@ describe('MarkdownView', () => {
     });
   });
 
-  [undefined, [{}]].forEach(mentions => {
+  [
+    { mentions: undefined, mentionMode: 'username' },
+    { mentions: [{}], mentionMode: 'display-name' },
+  ].forEach(({ mentions, mentionMode }) => {
     it('renders mention tags based on provided mentions', () => {
-      createComponent({ mentions });
+      createComponent({ mentions, mentionMode });
       assert.calledWith(
         fakeProcessAndReplaceMentionElements,
         sinon.match.any,
         mentions ?? [],
+        mentionMode,
       );
     });
   });

@@ -321,7 +321,11 @@ describe('processAndReplaceMentionElements', () => {
       <p>Mention without ID: <a data-hyp-mention="">@user_id_missing</a></p>
     `;
 
-    const result = processAndReplaceMentionElements(container, mentions);
+    const result = processAndReplaceMentionElements(
+      container,
+      mentions,
+      'username',
+    );
     assert.equal(result.size, 4);
 
     const [
@@ -391,7 +395,11 @@ describe('processAndReplaceMentionElements', () => {
       invalidProcessedMention,
     );
 
-    const result = processAndReplaceMentionElements(container, mentions);
+    const result = processAndReplaceMentionElements(
+      container,
+      mentions,
+      'username',
+    );
     assert.equal(result.size, 3);
 
     const [
@@ -408,6 +416,50 @@ describe('processAndReplaceMentionElements', () => {
 
     assert.equal(thirdElement, invalidProcessedMention);
     assert.equal(thirdMention, '@invalid');
+  });
+
+  [
+    {
+      mentionMode: 'username',
+      oldContent: '@janedoe',
+      mention: { username: 'janedoe_updated' },
+      expectedContent: '@janedoe_updated',
+    },
+    {
+      mentionMode: 'display-name',
+      oldContent: '@Jane Doe',
+      mention: { display_name: 'Jane Doe Updated' },
+      expectedContent: '@Jane Doe Updated',
+    },
+    {
+      mentionMode: 'display-name',
+      oldContent: '@Jane Doe',
+      mention: { display_name: '' },
+      expectedContent: '@Jane Doe',
+    },
+  ].forEach(({ mentionMode, oldContent, mention, expectedContent }) => {
+    it('returns most recent usernames or display names', () => {
+      const mentions = [
+        {
+          userid: 'acct:janedoe@hypothes.is',
+          ...mention,
+        },
+      ];
+      const container = document.createElement('div');
+      container.innerHTML = mentionElement({
+        username: 'janedoe',
+        content: oldContent,
+      }).outerHTML;
+
+      const result = processAndReplaceMentionElements(
+        container,
+        mentions,
+        mentionMode,
+      );
+      const [[mentionEl]] = [...result.entries()];
+
+      assert.equal(mentionEl.textContent, expectedContent);
+    });
   });
 });
 
