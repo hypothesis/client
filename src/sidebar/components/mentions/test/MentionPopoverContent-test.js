@@ -104,7 +104,7 @@ describe('MentionPopoverContent', () => {
     });
   });
 
-  it('renders no username in display-name mode', () => {
+  it('does not render username in display-name mode', () => {
     const wrapper = createComponent(
       { username: 'janedoe', display_name: 'Jane Doe' },
       'display-name',

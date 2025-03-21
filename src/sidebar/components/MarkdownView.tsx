@@ -195,14 +195,14 @@ export default function MarkdownView(props: MarkdownViewProps) {
   // some overflow calculations in the `Excerpt` element. This could be worth
   // a review in the future.
   return (
-    <div className="w-full break-anywhere cursor-text">
-      <StyledText
-        classes={classnames({
-          // A `relative` wrapper around the `Popover` component is needed for
-          // when the native Popover API is not supported.
-          relative: mentionsEnabled,
-        })}
-      >
+    <div
+      className={classnames('w-full break-anywhere cursor-text', {
+        // A `relative` wrapper around the `Popover` component is needed for
+        // when the native Popover API is not supported.
+        relative: mentionsEnabled,
+      })}
+    >
+      <StyledText>
         <div
           className={classes}
           data-testid="markdown-text"
@@ -239,23 +239,23 @@ export default function MarkdownView(props: MarkdownViewProps) {
             }
           }}
         />
-        {mentionsEnabled && (
-          <Popover
-            open={!!popoverContent}
-            onClose={() => setPopoverContentAfterDelay(null)}
-            anchorElementRef={mentionsPopoverAnchorRef}
-            classes="!max-w-[75%]"
-            elementRef={mentionsPopoverRef}
-          >
-            {popoverContent !== null && (
-              <MentionPopoverContent
-                content={popoverContent}
-                mentionMode={mentionMode}
-              />
-            )}
-          </Popover>
-        )}
       </StyledText>
+      {mentionsEnabled && (
+        <Popover
+          open={!!popoverContent}
+          onClose={() => setPopoverContentAfterDelay(null)}
+          anchorElementRef={mentionsPopoverAnchorRef}
+          classes="!max-w-[75%]"
+          elementRef={mentionsPopoverRef}
+        >
+          {popoverContent !== null && (
+            <MentionPopoverContent
+              content={popoverContent}
+              mentionMode={mentionMode}
+            />
+          )}
+        </Popover>
+      )}
     </div>
   );
 }
