@@ -2,6 +2,7 @@ import {
   Button,
   IconButton,
   Link,
+  MentionIcon,
   useSyncedRef,
 } from '@hypothesis/frontend-shared';
 import {
@@ -65,13 +66,14 @@ type Command =
   | 'list'
   | 'math'
   | 'numlist'
-  | 'quote';
+  | 'quote'
+  | 'mention';
 
 /**
  * Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
  * The shortcuts are taken from Stack Overflow's editor.
  */
-const SHORTCUT_KEYS: Record<Command, string> = {
+const SHORTCUT_KEYS: Partial<Record<Command, string>> = {
   bold: 'b',
   image: 'g',
   italic: 'i',
@@ -146,6 +148,11 @@ function handleToolbarCommand(
     case 'list':
       update(state => toggleBlockStyle(state, '* '));
       break;
+    case 'mention':
+      update(state => toggleSpanStyle(state, '@', '', ''));
+      // Dispatch keyup event with `@` key, to open the suggestions popover
+      inputEl.dispatchEvent(new KeyboardEvent('keyup', { key: '@' }));
+      break;
   }
 }
 
@@ -156,6 +163,7 @@ type ToolbarButtonProps = {
   onClick: (e: MouseEvent) => void;
   shortcutKey?: string;
   title?: string;
+  classes?: string | string[];
 };
 
 function ToolbarButton({
@@ -165,6 +173,7 @@ function ToolbarButton({
   onClick,
   shortcutKey,
   title = '',
+  classes,
 }: ToolbarButtonProps) {
   const modifierKey = useMemo(() => (isMacOS() ? 'Cmd' : 'Ctrl'), []);
 
@@ -182,7 +191,7 @@ function ToolbarButton({
   if (label) {
     return (
       <Button
-        classes="p-1.5 text-grey-7 hover:text-grey-9"
+        classes={classnames('p-1.5 text-grey-7 hover:text-grey-9', classes)}
         {...buttonProps}
         size="custom"
         variant="custom"
@@ -192,7 +201,7 @@ function ToolbarButton({
     );
   }
   return (
-    <IconButton classes="px-2 py-2.5" {...buttonProps}>
+    <IconButton classes={classnames('px-2 py-2.5', classes)} {...buttonProps}>
       {Icon && (
         <Icon className="w-[10px] h-[10px] touch:w-[13px] touch:h-[13px]" />
       )}
@@ -401,6 +410,7 @@ type ToolbarProps = {
   onCommand: (command: Command) => void;
 
   showHelpLink: boolean;
+  mentionsEnabled: boolean;
 
   /** Callback invoked when the "Preview" toggle button is clicked */
   onTogglePreview: () => void;
@@ -419,6 +429,7 @@ function Toolbar({
   onCommand,
   onTogglePreview,
   showHelpLink,
+  mentionsEnabled,
 }: ToolbarProps) {
   const toolbarContainer = useRef(null);
   useArrowKeyNavigation(toolbarContainer);
@@ -494,6 +505,17 @@ function Toolbar({
         shortcutKey={SHORTCUT_KEYS.list}
         title="Bulleted list"
       />
+      {mentionsEnabled && (
+        <ToolbarButton
+          disabled={isPreviewing}
+          icon={MentionIcon}
+          onClick={() => onCommand('mention')}
+          title="Mention"
+          // We temporarily add text-brand so that the mention feature is easier
+          // to discover. We'll remove it after some time.
+          classes="!text-brand"
+        />
+      )}
       <div className="grow flex justify-end">
         {showHelpLink && (
           <Link
@@ -626,6 +648,7 @@ export default function MarkdownEditor({
         isPreviewing={preview}
         onTogglePreview={togglePreview}
         showHelpLink={showHelpLink}
+        mentionsEnabled={mentionsEnabled}
       />
       {preview ? (
         <MarkdownView
