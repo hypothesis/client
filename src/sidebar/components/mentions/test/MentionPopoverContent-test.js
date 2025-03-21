@@ -4,14 +4,18 @@ import { checkAccessibility, mount } from '@hypothesis/frontend-testing';
 import MentionPopoverContent from '../MentionPopoverContent';
 
 describe('MentionPopoverContent', () => {
-  function createComponent(content) {
-    return mount(<MentionPopoverContent content={content} />);
+  function createComponent(content, mentionMode = 'username') {
+    return mount(
+      <MentionPopoverContent content={content} mentionMode={mentionMode} />,
+    );
   }
 
   it('renders user-not-found message when InvalidUser is provided', () => {
     const wrapper = createComponent('@invalid');
+    const userNotFound = wrapper.find('[data-testid="user-not-found"]');
 
-    assert.equal('No user with username @invalid exists', wrapper.text());
+    assert.isTrue(userNotFound.exists());
+    assert.equal('No user with username @invalid exists', userNotFound.text());
     assert.isFalse(wrapper.exists('[data-testid="username"]'));
     assert.isFalse(wrapper.exists('[data-testid="display-name"]'));
   });
@@ -97,6 +101,39 @@ describe('MentionPopoverContent', () => {
         wrapper.find('[data-testid="joined"]').text(),
         `Joined ${formatDateTime(joined, { includeTime: false })}`,
       );
+    });
+  });
+
+  it('renders no username in display-name mode', () => {
+    const wrapper = createComponent(
+      { username: 'janedoe', display_name: 'Jane Doe' },
+      'display-name',
+    );
+
+    assert.equal(
+      wrapper.find('[data-testid="display-name"]').text(),
+      'Jane Doe',
+    );
+    assert.isFalse(wrapper.exists('[data-testid="username"]'));
+  });
+
+  [
+    {
+      mentionMode: 'username',
+      expectedLink:
+        'https://web.hypothes.is/help/mentions-for-the-hypothesis-web-app/',
+    },
+    {
+      mentionMode: 'display-name',
+      expectedLink:
+        'https://web.hypothes.is/help/mentions-for-the-hypothesis-lms-app/',
+    },
+  ].forEach(({ mentionMode, expectedLink }) => {
+    it('adds different KB article link depending on mention mode', () => {
+      const wrapper = createComponent({ username: 'janedoe' }, mentionMode);
+      const link = wrapper.find('Link[data-testid="kb-article-link"]');
+
+      assert.equal(link.prop('href'), expectedLink);
     });
   });
 
