@@ -99,7 +99,16 @@ export default function MentionSuggestionsPopover({
   ...popoverProps
 }: MentionSuggestionsPopoverProps) {
   return (
-    <Popover {...popoverProps} classes="p-1">
+    <Popover
+      {...popoverProps}
+      classes={classnames('p-1', [
+        // Popovers have a default max-h-80, which only fits a bit more than 9
+        // suggestions at their current height.
+        // Since we cap at 10 suggestions, increasing this max height prevents
+        // scrollbars to appear.
+        '!max-h-96',
+      ])}
+    >
       <ul
         className="flex-col gap-y-0.5"
         role="listbox"
