@@ -220,6 +220,53 @@ describe('MarkdownEditor', () => {
     });
   });
 
+  describe('"mention" toolbar command', () => {
+    [true, false].forEach(mentionsEnabled => {
+      it('shows mention button only if mentions are enabled', () => {
+        const wrapper = createComponent({ mentionsEnabled });
+
+        assert.equal(
+          wrapper.exists(`ToolbarButton[title="Mention"] > IconButton button`),
+          mentionsEnabled,
+        );
+      });
+    });
+
+    it('inserts @ character and opens suggestions', () => {
+      const onEditText = sinon.stub();
+      const text = 'toolbar command test';
+      const wrapper = createComponent({
+        text,
+        onEditText,
+        mentionsEnabled: true,
+      });
+      const button = wrapper.find(
+        `ToolbarButton[title="Mention"] > IconButton button`,
+      );
+      const input = wrapper.find('textarea').getDOMNode();
+      input.selectionStart = 0;
+      input.selectionEnd = text.length;
+
+      const fakeKeyUpListener = sinon.stub();
+      input.addEventListener('keyup', fakeKeyUpListener);
+
+      button.simulate('click');
+
+      assert.calledWith(
+        fakeKeyUpListener,
+        sinon.match({ type: 'keyup', key: '@' }),
+      );
+      assert.calledWith(onEditText, 'formatted text');
+      assert.calledWith(
+        fakeMarkdownCommands.toggleSpanStyle,
+        sinon.match({ text, selectionStart: 0, selectionEnd: text.length }),
+        '@',
+        '',
+        '',
+      );
+    });
+  });
+
   [
     {
       // Shortcut letter but without ctrl key.
@@ -329,9 +376,16 @@ describe('MarkdownEditor', () => {
     let wrapper;
 
     beforeEach(() => {
-      wrapper = mount(<MarkdownEditor label="Test editor" text="test" />, {
-        connected: true,
-      });
+      wrapper = mount(
+        <MarkdownEditor
+          label="Test editor"
+          text="test"
+          mentionMode="username"
+          mentionsEnabled
+          usersForMentions={{ status: 'loading' }}
+        />,
+        { connected: true },
+      );
     });
 
     const pressKey = key =>
@@ -363,6 +417,7 @@ describe('MarkdownEditor', () => {
         'Insert math',
         'Numbered list',
         'Bulleted list',
+        'Mention',
         'Formatting help',
         'Preview',
         'Bold',
