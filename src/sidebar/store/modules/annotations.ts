@@ -603,6 +603,29 @@ const usersWhoAnnotated = createSelector(
   },
 );
 
+/**
+ * Return the list of unique users who have been mentioned in currently loaded
+ * annotations.
+ */
+const usersWhoWereMentioned = createSelector(
+  (state: State) => state.annotations,
+  annotations => {
+    const mentions = annotations.flatMap(anno => anno.mentions ?? []);
+    const addedUserIds = new Set<string>();
+
+    return mentions
+      .filter(({ userid }) => {
+        const userAlreadyAdded = addedUserIds.has(userid);
+        addedUserIds.add(userid);
+        return !userAlreadyAdded;
+      })
+      .map(({ display_name: displayName, ...rest }) => ({
+        displayName,
+        ...rest,
+      }));
+  },
+);
+
 export const annotationsModule = createStoreModule(initialState, {
   namespace: 'annotations',
   reducers,
@@ -634,5 +657,6 @@ export const annotationsModule = createStoreModule(initialState, {
     orphanCount,
     savedAnnotations,
     usersWhoAnnotated,
+    usersWhoWereMentioned,
   },
 });

@@ -12,6 +12,13 @@ export type UsersForMentions =
   | { status: 'loading' }
   | { status: 'loaded'; users: UserItem[] };
 
+export type CombineUsersOptions = {
+  usersWhoAnnotated: UserItem[];
+  usersWhoWereMentioned: UserItem[];
+  focusedGroupMembers: FocusedGroupMembers;
+  mentionMode: MentionMode;
+};
+
 /**
  * Merge, deduplicate and sort a list of users to be used for mention suggestions.
  * The list includes both users who already annotated the document, and members
@@ -26,11 +33,12 @@ export type UsersForMentions =
  * mix of some already-fetched users and a loading indicator from being shown at
  * the same time.
  */
-export function combineUsersForMentions(
-  usersWhoAnnotated: UserItem[],
-  focusedGroupMembers: FocusedGroupMembers,
-  mentionMode: MentionMode,
-): UsersForMentions {
+export function combineUsersForMentions({
+  usersWhoAnnotated,
+  usersWhoWereMentioned,
+  focusedGroupMembers,
+  mentionMode,
+}: CombineUsersOptions): UsersForMentions {
   if (focusedGroupMembers.status !== 'loaded') {
     return { status: 'loading' };
   }
@@ -45,7 +53,11 @@ export function combineUsersForMentions(
     }),
   );
   const addedUserIds = new Set<string>();
-  const users = [...usersWhoAnnotated, ...focusedGroupUsers]
+  const users = [
+    ...usersWhoAnnotated,
+    ...usersWhoWereMentioned,
+    ...focusedGroupUsers,
+  ]
     .filter(({ userid }) => {
       const usernameAlreadyAdded = addedUserIds.has(userid);
       addedUserIds.add(userid);
