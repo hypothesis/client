@@ -69,6 +69,7 @@ describe('AnnotationEditor', () => {
       removeAnnotations: sinon.stub(),
       isFeatureEnabled: sinon.stub().returns(false),
       usersWhoAnnotated: sinon.stub().returns([]),
+      usersWhoWereMentioned: sinon.stub().returns([]),
       getFocusedGroupMembers: sinon.stub().returns({ status: 'not-loaded' }),
       defaultAuthority: sinon.stub().returns(''),
     };

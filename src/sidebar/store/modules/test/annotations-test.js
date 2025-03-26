@@ -593,4 +593,66 @@ describe('sidebar/store/modules/annotations', () => {
       );
     });
   });
+
+  describe('usersWhoWereMentioned', () => {
+    it('returns expected list of unique users', () => {
+      const store = createTestStore();
+
+      // Add a few annotations with mentions
+      store.addAnnotations([
+        Object.assign(fixtures.defaultAnnotation(), {
+          id: 'a1',
+          mentions: [
+            {
+              userid: 'acct:jondoe@hypothes.is',
+              username: 'jondoe',
+              display_name: null,
+            },
+          ],
+        }),
+        Object.assign(fixtures.defaultAnnotation(), {
+          id: 'a2',
+          mentions: [
+            {
+              userid: 'acct:janedoe@hypothes.is',
+              username: 'janedoe',
+              display_name: 'Jane Doe',
+            },
+          ],
+        }),
+        Object.assign(fixtures.defaultAnnotation(), {
+          id: 'a3',
+          mentions: [
+            {
+              userid: 'acct:janedoe@hypothes.is',
+              username: 'janedoe',
+              display_name: 'Jane Doe',
+            },
+            {
+              userid: 'acct:jondoe@hypothes.is',
+              username: 'jondoe',
+              display_name: null,
+            },
+          ],
+        }),
+      ]);
+
+      // Only one instance of every mentioned user should be returned
+      assert.deepEqual(
+        [
+          {
+            userid: 'acct:jondoe@hypothes.is',
+            username: 'jondoe',
+            displayName: null,
+          },
+          {
+            userid: 'acct:janedoe@hypothes.is',
+            username: 'janedoe',
+            displayName: 'Jane Doe',
+          },
+        ],
+        store.usersWhoWereMentioned(),
+      );
+    });
+  });
 });

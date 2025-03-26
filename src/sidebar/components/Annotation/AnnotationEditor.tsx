@@ -232,15 +232,22 @@ function AnnotationEditor({
 
   const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const usersWhoAnnotated = store.usersWhoAnnotated();
+  const usersWhoWereMentioned = store.usersWhoWereMentioned();
   const focusedGroupMembers = store.getFocusedGroupMembers();
   const usersForMentions = useMemo(
     () =>
-      combineUsersForMentions(
+      combineUsersForMentions({
         usersWhoAnnotated,
+        usersWhoWereMentioned,
         focusedGroupMembers,
         mentionMode,
-      ),
-    [focusedGroupMembers, mentionMode, usersWhoAnnotated],
+      }),
+    [
+      focusedGroupMembers,
+      mentionMode,
+      usersWhoAnnotated,
+      usersWhoWereMentioned,
+    ],
   );
 
   useEffect(() => {

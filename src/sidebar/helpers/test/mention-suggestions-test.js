@@ -7,14 +7,21 @@ describe('combineUsersForMentions', () => {
   [{ status: 'not-loaded' }, { status: 'loading' }].forEach(
     focusedGroupMembers => {
       it('returns "loading" status if focused group members are not loaded yet', () => {
-        assert.deepEqual(combineUsersForMentions([], focusedGroupMembers), {
-          status: 'loading',
-        });
+        assert.deepEqual(
+          combineUsersForMentions({
+            usersWhoAnnotated: [],
+            usersWhoWereMentioned: [],
+            focusedGroupMembers,
+          }),
+          {
+            status: 'loading',
+          },
+        );
       });
     },
   );
 
-  it('merges and dedups users who already annotated with group members', () => {
+  it('merges and dedups users who already annotated, mentioned users and group members', () => {
     const usersWhoAnnotated = [
       {
         userid: 'acct:janedoe@example.com',
@@ -22,8 +29,20 @@ describe('combineUsersForMentions', () => {
         displayName: 'Jane Doe',
       },
       {
-        userid: 'acct:cecilia92@example.com',
-        username: 'cecilia92',
+        userid: 'acct:cecelia92@example.com',
+        username: 'cecelia92',
+        displayName: 'Cecelia Davenport',
+      },
+    ];
+    const usersWhoWereMentioned = [
+      {
+        userid: 'acct:johndoe@example.com',
+        username: 'johndoe',
+        displayName: 'John Doe',
+      },
+      {
+        userid: 'acct:cecelia92@example.com',
+        username: 'cecelia92',
         displayName: 'Cecelia Davenport',
       },
     ];
@@ -44,11 +63,12 @@ describe('combineUsersForMentions', () => {
     };
 
     assert.deepEqual(
-      combineUsersForMentions(
+      combineUsersForMentions({
         usersWhoAnnotated,
+        usersWhoWereMentioned,
         focusedGroupMembers,
-        'username',
-      ),
+        mentionMode: 'username',
+      }),
       {
         status: 'loaded',
         users: [
@@ -58,14 +78,19 @@ describe('combineUsersForMentions', () => {
             displayName: 'Albert Banana',
           },
           {
-            userid: 'acct:cecilia92@example.com',
-            username: 'cecilia92',
+            userid: 'acct:cecelia92@example.com',
+            username: 'cecelia92',
             displayName: 'Cecelia Davenport',
           },
           {
             userid: 'acct:janedoe@example.com',
             username: 'janedoe',
             displayName: 'Jane Doe',
+          },
+          {
+            userid: 'acct:johndoe@example.com',
+            username: 'johndoe',
+            displayName: 'John Doe',
           },
         ],
       },
@@ -82,13 +107,13 @@ describe('combineUsersForMentions', () => {
           displayName: 'á',
         },
         {
-          userid: 'acct:cecilia1@example.com',
-          username: 'cecilia1',
+          userid: 'acct:cecelia1@example.com',
+          username: 'cecelia1',
           displayName: 'Cecelia Davenport',
         },
         {
-          userid: 'acct:cecilia92@example.com',
-          username: 'cecilia92',
+          userid: 'acct:cecelia92@example.com',
+          username: 'cecelia92',
           displayName: 'Cecelia Davenport',
         },
         {
@@ -112,13 +137,13 @@ describe('combineUsersForMentions', () => {
           displayName: 'a',
         },
         {
-          userid: 'acct:cecilia1@example.com',
-          username: 'cecilia1',
+          userid: 'acct:cecelia1@example.com',
+          username: 'cecelia1',
           displayName: 'Cecelia Davenport',
         },
         {
-          userid: 'acct:cecilia92@example.com',
-          username: 'cecilia92',
+          userid: 'acct:cecelia92@example.com',
+          username: 'cecelia92',
           displayName: 'Cecelia Davenport',
         },
       ],
@@ -137,22 +162,23 @@ describe('combineUsersForMentions', () => {
           displayName: 'a',
         },
         {
-          userid: 'acct:cecilia92@example.com',
-          username: 'cecilia92',
+          userid: 'acct:cecelia92@example.com',
+          username: 'cecelia92',
           displayName: 'Cecelia Davenport',
         },
         {
-          userid: 'acct:cecilia1@example.com',
-          username: 'cecilia1',
+          userid: 'acct:cecelia1@example.com',
+          username: 'cecelia1',
           displayName: 'Cecelia Davenport',
         },
       ];
       assert.deepEqual(
-        combineUsersForMentions(
+        combineUsersForMentions({
           usersWhoAnnotated,
-          { status: 'loaded', members: [] },
+          usersWhoWereMentioned: [],
+          focusedGroupMembers: { status: 'loaded', members: [] },
           mentionMode,
-        ),
+        }),
         {
           status: 'loaded',
           users: expectedUsers,
