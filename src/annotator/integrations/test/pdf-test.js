@@ -3,6 +3,7 @@ import { delay } from '@hypothesis/frontend-testing';
 import { RenderingStates } from '../../anchoring/pdf';
 import { createPlaceholder } from '../../anchoring/placeholder';
 import { FakePDFViewerApplication } from '../../anchoring/test/fake-pdf-viewer-application';
+import { FeatureFlags } from '../../features';
 import { PDFIntegration, isPDF, $imports } from '../pdf';
 
 function awaitEvent(target, eventName) {
@@ -50,7 +51,11 @@ describe('annotator/integrations/pdf', () => {
     let pdfIntegration;
 
     function createPDFIntegration(options = {}) {
-      return new PDFIntegration(fakeAnnotator, options);
+      return new PDFIntegration({
+        annotator: fakeAnnotator,
+        features: new FeatureFlags(['pdf_image_annotation']),
+        ...options,
+      });
     }
 
     beforeEach(() => {
@@ -616,6 +621,34 @@ describe('annotator/integrations/pdf', () => {
         await scrollDone;
 
         assert.notCalled(fakeScrollUtils.scrollElement);
+      });
+    });
+
+    describe('#supportedTools', () => {
+      it('returns "selection" if `pdf_image_annotation` flag is disabled', () => {
+        pdfIntegration = createPDFIntegration();
+        assert.deepEqual(pdfIntegration.supportedTools(), ['selection']);
+      });
+
+      it('returns "selection" and "rect" if `pdf_image_annotation` flag is enabled', () => {
+        const features = new FeatureFlags(['pdf_image_annotation']);
+        pdfIntegration = createPDFIntegration({ features });
+        features.update({ pdf_image_annotation: true });
+        assert.deepEqual(pdfIntegration.supportedTools(), [
+          'selection',
+          'rect',
+        ]);
+      });
+
+      it('emits "supportedToolsChanged" flag when tools change', () => {
+        const features = new FeatureFlags(['pdf_image_annotation']);
+        pdfIntegration = createPDFIntegration({ features });
+        const supportedToolsChanged = sinon.stub();
+        pdfIntegration.on('supportedToolsChanged', supportedToolsChanged);
+
+        features.update({ pdf_image_annotation: true });
+
+        assert.calledWith(supportedToolsChanged, ['selection', 'rect']);
       });
     });
   });

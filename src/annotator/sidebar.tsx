@@ -8,6 +8,7 @@ import { sendErrorsTo } from '../shared/frame-error-capture';
 import { PortRPC } from '../shared/messaging';
 import type {
   AnchorPosition,
+  AnnotationTool,
   SidebarLayout,
   Destroyable,
 } from '../types/annotator';
@@ -258,13 +259,13 @@ export class Sidebar implements Destroyable {
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
       sidebarContainerId: this.iframeContainer?.id,
-      createAnnotation: () => {
+      createAnnotation: (tool: AnnotationTool) => {
         if (this._guestRPC.length === 0) {
           return;
         }
 
         const rpc = this._guestWithSelection ?? this._guestRPC[0];
-        rpc.call('createAnnotation');
+        rpc.call('createAnnotation', { tool });
       },
       setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setHighlightsVisible(show),
@@ -401,6 +402,10 @@ export class Sidebar implements Destroyable {
         this._guestWithSelection = null;
       }
       this._guestRPC = this._guestRPC.filter(rpc => rpc !== guestRPC);
+    });
+
+    guestRPC.on('supportedToolsChanged', (tools: AnnotationTool[]) => {
+      this.toolbar.supportedAnnotationTools = tools;
     });
 
     guestRPC.connect(port);

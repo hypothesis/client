@@ -49,8 +49,11 @@ describe('Sidebar', () => {
     return fakePortRPCs[0];
   };
 
-  /** Return the PortRPC instance for the first connected guest. */
+  /** Return the PortRPC instance for the `index`th connected guest. */
   const guestRPC = (index = 1) => {
+    if (index >= fakePortRPCs.length) {
+      throw new Error(`guestRPC index ${index} is out of bounds`);
+    }
     return fakePortRPCs[index];
   };
 
@@ -174,6 +177,7 @@ describe('Sidebar', () => {
           return toggleButton;
         }
       },
+      supportedAnnotationTools: ['selection'],
     };
     FakeToolbarController = sinon.stub().returns(fakeToolbar);
 
@@ -288,16 +292,18 @@ describe('Sidebar', () => {
     it("doesn't throw when creating an annotation by clicking in toolbar button and there are not connected guests", () => {
       createSidebar();
 
-      FakeToolbarController.args[0][1].createAnnotation();
+      FakeToolbarController.args[0][1].createAnnotation('selection');
     });
 
     it('creates an annotation in the first connected guest when toolbar button is clicked', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
 
-      FakeToolbarController.args[0][1].createAnnotation();
+      FakeToolbarController.args[0][1].createAnnotation('selection');
 
-      assert.calledWith(guestRPC().call, 'createAnnotation');
+      assert.calledWith(guestRPC().call, 'createAnnotation', {
+        tool: 'selection',
+      });
     });
 
     it('creates an annotation in guest with selected text when toolbar button is clicked', () => {
@@ -306,10 +312,14 @@ describe('Sidebar', () => {
       connectGuest(sidebar);
 
       emitNthGuestEvent(2, 'textSelected');
-      FakeToolbarController.args[0][1].createAnnotation();
+      FakeToolbarController.args[0][1].createAnnotation('selection');
 
-      assert.neverCalledWith(guestRPC(1).call, 'createAnnotation');
-      assert.calledWith(guestRPC(2).call, 'createAnnotation');
+      assert.neverCalledWith(guestRPC(1).call, 'createAnnotation', {
+        tool: 'selection',
+      });
+      assert.calledWith(guestRPC(2).call, 'createAnnotation', {
+        tool: 'selection',
+      });
     });
 
     it('creates an annotation in the first connected guest if guest with selected text has closed', () => {
@@ -319,10 +329,14 @@ describe('Sidebar', () => {
 
       emitNthGuestEvent(2, 'textSelected');
       emitNthGuestEvent(2, 'close');
-      FakeToolbarController.args[0][1].createAnnotation();
+      FakeToolbarController.args[0][1].createAnnotation('selection');
 
-      assert.calledWith(guestRPC(1).call, 'createAnnotation');
-      assert.neverCalledWith(guestRPC(2).call, 'createAnnotation');
+      assert.calledWith(guestRPC(1).call, 'createAnnotation', {
+        tool: 'selection',
+      });
+      assert.neverCalledWith(guestRPC(2).call, 'createAnnotation', {
+        tool: 'selection',
+      });
     });
 
     it('toggles create annotation button to "Annotation" when selection becomes non-empty', () => {
@@ -623,6 +637,22 @@ describe('Sidebar', () => {
         assert.notCalled(guestRPC().call);
       });
     });
+
+    describe('on "supportedToolsChanged" event', () => {
+      it('updates toolbar controls', () => {
+        const sidebar = createSidebar();
+        connectGuest(sidebar);
+
+        emitGuestEvent('supportedToolsChanged', ['selection', 'rect']);
+        assert.deepEqual(fakeToolbar.supportedAnnotationTools, [
+          'selection',
+          'rect',
+        ]);
+
+        emitGuestEvent('supportedToolsChanged', ['selection']);
+        assert.deepEqual(fakeToolbar.supportedAnnotationTools, ['selection']);
+      });
+    });
   });
 
   describe('when the sidebar toggle button is dragged', () => {
@@ -772,7 +802,7 @@ describe('Sidebar', () => {
       sidebar.onFrameConnected('dummy', port1);
 
       assert.notCalled(sidebarRPC().connect);
-      assert.isUndefined(guestRPC());
+      assert.throws(() => guestRPC());
     });
 
     it('create RPC channels for recognized source frames', () => {

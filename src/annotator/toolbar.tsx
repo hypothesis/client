@@ -1,10 +1,11 @@
 import { createRef, render } from 'preact';
 import type { RefObject } from 'preact';
 
+import type { AnnotationTool } from '../types/annotator';
 import Toolbar from './components/Toolbar';
 
 export type ToolbarOptions = {
-  createAnnotation: () => void;
+  createAnnotation: (tool: AnnotationTool) => void;
   setSidebarOpen: (open: boolean) => void;
   setHighlightsVisible: (visible: boolean) => void;
   sidebarContainerId?: string;
@@ -26,8 +27,9 @@ export class ToolbarController {
   private _closeSidebar: () => void;
   private _toggleSidebar: () => void;
   private _toggleHighlights: () => void;
-  private _createAnnotation: () => void;
+  private _createAnnotation: (tool: AnnotationTool) => void;
   private _sidebarToggleButton: RefObject<HTMLButtonElement>;
+  private _supportedAnnotationTools: AnnotationTool[];
 
   /**
    * @param container - Element into which the toolbar is rendered
@@ -41,14 +43,23 @@ export class ToolbarController {
     this._highlightsVisible = false;
     this._sidebarOpen = false;
     this._sidebarContainerId = options.sidebarContainerId;
+    this._supportedAnnotationTools = ['selection'];
 
     this._closeSidebar = () => setSidebarOpen(false);
     this._toggleSidebar = () => setSidebarOpen(!this._sidebarOpen);
     this._toggleHighlights = () =>
       setHighlightsVisible(!this._highlightsVisible);
-    this._createAnnotation = () => {
-      createAnnotation();
-      setSidebarOpen(true);
+    this._createAnnotation = (tool: AnnotationTool) => {
+      createAnnotation(tool);
+
+      // For the text selection tool, the selection already exists so we can
+      // create the new annotation immediately and open the sidebar for the
+      // user to type. For other tools the user will first need to make a
+      // selection (eg. by drawing a shape), then we can open the sidebar for
+      // them to add text.
+      if (tool === 'selection') {
+        setSidebarOpen(true);
+      }
     };
 
     /** Reference to the sidebar toggle button. */
@@ -122,6 +133,16 @@ export class ToolbarController {
     return this._sidebarToggleButton.current;
   }
 
+  /** Set which tools are supported for creating new annotations. */
+  set supportedAnnotationTools(tools) {
+    this._supportedAnnotationTools = tools;
+    this.render();
+  }
+
+  get supportedAnnotationTools() {
+    return this._supportedAnnotationTools;
+  }
+
   render() {
     render(
       <Toolbar
@@ -131,6 +152,7 @@ export class ToolbarController {
         isSidebarOpen={this._sidebarOpen}
         sidebarContainerId={this._sidebarContainerId}
         showHighlights={this._highlightsVisible}
+        supportedTools={this._supportedAnnotationTools}
         toggleHighlights={this._toggleHighlights}
         toggleSidebar={this._toggleSidebar}
         toggleSidebarRef={this._sidebarToggleButton}

@@ -5,6 +5,7 @@ import {
   CaretRightIcon,
   CaretLeftIcon,
   HideIcon,
+  ImageIcon,
   NoteIcon,
   ShowIcon,
 } from '@hypothesis/frontend-shared';
@@ -15,6 +16,8 @@ import type {
 } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 import type { JSX, RefObject } from 'preact';
+
+import type { AnnotationTool } from '../../types/annotator';
 
 // TODO: ToolbarButton should be extracted as a shared design pattern or
 // component
@@ -66,8 +69,10 @@ export type ToolbarProps = {
    */
   closeSidebar: () => void;
 
-  /** Callback for when "Create annotation" button is clicked. */
-  createAnnotation: () => void;
+  /**
+   * Callback for a button that creates an annotation.
+   */
+  createAnnotation: (tool: AnnotationTool) => void;
 
   /** Is the sidebar currently open? */
   isSidebarOpen: boolean;
@@ -109,6 +114,11 @@ export type ToolbarProps = {
    * when the sidebar is open. This is enabled for the "clean" theme.
    */
   useMinimalControls?: boolean;
+
+  /**
+   * Specifies which tools are supported for creating new annotations.
+   */
+  supportedTools: AnnotationTool[];
 };
 
 /**
@@ -126,6 +136,7 @@ export default function Toolbar({
   sidebarContainerId,
   newAnnotationType,
   showHighlights,
+  supportedTools = ['selection'],
   toggleHighlights,
   toggleSidebar,
   toggleSidebarRef,
@@ -191,15 +202,26 @@ export default function Toolbar({
               pressed={showHighlights}
               onClick={toggleHighlights}
             />
-            <ToolbarButton
-              title={
-                newAnnotationType === 'note'
-                  ? 'New page note'
-                  : 'New annotation'
-              }
-              icon={newAnnotationType === 'note' ? NoteIcon : AnnotateIcon}
-              onClick={createAnnotation}
-            />
+            {supportedTools.includes('selection') && (
+              <ToolbarButton
+                data-testid="text-annotation"
+                title={
+                  newAnnotationType === 'note'
+                    ? 'New page note'
+                    : 'New annotation'
+                }
+                icon={newAnnotationType === 'note' ? NoteIcon : AnnotateIcon}
+                onClick={() => createAnnotation('selection')}
+              />
+            )}
+            {supportedTools.includes('rect') && (
+              <ToolbarButton
+                data-testid="rect-annotation"
+                title="Rectangle annotation"
+                icon={ImageIcon}
+                onClick={() => createAnnotation('rect')}
+              />
+            )}
           </div>
           <StatusNotifier highlightsVisible={showHighlights} />
         </>

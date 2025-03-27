@@ -6,6 +6,7 @@ describe('ToolbarController', () => {
 
   const createToolbar = options => {
     return new ToolbarController(container, {
+      setSidebarOpen: sinon.stub(),
       ...options,
     });
   };
@@ -89,6 +90,16 @@ describe('ToolbarController', () => {
     });
   });
 
+  it('re-renders when `supportedAnnotationTools` changes', () => {
+    const controller = createToolbar();
+    assert.deepEqual(controller.supportedAnnotationTools, ['selection']);
+    assert.deepEqual(toolbarProps.supportedTools, ['selection']);
+
+    controller.supportedAnnotationTools = ['selection', 'rect'];
+
+    assert.deepEqual(toolbarProps.supportedTools, ['selection', 'rect']);
+  });
+
   it('calls `setSidebarOpen` callback when sidebar toggle button is clicked', () => {
     const setSidebarOpen = sinon.stub();
     const controller = createToolbar({ setSidebarOpen });
@@ -128,9 +139,9 @@ describe('ToolbarController', () => {
     const setSidebarOpen = sinon.stub();
     createToolbar({ createAnnotation, setSidebarOpen });
 
-    toolbarProps.createAnnotation();
+    toolbarProps.createAnnotation('selection');
 
-    assert.called(createAnnotation);
+    assert.calledWith(createAnnotation, 'selection');
     assert.called(setSidebarOpen);
   });
 
