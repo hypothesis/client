@@ -255,6 +255,9 @@ export type IntegrationBase = {
    * reporting document information to the sidebar.
    */
   persistFrame?(): boolean;
+
+  /** Query the annotation tools supported by this integration. */
+  supportedTools(): AnnotationTool[];
 };
 
 export type Integration = Destroyable & TinyEmitter & IntegrationBase;
@@ -364,3 +367,13 @@ export type SideBySideOptions =
     };
 
 export type SideBySideMode = SideBySideOptions['mode'];
+
+/**
+ * Tool to use to create a new annotation.
+ *
+ * This controls how the target region of the new annotation is determined.
+ *
+ * - "selection" - Use the current text or DOM selection
+ * - "rect" - Draw a rectangle to select a region of the document
+ */
+export type AnnotationTool = 'selection' | 'rect';

@@ -23,7 +23,10 @@ export type GuestToHostEvent =
    * not sent if highlights are turned on/off in the frame in response to a
    * command from the sidebar or host frames.
    */
-  | 'highlightsVisibleChanged';
+  | 'highlightsVisibleChanged'
+
+  /** The annotation tools supported by this guest have changed. */
+  | 'supportedToolsChanged';
 
 /**
  * Events that guests send to the sidebar.
@@ -63,11 +66,7 @@ export type GuestToSidebarEvent =
  */
 export type HostToGuestEvent =
   /**
-   * The host requests that the guest frame create a new annotation.
-   *
-   * This is used for the toolbar button that creates a new annotation or
-   * page note for the main guest frame, depending on whether there is a
-   * selection.
+   * Create a new annotation in the guest.
    */
   | 'createAnnotation'
 

@@ -5,6 +5,7 @@ import { documentCFI, stripCFIAssertions } from '../../shared/cfi';
 import type {
   Anchor,
   AnnotationData,
+  AnnotationTool,
   Integration,
   SegmentInfo,
   SidebarLayout,
@@ -436,6 +437,11 @@ export class VitalSourceContentIntegration
     } else {
       return this._htmlIntegration.sideBySideActive();
     }
+  }
+
+  /* istanbul ignore next */
+  supportedTools(): AnnotationTool[] {
+    return ['selection'];
   }
 
   async getMetadata() {

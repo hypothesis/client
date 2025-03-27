@@ -2,6 +2,7 @@ import { TinyEmitter } from 'tiny-emitter';
 
 import type {
   Anchor,
+  AnnotationTool,
   FeatureFlags,
   Integration,
   SidebarLayout,
@@ -31,7 +32,7 @@ const MIN_HTML_WIDTH = 480;
  */
 export class HTMLIntegration extends TinyEmitter implements Integration {
   container: HTMLElement;
-  features: FeatureFlags;
+  featureFlags: FeatureFlags;
 
   private _flagsChanged: () => void;
   private _htmlMeta: HTMLMetadata;
@@ -63,7 +64,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
   }) {
     super();
 
-    this.features = features;
+    this.featureFlags = features;
     this.container = container;
 
     this._htmlMeta = new HTMLMetadata();
@@ -102,7 +103,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     this._flagsChanged = () => {
       // There are currently no feature flags that the integration responds to.
     };
-    this.features.on('flagsChanged', this._flagsChanged);
+    this.featureFlags.on('flagsChanged', this._flagsChanged);
   }
 
   anchor(root: Element, selectors: Selector[]): Promise<Range> {
@@ -144,7 +145,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     this._deactivateSideBySide();
     this._navObserver.disconnect();
     this._metaObserver.disconnect();
-    this.features.off('flagsChanged', this._flagsChanged);
+    this.featureFlags.off('flagsChanged', this._flagsChanged);
   }
 
   contentContainer() {
@@ -178,6 +179,10 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
 
   sideBySideActive() {
     return this._sideBySideActive;
+  }
+
+  supportedTools(): AnnotationTool[] {
+    return ['selection'];
   }
 
   /**

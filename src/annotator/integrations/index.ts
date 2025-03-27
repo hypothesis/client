@@ -12,7 +12,10 @@ import {
  */
 export function createIntegration(annotator: Annotator): Integration {
   if (isPDF()) {
-    return new PDFIntegration(annotator);
+    return new PDFIntegration({
+      annotator: annotator,
+      features: annotator.features,
+    });
   }
 
   const vsFrameRole = vitalSourceFrameRole();

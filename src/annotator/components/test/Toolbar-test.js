@@ -109,6 +109,37 @@ describe('Toolbar', () => {
     );
   });
 
+  it('shows selection annotation button if `supportedTools` includes "selection"', () => {
+    const createAnnotation = sinon.stub();
+    const wrapper = createToolbar({
+      createAnnotation,
+      supportedTools: ['selection'],
+    });
+
+    const button = wrapper.find('button[data-testid="text-annotation"]');
+    button.simulate('click');
+
+    assert.calledWith(createAnnotation, 'selection');
+  });
+
+  it('hides rect annotation button if `supportedTools` does not include "rect"', () => {
+    const wrapper = createToolbar();
+    assert.isFalse(wrapper.exists('button[data-testid="rect-annotation"]'));
+  });
+
+  it('shows rect annotation button if `supportedTools` includes "rect"', () => {
+    const createAnnotation = sinon.stub();
+    const wrapper = createToolbar({
+      createAnnotation,
+      supportedTools: ['selection', 'rect'],
+    });
+
+    const button = wrapper.find('button[data-testid="rect-annotation"]');
+    button.simulate('click');
+
+    assert.calledWith(createAnnotation, 'rect');
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

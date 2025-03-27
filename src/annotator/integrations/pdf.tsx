@@ -5,9 +5,11 @@ import { TinyEmitter } from 'tiny-emitter';
 import type {
   Anchor,
   AnnotationData,
+  AnnotationTool,
   Annotator,
   ContentInfoConfig,
   Destroyable,
+  FeatureFlags,
   Integration,
   SidebarLayout,
 } from '../../types/annotator';
@@ -149,6 +151,14 @@ class BannerController implements Destroyable {
   }
 }
 
+export type Options = {
+  annotator: Annotator;
+  features: FeatureFlags;
+
+  /** Max time to wait for re-anchoring to complete when scrolling to an un-rendered page. */
+  reanchoringMaxWait?: number;
+};
+
 /**
  * Integration that works with PDF.js
  */
@@ -163,6 +173,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
    * `destroy` being called during async code elsewhere in the class.
    */
   private _destroyed: boolean;
+  private _features: FeatureFlags;
   private _listeners: ListenerCollection;
   private _observer: MutationObserver;
   private _pdfContainer: HTMLElement;
@@ -178,17 +189,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
 
   private _sideBySideActive: boolean;
 
-  /**
-   * @param annotator
-   * @param options
-   *   @param [options.reanchoringMaxWait] - Max time to wait for
-   *     re-anchoring to complete when scrolling to an un-rendered page.
-   */
-  constructor(
-    annotator: Annotator,
-    /* istanbul ignore next */
-    options: { reanchoringMaxWait?: number } = {},
-  ) {
+  constructor({ annotator, features, reanchoringMaxWait }: Options) {
     super();
 
     this._annotator = annotator;
@@ -214,7 +215,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
       subtree: true,
     });
 
-    this._reanchoringMaxWait = options.reanchoringMaxWait ?? 3000;
+    this._reanchoringMaxWait = reanchoringMaxWait ?? 3000;
     this._banner = new BannerController();
     this._checkForSelectableText();
     this._sideBySideActive = false;
@@ -241,6 +242,11 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     );
 
     this._destroyed = false;
+
+    this._features = features;
+    this._features.on('flagsChanged', () => {
+      this.emit('supportedToolsChanged', this.supportedTools());
+    });
   }
 
   destroy() {
@@ -457,6 +463,15 @@ export class PDFIntegration extends TinyEmitter implements Integration {
 
   sideBySideActive() {
     return this._sideBySideActive;
+  }
+
+  supportedTools(): AnnotationTool[] {
+    const imageAnnotation = this._features?.flagEnabled('pdf_image_annotation');
+    if (imageAnnotation) {
+      return ['selection', 'rect'];
+    } else {
+      return ['selection'];
+    }
   }
 
   /**

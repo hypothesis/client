@@ -181,6 +181,7 @@ describe('Guest', () => {
       scrollToAnchor: sinon.stub().resolves(),
       showContentInfo: sinon.stub(),
       sideBySideActive: sinon.stub().returns(false),
+      supportedTools: sinon.stub().returns(['selection']),
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
     });
 
@@ -550,7 +551,7 @@ describe('Guest', () => {
       it('creates an annotation', async () => {
         createGuest();
 
-        emitHostEvent('createAnnotation');
+        emitHostEvent('createAnnotation', { tool: 'selection' });
         await delay(0);
 
         assert.calledWith(sidebarRPC().call, 'createAnnotation');
@@ -1037,7 +1038,7 @@ describe('Guest', () => {
     it('adds document metadata to the annotation', async () => {
       const guest = createGuest();
 
-      const annotation = await guest.createAnnotation();
+      const annotation = await guest.createAnnotationFromSelection();
 
       assert.equal(annotation.uri, await fakeIntegration.uri());
       assert.deepEqual(
@@ -1056,7 +1057,7 @@ describe('Guest', () => {
       fakeIntegration.anchor.resolves({});
       fakeIntegration.describe.returns([selectorA, selectorB]);
 
-      const annotation = await guest.createAnnotation({});
+      const annotation = await guest.createAnnotationFromSelection({});
 
       assert.calledWith(fakeIntegration.describe, guest.element, fakeRange);
       assert.deepEqual(annotation.target, [
@@ -1072,7 +1073,7 @@ describe('Guest', () => {
       const removeAllRanges = sandbox.stub();
       sandbox.stub(document, 'getSelection').returns({ removeAllRanges });
 
-      await guest.createAnnotation();
+      await guest.createAnnotationFromSelection();
 
       assert.calledOnce(removeAllRanges);
       notifySelectionChanged(null); // removing the text selection triggers the selection observer
@@ -1081,38 +1082,44 @@ describe('Guest', () => {
 
     it('sets `$tag` property', async () => {
       const guest = createGuest();
-      const annotation = await guest.createAnnotation();
+      const annotation = await guest.createAnnotationFromSelection();
       assert.match(annotation.$tag, /a:\w{8}/);
     });
 
     it('sets falsey `$highlight` if `highlight` is false', async () => {
       const guest = createGuest();
-      const annotation = await guest.createAnnotation();
+      const annotation = await guest.createAnnotationFromSelection();
       assert.notOk(annotation.$highlight);
     });
 
     it('sets `$highlight` to true if `highlight` is true', async () => {
       const guest = createGuest();
-      const annotation = await guest.createAnnotation({ highlight: true });
+      const annotation = await guest.createAnnotationFromSelection({
+        highlight: true,
+      });
       assert.equal(annotation.$highlight, true);
     });
 
     it('sets `$cluster` to `user-highlights` if `highlight` is true', async () => {
       const guest = createGuest();
-      const annotation = await guest.createAnnotation({ highlight: true });
+      const annotation = await guest.createAnnotationFromSelection({
+        highlight: true,
+      });
       assert.equal(annotation.$cluster, 'user-highlights');
     });
 
     it('sets `$cluster` to `user-annotations` if `highlight` is false', async () => {
       const guest = createGuest();
-      const annotation = await guest.createAnnotation({ highlight: false });
+      const annotation = await guest.createAnnotationFromSelection({
+        highlight: false,
+      });
       assert.equal(annotation.$cluster, 'user-annotations');
     });
 
     it('triggers a "createAnnotation" event', async () => {
       const guest = createGuest();
 
-      const annotation = await guest.createAnnotation();
+      const annotation = await guest.createAnnotationFromSelection();
 
       assert.calledWith(sidebarRPC().call, 'createAnnotation', annotation);
     });
@@ -1652,6 +1659,30 @@ describe('Guest', () => {
       segmentInfo: undefined,
       persistent: false,
     });
+  });
+
+  it('sends supported annotation tools to host', async () => {
+    // Tools should be sent when guest first connects to host.
+    fakeIntegration.supportedTools.returns(['selection', 'rect']);
+    createGuest();
+    assert.calledWith(hostRPC().call, 'supportedToolsChanged', [
+      'selection',
+      'rect',
+    ]);
+
+    hostRPC().call.resetHistory();
+
+    // Tools should be sent if the guest's capabilities change later.
+    fakeIntegration.supportedTools.returns(['selection']);
+    fakeIntegration.emit(
+      'supportedToolsChanged',
+      fakeIntegration.supportedTools(),
+    );
+    assert.calledWith(
+      hostRPC().call,
+      'supportedToolsChanged',
+      fakeIntegration.supportedTools(),
+    );
   });
 
   describe('#fitSideBySide', () => {

@@ -35,7 +35,10 @@ describe('createIntegration', () => {
 
     const integration = createIntegration(annotator);
 
-    assert.calledWith(FakePDFIntegration, annotator);
+    assert.calledWith(FakePDFIntegration, {
+      annotator,
+      features: annotator.features,
+    });
     assert.instanceOf(integration, FakePDFIntegration);
   });
 

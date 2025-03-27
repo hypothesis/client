@@ -6,6 +6,7 @@ import { generateHexString } from '../shared/random';
 import { matchShortcut } from '../shared/shortcut';
 import type {
   AnnotationData,
+  AnnotationTool,
   Annotator,
   Anchor,
   ContentInfoConfig,
@@ -276,8 +277,9 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._outsideAssignmentNotice = null;
 
     this._adder = new Adder(this.element, {
-      onAnnotate: () => this.createAnnotation(),
-      onHighlight: () => this.createAnnotation({ highlight: true }),
+      onAnnotate: () => this.createAnnotationFromSelection(),
+      onHighlight: () =>
+        this.createAnnotationFromSelection({ highlight: true }),
 
       // When the "Show" button is triggered, open the sidebar and select the
       // annotations. Also give keyboard focus to the first selected annotation.
@@ -330,6 +332,10 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
         },
       );
     }
+
+    this._integration.on('supportedToolsChanged', () =>
+      this._notifySupportedToolsChanged(),
+    );
 
     this._hostRPC = new PortRPC();
     this._connectHost(hostFrame);
@@ -485,7 +491,19 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       }
     });
 
-    this._hostRPC.on('createAnnotation', () => this.createAnnotation());
+    this._hostRPC.on(
+      'createAnnotation',
+      ({ tool }: { tool: AnnotationTool }) => {
+        switch (tool) {
+          case 'selection':
+            this.createAnnotationFromSelection();
+            break;
+          /* istanbul ignore next */
+          default:
+            console.warn('Unsupported annotation tool', tool);
+        }
+      },
+    );
 
     this._hostRPC.on('hoverAnnotations', (tags: string[]) =>
       this._hoverAnnotations(tags),
@@ -517,10 +535,21 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
 
     this._hostRPC.on('close', () => this.emit('hostDisconnected'));
 
+    // Schedule messages to be sent after connection to host is established.
+    this._notifySupportedToolsChanged();
+
     // Discover and connect to the host frame. All RPC events must be
     // registered before creating the channel.
     const hostPort = await this._portFinder.discover('host');
     this._hostRPC.connect(hostPort);
+  }
+
+  /** Report the tools supported by the current document type to the host frame. */
+  private _notifySupportedToolsChanged() {
+    this._hostRPC.call(
+      'supportedToolsChanged',
+      this._integration.supportedTools(),
+    );
   }
 
   /**
@@ -778,7 +807,9 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    *     prompting for a comment.
    * @return The new annotation
    */
-  async createAnnotation({ highlight = false } = {}): Promise<AnnotationData> {
+  async createAnnotationFromSelection({
+    highlight = false,
+  } = {}): Promise<AnnotationData> {
     const ranges = this.selectedRanges;
     this.selectedRanges = [];
 

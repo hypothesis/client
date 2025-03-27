@@ -6,7 +6,7 @@ import type { FeatureFlags as IFeatureFlags } from '../types/annotator';
 /**
  * List of feature flags that annotator code tests for.
  */
-const annotatorFlags = ['styled_highlight_clusters'];
+const annotatorFlags = ['pdf_image_annotation', 'styled_highlight_clusters'];
 
 /**
  * An observable container of feature flags.
