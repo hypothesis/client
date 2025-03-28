@@ -115,7 +115,7 @@ function ModerationBanner({
           title={
             annotation.hidden
               ? 'Make this annotation visible to everyone'
-              : 'Hide this annotationn from non-moderators'
+              : 'Hide this annotation from non-moderators'
           }
           size="custom"
           variant="custom"
