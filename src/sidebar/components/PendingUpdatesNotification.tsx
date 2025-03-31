@@ -1,4 +1,4 @@
-import { Button, DownloadIcon } from '@hypothesis/frontend-shared';
+import { Button, DownloadIcon, MentionIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
@@ -41,6 +41,35 @@ function HideableBlock({ hidden, children }: HideableBlockProps) {
   );
 }
 
+type UpdateBlockProps = {
+  type: 'updates' | 'mentions';
+  collapsed: boolean;
+  count: number;
+};
+
+function UpdateBlock({ type, collapsed, count }: UpdateBlockProps) {
+  const singular = type === 'updates' ? 'update' : 'mention';
+  const plural = type === 'updates' ? 'updates' : 'mentions';
+  const Icon = type === 'updates' ? DownloadIcon : MentionIcon;
+
+  return (
+    <div
+      className={classnames(
+        'flex gap-1.5 items-center px-2 py-1',
+        'border-l first:border-l-0 border-white/60',
+      )}
+    >
+      <Icon className="w-em h-em" />
+      <div className="flex gap-1">
+        <span className="font-bold">{count}</span>
+        <HideableBlock hidden={collapsed}>
+          {pluralize(count, singular, plural)}
+        </HideableBlock>
+      </div>
+    </div>
+  );
+}
+
 const collapseDelay = 5000;
 
 function PendingUpdatesNotification({
@@ -53,6 +82,8 @@ function PendingUpdatesNotification({
 }: PendingUpdatesNotificationProps) {
   const store = useSidebarStore();
   const pendingUpdateCount = store.pendingUpdateCount();
+  const pendingMentionCount = store.pendingMentionCount();
+  const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const hasPendingChanges = store.hasPendingUpdatesOrDeletions();
   const applyPendingUpdates = useCallback(() => {
     streamer.applyPendingUpdates();
@@ -89,25 +120,26 @@ function PendingUpdatesNotification({
         onClick={applyPendingUpdates}
         unstyled
         classes={classnames(
-          'flex gap-1.5 items-center py-1 px-2',
+          'flex items-center',
           'rounded shadow-lg bg-gray-900 text-white',
           'group focus-visible-ring',
         )}
+        data-testid="notification"
+        data-collapsed={collapsed}
       >
-        <DownloadIcon className="w-em h-em opacity-80" />
-        <div
-          data-testid={
-            collapsed ? 'collapsed-notification' : 'full-notification'
-          }
-          className="flex gap-1"
-        >
-          <HideableBlock hidden={collapsed}>Load</HideableBlock>
-          <span className="font-bold">{pendingUpdateCount}</span>
-          <HideableBlock hidden={collapsed}>
-            {pluralize(pendingUpdateCount, 'update', 'updates')}
-          </HideableBlock>
-        </div>
-        <span className="sr-only">by pressing l</span>
+        <UpdateBlock
+          type="updates"
+          collapsed={collapsed}
+          count={pendingUpdateCount}
+        />
+        {mentionsEnabled && pendingMentionCount > 0 && (
+          <UpdateBlock
+            type="mentions"
+            collapsed={collapsed}
+            count={pendingMentionCount}
+          />
+        )}
+        <span className="sr-only">load them by pressing l</span>
       </Button>
     </div>
   );
