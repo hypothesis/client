@@ -6,7 +6,7 @@ import type { Dispatch } from 'redux';
 import { createSelector } from 'reselect';
 
 import { hasOwn } from '../../../shared/has-own';
-import type { Annotation } from '../../../types/api';
+import type { Annotation, Mention } from '../../../types/api';
 import { createStoreModule, makeAction } from '../create-store';
 import type { State as AnnotationsState } from './annotations';
 import { annotationsModule } from './annotations';
@@ -14,6 +14,8 @@ import type { State as GroupsState } from './groups';
 import { groupsModule } from './groups';
 import type { State as RouteState } from './route';
 import { routeModule } from './route';
+import type { State as SessionState } from './session';
+import { sessionModule } from './session';
 
 export type AnnotationMap = Record<string, Annotation>;
 export type BooleanMap = Record<string, boolean>;
@@ -221,6 +223,47 @@ function hasPendingUpdatesOrDeletions(state: State): boolean {
   return pendingUpdateCount(state) > 0;
 }
 
+type RootState = {
+  realTimeUpdates: State;
+  session: SessionState;
+  annotations: AnnotationsState;
+};
+
+/**
+ * Return a total count of pending updates containing mentions for current user.
+ * This includes any new annotation where current user was mentioned, or any
+ * existing annotation which was edited to add a new mention to current user.
+ */
+const pendingMentionCount = createSelector(
+  (rootState: RootState) => rootState.realTimeUpdates.pendingUpdates,
+  (rootState: RootState) => sessionModule.selectors.profile(rootState.session),
+  (rootState: RootState) =>
+    annotationsModule.selectors.allAnnotations(rootState.annotations),
+  (pendingUpdates, { userid: currentUserId }, allAnnotations) => {
+    const pendingAnnotations = Object.values(pendingUpdates);
+    const mentionsIncludeCurrentUser = (mentions?: Mention[]) =>
+      !!mentions?.some(mention => mention.userid === currentUserId);
+
+    return pendingAnnotations.filter(({ mentions, id }) => {
+      const mentionsCurrentUser = mentionsIncludeCurrentUser(mentions);
+      const prevAnnotation = allAnnotations.find(a => a.id === id);
+
+      // For new annotations, we just need to check if they include a mention of
+      // current user
+      if (!prevAnnotation) {
+        return mentionsCurrentUser;
+      }
+
+      // For existing annotations, we also need to check that they did not
+      // already include mentions of current user.
+      return (
+        mentionsCurrentUser &&
+        !mentionsIncludeCurrentUser(prevAnnotation.mentions)
+      );
+    }).length;
+  },
+);
+
 export const realTimeUpdatesModule = createStoreModule(initialState, {
   namespace: 'realTimeUpdates',
   reducers,
@@ -235,5 +278,8 @@ export const realTimeUpdatesModule = createStoreModule(initialState, {
     pendingDeletions,
     pendingUpdates,
     pendingUpdateCount,
+  },
+  rootSelectors: {
+    pendingMentionCount,
   },
 });

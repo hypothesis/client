@@ -24,7 +24,9 @@ describe('PendingUpdatesNotification', () => {
     };
     fakeStore = {
       pendingUpdateCount: sinon.stub().returns(3),
+      pendingMentionCount: sinon.stub().returns(0),
       hasPendingUpdatesOrDeletions: sinon.stub().returns(true),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     $imports.$mock({
@@ -51,7 +53,9 @@ describe('PendingUpdatesNotification', () => {
   }
 
   function notificationIsCollapsed(wrapper) {
-    return wrapper.exists('[data-testid="collapsed-notification"]');
+    return wrapper
+      .find('Button[data-testid="notification"]')
+      .prop('data-collapsed');
   }
 
   /**
@@ -84,7 +88,6 @@ describe('PendingUpdatesNotification', () => {
     const wrapper = createComponent();
 
     // Initially, it shows full notification
-    assert.isTrue(wrapper.exists('[data-testid="full-notification"]'));
     assert.isFalse(notificationIsCollapsed(wrapper));
     assert.calledOnce(fakeSetTimeout);
 
@@ -92,7 +95,6 @@ describe('PendingUpdatesNotification', () => {
     wrapper.update();
 
     // Once the timeout callback has been invoked, it collapses the notification
-    assert.isFalse(wrapper.exists('[data-testid="full-notification"]'));
     assert.isTrue(notificationIsCollapsed(wrapper));
   });
 
@@ -133,6 +135,36 @@ describe('PendingUpdatesNotification', () => {
       );
       assert.equal(fakeStreamer.applyPendingUpdates.called, hasPendingUpdates);
       assert.equal(fakeAnalytics.trackEvent.called, hasPendingUpdates);
+    });
+  });
+
+  [
+    { pendingMentionCount: 3, mentionsEnabled: true },
+    { pendingMentionCount: 1, mentionsEnabled: true },
+    { pendingMentionCount: 0, mentionsEnabled: true },
+    { pendingMentionCount: 3, mentionsEnabled: false },
+    { pendingMentionCount: 1, mentionsEnabled: false },
+    { pendingMentionCount: 0, mentionsEnabled: false },
+  ].forEach(({ pendingMentionCount, mentionsEnabled }) => {
+    it('shows a segment for mentions when there are pending mentions', () => {
+      fakeStore.isFeatureEnabled.returns(mentionsEnabled);
+      fakeStore.pendingMentionCount.returns(pendingMentionCount);
+
+      const wrapper = createComponent();
+      const shouldShowPendingMentions =
+        pendingMentionCount > 0 && mentionsEnabled;
+
+      assert.equal(
+        wrapper.exists('UpdateBlock[type="mentions"]'),
+        shouldShowPendingMentions,
+      );
+
+      if (shouldShowPendingMentions) {
+        assert.equal(
+          wrapper.find('UpdateBlock[type="mentions"]').text(),
+          `${pendingMentionCount}mention${pendingMentionCount === 1 ? '' : 's'}`,
+        );
+      }
     });
   });
 });
