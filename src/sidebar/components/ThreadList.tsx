@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 
 import type { Annotation, EPUBContentSelector } from '../../types/api';
 import type { Thread } from '../helpers/build-thread';
+import { mostRelevantAnnotation } from '../helpers/highlighted-annotations';
 import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
@@ -185,6 +186,7 @@ export default function ThreadList({ threads }: ThreadListProps) {
   }, [threads]);
 
   const store = useSidebarStore();
+  const currentUserId = store.profile().userid;
   const editing = store.countDrafts() > 0;
   const highlightedAnnotations = store.highlightedAnnotations();
   const allAnnotations = store.allAnnotations();
@@ -212,32 +214,22 @@ export default function ThreadList({ threads }: ThreadListProps) {
     }
   }, [store, newAnnotationTag]);
 
-  const mostRecentHighlightedAnnotationId = useMemo(() => {
-    const highlightedAnnos = allAnnotations.filter(
-      anno => anno.id && highlightedAnnotations.includes(anno.id),
-    );
-    // Get the annotation with most recent updated field, which contains a
-    // date in ISO format. This means their alphabetical and chronological
-    // orders match.
-    const mostRecentHighlightedAnnotation =
-      highlightedAnnos.reduce<Annotation | null>(
-        (mostRecent, current) =>
-          !mostRecent || mostRecent.updated < current.updated
-            ? current
-            : mostRecent,
-        null,
-      );
+  const mostRelevantHighlightedAnnotationId = useMemo(
+    () =>
+      mostRelevantAnnotation(allAnnotations, {
+        highlightedAnnotations,
+        currentUserId,
+      })?.id,
+    [allAnnotations, currentUserId, highlightedAnnotations],
+  );
 
-    return mostRecentHighlightedAnnotation?.id;
-  }, [allAnnotations, highlightedAnnotations]);
-
-  // Scroll to the most recently highlighted annotation, unless creating/editing
+  // Scroll to the most relevant highlighted annotation, unless creating/editing
   // another annotation
   useEffect(() => {
-    if (!editing && mostRecentHighlightedAnnotationId) {
-      setScrollToId(mostRecentHighlightedAnnotationId);
+    if (!editing && mostRelevantHighlightedAnnotationId) {
+      setScrollToId(mostRelevantHighlightedAnnotationId);
     }
-  }, [editing, mostRecentHighlightedAnnotationId]);
+  }, [editing, mostRelevantHighlightedAnnotationId]);
 
   // Effect to scroll a particular thread into view. This is mainly used to
   // scroll a newly created annotation into view.
