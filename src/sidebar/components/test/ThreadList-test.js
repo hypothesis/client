@@ -15,6 +15,7 @@ describe('ThreadList', () => {
   let fakeScrollContainer;
   let fakeStore;
   let fakeVisibleThreadsUtil;
+  let fakeMostRelevantAnnotation;
   let wrappers;
 
   function createComponent(props) {
@@ -58,6 +59,7 @@ describe('ThreadList', () => {
       countDrafts: sinon.stub().returns(0),
       highlightedAnnotations: sinon.stub().returns([]),
       allAnnotations: sinon.stub().returns([]),
+      profile: sinon.stub().returns({ userid: 'current_user_id' }),
     };
 
     fakeTopThread = {
@@ -86,11 +88,16 @@ describe('ThreadList', () => {
       },
     };
 
+    fakeMostRelevantAnnotation = sinon.stub();
+
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store': { useSidebarStore: () => fakeStore },
       '../util/dom': fakeDomUtil,
       '../helpers/visible-threads': fakeVisibleThreadsUtil,
+      '../helpers/highlighted-annotations': {
+        mostRelevantAnnotation: fakeMostRelevantAnnotation,
+      },
     });
     sinon.stub(console, 'warn');
   });
@@ -195,59 +202,21 @@ describe('ThreadList', () => {
     });
 
     [
-      {
-        annotationUpdates: {
-          t2: '2024-01-01T10:40:00',
-          t3: '2024-01-01T10:41:00', // Most recent
-          t4: '2024-01-01T10:39:00',
-        },
-        // The most recent highlighted annotation is the third.
-        // At default height (200) should be at 400px.
-        expectedScrollTop: 400,
-      },
-      {
-        annotationUpdates: {
-          t1: '2024-01-01T10:42:00', // Most recent
-          t3: '2024-01-01T10:39:00',
-          t4: '2024-01-01T10:39:00',
-        },
-        // The most recent highlighted annotation is the first.
-        // At default height (200) should be at 0px.
-        expectedScrollTop: 0,
-      },
-      {
-        annotationUpdates: {
-          t1: '2024-01-01T10:42:00',
-          t3: '2024-01-01T10:39:00',
-          t4: '2024-01-01T10:51:00', // Most recent
-        },
-        // The most recent highlighted annotation is the fourth.
-        // At default height (200) should be at 600px.
-        expectedScrollTop: 600,
-      },
-      {
-        annotationUpdates: {
-          t1: '2024-01-01T10:42:00',
-          t3: '2024-01-01T10:39:00',
-          t2: '2024-01-01T10:51:00', // Most recent
-        },
-        // The most recent highlighted annotation is the second.
-        // At default height (200) should be at 200px.
-        expectedScrollTop: 200,
-      },
-    ].forEach(({ annotationUpdates, expectedScrollTop }) => {
-      it('should set the scroll container `scrollTop` to most recent highlighted annotation', () => {
-        fakeStore.highlightedAnnotations.returns(
-          Object.keys(annotationUpdates),
-        );
-        fakeStore.allAnnotations.returns([
-          {}, // Discarded
-          { id: 't1', updated: annotationUpdates.t1 },
-          { id: 't2', updated: annotationUpdates.t2 },
-          { id: 't3', updated: annotationUpdates.t3 },
-          { id: 't4', updated: annotationUpdates.t4 },
-          { id: 't5', updated: annotationUpdates.t5 },
-        ]);
+      { mostRelevantAnno: 0, expectedScrollTop: 0 },
+      { mostRelevantAnno: 1, expectedScrollTop: 200 },
+      { mostRelevantAnno: 2, expectedScrollTop: 400 },
+      { mostRelevantAnno: 3, expectedScrollTop: 600 },
+    ].forEach(({ mostRelevantAnno, expectedScrollTop }) => {
+      it('should set the scroll container `scrollTop` to the most relevant annotation', () => {
+        const allAnnotations = [
+          { id: 't1', updated: '2024-01-01T10:42:00' },
+          { id: 't2', updated: '2024-01-02T10:42:00' },
+          { id: 't3', updated: '2024-01-03T10:42:00' },
+          { id: 't4', updated: '2024-01-04T10:42:00' },
+        ];
+
+        fakeMostRelevantAnnotation.returns(allAnnotations[mostRelevantAnno]);
+        fakeStore.allAnnotations.returns(allAnnotations);
 
         createComponent();
 
