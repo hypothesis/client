@@ -468,7 +468,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
   supportedTools(): AnnotationTool[] {
     const imageAnnotation = this._features?.flagEnabled('pdf_image_annotation');
     if (imageAnnotation) {
-      return ['selection', 'rect'];
+      return ['selection', 'rect', 'point'];
     } else {
       return ['selection'];
     }

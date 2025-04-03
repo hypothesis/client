@@ -7,6 +7,7 @@ import {
   HideIcon,
   ImageIcon,
   NoteIcon,
+  PinIcon,
   ShowIcon,
 } from '@hypothesis/frontend-shared';
 import type { ButtonProps } from '@hypothesis/frontend-shared/lib/components/input/Button';
@@ -220,6 +221,14 @@ export default function Toolbar({
                 title="Rectangle annotation"
                 icon={ImageIcon}
                 onClick={() => createAnnotation('rect')}
+              />
+            )}
+            {supportedTools.includes('point') && (
+              <ToolbarButton
+                data-testid="point-annotation"
+                title="Point annotation"
+                icon={PinIcon}
+                onClick={() => createAnnotation('point')}
               />
             )}
           </div>
