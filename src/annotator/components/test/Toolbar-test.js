@@ -140,6 +140,24 @@ describe('Toolbar', () => {
     assert.calledWith(createAnnotation, 'rect');
   });
 
+  it('hides point annotation button if `supportedTools` does not include "point"', () => {
+    const wrapper = createToolbar();
+    assert.isFalse(wrapper.exists('button[data-testid="point-annotation"]'));
+  });
+
+  it('shows point annotation button if `supportedTools` includes "point"', () => {
+    const createAnnotation = sinon.stub();
+    const wrapper = createToolbar({
+      createAnnotation,
+      supportedTools: ['selection', 'rect', 'point'],
+    });
+
+    const button = wrapper.find('button[data-testid="point-annotation"]');
+    button.simulate('click');
+
+    assert.calledWith(createAnnotation, 'point');
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

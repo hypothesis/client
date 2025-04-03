@@ -376,4 +376,4 @@ export type SideBySideMode = SideBySideOptions['mode'];
  * - "selection" - Use the current text or DOM selection
  * - "rect" - Draw a rectangle to select a region of the document
  */
-export type AnnotationTool = 'selection' | 'rect';
+export type AnnotationTool = 'selection' | 'rect' | 'point';

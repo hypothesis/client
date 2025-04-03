@@ -637,6 +637,7 @@ describe('annotator/integrations/pdf', () => {
         assert.deepEqual(pdfIntegration.supportedTools(), [
           'selection',
           'rect',
+          'point',
         ]);
       });
 
@@ -648,7 +649,11 @@ describe('annotator/integrations/pdf', () => {
 
         features.update({ pdf_image_annotation: true });
 
-        assert.calledWith(supportedToolsChanged, ['selection', 'rect']);
+        assert.calledWith(supportedToolsChanged, [
+          'selection',
+          'rect',
+          'point',
+        ]);
       });
     });
   });
