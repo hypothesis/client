@@ -26,6 +26,7 @@ import type {
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
+import { DrawTool } from './draw-tool';
 import { LayoutChangeEvent } from './events';
 import { FeatureFlags } from './features';
 import { HighlightClusterController } from './highlight-clusters';
@@ -207,6 +208,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
 
   private _adder: Adder;
   private _clusterToolbar?: HighlightClusterController;
+  private _drawTool: DrawTool;
   private _hostFrame: Window;
   private _highlightsVisible: boolean;
   private _isAdderVisible: boolean;
@@ -289,6 +291,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       onShowAnnotations: tags =>
         this.selectAnnotations(tags, { focusInSidebar: true }),
     });
+    this._drawTool = new DrawTool(this.element);
 
     this._selectionObserver = new SelectionObserver(range => {
       if (range) {
@@ -491,18 +494,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       }
     });
 
-    this._hostRPC.on(
-      'createAnnotation',
-      ({ tool }: { tool: AnnotationTool }) => {
-        switch (tool) {
-          case 'selection':
-            this.createAnnotationFromSelection();
-            break;
-          /* istanbul ignore next */
-          default:
-            console.warn('Unsupported annotation tool', tool);
-        }
-      },
+    this._hostRPC.on('createAnnotation', ({ tool }: { tool: AnnotationTool }) =>
+      this.createAnnotation(tool),
     );
 
     this._hostRPC.on('hoverAnnotations', (tags: string[]) =>
@@ -647,6 +640,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   }
 
   destroy() {
+    this._drawTool.destroy();
     this._portFinder.destroy();
     this._hostRPC.destroy();
     this._sidebarRPC.destroy();
@@ -794,6 +788,38 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._clusterToolbar?.scheduleClusterUpdates();
     if (notify) {
       this._bucketBarClient.update(this.anchors);
+    }
+  }
+
+  /** Create a new annotation using the specified tool. */
+  async createAnnotation(tool: AnnotationTool): Promise<AnnotationData> {
+    if (tool === 'selection') {
+      return this.createAnnotationFromSelection();
+    } else if (['rect', 'point'].includes(tool)) {
+      // Draw the shape for the new annotation's region.
+      await this._drawTool.draw(tool);
+
+      // Create annotation data and send to sidebar.
+      const info = await this.getDocumentInfo();
+      const target: Target[] = [
+        {
+          source: info.uri,
+          // TODO: Serialize shape into selectors
+        },
+      ];
+
+      const annotation: AnnotationData = {
+        uri: info.uri,
+        document: info.metadata,
+        target,
+        $tag: 'a:' + generateHexString(8),
+      };
+
+      this._sidebarRPC.call('createAnnotation', annotation);
+
+      return annotation;
+    } else {
+      throw new Error('Unsupported annotation tool');
     }
   }
 

@@ -39,6 +39,8 @@ describe('Guest', () => {
 
   let FakeBucketBarClient;
   let fakeBucketBarClient;
+  let FakeDrawTool;
+  let fakeDrawTool;
   let fakeHighlightClusterController;
   let FakeHighlightClusterController;
   let fakeCreateIntegration;
@@ -156,6 +158,12 @@ describe('Guest', () => {
     };
     FakeBucketBarClient = sinon.stub().returns(fakeBucketBarClient);
 
+    fakeDrawTool = {
+      destroy: sinon.stub(),
+      draw: sinon.stub().resolves({ type: 'point', x: 0, y: 0 }),
+    };
+    FakeDrawTool = sinon.stub().returns(fakeDrawTool);
+
     fakeHighlightClusterController = {
       destroy: sinon.stub(),
     };
@@ -215,6 +223,9 @@ describe('Guest', () => {
       },
       './bucket-bar-client': {
         BucketBarClient: FakeBucketBarClient,
+      },
+      './draw-tool': {
+        DrawTool: FakeDrawTool,
       },
       './highlight-clusters': {
         HighlightClusterController: FakeHighlightClusterController,
@@ -548,13 +559,50 @@ describe('Guest', () => {
     });
 
     describe('on "createAnnotation" event', () => {
-      it('creates an annotation', async () => {
+      it('creates an annotation if `tool` is "selection"', async () => {
         createGuest();
 
         emitHostEvent('createAnnotation', { tool: 'selection' });
         await delay(0);
 
         assert.calledWith(sidebarRPC().call, 'createAnnotation');
+      });
+
+      it('starts drawing if `tool` is "rect"', async () => {
+        createGuest();
+
+        emitHostEvent('createAnnotation', { tool: 'rect' });
+        await delay(0);
+        assert.calledWith(fakeDrawTool.draw, 'rect');
+
+        // After drawing completes, an annotation should be created.
+        assert.calledWith(sidebarRPC().call, 'createAnnotation');
+      });
+
+      it('starts drawing if `tool` is "point"', async () => {
+        createGuest();
+
+        emitHostEvent('createAnnotation', { tool: 'point' });
+        await delay(0);
+
+        assert.calledWith(fakeDrawTool.draw, 'point');
+
+        // After drawing completes, an annotation should be created.
+        assert.calledWith(sidebarRPC().call, 'createAnnotation');
+      });
+
+      it('reports error if annotation tool is unsupported', async () => {
+        createGuest();
+
+        let err;
+        try {
+          await emitHostEvent('createAnnotation', { tool: 'star' });
+        } catch (e) {
+          err = e;
+        }
+
+        assert.instanceOf(err, Error);
+        assert.equal(err.message, 'Unsupported annotation tool');
       });
     });
 
