@@ -161,6 +161,26 @@ export type SidebarLayout = {
   toolbarWidth: number;
 };
 
+export type Rect = {
+  type: 'rect';
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
+
+export type Point = {
+  type: 'point';
+  x: number;
+  y: number;
+};
+
+/**
+ * Shapes used to define 2D regions of a document that an annotation can be
+ * associated with.
+ */
+export type Shape = Rect | Point;
+
 /**
  * Interface for document type/viewer integrations that handle all the details
  * of supporting a specific document type (web page, PDF, ebook, etc.).
