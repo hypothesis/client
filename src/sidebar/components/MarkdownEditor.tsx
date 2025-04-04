@@ -238,9 +238,9 @@ function TextArea({
   const userSuggestions = useMemo(
     () =>
       mentionsEnabled
-        ? usersMatchingMention(activeMention, usersForMentions)
+        ? usersMatchingMention(activeMention, usersForMentions, { mentionMode })
         : [],
-    [activeMention, mentionsEnabled, usersForMentions],
+    [activeMention, mentionMode, mentionsEnabled, usersForMentions],
   );
 
   const checkForMentionAtCaret = useCallback(
