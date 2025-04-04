@@ -568,27 +568,71 @@ describe('Guest', () => {
         assert.calledWith(sidebarRPC().call, 'createAnnotation');
       });
 
-      it('starts drawing if `tool` is "rect"', async () => {
-        createGuest();
+      it('creates annotation if `tool` is "rect"', async () => {
+        const guest = createGuest();
+        const rectShape = {
+          type: 'rect',
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+        };
+        const rectSelectors = [
+          {
+            type: 'ShapeSelector',
+            shape: rectShape,
+          },
+        ];
+        fakeDrawTool.draw.resolves(rectShape);
+        fakeIntegration.describe.resolves(rectSelectors);
 
         emitHostEvent('createAnnotation', { tool: 'rect' });
         await delay(0);
         assert.calledWith(fakeDrawTool.draw, 'rect');
+        assert.calledWith(fakeIntegration.describe, guest.element, rectShape);
 
-        // After drawing completes, an annotation should be created.
-        assert.calledWith(sidebarRPC().call, 'createAnnotation');
+        assert.calledWith(
+          sidebarRPC().call,
+          'createAnnotation',
+          sinon.match({
+            target: [
+              sinon.match({
+                selector: rectSelectors,
+              }),
+            ],
+          }),
+        );
       });
 
-      it('starts drawing if `tool` is "point"', async () => {
-        createGuest();
+      it('creates annotation if `tool` is "point"', async () => {
+        const guest = createGuest();
+        const pointShape = { type: 'point', x: 0, y: 0 };
+        const pointSelectors = [
+          {
+            type: 'ShapeSelector',
+            shape: pointShape,
+          },
+        ];
+        fakeDrawTool.draw.resolves(pointShape);
+        fakeIntegration.describe.resolves(pointSelectors);
 
         emitHostEvent('createAnnotation', { tool: 'point' });
         await delay(0);
 
         assert.calledWith(fakeDrawTool.draw, 'point');
+        assert.calledWith(fakeIntegration.describe, guest.element, pointShape);
 
-        // After drawing completes, an annotation should be created.
-        assert.calledWith(sidebarRPC().call, 'createAnnotation');
+        assert.calledWith(
+          sidebarRPC().call,
+          'createAnnotation',
+          sinon.match({
+            target: [
+              sinon.match({
+                selector: pointSelectors,
+              }),
+            ],
+          }),
+        );
       });
 
       it('reports error if annotation tool is unsupported', async () => {

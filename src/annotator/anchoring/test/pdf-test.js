@@ -2,7 +2,7 @@ import { delay } from '@hypothesis/frontend-testing';
 
 import { matchQuote } from '../match-quote';
 import * as pdfAnchoring from '../pdf';
-import { isTextLayerRenderingDone } from '../pdf';
+import { describeShape, isTextLayerRenderingDone } from '../pdf';
 import { TextRange } from '../text-range';
 import { FakePDFViewerApplication } from './fake-pdf-viewer-application';
 
@@ -758,6 +758,150 @@ describe('annotator/anchoring/pdf', () => {
       it('returns true if the div contains an endOfContent element', () => {
         assert.equal(isTextLayerRenderingDone({ div }), expectedResult);
       });
+    });
+  });
+
+  describe('describeShape', () => {
+    let elementsFromPoint;
+
+    beforeEach(() => {
+      // Dummy element to check that elements returned by `elementsFromPoint`,
+      // which are not a PDF page container, are ignored.
+      const dummy = document.createElement('div');
+
+      // Override `elementsFromPoint` to control how viewport coordinates are
+      // mapped to pages.
+      elementsFromPoint = sinon.stub(document, 'elementsFromPoint');
+      elementsFromPoint.callsFake((x, y) => {
+        // Simulate a layout where the viewer has a 10px margin around the
+        // content and each page is 100x100 px.
+        if (x < 10 || x > 110 || y < 10) {
+          return [];
+        }
+        const pageIndex = Math.floor((y - 10) / 100);
+        if (pageIndex >= viewer.pdfViewer.pagesCount) {
+          return [];
+        }
+        return [dummy, viewer.pdfViewer.getPageView(pageIndex).div];
+      });
+    });
+
+    afterEach(() => {
+      document.elementsFromPoint.restore();
+    });
+
+    context('when shape is a point', () => {
+      it('throws if point is not in a page', async () => {
+        let err;
+        try {
+          await describeShape({ type: 'point', x: 0, y: 0 });
+        } catch (e) {
+          err = e;
+        }
+        assert.instanceOf(err, Error);
+        assert.equal(err.message, 'Point is not in a page');
+      });
+
+      it('returns selectors with PDF user space coordinates for point', async () => {
+        const pageView = viewer.pdfViewer.getPageView(0);
+        const expected = pageView.getPagePoint(10, 10);
+
+        const selectors = await describeShape({ type: 'point', x: 10, y: 10 });
+
+        assert.deepEqual(selectors, [
+          {
+            type: 'PageSelector',
+            index: 0,
+          },
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'point',
+              x: expected[0],
+              y: expected[1],
+            },
+          },
+        ]);
+      });
+    });
+
+    context('when shape is a rect', () => {
+      [
+        {
+          left: 0,
+          top: 0,
+          right: 10,
+          bottom: 10,
+          expected: 'Top-left point is not in a page',
+        },
+        {
+          left: 10,
+          top: 10,
+          right: 0,
+          bottom: 0,
+          expected: 'Bottom-right point is not in a page',
+        },
+        {
+          left: 10,
+          top: 10,
+          right: 10,
+          bottom: 110,
+          expected: 'Shape must start and end on same page',
+        },
+      ].forEach(({ left, top, right, bottom, expected }) => {
+        it('throws if both corners are not in the same page', async () => {
+          let err;
+          try {
+            await describeShape({ type: 'rect', left, top, right, bottom });
+          } catch (e) {
+            err = e;
+          }
+          assert.instanceOf(err, Error);
+          assert.equal(err.message, expected);
+        });
+      });
+
+      it('returns selectors with PDF user space coordinates for rect', async () => {
+        const pageView = viewer.pdfViewer.getPageView(0);
+        const [expectedLeft, expectedTop] = pageView.getPagePoint(10, 10);
+        const [expectedRight, expectedBottom] = pageView.getPagePoint(30, 50);
+
+        const selectors = await describeShape({
+          type: 'rect',
+          left: 10,
+          top: 10,
+          right: 30,
+          bottom: 50,
+        });
+
+        assert.deepEqual(selectors, [
+          {
+            type: 'PageSelector',
+            index: 0,
+          },
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'rect',
+              left: expectedLeft,
+              top: expectedTop,
+              right: expectedRight,
+              bottom: expectedBottom,
+            },
+          },
+        ]);
+      });
+    });
+
+    it('throws if shape is unsupported', async () => {
+      let err;
+      try {
+        await describeShape({ type: 'star' });
+      } catch (e) {
+        err = e;
+      }
+      assert.instanceOf(err, Error);
+      assert.equal(err.message, 'Unsupported shape');
     });
   });
 });

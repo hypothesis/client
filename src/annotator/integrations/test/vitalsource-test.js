@@ -396,9 +396,10 @@ describe('annotator/integrations/vitalsource', () => {
       integration.contentContainer();
       assert.calledWith(fakeHTMLIntegration.contentContainer);
 
+      const root = {};
       const range = new Range();
-      await integration.describe(range);
-      assert.calledWith(fakeHTMLIntegration.describe, range);
+      await integration.describe(root, range);
+      assert.calledWith(fakeHTMLIntegration.describe, root, range);
 
       const selectors = [{ type: 'TextQuoteSelector', exact: 'foobar' }];
       await integration.anchor(selectors);
@@ -414,8 +415,9 @@ describe('annotator/integrations/vitalsource', () => {
       integration.contentContainer();
       assert.calledWith(fakeHTMLIntegration.contentContainer);
 
+      const root = {};
       const range = new Range();
-      const selectors = await integration.describe(range);
+      const selectors = await integration.describe(root, range);
 
       const cfiSelector = selectors.find(s => s.type === 'EPUBContentSelector');
 
@@ -442,8 +444,9 @@ describe('annotator/integrations/vitalsource', () => {
       integration.contentContainer();
       assert.calledWith(fakeHTMLIntegration.contentContainer);
 
+      const root = {};
       const range = new Range();
-      const selectors = await integration.describe(range);
+      const selectors = await integration.describe(root, range);
       const cfiSelector = selectors.find(s => s.type === 'EPUBContentSelector');
 
       assert.ok(cfiSelector);
@@ -475,10 +478,11 @@ describe('annotator/integrations/vitalsource', () => {
         integration.contentContainer();
         assert.calledWith(fakeHTMLIntegration.contentContainer);
 
+        const root = {};
         const range = new Range();
         let error;
         try {
-          await integration.describe(range);
+          await integration.describe(root, range);
         } catch (err) {
           error = err;
         }

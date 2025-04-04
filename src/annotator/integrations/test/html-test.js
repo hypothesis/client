@@ -102,16 +102,35 @@ describe('HTMLIntegration', () => {
     );
   }
 
-  it('implements `anchor` and `destroy` using HTML anchoring', async () => {
+  it('implements `anchor` using HTML anchoring', async () => {
     const integration = createIntegration();
     const root = {};
     const selectors = [];
 
-    const range = await integration.anchor(root, selectors);
+    await integration.anchor(root, selectors);
     assert.calledWith(fakeHTMLAnchoring.anchor, root, selectors);
+  });
 
-    integration.describe(root, range);
-    assert.calledWith(fakeHTMLAnchoring.describe, root, range);
+  describe('#describe', () => {
+    it('describes DOM ranges', () => {
+      const integration = createIntegration();
+      const root = {};
+
+      const range = document.createRange();
+      integration.describe(root, range);
+      assert.calledWith(fakeHTMLAnchoring.describe, root, range);
+    });
+
+    it('throws if passed a shape', () => {
+      const integration = createIntegration();
+      const root = {};
+
+      const shape = { type: 'point', x: 0, y: 0 };
+      assert.throws(() => {
+        integration.describe(root, shape);
+      }, 'Unsupported region type');
+      assert.notCalled(fakeHTMLAnchoring.describe);
+    });
   });
 
   describe('#getAnnotatableRange', () => {

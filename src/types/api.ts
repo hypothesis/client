@@ -134,6 +134,34 @@ export type PageSelector = {
   label?: string;
 };
 
+export type RectShape = {
+  type: 'rect';
+  left: number;
+  top: number;
+  bottom: number;
+  right: number;
+};
+
+export type PointShape = {
+  type: 'point';
+  x: number;
+  y: number;
+};
+
+export type Shape = RectShape | PointShape;
+
+/**
+ * Selector which identifies a region of the document defined by a shape.
+ *
+ * TODO:
+ *  - Specify the origin used by the shape coordinates (eg. page, document body)
+ *  - Specify the coordinate system
+ */
+export type ShapeSelector = {
+  type: 'ShapeSelector';
+  shape: Shape;
+};
+
 /**
  * Serialized representation of a region of a document which an annotation
  * pertains to.
@@ -144,7 +172,8 @@ export type Selector =
   | RangeSelector
   | EPUBContentSelector
   | MediaTimeSelector
-  | PageSelector;
+  | PageSelector
+  | ShapeSelector;
 
 /**
  * An entry in the `target` field of an annotation which identifies the document
