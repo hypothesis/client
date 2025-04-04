@@ -194,11 +194,13 @@ describe('usersMatchingMention', () => {
     {
       usersForMentions: { status: 'loaded', users: [] },
       mention: '',
+      options: { mentionMode: 'username' },
       expectedSuggestions: [],
     },
     {
       usersForMentions: { status: 'loading' },
       mention: '',
+      options: { mentionMode: 'username' },
       expectedSuggestions: [],
     },
 
@@ -226,6 +228,7 @@ describe('usersMatchingMention', () => {
         ],
       },
       mention: 'nothing_will_match',
+      options: { mentionMode: 'username' },
       expectedSuggestions: [],
     },
 
@@ -252,6 +255,7 @@ describe('usersMatchingMention', () => {
         ],
       },
       mention: undefined,
+      options: { mentionMode: 'username' },
       expectedSuggestions: [],
     },
 
@@ -279,6 +283,7 @@ describe('usersMatchingMention', () => {
         ],
       },
       mention: 'two',
+      options: { mentionMode: 'username' },
       expectedSuggestions: [
         {
           userid: 'acct:two@example.com',
@@ -287,6 +292,8 @@ describe('usersMatchingMention', () => {
         },
       ],
     },
+
+    // Matching is case-insensitive
     {
       usersForMentions: {
         status: 'loaded',
@@ -308,7 +315,8 @@ describe('usersMatchingMention', () => {
           },
         ],
       },
-      mention: 'johndoe',
+      mention: 'JohnDoe',
+      options: { mentionMode: 'username' },
       expectedSuggestions: [
         {
           userid: 'acct:one@example.com',
@@ -351,6 +359,7 @@ describe('usersMatchingMention', () => {
         ],
       },
       mention: '',
+      options: { mentionMode: 'username' },
       expectedSuggestions: [
         {
           userid: 'acct:one@example.com',
@@ -393,7 +402,7 @@ describe('usersMatchingMention', () => {
         ],
       },
       mention: 'johndoe',
-      options: { maxUsers: 2 },
+      options: { maxUsers: 2, mentionMode: 'username' },
       expectedSuggestions: [
         {
           userid: 'acct:one@example.com',
@@ -407,7 +416,45 @@ describe('usersMatchingMention', () => {
         },
       ],
     },
-  ].forEach(({ usersForMentions, mention, expectedSuggestions, options }) => {
+
+    // Matching in display-name mode ignores usernames
+    {
+      usersForMentions: {
+        status: 'loaded',
+        users: [
+          {
+            userid: 'acct:one@example.com',
+            username: 'foo', // This won't match
+            displayName: 'johndoe',
+          },
+          {
+            userid: 'acct:two@example.com',
+            username: 'two',
+            displayName: 'Foo One',
+          },
+          {
+            userid: 'acct:three@example.com',
+            username: 'jane',
+            displayName: 'Jane "foo" Doe',
+          },
+        ],
+      },
+      mention: 'foo',
+      options: { mentionMode: 'display-name' },
+      expectedSuggestions: [
+        {
+          userid: 'acct:two@example.com',
+          username: 'two',
+          displayName: 'Foo One',
+        },
+        {
+          userid: 'acct:three@example.com',
+          username: 'jane',
+          displayName: 'Jane "foo" Doe',
+        },
+      ],
+    },
+  ].forEach(({ usersForMentions, mention, options, expectedSuggestions }) => {
     it('suggests expected users for mention', () => {
       assert.deepEqual(
         usersMatchingMention(mention, usersForMentions, options),

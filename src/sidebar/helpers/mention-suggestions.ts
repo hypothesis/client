@@ -83,6 +83,7 @@ export function combineUsersForMentions({
 }
 
 export type UsersMatchingMentionOptions = {
+  mentionMode: MentionMode;
   /** Maximum amount of users to return. Defaults to 10 */
   maxUsers?: number;
 };
@@ -93,21 +94,27 @@ export type UsersMatchingMentionOptions = {
 export function usersMatchingMention(
   mentionToMatch: string | undefined,
   usersForMentions: UsersForMentions,
-  options?: UsersMatchingMentionOptions,
+  { mentionMode, maxUsers = 10 }: UsersMatchingMentionOptions,
 ): UserItem[] {
   if (mentionToMatch === undefined || usersForMentions.status === 'loading') {
     return [];
   }
 
   return usersForMentions.users
-    .filter(
-      u =>
+    .filter(u => {
+      if (!mentionToMatch) {
         // Match all users if the active mention is empty, which happens right
         // after typing `@`
-        !mentionToMatch ||
-        `${u.username} ${u.displayName ?? ''}`
-          .toLowerCase()
-          .match(mentionToMatch.toLowerCase()),
-    )
-    .slice(0, options?.maxUsers ?? 10);
+        return true;
+      }
+
+      const displayName = u.displayName ?? '';
+      const contentToMatch =
+        mentionMode === 'username'
+          ? `${u.username} ${displayName}`
+          : displayName;
+
+      return contentToMatch.match(new RegExp(mentionToMatch, 'i'));
+    })
+    .slice(0, maxUsers);
 }
