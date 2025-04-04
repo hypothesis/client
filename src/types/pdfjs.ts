@@ -110,6 +110,12 @@ export type PDFPageView = {
   textLayer: TextLayer | null;
   /** See `RenderingStates` enum in src/annotator/anchoring/pdf.js */
   renderingState: number;
+
+  /**
+   * Return the `[x, y]` coordinates in PDF user space that correspond to a
+   * given position in the viewport for this page.
+   */
+  getPagePoint(x: number, y: number): [number, number];
 };
 
 /**

@@ -1,5 +1,6 @@
 /* global PDFViewerApplication */
 import { warnOnce } from '../../shared/warn-once';
+import type { Shape } from '../../types/annotator';
 import type {
   PageSelector,
   TextPositionSelector,
@@ -688,6 +689,104 @@ export async function describe(
   };
 
   return [position, quote, pageSelector];
+}
+
+type PDFPoint = {
+  pageIndex: number;
+  x: number;
+  y: number;
+};
+
+/**
+ * Map a point in viewport coordinates to a point in PDF user space coordinates.
+ *
+ * Returns `null` if the specified viewport coordinates are not in any PDF page.
+ */
+async function mapViewportToPDF(
+  x: number,
+  y: number,
+): Promise<PDFPoint | null> {
+  const elements = document.elementsFromPoint(x, y);
+  for (const el of elements) {
+    if (!el.classList.contains('page')) {
+      continue;
+    }
+    const pageIndex = getSiblingIndex(el);
+    const pageViewRect = el.getBoundingClientRect();
+    const pageViewX = x - pageViewRect.left;
+    const pageViewY = y - pageViewRect.top;
+    const pdfPageView = await getPageView(pageIndex);
+    const [userX, userY] = pdfPageView.getPagePoint(pageViewX, pageViewY);
+
+    return {
+      pageIndex,
+      x: userX,
+      y: userY,
+    };
+  }
+  return null;
+}
+
+export async function describeShape(shape: Shape): Promise<Selector[]> {
+  switch (shape.type) {
+    case 'rect': {
+      const [topLeft, bottomRight] = await Promise.all([
+        mapViewportToPDF(shape.left, shape.top),
+        mapViewportToPDF(shape.right, shape.bottom),
+      ]);
+
+      if (!topLeft) {
+        throw new Error('Top-left point is not in a page');
+      }
+      if (!bottomRight) {
+        throw new Error('Bottom-right point is not in a page');
+      }
+
+      if (topLeft.pageIndex !== bottomRight.pageIndex) {
+        throw new Error('Shape must start and end on same page');
+      }
+
+      return [
+        {
+          type: 'PageSelector',
+          index: topLeft.pageIndex,
+        },
+        {
+          type: 'ShapeSelector',
+          shape: {
+            type: 'rect',
+            left: topLeft.x,
+            top: topLeft.y,
+            right: bottomRight.x,
+            bottom: bottomRight.y,
+          },
+        },
+      ];
+    }
+    case 'point': {
+      const point = await mapViewportToPDF(shape.x, shape.y);
+      if (!point) {
+        throw new Error('Point is not in a page');
+      }
+
+      return [
+        {
+          type: 'PageSelector',
+          index: point.pageIndex,
+        },
+        {
+          type: 'ShapeSelector',
+          shape: {
+            type: 'point',
+            x: point.x,
+            y: point.y,
+          },
+        },
+      ];
+    }
+    default:
+      throw new Error('Unsupported shape');
+  }
 }
 
 /**

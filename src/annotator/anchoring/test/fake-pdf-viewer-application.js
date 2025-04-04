@@ -141,6 +141,16 @@ class FakePDFPageView {
   dispose() {
     this.div.remove();
   }
+
+  getPagePoint(x, y) {
+    const userSpaceX = x * 2;
+
+    // PDF user space coordinates have the origin at the bottom left corner,
+    // with Y increasing going up the page.
+    const userSpaceY = 100 - y;
+
+    return [userSpaceX, userSpaceY];
+  }
 }
 
 /**

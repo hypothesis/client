@@ -797,14 +797,14 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       return this.createAnnotationFromSelection();
     } else if (['rect', 'point'].includes(tool)) {
       // Draw the shape for the new annotation's region.
-      await this._drawTool.draw(tool);
+      const shape = await this._drawTool.draw(tool);
 
       // Create annotation data and send to sidebar.
       const info = await this.getDocumentInfo();
       const target: Target[] = [
         {
           source: info.uri,
-          // TODO: Serialize shape into selectors
+          selector: await this._integration.describe(this.element, shape),
         },
       ];
 
