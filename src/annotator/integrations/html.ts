@@ -5,6 +5,7 @@ import type {
   AnnotationTool,
   FeatureFlags,
   Integration,
+  Shape,
   SidebarLayout,
   SideBySideOptions,
 } from '../../types/annotator';
@@ -110,8 +111,12 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     return anchor(root, selectors);
   }
 
-  describe(root: Element, range: Range): Selector[] {
-    return describe(root, range);
+  describe(root: Element, region: Range | Shape): Selector[] {
+    if (region instanceof Range) {
+      return describe(root, region);
+    } else {
+      throw new Error('Unsupported region type');
+    }
   }
 
   _checkForURIChange() {

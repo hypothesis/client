@@ -85,6 +85,7 @@ describe('annotator/integrations/pdf', () => {
         anchor: sinon.stub(),
         canDescribe: sinon.stub().returns(true),
         describe: sinon.stub(),
+        describeShape: sinon.stub(),
         documentHasText: sinon.stub().resolves(true),
       };
 
@@ -225,15 +226,25 @@ describe('annotator/integrations/pdf', () => {
     });
 
     describe('#describe', () => {
-      it('generates selectors for passed range', async () => {
+      it('generates selectors for DOM range', async () => {
         pdfIntegration = createPDFIntegration();
-        const range = {};
+        const range = document.createRange();
         fakePDFAnchoring.describe.returns([]);
 
         const selectors = await pdfIntegration.describe({}, range);
 
         assert.calledWith(fakePDFAnchoring.describe, sinon.match.any, range);
         assert.equal(selectors, fakePDFAnchoring.describe());
+      });
+
+      it('generates selectors for shape', async () => {
+        pdfIntegration = createPDFIntegration();
+        const shape = { type: 'point', x: 0, y: 0 };
+
+        const selectors = await pdfIntegration.describe({}, shape);
+
+        assert.calledWith(fakePDFAnchoring.describeShape, shape);
+        assert.equal(selectors, fakePDFAnchoring.describeShape());
       });
     });
 

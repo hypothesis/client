@@ -8,6 +8,7 @@ import type {
   AnnotationTool,
   Integration,
   SegmentInfo,
+  Shape,
   SidebarLayout,
 } from '../../types/annotator';
 import type {
@@ -347,8 +348,8 @@ export class VitalSourceContentIntegration
     return this._htmlIntegration.anchor(root, selectors);
   }
 
-  async describe(root: HTMLElement, range: Range) {
-    const selectors: Selector[] = this._htmlIntegration.describe(root, range);
+  async describe(root: HTMLElement, region: Range | Shape) {
+    const selectors: Selector[] = this._htmlIntegration.describe(root, region);
 
     const {
       cfi,
