@@ -11,6 +11,7 @@ import type {
   Destroyable,
   FeatureFlags,
   Integration,
+  Shape,
   SidebarLayout,
 } from '../../types/annotator';
 import type { Selector } from '../../types/api';
@@ -20,6 +21,7 @@ import {
   anchor,
   canDescribe,
   describe,
+  describeShape,
   documentHasText,
   isTextLayerRenderingDone,
 } from '../anchoring/pdf';
@@ -321,12 +323,16 @@ export class PDFIntegration extends TinyEmitter implements Integration {
   }
 
   /**
-   * Generate selectors for the text in `range`.
+   * Generate selectors for the text in `region`.
    */
-  describe(root: HTMLElement, range: Range): Promise<Selector[]> {
-    // nb. The `root` argument is not really used by `anchor`. It existed for
-    // consistency between HTML and PDF anchoring and could be removed.
-    return describe(root, range);
+  describe(root: HTMLElement, region: Range | Shape): Promise<Selector[]> {
+    if (region instanceof Range) {
+      // nb. The `root` argument is not really used by `anchor`. It existed for
+      // consistency between HTML and PDF anchoring and could be removed.
+      return describe(root, region);
+    } else {
+      return describeShape(region);
+    }
   }
 
   /**

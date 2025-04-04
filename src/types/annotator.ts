@@ -195,13 +195,20 @@ export type IntegrationBase = {
    */
   anchor(root: HTMLElement, selectors: Selector[]): Promise<Range>;
 
-  /** Generate a list of serializable selectors which represent the content in `range`. */
-  describe(root: HTMLElement, range: Range): Selector[] | Promise<Selector[]>;
+  /**
+   * Generate a list of serializable selectors which represent the content in `region`.
+   */
+  describe(
+    root: HTMLElement,
+    region: Range | Shape,
+  ): Selector[] | Promise<Selector[]>;
+
   /**
    * Return the main element that contains the document content. This is used
    * by controls such as the bucket bar to know when the content might have scrolled.
    */
   contentContainer(): HTMLElement;
+
   /**
    * Attempt to resize the content so that it is visible alongside the sidebar.
    *
