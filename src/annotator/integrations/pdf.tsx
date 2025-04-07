@@ -293,9 +293,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
    * Resolve serialized `selectors` from an annotation to a range.
    */
   anchor(root: HTMLElement, selectors: Selector[]): Promise<Range> {
-    // nb. The `root` argument is not really used by `anchor`. It existed for
-    // consistency between HTML and PDF anchoring and could be removed.
-    return anchor(root, selectors);
+    return anchor(selectors);
   }
 
   /**
@@ -327,9 +325,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
    */
   describe(root: HTMLElement, region: Range | Shape): Promise<Selector[]> {
     if (region instanceof Range) {
-      // nb. The `root` argument is not really used by `anchor`. It existed for
-      // consistency between HTML and PDF anchoring and could be removed.
-      return describe(root, region);
+      return describe(region);
     } else {
       return describeShape(region);
     }

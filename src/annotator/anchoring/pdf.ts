@@ -541,10 +541,7 @@ async function anchorQuote(
  * `selectors` must include a `TextQuoteSelector` and may include other selector
  * types.
  */
-export async function anchor(
-  root: HTMLElement,
-  selectors: Selector[],
-): Promise<Range> {
+export async function anchor(selectors: Selector[]): Promise<Range> {
   const quote = selectors.find(s => s.type === 'TextQuoteSelector') as
     | TextQuoteSelector
     | undefined;
@@ -652,10 +649,7 @@ export function canDescribe(range: Range) {
  *
  * @param root - The root element
  */
-export async function describe(
-  root: HTMLElement,
-  range: Range,
-): Promise<Selector[]> {
+export async function describe(range: Range): Promise<Selector[]> {
   const [textRange, textLayer] = getTextLayerForRange(range);
 
   const startPos = TextPosition.fromPoint(
@@ -680,7 +674,7 @@ export async function describe(
     end: pageOffset + endPos.offset,
   } as TextPositionSelector;
 
-  const quote = TextQuoteAnchor.fromRange(root, textRange).toSelector();
+  const quote = TextQuoteAnchor.fromRange(pageView.div, textRange).toSelector();
 
   const pageSelector: PageSelector = {
     type: 'PageSelector',
