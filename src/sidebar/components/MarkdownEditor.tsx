@@ -150,8 +150,8 @@ function handleToolbarCommand(
       break;
     case 'mention':
       update(state => toggleSpanStyle(state, '@', '', ''));
-      // Dispatch keyup event with `@` key, to open the suggestions popover
-      inputEl.dispatchEvent(new KeyboardEvent('keyup', { key: '@' }));
+      // Dispatch input event with `@` key, to open the suggestions popover
+      inputEl.dispatchEvent(new KeyboardEvent('input', { key: '@' }));
       break;
   }
 }
@@ -230,7 +230,7 @@ function TextArea({
   onInsertMentionSuggestion,
   ...restProps
 }: TextAreaProps & JSX.TextareaHTMLAttributes) {
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [suggestionsPopoverOpen, setSuggestionsPopoverOpen] = useState(false);
   const [activeMention, setActiveMention] = useState<string>();
   const textareaRef = useSyncedRef(containerRef);
   const [highlightedSuggestion, setHighlightedSuggestion] = useState(0);
@@ -257,13 +257,8 @@ function TextArea({
 
       const term = termBeforePosition(textarea.value, textarea.selectionStart);
       const isAtMention = term.startsWith('@');
-      setPopoverOpen(isAtMention);
+      setSuggestionsPopoverOpen(isAtMention);
       setActiveMention(isAtMention ? term.substring(1) : undefined);
-
-      // Reset highlighted suggestion when closing the popover
-      if (!isAtMention) {
-        setHighlightedSuggestion(0);
-      }
     },
     [mentionsEnabled],
   );
@@ -292,7 +287,7 @@ function TextArea({
 
       // Close popover and reset highlighted suggestion once the value is
       // replaced
-      setPopoverOpen(false);
+      setSuggestionsPopoverOpen(false);
       setHighlightedSuggestion(0);
     },
     [mentionMode, onEditText, onInsertMentionSuggestion, textareaRef],
@@ -300,7 +295,7 @@ function TextArea({
 
   const usersListboxId = useId();
   const accessibilityAttributes = useMemo((): JSX.TextareaHTMLAttributes => {
-    if (!popoverOpen) {
+    if (!suggestionsPopoverOpen) {
       return {};
     }
 
@@ -319,7 +314,12 @@ function TextArea({
       'aria-haspopup': 'listbox',
       'aria-activedescendant': activeDescendant,
     };
-  }, [highlightedSuggestion, popoverOpen, userSuggestions, usersListboxId]);
+  }, [
+    highlightedSuggestion,
+    suggestionsPopoverOpen,
+    userSuggestions,
+    usersListboxId,
+  ]);
 
   return (
     <div className="relative">
@@ -331,19 +331,22 @@ function TextArea({
           classes,
         )}
         onInput={(e: Event) => {
-          onEditText((e.target as HTMLInputElement).value);
+          const textarea = e.target as HTMLTextAreaElement;
+          onEditText(textarea.value);
           // Reset highlighted suggestion every time text is edited, as that
           // could affect the list of suggestions
           setHighlightedSuggestion(0);
+          checkForMentionAtCaret(textarea);
         }}
         {...restProps}
         // We listen for `keyup` to make sure the text in the textarea reflects
         // the just-pressed key when we evaluate it
         onKeyUp={e => {
-          // `Esc` key is used to close the popover. Do nothing and let users
-          // close it that way, even if the caret is in a mention.
-          // `Enter` is handled on keydown. Do not handle it here.
-          if (!['Escape', 'Enter'].includes(e.key)) {
+          // Check if suggestions need to be closed, maybe because the pressed
+          // key caused the caret to move "out" of a mention.
+          // If already closed we don't need to do anything, as opening the
+          // popover is handled in `onInput`.
+          if (suggestionsPopoverOpen) {
             checkForMentionAtCaret(e.target as HTMLTextAreaElement);
           }
         }}
@@ -351,7 +354,7 @@ function TextArea({
           // Invoke original handler if present
           onKeyDown?.(e);
 
-          if (!popoverOpen || userSuggestions.length === 0) {
+          if (!suggestionsPopoverOpen || userSuggestions.length === 0) {
             return;
           }
 
@@ -371,12 +374,6 @@ function TextArea({
             insertMention(userSuggestions[highlightedSuggestion]);
           }
         }}
-        onClick={e => {
-          e.stopPropagation();
-          // When clicking the textarea, it's possible the caret is moved "into" a
-          // mention, so we check if the popover should be opened
-          checkForMentionAtCaret(e.target as HTMLTextAreaElement);
-        }}
         ref={textareaRef}
         {...accessibilityAttributes}
       />
@@ -386,8 +383,8 @@ function TextArea({
       />
       {mentionsEnabled && (
         <MentionSuggestionsPopover
-          open={popoverOpen}
-          onClose={() => setPopoverOpen(false)}
+          open={suggestionsPopoverOpen}
+          onClose={() => setSuggestionsPopoverOpen(false)}
           anchorElementRef={caretElementRef}
           loadingUsers={usersForMentions.status === 'loading'}
           users={userSuggestions}
