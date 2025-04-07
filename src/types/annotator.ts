@@ -106,25 +106,6 @@ export type AnchorPosition = {
 };
 
 /**
- * Anchoring implementation for a particular document type (eg. PDF or HTML).
- *
- * This is responsible for converting between serialized "selectors" that can
- * be stored in the Hypothesis backend and ranges in the document.
- */
-export type AnchoringImpl = {
-  anchor(
-    root: HTMLElement,
-    selectors: Selector[],
-    options: unknown,
-  ): Promise<Range>;
-  describe(
-    root: HTMLElement,
-    range: Range,
-    options: unknown,
-  ): Selector[] | Promise<Selector[]>;
-};
-
-/**
  * Interface for querying a collection of feature flags and subscribing to
  * flag updates.
  *
