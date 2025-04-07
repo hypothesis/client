@@ -72,7 +72,7 @@ describe('MarkdownEditor', () => {
     textareaDOMNode.value = text;
     textareaDOMNode.selectionStart = text.length;
 
-    textarea.simulate('keyup', { key });
+    textarea.simulate('input', { key });
   }
 
   const commands = [
@@ -247,14 +247,14 @@ describe('MarkdownEditor', () => {
       input.selectionStart = 0;
       input.selectionEnd = text.length;
 
-      const fakeKeyUpListener = sinon.stub();
-      input.addEventListener('keyup', fakeKeyUpListener);
+      const fakeInputListener = sinon.stub();
+      input.addEventListener('input', fakeInputListener);
 
       button.simulate('click');
 
       assert.calledWith(
-        fakeKeyUpListener,
-        sinon.match({ type: 'keyup', key: '@' }),
+        fakeInputListener,
+        sinon.match({ type: 'input', key: '@' }),
       );
       assert.calledWith(onEditText, 'formatted text');
       assert.calledWith(
@@ -482,7 +482,7 @@ describe('MarkdownEditor', () => {
     }
 
     [true, false].forEach(mentionsEnabled => {
-      it('renders Popover if @mentions are enabled', () => {
+      it('renders suggestions Popover if @mentions are enabled', () => {
         const wrapper = createComponent({ mentionsEnabled });
         assert.equal(
           wrapper.exists('MentionSuggestionsPopover'),
@@ -497,14 +497,14 @@ describe('MarkdownEditor', () => {
       });
     });
 
-    it('opens Popover when an @mention is typed in textarea', () => {
+    it('opens suggestions when an @mention is typed in textarea', () => {
       const wrapper = createComponent({ mentionsEnabled: true });
       typeInTextarea(wrapper, '@johndoe');
 
       assert.isTrue(suggestionsPopoverIsOpen(wrapper));
     });
 
-    it('closes Popover when cursor moves away from @mention', () => {
+    it('closes suggestions when cursor moves away from @mention', () => {
       const wrapper = createComponent({ mentionsEnabled: true });
 
       // Popover is open after typing the at-mention
@@ -516,7 +516,7 @@ describe('MarkdownEditor', () => {
       assert.isFalse(suggestionsPopoverIsOpen(wrapper));
     });
 
-    it('closes Popover when @mention is removed', () => {
+    it('closes suggestions when @mention is removed', () => {
       const wrapper = createComponent({ mentionsEnabled: true });
 
       // Popover is open after typing the at-mention
@@ -528,27 +528,30 @@ describe('MarkdownEditor', () => {
       assert.isFalse(suggestionsPopoverIsOpen(wrapper));
     });
 
-    it('opens Popover when cursor moves into an @mention', () => {
-      const text = '@johndoe ';
-      const wrapper = createComponent({
-        text,
-        mentionsEnabled: true,
-      });
+    it('closes suggestions if caret is no longer "inside" a mention', () => {
+      const wrapper = createComponent({ mentionsEnabled: true });
+
+      // Popover is open after typing the at-mention
+      typeInTextarea(wrapper, 'Hello @johndoe');
+      assert.isTrue(suggestionsPopoverIsOpen(wrapper));
+
       const textarea = wrapper.find('textarea');
       const textareaDOMNode = textarea.getDOMNode();
 
-      // Popover is initially closed
-      assert.isFalse(suggestionsPopoverIsOpen(wrapper));
-
-      // Move cursor to the left
-      textareaDOMNode.selectionStart = text.length - 1;
-      act(() => textareaDOMNode.dispatchEvent(new KeyboardEvent('keyup')));
+      // We move the cursor to the left, "out" of the mention
+      textareaDOMNode.selectionStart = 2;
+      act(() =>
+        textareaDOMNode.dispatchEvent(
+          new KeyboardEvent('keyup', { key: 'ArrowLeft' }),
+        ),
+      );
       wrapper.update();
 
-      assert.isTrue(suggestionsPopoverIsOpen(wrapper));
+      // The suggestions should now be closed
+      assert.isFalse(suggestionsPopoverIsOpen(wrapper));
     });
 
-    it('closes Popover when onClose is called', () => {
+    it('closes suggestions when onClose is called', () => {
       const wrapper = createComponent({ mentionsEnabled: true });
 
       // Popover is initially open
@@ -558,34 +561,6 @@ describe('MarkdownEditor', () => {
       wrapper.find('MentionSuggestionsPopover').props().onClose();
       wrapper.update();
       assert.isFalse(suggestionsPopoverIsOpen(wrapper));
-    });
-
-    it('ignores `Escape` key press in textarea', () => {
-      const wrapper = createComponent({ mentionsEnabled: true });
-
-      // Popover is still closed if the key is `Escape`
-      typeInTextarea(wrapper, '@johndoe', 'Escape');
-      assert.isFalse(suggestionsPopoverIsOpen(wrapper));
-    });
-
-    it('opens popover when clicking textarea and moving the caret to a mention', () => {
-      const text = 'text @johndoe more text';
-      const wrapper = createComponent({
-        text,
-        mentionsEnabled: true,
-      });
-      const textarea = wrapper.find('textarea');
-      const textareaDOMNode = textarea.getDOMNode();
-
-      // Popover is initially closed
-      assert.isFalse(suggestionsPopoverIsOpen(wrapper));
-
-      // Move cursor to overlap with the mention
-      textareaDOMNode.selectionStart = text.indexOf('@') + 1;
-      act(() => textareaDOMNode.dispatchEvent(new MouseEvent('click')));
-      wrapper.update();
-
-      assert.isTrue(suggestionsPopoverIsOpen(wrapper));
     });
 
     it('allows changing highlighted suggestion via vertical arrow keys', () => {
