@@ -96,7 +96,7 @@ describe('annotator/anchoring/pdf', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
 
-      const selectors = await pdfAnchoring.describe(container, range);
+      const selectors = await pdfAnchoring.describe(range);
       selectors.sort((a, b) => a.type.localeCompare(b.type));
 
       const types = selectors.map(s => s.type);
@@ -114,7 +114,7 @@ describe('annotator/anchoring/pdf', () => {
       const contentStr = fixtures.pdfPages.join('');
       const expectedPos = contentStr.replace(/\n/g, '').lastIndexOf(quote);
 
-      const selectors = await pdfAnchoring.describe(container, range);
+      const selectors = await pdfAnchoring.describe(range);
       const position = selectors.find(s => s.type === 'TextPositionSelector');
 
       assert.equal(position.start, expectedPos);
@@ -124,7 +124,7 @@ describe('annotator/anchoring/pdf', () => {
     it('returns a quote selector with the correct quote', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
-      return pdfAnchoring.describe(container, range).then(selectors => {
+      return pdfAnchoring.describe(range).then(selectors => {
         const quote = selectors.find(s => s.type === 'TextQuoteSelector');
 
         assert.deepEqual(quote, {
@@ -140,7 +140,7 @@ describe('annotator/anchoring/pdf', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
 
-      const selectors = await pdfAnchoring.describe(container, range);
+      const selectors = await pdfAnchoring.describe(range);
 
       const page = selectors.find(s => s.type === 'PageSelector');
       assert.deepEqual(page, {
@@ -155,7 +155,7 @@ describe('annotator/anchoring/pdf', () => {
       viewer.pdfViewer.getPageView(2).pageLabel = 'iv';
       const range = findText(container, 'Netherfield Park');
 
-      const selectors = await pdfAnchoring.describe(container, range);
+      const selectors = await pdfAnchoring.describe(range);
 
       const page = selectors.find(s => s.type === 'PageSelector');
       assert.deepEqual(page, {
@@ -194,7 +194,7 @@ describe('annotator/anchoring/pdf', () => {
       const contentStr = fixtures.pdfPages.join('');
       const expectedPos = contentStr.replace(/\n/g, '').lastIndexOf(quote);
 
-      return pdfAnchoring.describe(container, range).then(selectors => {
+      return pdfAnchoring.describe(range).then(selectors => {
         const position = selectors[0];
         assert.equal(position.start, expectedPos);
         assert.equal(position.end, expectedPos + quote.length);
@@ -210,7 +210,7 @@ describe('annotator/anchoring/pdf', () => {
       range.setEnd(secondPageRange.startContainer, secondPageRange.endOffset);
 
       await assert.rejects(
-        pdfAnchoring.describe(container, range),
+        pdfAnchoring.describe(range),
         'Selecting across page breaks is not supported',
       );
     });
@@ -225,7 +225,7 @@ describe('annotator/anchoring/pdf', () => {
       range.setEnd(el.firstChild, 6);
 
       await assert.rejects(
-        pdfAnchoring.describe(container, range),
+        pdfAnchoring.describe(range),
         'Selection is outside page text',
       );
     });
@@ -239,7 +239,7 @@ describe('annotator/anchoring/pdf', () => {
       range.setEnd(el, 0);
 
       await assert.rejects(
-        pdfAnchoring.describe(container, range),
+        pdfAnchoring.describe(range),
         'Selection does not contain text',
       );
     });
@@ -292,7 +292,7 @@ describe('annotator/anchoring/pdf', () => {
     it('anchors previously created selectors if the page is rendered', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'My dear Mr. Bennet');
-      return pdfAnchoring.describe(container, range).then(selectors => {
+      return pdfAnchoring.describe(range).then(selectors => {
         const position = selectors[0];
         const quote = selectors[1];
 
@@ -306,7 +306,7 @@ describe('annotator/anchoring/pdf', () => {
           const description = 'anchoring failed with ' + types.join(', ');
 
           return pdfAnchoring
-            .anchor(container, subset)
+            .anchor(subset)
             .then(anchoredRange => {
               assert.equal(
                 anchoredRange.toString(),
@@ -328,7 +328,7 @@ describe('annotator/anchoring/pdf', () => {
         it('fails to anchor if there is no quote selector', async () => {
           let error;
           try {
-            await pdfAnchoring.anchor(container, selectors);
+            await pdfAnchoring.anchor(selectors);
           } catch (err) {
             error = err;
           }
@@ -343,7 +343,7 @@ describe('annotator/anchoring/pdf', () => {
 
       // Choose a quote in the first page, which has blank text items in it.
       const quote = { type: 'TextQuoteSelector', exact: 'Jane Austen' };
-      const range = await pdfAnchoring.anchor(container, [quote]);
+      const range = await pdfAnchoring.anchor([quote]);
 
       assert.equal(range.toString(), 'Jane Austen');
     });
@@ -363,7 +363,7 @@ describe('annotator/anchoring/pdf', () => {
       it('anchors quotes to best match across all pages', async () => {
         viewer.pdfViewer.setCurrentPage(2);
         const quote = { type: 'TextQuoteSelector', exact: quoteText };
-        const range = await pdfAnchoring.anchor(container, [quote]);
+        const range = await pdfAnchoring.anchor([quote]);
 
         // This should anchor to an exact match on the third page, rather than a
         // close match on the second page.
@@ -428,7 +428,7 @@ describe('annotator/anchoring/pdf', () => {
         };
 
         // Anchor the quote without providing a position selector, so pages are tried in order.
-        const range = await pdfAnchoring.anchor(container, [quote]);
+        const range = await pdfAnchoring.anchor([quote]);
 
         // Check that we found the match on the expected page.
         assert.equal(range.toString(), 'Netherfield');
@@ -471,7 +471,7 @@ describe('annotator/anchoring/pdf', () => {
         end: quoteOffset + 1,
       };
 
-      await pdfAnchoring.anchor(container, [position, quote]);
+      await pdfAnchoring.anchor([position, quote]);
 
       const stripSpaces = str => str.replace(/\s+/g, '');
       const strippedText = stripSpaces(fixtures.pdfPages[2]);
@@ -498,7 +498,7 @@ describe('annotator/anchoring/pdf', () => {
           exact: 'horde of the living dead.',
         },
       ];
-      const anchoredRange = await pdfAnchoring.anchor(container, selectors);
+      const anchoredRange = await pdfAnchoring.anchor(selectors);
       assert.equal(anchoredRange.toString(), selectors[0].exact);
     });
 
@@ -529,14 +529,14 @@ describe('annotator/anchoring/pdf', () => {
         const selection = 'zombie in possession';
         const range = findText(container, selection);
         return pdfAnchoring
-          .describe(container, range)
+          .describe(range)
           .then(([, quote]) => {
             const position = {
               type: 'TextPositionSelector',
               start: offset,
               end: offset + selection.length,
             };
-            return pdfAnchoring.anchor(container, [position, quote]);
+            return pdfAnchoring.anchor([position, quote]);
           })
           .then(range => {
             assert.equal(range.toString(), selection);
@@ -548,7 +548,7 @@ describe('annotator/anchoring/pdf', () => {
       viewer.pdfViewer.setCurrentPage(1);
       const selection = 'zombie in possession';
       const range = findText(container, selection);
-      const [, quote] = await pdfAnchoring.describe(container, range);
+      const [, quote] = await pdfAnchoring.describe(range);
 
       // Add extra spaces into the text layer. This can happen due to
       // differences in the way that PDF.js constructs the text layer compared
@@ -558,7 +558,7 @@ describe('annotator/anchoring/pdf', () => {
         viewer.pdfViewer.getPageView(1).textLayer.textLayerDiv;
       textLayerEl.textContent = textLayerEl.textContent.split('').join(' ');
 
-      const anchoredRange = await pdfAnchoring.anchor(container, [quote]);
+      const anchoredRange = await pdfAnchoring.anchor([quote]);
       assert.equal(
         anchoredRange.toString(),
         'z o m b i e   i n   p o s s e s s i o n',
@@ -574,7 +574,7 @@ describe('annotator/anchoring/pdf', () => {
       viewer.pdfViewer.setCurrentPage(1);
       const selection = 'zombie in possession';
       const range = findText(container, selection);
-      const [, quote] = await pdfAnchoring.describe(container, range);
+      const [, quote] = await pdfAnchoring.describe(range);
 
       // Modify text layer so it doesn't match text from PDF.js APIs.
       // This will cause mis-anchoring, but if the differences are only minor,
@@ -586,7 +586,7 @@ describe('annotator/anchoring/pdf', () => {
         'zomby',
       );
 
-      const anchoredRange = await pdfAnchoring.anchor(container, [quote]);
+      const anchoredRange = await pdfAnchoring.anchor([quote]);
       assert.equal(anchoredRange.toString(), 'zomby in possession o');
       assert.calledWith(
         warnOnce,
@@ -598,10 +598,10 @@ describe('annotator/anchoring/pdf', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
       return pdfAnchoring
-        .describe(container, range)
+        .describe(range)
         .then(selectors => {
           viewer.pdfViewer.setCurrentPage(0);
-          return pdfAnchoring.anchor(container, selectors);
+          return pdfAnchoring.anchor(selectors);
         })
         .then(anchoredRange => {
           assert.equal(anchoredRange.toString(), 'Loading annotations...');
@@ -616,7 +616,7 @@ describe('annotator/anchoring/pdf', () => {
           exact: 'phrase that does not exist in the PDF',
         },
       ];
-      return pdfAnchoring.anchor(container, selectors).catch(err => {
+      return pdfAnchoring.anchor(selectors).catch(err => {
         assert.equal(err.message, 'Quote not found');
       });
     });
@@ -626,7 +626,7 @@ describe('annotator/anchoring/pdf', () => {
       const range = findText(container, 'said his lady');
       let selectors;
       return pdfAnchoring
-        .describe(container, range)
+        .describe(range)
         .then(selectors_ => {
           selectors = selectors_;
 
@@ -638,12 +638,12 @@ describe('annotator/anchoring/pdf', () => {
           position.start += 100;
           position.end += 100;
 
-          return pdfAnchoring.anchor(container, selectors);
+          return pdfAnchoring.anchor(selectors);
         })
         .then(() => {
           // Anchor again using the same selectors. This time anchoring will
           // use the existing cache.
-          return pdfAnchoring.anchor(container, selectors);
+          return pdfAnchoring.anchor(selectors);
         })
         .then(range => {
           assert.equal(range.toString(), 'said his lady');
@@ -685,7 +685,7 @@ describe('annotator/anchoring/pdf', () => {
 
         // Try anchoring. The PDF anchoring logic should wait until the PDF
         // page view is ready.
-        const anchorPromise = pdfAnchoring.anchor(container, [
+        const anchorPromise = pdfAnchoring.anchor([
           {
             type: 'TextQuoteSelector',
             exact: 'a zombie in possession',

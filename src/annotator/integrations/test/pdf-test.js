@@ -187,7 +187,7 @@ describe('annotator/integrations/pdf', () => {
 
         const range = await pdfIntegration.anchor({}, selectors);
 
-        assert.calledWith(fakePDFAnchoring.anchor, sinon.match.any, selectors);
+        assert.calledWith(fakePDFAnchoring.anchor, selectors);
         assert.equal(range, fakePDFAnchoring.anchor());
       });
     });
@@ -233,7 +233,7 @@ describe('annotator/integrations/pdf', () => {
 
         const selectors = await pdfIntegration.describe({}, range);
 
-        assert.calledWith(fakePDFAnchoring.describe, sinon.match.any, range);
+        assert.calledWith(fakePDFAnchoring.describe, range);
         assert.equal(selectors, fakePDFAnchoring.describe());
       });
 
