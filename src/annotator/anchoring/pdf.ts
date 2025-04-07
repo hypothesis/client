@@ -1,11 +1,12 @@
 /* global PDFViewerApplication */
 import { warnOnce } from '../../shared/warn-once';
-import type { Shape } from '../../types/annotator';
+import type { Shape, ShapeAnchor } from '../../types/annotator';
 import type {
   PageSelector,
   TextPositionSelector,
   TextQuoteSelector,
   Selector,
+  ShapeSelector,
 } from '../../types/api';
 import type { PDFPageView, PDFViewer, TextLayer } from '../../types/pdfjs';
 import { translateOffsets } from '../util/normalize';
@@ -541,7 +542,7 @@ async function anchorQuote(
  * `selectors` must include a `TextQuoteSelector` and may include other selector
  * types.
  */
-export async function anchor(selectors: Selector[]): Promise<Range> {
+async function anchorRange(selectors: Selector[]): Promise<Range> {
   const quote = selectors.find(s => s.type === 'TextQuoteSelector') as
     | TextQuoteSelector
     | undefined;
@@ -595,6 +596,86 @@ export async function anchor(selectors: Selector[]): Promise<Range> {
   }
 
   return anchorQuote(quote, position?.start);
+}
+
+/**
+ * Anchor a set of selectors to either a DOM Range or a shape anchor.
+ */
+export async function anchor(
+  selectors: Selector[],
+): Promise<Range | ShapeAnchor> {
+  const pageSelector = selectors.find(s => s.type === 'PageSelector') as
+    | PageSelector
+    | undefined;
+  const shapeSelector = selectors.find(s => s.type === 'ShapeSelector') as
+    | ShapeSelector
+    | undefined;
+
+  if (shapeSelector) {
+    if (!pageSelector) {
+      throw new Error('Cannot anchor a shape selector without a page');
+    }
+    return anchorShape(pageSelector, shapeSelector);
+  } else {
+    return anchorRange(selectors);
+  }
+}
+
+async function anchorShape(
+  pageSelector: PageSelector,
+  shapeSelector: ShapeSelector,
+): Promise<ShapeAnchor> {
+  const viewer = getPDFViewer();
+  if (
+    typeof pageSelector.index !== 'number' ||
+    pageSelector.index >= viewer.pagesCount
+  ) {
+    throw new Error('PDF page index is invalid');
+  }
+
+  const pageView = await getPageView(pageSelector.index);
+  const anchor = pageView.div;
+
+  // Get page bounding box in user-space coordinates.
+  //
+  // Note that the origin is at the bottom-left corner of the page, with Y
+  // going up.
+  const [pageLeft, pageBottom, pageRight, pageTop] = pageView.pdfPage.view;
+  const pageWidth = pageRight - pageLeft;
+  const pageHeight = pageTop - pageBottom;
+
+  // Map the user-space coordinates of the shape to coordinates relative to the
+  // PDF page container, where the top-left is (0, 0) and the bottom right is
+  // (1, 1).
+  let shape: Shape;
+  switch (shapeSelector.shape.type) {
+    case 'rect':
+      {
+        const s = shapeSelector.shape;
+        const left = (s.left - pageLeft) / pageWidth;
+        const top = (pageHeight - s.top) / pageHeight;
+        const right = (s.right - pageLeft) / pageWidth;
+        const bottom = (pageHeight - s.bottom) / pageHeight;
+        shape = { type: 'rect', left, right, top, bottom };
+      }
+      break;
+    case 'point':
+      {
+        const s = shapeSelector.shape;
+        const x = (s.x - pageLeft) / pageWidth;
+        const y = (pageHeight - s.y) / pageHeight;
+        shape = { type: 'point', x, y };
+      }
+      break;
+    default:
+      throw new Error('Unsupported shape in shape selector');
+  }
+
+  return {
+    anchor,
+    shape,
+    coordinates: 'anchor',
+  };
 }
 
 /**

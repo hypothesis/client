@@ -12,6 +12,7 @@ import type {
   FeatureFlags,
   Integration,
   Shape,
+  ShapeAnchor,
   SidebarLayout,
 } from '../../types/annotator';
 import type { Selector } from '../../types/api';
@@ -292,7 +293,10 @@ export class PDFIntegration extends TinyEmitter implements Integration {
   /**
    * Resolve serialized `selectors` from an annotation to a range.
    */
-  anchor(root: HTMLElement, selectors: Selector[]): Promise<Range> {
+  anchor(
+    root: HTMLElement,
+    selectors: Selector[],
+  ): Promise<Range | ShapeAnchor> {
     return anchor(selectors);
   }
 
@@ -401,7 +405,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
           const hl = anchor.highlights[index];
           if (!document.body.contains(hl)) {
             anchor.highlights.splice(index, 1);
-            delete anchor.range;
+            delete anchor.region;
             refreshAnnotations.push(anchor.annotation);
             break;
           }

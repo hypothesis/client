@@ -121,6 +121,7 @@ describe('Guest', () => {
     highlighter = {
       getHighlightsContainingNode: sinon.stub().returns([]),
       highlightRange: sinon.stub().returns([]),
+      highlightShape: sinon.stub().returns([]),
       removeHighlights: sinon.stub(),
       removeAllHighlights: sinon.stub(),
       setHighlightsFocused: sinon.stub(),
@@ -334,15 +335,14 @@ describe('Guest', () => {
   });
 
   describe('on "scrollToAnnotation" event from host or sidebar', () => {
-    const setupGuest = () => {
+    const setupGuest = ({ region = new FakeTextRange(new Range()) } = {}) => {
       const highlight = document.createElement('span');
       const guest = createGuest();
-      const fakeRange = sinon.stub();
       guest.anchors = [
         {
           annotation: { $tag: 'tag1' },
           highlights: [highlight],
-          range: new FakeTextRange(fakeRange),
+          region,
         },
       ];
       return guest;
@@ -361,24 +361,32 @@ describe('Guest', () => {
         await delay(0);
       };
 
-      it('scrolls to the anchor with the matching tag', async () => {
+      it('scrolls to range anchor with the matching tag', async () => {
         const guest = setupGuest();
-
         await triggerScroll();
+        assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
+      });
 
-        assert.called(fakeIntegration.scrollToAnchor);
+      it('scrolls to shape anchor with the matching tag', async () => {
+        const guest = setupGuest({
+          region: {
+            anchor: document.createElement('div'),
+            shape: { type: 'point', x: 0, y: 0 },
+          },
+        });
+        await triggerScroll();
         assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
       });
 
       it('emits a "scrolltorange" DOM event', () => {
         const highlight = document.createElement('span');
         const guest = createGuest();
-        const fakeRange = sinon.stub();
+        const fakeRange = document.createRange();
         guest.anchors = [
           {
             annotation: { $tag: 'tag1' },
             highlights: [highlight],
-            range: new FakeTextRange(fakeRange),
+            region: new FakeTextRange(fakeRange),
           },
         ];
 
@@ -443,7 +451,7 @@ describe('Guest', () => {
           {
             annotation: { $tag: 'tag1' },
             highlights: [highlight],
-            range: {
+            region: {
               toRange: sandbox.stub().throws(new Error('Something went wrong')),
             },
           },
@@ -586,10 +594,13 @@ describe('Guest', () => {
         fakeDrawTool.draw.resolves(rectShape);
         fakeIntegration.describe.resolves(rectSelectors);
 
-        emitHostEvent('createAnnotation', { tool: 'rect' });
-        await delay(0);
+        const anchorSpy = sinon.spy(guest, 'anchor');
+        const annotation = await emitHostEvent('createAnnotation', {
+          tool: 'rect',
+        });
         assert.calledWith(fakeDrawTool.draw, 'rect');
         assert.calledWith(fakeIntegration.describe, guest.element, rectShape);
+        assert.calledWith(anchorSpy, annotation);
 
         assert.calledWith(
           sidebarRPC().call,
@@ -616,11 +627,13 @@ describe('Guest', () => {
         fakeDrawTool.draw.resolves(pointShape);
         fakeIntegration.describe.resolves(pointSelectors);
 
-        emitHostEvent('createAnnotation', { tool: 'point' });
-        await delay(0);
-
+        const anchorSpy = sinon.spy(guest, 'anchor');
+        const annotation = await emitHostEvent('createAnnotation', {
+          tool: 'point',
+        });
         assert.calledWith(fakeDrawTool.draw, 'point');
         assert.calledWith(fakeIntegration.describe, guest.element, pointShape);
+        assert.calledWith(anchorSpy, annotation);
 
         assert.calledWith(
           sidebarRPC().call,
@@ -1141,7 +1154,7 @@ describe('Guest', () => {
 
     it('adds selectors for selected ranges to the annotation', async () => {
       const guest = createGuest();
-      const fakeRange = {};
+      const fakeRange = document.createRange();
       guest.selectedRanges = [fakeRange];
 
       const selectorA = { type: 'TextPositionSelector', start: 0, end: 10 };
@@ -1325,7 +1338,7 @@ describe('Guest', () => {
         .then(() => assert.isTrue(annotation.$orphan));
     });
 
-    it('marks an annotation where the target has no TextQuoteSelectors as an orphan', () => {
+    it('marks an annotation where the target has no quote or shape as an orphan', () => {
       const guest = createGuest();
       const annotation = {
         target: [
@@ -1341,7 +1354,7 @@ describe('Guest', () => {
         .then(() => assert.isTrue(annotation.$orphan));
     });
 
-    it('does not attempt to anchor targets which have no TextQuoteSelector', () => {
+    it('does not attempt to anchor targets which have no quote or shape selector', () => {
       const guest = createGuest();
       const annotation = {
         target: [
@@ -1390,7 +1403,7 @@ describe('Guest', () => {
       );
     });
 
-    it('returns a promise of the anchors for the annotation', () => {
+    it('returns anchors for an annotation with a quote selector', async () => {
       const guest = createGuest();
       const highlights = [document.createElement('span')];
       fakeIntegration.anchor.returns(Promise.resolve(range));
@@ -1398,9 +1411,27 @@ describe('Guest', () => {
       const target = {
         selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
       };
-      return guest
-        .anchor({ target: [target] })
-        .then(anchors => assert.equal(anchors.length, 1));
+
+      const anchors = await guest.anchor({ target: [target] });
+
+      assert.equal(anchors.length, 1);
+    });
+
+    it('returns anchors for an annotation with a shape selector', async () => {
+      const guest = createGuest();
+      const highlights = [document.createElement('span')];
+      fakeIntegration.anchor.returns({
+        anchor: document.createElement('div'),
+        shape: { type: 'point', x: 0, y: 0 },
+      });
+      highlighter.highlightShape.returns(highlights);
+      const target = {
+        selector: [
+          { type: 'ShapeSelector', shape: { type: 'point', x: 0, y: 100 } },
+        ],
+      };
+      const anchors = await guest.anchor({ target: [target] });
+      assert.equal(anchors.length, 1);
     });
 
     it('adds the anchor to the "anchors" instance property"', () => {
@@ -1416,7 +1447,7 @@ describe('Guest', () => {
         assert.equal(guest.anchors.length, 1);
         assert.strictEqual(guest.anchors[0].annotation, annotation);
         assert.strictEqual(guest.anchors[0].target, target);
-        assert.strictEqual(guest.anchors[0].range.toRange(), range);
+        assert.strictEqual(guest.anchors[0].region.toRange(), range);
         assert.strictEqual(guest.anchors[0].highlights, highlights);
       });
     });

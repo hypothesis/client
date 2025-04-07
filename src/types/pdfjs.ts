@@ -93,6 +93,12 @@ export type TextContent = {
 
 export type PDFPageProxy = {
   getTextContent(o?: GetTextContentParameters): Promise<TextContent>;
+
+  /**
+   * Return the visible portion of this page in user space units as an
+   * `[x1, y1, x2, y2]` tuple.
+   */
+  get view(): [number, number, number, number];
 };
 
 export type PDFPageView = {

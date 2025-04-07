@@ -4,6 +4,7 @@ import {
   getBoundingClientRect,
   getHighlightsContainingNode,
   highlightRange,
+  highlightShape,
   removeHighlights,
   removeAllHighlights,
   setHighlightsFocused,
@@ -361,6 +362,77 @@ describe('annotator/highlighter', () => {
         // ...but the highlight should be visually hidden so the SVG should
         // not be created.
         assert.isNull(container.querySelector('rect'));
+      });
+    });
+  });
+
+  describe('highlightShape', () => {
+    [
+      {
+        // Rect covering whole area of anchor element.
+        shape: {
+          type: 'rect',
+          left: 0,
+          top: 0,
+          right: 1,
+          bottom: 1,
+        },
+        expected: {
+          top: '-5px',
+          left: '-5px',
+          // 100 anchor width - 2 * 5 anchor border - 2 * 3 highlight border
+          width: '84px',
+          // 200 anchor height - 2 * 5 anchor border - 2 * 3 highlight border
+          height: '184px',
+        },
+      },
+      {
+        // Point at top-left corner of anchor element.
+        shape: { type: 'point', x: 0, y: 0 },
+        expected: {
+          top: '-5px',
+          left: '-5px',
+          width: '10px',
+          height: '10px',
+        },
+      },
+      // Unsupported shapes currently generate highlights with no position
+      // properties set.
+      {
+        shape: { type: 'star' },
+        expected: {
+          top: '',
+          left: '',
+          width: '',
+          height: '',
+        },
+      },
+    ].forEach(({ shape, expected }) => {
+      it('creates highlight element for shape anchor', () => {
+        const anchor = document.createElement('div');
+        document.body.append(anchor);
+
+        try {
+          anchor.style.width = '100px';
+          anchor.style.height = '200px';
+          anchor.style.position = 'relative';
+          anchor.style.borderWidth = '5px';
+          const shapeAnchor = {
+            anchor,
+            shape,
+          };
+          const highlights = highlightShape(shapeAnchor);
+          assert.equal(highlights.length, 1);
+
+          const highlight = highlights[0];
+          assert.equal(highlight.localName, 'hypothesis-highlight');
+          assert.equal(highlight.style.left, expected.left);
+          assert.equal(highlight.style.top, expected.top);
+          assert.equal(highlight.style.width, expected.width);
+          assert.equal(highlight.style.height, expected.height);
+        } finally {
+          anchor.remove();
+        }
       });
     });
   });

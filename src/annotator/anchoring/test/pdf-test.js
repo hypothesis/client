@@ -704,6 +704,113 @@ describe('annotator/anchoring/pdf', () => {
         assert.equal(anchor.toString(), 'a zombie in possession');
       });
     });
+
+    [
+      // Rect annotation
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+
+            // Rect at bottom-left corner of page.
+            shape: {
+              type: 'rect',
+              left: 0,
+              top: 0,
+              right: 10,
+              bottom: 10,
+            },
+          },
+          { type: 'PageSelector', index: 0 },
+        ],
+        expected: {
+          anchor: 0,
+          shape: {
+            type: 'rect',
+            left: 0,
+            top: 1,
+            right: 0.1,
+            bottom: 0.95,
+          },
+          coordinates: 'anchor',
+        },
+      },
+      // Point annotation
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+
+            // Point at bottom-left corner of page.
+            shape: { type: 'point', x: 0, y: 0 },
+          },
+          { type: 'PageSelector', index: 1 },
+        ],
+        expected: {
+          anchor: 1,
+          shape: { type: 'point', x: 0, y: 1 },
+          coordinates: 'anchor',
+        },
+      },
+    ].forEach(({ selectors, expected }) => {
+      it('anchors shape selectors', async () => {
+        const anchor = await pdfAnchoring.anchor(selectors);
+        const expectedAnchor = {
+          ...expected,
+          anchor: viewer.pdfViewer.getPageView(expected.anchor).div,
+        };
+        assert.deepEqual(anchor, expectedAnchor);
+      });
+    });
+
+    [
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: { type: 'point', x: 0, y: 0 },
+          },
+        ],
+        expected: 'Cannot anchor a shape selector without a page',
+      },
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: { type: 'point', x: 0, y: 0 },
+          },
+          {
+            type: 'PageSelector',
+            index: 100,
+          },
+        ],
+        expected: 'PDF page index is invalid',
+      },
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: { type: 'circle', center: 0, radius: 5 },
+          },
+          {
+            type: 'PageSelector',
+            index: 0,
+          },
+        ],
+        expected: 'Unsupported shape in shape selector',
+      },
+    ].forEach(({ selectors, expected }) => {
+      it('fails to anchor invalid shape selector', async () => {
+        let error;
+        try {
+          await pdfAnchoring.anchor(selectors);
+        } catch (e) {
+          error = e;
+        }
+        assert.instanceOf(error, Error);
+        assert.equal(error.message, expected);
+      });
+    });
   });
 
   describe('documentHasText', () => {

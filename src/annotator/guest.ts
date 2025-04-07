@@ -5,6 +5,7 @@ import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
 import { matchShortcut } from '../shared/shortcut';
 import type {
+  AbstractRange,
   AnnotationData,
   AnnotationTool,
   Annotator,
@@ -13,6 +14,7 @@ import type {
   Destroyable,
   DocumentInfo,
   Integration,
+  ShapeAnchor,
   SidebarLayout,
   SideBySideOptions,
 } from '../types/annotator';
@@ -33,6 +35,7 @@ import { HighlightClusterController } from './highlight-clusters';
 import {
   getHighlightsContainingNode,
   highlightRange,
+  highlightShape,
   removeAllHighlights,
   removeHighlights,
   setHighlightsFocused,
@@ -74,18 +77,27 @@ function annotationsAt(node: Node): string[] {
   return items as string[];
 }
 
+function isRange(r: AbstractRange | ShapeAnchor): r is AbstractRange {
+  return r !== undefined && 'toRange' in r && typeof r.toRange === 'function';
+}
+
 /**
  * Resolve an anchor's associated document region to a concrete `Range`.
  *
  * This may fail if anchoring failed or if the document has been mutated since
  * the anchor was created in a way that invalidates the anchor.
  */
-function resolveAnchor(anchor: Anchor): Range | null {
-  if (!anchor.range) {
+function resolveAnchor(anchor: Anchor): Range | ShapeAnchor | null {
+  if (!anchor.region) {
     return null;
   }
+
+  if (!isRange(anchor.region)) {
+    return anchor.region;
+  }
+
   try {
-    return anchor.range.toRange();
+    return anchor.region.toRange();
   } catch {
     return null;
   }
@@ -552,9 +564,17 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    * {@link Integration.scrollToAnchor}.
    */
   private async _scrollToAnchor(anchor: Anchor) {
-    const range = resolveAnchor(anchor);
-    if (!range) {
+    const region = resolveAnchor(anchor);
+    if (!region) {
       return;
+    }
+
+    let range;
+    if (region instanceof Range) {
+      range = region;
+    } else {
+      range = new Range();
+      range.selectNodeContents(region.anchor);
     }
 
     // Emit a custom event that the host page can respond to. This is useful
@@ -677,28 +697,35 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
      * Resolve an annotation's selectors to a concrete range.
      */
     const locate = async (target: Target): Promise<Anchor> => {
-      // Only annotations with an associated quote can currently be anchored.
-      // This is because the quote is used to verify anchoring with other selector
-      // types.
+      // Annotations must have either a quote or a shape selector.
+      //
+      // For annotations of text, the quote is used to verify anchoring with
+      // other selector types.
       if (
         !target.selector ||
-        !target.selector.some(s => s.type === 'TextQuoteSelector')
+        !target.selector.some(
+          s => s.type === 'TextQuoteSelector' || s.type === 'ShapeSelector',
+        )
       ) {
         return { annotation, target };
       }
 
       let anchor: Anchor;
       try {
-        const range = await this._integration.anchor(
+        const region = await this._integration.anchor(
           this.element,
           target.selector,
         );
-        // Convert the `Range` to a `TextRange` which can be converted back to
-        // a `Range` later. The `TextRange` representation allows for highlights
-        // to be inserted during anchoring other annotations without "breaking"
-        // this anchor.
-        const textRange = TextRange.fromRange(range);
-        anchor = { annotation, target, range: textRange };
+        if (region instanceof Range) {
+          // Convert the `Range` to a `TextRange` which can be converted back to
+          // a `Range` later. The `TextRange` representation allows for highlights
+          // to be inserted during anchoring other annotations without "breaking"
+          // this anchor.
+          const textRange = TextRange.fromRange(region);
+          anchor = { annotation, target, region: textRange };
+        } else {
+          anchor = { annotation, target, region };
+        }
       } catch {
         anchor = { annotation, target };
       }
@@ -709,15 +736,20 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
      * Highlight the text range that `anchor` refers to.
      */
     const highlight = (anchor: Anchor) => {
-      const range = resolveAnchor(anchor);
-      if (!range) {
+      const region = resolveAnchor(anchor);
+      if (!region) {
         return;
       }
 
-      const highlights = highlightRange(
-        range,
-        anchor.annotation?.$cluster /* cssClass */,
-      ) as AnnotationHighlight[];
+      let highlights;
+      if (region instanceof Range) {
+        highlights = highlightRange(
+          region,
+          anchor.annotation?.$cluster /* cssClass */,
+        ) as AnnotationHighlight[];
+      } else {
+        highlights = highlightShape(region) as AnnotationHighlight[];
+      }
       highlights.forEach(h => {
         h._annotation = anchor.annotation;
       });
@@ -753,7 +785,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     // Page Note) or we successfully resolved the selectors to a range.
     annotation.$orphan =
       anchors.length > 0 &&
-      anchors.every(anchor => anchor.target.selector && !anchor.range);
+      anchors.every(anchor => anchor.target.selector && !anchor.region);
 
     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
 
@@ -816,6 +848,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       };
 
       this._sidebarRPC.call('createAnnotation', annotation);
+      this.anchor(annotation);
 
       return annotation;
     } else {

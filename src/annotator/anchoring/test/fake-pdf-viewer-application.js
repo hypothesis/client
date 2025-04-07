@@ -73,6 +73,10 @@ class FakePDFPageProxy {
     this._config = config;
   }
 
+  get view() {
+    return [0, 0, 100, 200]; // [left, bottom, right, top]
+  }
+
   getTextContent(params = {}) {
     if (!params.normalizeWhitespace) {
       return Promise.reject(

@@ -86,7 +86,7 @@ export type Anchor = {
   /** The HTML elements that create the highlight for this annotation. */
   highlights?: HTMLElement[];
   /** Region of the document that this annotation's selectors were resolved to. */
-  range?: AbstractRange;
+  region?: AbstractRange | ShapeAnchor;
   target: Target;
 };
 
@@ -163,6 +163,31 @@ export type Point = {
 export type Shape = Rect | Point;
 
 /**
+ * Specifies a region of a document as a combination of an anchor element and
+ * a shape whose coordinates are relative to the anchor.
+ */
+export type ShapeAnchor = {
+  /**
+   * Element which coordinates in {@link ShapeAnchor.shape} are relative to.
+   *
+   * For example in a PDF where there is one container element in the viewport
+   * per page, the anchor element is the page on which the annotation was made.
+   */
+  anchor: Element;
+
+  /** Shape with coordinates relative to the {@link ShapeAnchor.anchor}. */
+  shape: Shape;
+
+  /**
+   * Specifies how to interpret the coordinates of the {@link ShapeAnchor.shape}.
+   *
+   * - "anchor" - Coordinate system where `[0, 0]` is the top-left corner of the
+   *   anchor element and `[1, 1]` is the bottom-right corner.
+   */
+  coordinates: 'anchor';
+};
+
+/**
  * Interface for document type/viewer integrations that handle all the details
  * of supporting a specific document type (web page, PDF, ebook, etc.).
  */
@@ -171,13 +196,28 @@ export type IntegrationBase = {
    * Return whether this integration supports styling multiple clusters of highlights
    */
   canStyleClusteredHighlights?(): boolean;
+
   /**
-   * Attempt to resolve a set of serialized selectors to the corresponding content in the current document.
+   * Attempt to resolve a set of serialized selectors to the corresponding content
+   * in the current document.
+   *
+   * The result of anchoring may be:
+   *
+   *  - A DOM range containing the annotated text
+   *  - An anchor element and shape specifying the geometry of the annotation
+   *    target.
    */
-  anchor(root: HTMLElement, selectors: Selector[]): Promise<Range>;
+  anchor(
+    root: HTMLElement,
+    selectors: Selector[],
+  ): Promise<Range | ShapeAnchor>;
 
   /**
    * Generate a list of serializable selectors which represent the content in `region`.
+   *
+   * If the region is a shape, the coordinates are positions relative to the
+   * viewport. This matches, for example, coordinates returned by
+   * {@link Element.getBoundingClientRect}.
    */
   describe(
     root: HTMLElement,
@@ -249,6 +289,7 @@ export type IntegrationBase = {
    * `anchor.highlights` is a non-empty array)
    */
   scrollToAnchor(a: Anchor): Promise<void>;
+
   /** Show information about the current document and content provider */
   showContentInfo?(config: ContentInfoConfig): void;
 
@@ -383,5 +424,6 @@ export type SideBySideMode = SideBySideOptions['mode'];
  *
  * - "selection" - Use the current text or DOM selection
  * - "rect" - Draw a rectangle to select a region of the document
+ * - "point" - Indicate a region of the document using a point (or "pin")
  */
 export type AnnotationTool = 'selection' | 'rect' | 'point';
