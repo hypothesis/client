@@ -1,6 +1,7 @@
 import classnames from 'classnames';
 
 import { generateHexString } from '../shared/random';
+import type { ShapeAnchor } from '../types/annotator';
 import type { HighlightCluster } from '../types/shared';
 import { isInPlaceholder } from './anchoring/placeholder';
 import { isNodeInRange } from './range-util';
@@ -194,6 +195,58 @@ function wholeTextNodesInRange(range: Range): Text[] {
   }
 
   return textNodes;
+}
+
+/**
+ * Create highlights for an annotated region defined by a shape.
+ */
+export function highlightShape(region: ShapeAnchor): HighlightElement[] {
+  const { shape, anchor } = region;
+
+  const anchorStyles = getComputedStyle(anchor);
+  const borderWidth = parseInt(anchorStyles.borderWidth);
+
+  // "Outer" rect of the anchor that includes the border.
+  const anchorOuterBox = anchor.getBoundingClientRect();
+
+  // Inner rect of the anchor that does not include the border.
+  const anchorBox = new DOMRect(
+    anchorOuterBox.left,
+    anchorOuterBox.top,
+    anchorOuterBox.width - 2 * borderWidth,
+    anchorOuterBox.height - 2 * borderWidth,
+  );
+
+  const highlightBorderWidth = 3;
+  const highlightEl = document.createElement('hypothesis-highlight');
+  highlightEl.style.position = 'absolute';
+  highlightEl.style.zIndex = '10';
+
+  // This color is similar to the default highlight fill, but darker so it has
+  // more contrast when used as a border.
+  highlightEl.style.border = `${highlightBorderWidth}px solid #edd72b`;
+
+  if (shape.type === 'rect') {
+    const left = shape.left * anchorBox.width - borderWidth;
+    const top = shape.top * anchorBox.height - borderWidth;
+    const width = (shape.right - shape.left) * anchorBox.width;
+    const height = (shape.bottom - shape.top) * anchorBox.height;
+    highlightEl.style.left = `${left}px`;
+    highlightEl.style.top = `${top}px`;
+    highlightEl.style.width = `${width - 2 * highlightBorderWidth}px`;
+    highlightEl.style.height = `${height - 2 * highlightBorderWidth}px`;
+  } else if (shape.type === 'point') {
+    const x = shape.x * anchorBox.width - borderWidth;
+    const y = shape.y * anchorBox.height - borderWidth;
+    highlightEl.style.left = `${x}px`;
+    highlightEl.style.top = `${y}px`;
+    highlightEl.style.width = '10px';
+    highlightEl.style.height = '10px';
+  }
+
+  anchor.append(highlightEl);
+
+  return [highlightEl];
 }
 
 /**

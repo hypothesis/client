@@ -377,7 +377,7 @@ describe('annotator/integrations/pdf', () => {
         const anchor = {
           anchor: {},
           highlights: [document.createElement('div')],
-          range: document.createRange(),
+          region: document.createRange(),
         };
         fakeAnnotator.anchors.push(anchor);
         return anchor;
@@ -390,7 +390,7 @@ describe('annotator/integrations/pdf', () => {
         await triggerUpdate();
 
         assert.equal(anchor.highlights.length, 0);
-        assert.isUndefined(anchor.range);
+        assert.isUndefined(anchor.region);
         assert.calledWith(fakeAnnotator.anchor, anchor.annotation);
       });
 
@@ -404,7 +404,7 @@ describe('annotator/integrations/pdf', () => {
           await triggerUpdate();
 
           assert.equal(anchor.highlights.length, 1);
-          assert.ok(anchor.range);
+          assert.ok(anchor.region);
           assert.notCalled(fakeAnnotator.anchor);
         } finally {
           anchor.highlights[0].remove();
