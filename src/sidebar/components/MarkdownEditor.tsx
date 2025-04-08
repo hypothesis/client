@@ -326,7 +326,7 @@ function TextArea({
       <textarea
         className={classnames(
           'border rounded p-2',
-          'text-color-text-light bg-grey-0',
+          'placeholder:text-grey-6 bg-grey-0',
           'focus:bg-white focus:outline-none focus:shadow-focus-inner',
           classes,
         )}
