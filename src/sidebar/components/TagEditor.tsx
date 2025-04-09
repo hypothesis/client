@@ -268,7 +268,7 @@ function TagEditor({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           elementRef={inputEl}
-          placeholder="Add new tags"
+          placeholder="Add new tags…"
           type="text"
           autoComplete="off"
           aria-autocomplete="list"

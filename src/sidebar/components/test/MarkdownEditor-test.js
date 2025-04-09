@@ -361,7 +361,7 @@ describe('MarkdownEditor', () => {
     const wrapper = createComponent({ label: 'Enter comment' });
     const inputField = wrapper.find('textarea');
     assert.equal(inputField.prop('aria-label'), 'Enter comment');
-    assert.equal(inputField.prop('placeholder'), 'Enter comment');
+    assert.equal(inputField.prop('placeholder'), 'Enter comment…');
   });
 
   it('unwraps mention tags', () => {
