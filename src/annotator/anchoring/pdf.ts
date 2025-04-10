@@ -644,6 +644,9 @@ async function anchorShape(
   const pageWidth = pageRight - pageLeft;
   const pageHeight = pageTop - pageBottom;
 
+  const mapX = (x: number) => (x - pageLeft) / pageWidth;
+  const mapY = (y: number) => (pageTop - y) / pageHeight;
+
   // Map the user-space coordinates of the shape to coordinates relative to the
   // PDF page container, where the top-left is (0, 0) and the bottom right is
   // (1, 1).
@@ -652,19 +655,19 @@ async function anchorShape(
     case 'rect':
       {
         const s = shapeSelector.shape;
-        const left = (s.left - pageLeft) / pageWidth;
-        const top = (pageHeight - s.top) / pageHeight;
-        const right = (s.right - pageLeft) / pageWidth;
-        const bottom = (pageHeight - s.bottom) / pageHeight;
-        shape = { type: 'rect', left, right, top, bottom };
+        shape = {
+          type: 'rect',
+          left: mapX(s.left),
+          right: mapX(s.right),
+          top: mapY(s.top),
+          bottom: mapY(s.bottom),
+        };
       }
       break;
     case 'point':
       {
         const s = shapeSelector.shape;
-        const x = (s.x - pageLeft) / pageWidth;
-        const y = (pageHeight - s.y) / pageHeight;
-        shape = { type: 'point', x, y };
+        shape = { type: 'point', x: mapX(s.x), y: mapY(s.y) };
       }
       break;
     default:

@@ -71,10 +71,18 @@ class FakePDFPageProxy {
   constructor(pageText, config) {
     this.pageText = pageText;
     this._config = config;
+    this._view = [0, 0, 100, 200]; // [left, bottom, right, top]
+  }
+
+  /**
+   * Set the page bounding box. This is not part of the `PDFPageProxy` API.
+   */
+  setPageBoundingBox(box) {
+    this._view = box;
   }
 
   get view() {
-    return [0, 0, 100, 200]; // [left, bottom, right, top]
+    return this._view;
   }
 
   getTextContent(params = {}) {

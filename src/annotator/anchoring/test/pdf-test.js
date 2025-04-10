@@ -708,6 +708,7 @@ describe('annotator/anchoring/pdf', () => {
     [
       // Rect annotation
       {
+        pageBoundingBox: [5, 9, 105, 209],
         selectors: [
           {
             type: 'ShapeSelector',
@@ -715,10 +716,10 @@ describe('annotator/anchoring/pdf', () => {
             // Rect at bottom-left corner of page.
             shape: {
               type: 'rect',
-              left: 0,
-              top: 0,
-              right: 10,
-              bottom: 10,
+              left: 5,
+              top: 9,
+              right: 15,
+              bottom: 19,
             },
           },
           { type: 'PageSelector', index: 0 },
@@ -737,12 +738,13 @@ describe('annotator/anchoring/pdf', () => {
       },
       // Point annotation
       {
+        pageBoundingBox: [5, 9, 105, 209],
         selectors: [
           {
             type: 'ShapeSelector',
 
             // Point at bottom-left corner of page.
-            shape: { type: 'point', x: 0, y: 0 },
+            shape: { type: 'point', x: 5, y: 9 },
           },
           { type: 'PageSelector', index: 1 },
         ],
@@ -752,12 +754,34 @@ describe('annotator/anchoring/pdf', () => {
           coordinates: 'anchor',
         },
       },
-    ].forEach(({ selectors, expected }) => {
+      {
+        pageBoundingBox: [5, 9, 105, 209],
+        selectors: [
+          {
+            type: 'ShapeSelector',
+
+            // Point at top-right corner of page.
+            shape: { type: 'point', x: 105, y: 209 },
+          },
+          { type: 'PageSelector', index: 1 },
+        ],
+        expected: {
+          anchor: 1,
+          shape: { type: 'point', x: 1, y: 0 },
+          coordinates: 'anchor',
+        },
+      },
+    ].forEach(({ pageBoundingBox, selectors, expected }) => {
       it('anchors shape selectors', async () => {
+        const pageView = viewer.pdfViewer.getPageView(expected.anchor);
+
+        // Set page bounding box in PDF user space coordinates.
+        pageView.pdfPage.setPageBoundingBox(pageBoundingBox);
+
         const anchor = await pdfAnchoring.anchor(selectors);
         const expectedAnchor = {
           ...expected,
-          anchor: viewer.pdfViewer.getPageView(expected.anchor).div,
+          anchor: pageView.div,
         };
         assert.deepEqual(anchor, expectedAnchor);
       });
