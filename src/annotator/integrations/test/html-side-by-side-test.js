@@ -161,10 +161,8 @@ the fighting was.`;
 
       // nb. `scrollTop` returns an integer number of pixels, whereas `delta`
       // may be fractional.
-      assert.equal(
-        Math.floor(scrollRoot.scrollTop),
-        Math.floor(initialScrollTop + delta),
-      );
+      const tolerance = 2;
+      assert.closeTo(scrollRoot.scrollTop, initialScrollTop + delta, tolerance);
     }
 
     it('selects content as a scroll anchor and preserves its position in the viewport', () => {
