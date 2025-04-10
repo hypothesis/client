@@ -9102,7 +9102,6 @@ __metadata:
     showdown: ^2.0.0
     sinon: ^20.0.0
     tailwindcss: ^3.0.2
-    tiny-emitter: ^2.0.2
     typescript: ^5.0.2
     typescript-eslint: ^8.10.0
     wrap-text: ^1.0.7
@@ -14227,13 +14226,6 @@ __metadata:
   dependencies:
     any-promise: ^1.0.0
   checksum: 84e1b804bfec49f3531215f17b4a6e50fd4397b5f7c1bccc427b9c656e1ecfb13ea79d899930184f78bc2f57285c54d9a50a590c8868f4f0cef5c1d9f898b05e
-  languageName: node
-  linkType: hard
-
-"tiny-emitter@npm:^2.0.2":
-  version: 2.1.0
-  resolution: "tiny-emitter@npm:2.1.0"
-  checksum: fbcfb5145751a0e3b109507a828eb6d6d4501352ab7bb33eccef46e22e9d9ad3953158870a6966a59e57ab7c3f9cfac7cab8521db4de6a5e757012f4677df2dd
   languageName: node
   linkType: hard
 

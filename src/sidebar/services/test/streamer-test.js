@@ -1,7 +1,7 @@
 import { delay } from '@hypothesis/frontend-testing';
 import sinon from 'sinon';
-import EventEmitter from 'tiny-emitter';
 
+import { EventEmitter } from '../../../shared/event-emitter';
 import { promiseWithResolvers } from '../../../shared/promise-with-resolvers';
 import { fakeReduxStore } from '../../test/fake-redux-store';
 import { StreamerService, $imports } from '../streamer';

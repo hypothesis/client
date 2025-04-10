@@ -7,7 +7,7 @@ import {
   PortProvider,
   installPortCloseWorkaroundForSafari,
 } from '../shared/messaging';
-import type { Destroyable } from '../types/annotator';
+import type { Destroyable, Events } from '../types/annotator';
 import type { NotebookConfig } from './components/NotebookModal';
 import type { ProfileConfig } from './components/ProfileModal';
 import { getConfig } from './config/index';
@@ -105,7 +105,7 @@ function init() {
     const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
     const portProvider = new PortProvider(hypothesisAppsOrigin);
 
-    const eventBus = new EventBus();
+    const eventBus = new EventBus<Events>();
     const sidebar = new Sidebar(document.body, eventBus, sidebarConfig);
     const notebook = new Notebook(
       document.body,

@@ -2,19 +2,20 @@ import { CancelIcon, IconButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
+import type { Events } from '../../types/annotator';
 import type { Emitter, EventBus } from '../util/emitter';
 import ModalDialog from './ModalDialog';
 
 export type ProfileConfig = { profileAppUrl: string } & Record<string, unknown>;
 
 type ProfileModalProps = {
-  eventBus: EventBus;
+  eventBus: EventBus<Events>;
   config: ProfileConfig;
 };
 
 export default function ProfileModal({ eventBus, config }: ProfileModalProps) {
   const [isHidden, setIsHidden] = useState(true);
-  const emitterRef = useRef<Emitter | null>(null);
+  const emitterRef = useRef<Emitter<Events> | null>(null);
 
   useEffect(() => {
     const emitter = eventBus.createEmitter();

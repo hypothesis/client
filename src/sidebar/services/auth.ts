@@ -1,5 +1,4 @@
-import { TinyEmitter } from 'tiny-emitter';
-
+import { EventEmitter } from '../../shared/event-emitter';
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import { OAuthClient } from '../util/oauth-client';
@@ -24,6 +23,10 @@ const isTokenInfo = (token: unknown): token is TokenInfo =>
   'expiresAt' in token &&
   typeof token.expiresAt === 'number';
 
+export type Events = {
+  oauthTokensChanged(): void;
+};
+
 /**
  * Authorization service.
  *
@@ -39,7 +42,7 @@ const isTokenInfo = (token: unknown): token is TokenInfo =>
  *
  * @inject
  */
-export class AuthService extends TinyEmitter {
+export class AuthService extends EventEmitter<Events> {
   /**
    * Authorization code from auth popup window. Set by the login method
    * and exchanged for an Access Token on the next API call.

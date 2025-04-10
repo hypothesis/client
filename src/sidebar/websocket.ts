@@ -1,4 +1,4 @@
-import { TinyEmitter } from 'tiny-emitter';
+import { EventEmitter } from '../shared/event-emitter';
 
 // Status codes indicating the reason why a WebSocket connection closed.
 // See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent and
@@ -14,6 +14,14 @@ export const CLOSE_ABNORMAL = 1006;
 // There are other possible close status codes not listed here. They are all
 // considered abnormal closures.
 
+export type SocketEvents = {
+  open(e: Event): void;
+  close(e: Event): void;
+  disconnect(): void;
+  message(e: MessageEvent): void;
+  error(e: Event): void;
+};
+
 /**
  * Socket is a minimal wrapper around {@link WebSocket} which provides:
  *
@@ -22,7 +30,7 @@ export const CLOSE_ABNORMAL = 1006;
  * - Queuing of messages passed to send() whilst the socket is
  *   connecting
  */
-export class Socket extends TinyEmitter {
+export class Socket extends EventEmitter<SocketEvents> {
   private _socket: WebSocket;
 
   /** Queue of JSON objects which have not yet been submitted. */

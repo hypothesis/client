@@ -11,6 +11,7 @@ import type {
   AnnotationTool,
   SidebarLayout,
   Destroyable,
+  Events,
 } from '../types/annotator';
 import type { Service } from '../types/config';
 import type {
@@ -104,7 +105,7 @@ type DragResizeState = {
  * as well as (3) the adjacent controls.
  */
 export class Sidebar implements Destroyable {
-  private _emitter: Emitter;
+  private _emitter: Emitter<Events>;
   private _config: SidebarContainerConfig & SidebarConfig;
   private _dragResizeHandler: DragHandler | undefined;
   private _dragResizeState: DragResizeState;
@@ -151,7 +152,7 @@ export class Sidebar implements Destroyable {
    */
   constructor(
     element: HTMLElement,
-    eventBus: EventBus,
+    eventBus: EventBus<Events>,
     config: SidebarContainerConfig & SidebarConfig,
   ) {
     this._emitter = eventBus.createEmitter();

@@ -1,5 +1,4 @@
-import { TinyEmitter } from 'tiny-emitter';
-
+import { EventEmitter } from '../shared/event-emitter';
 import type { Annotation, SearchQuery, SearchResponse } from '../types/api';
 
 /**
@@ -67,6 +66,13 @@ export type SearchOptions = {
   sortOrder?: SortOrder;
 };
 
+export type Events = {
+  resultCount(count: number): void;
+  results(anns: Annotation[]): void;
+  error(err: Error): void;
+  end(): void;
+};
+
 /**
  * Client for the Hypothesis annotation search API [1].
  *
@@ -77,7 +83,7 @@ export type SearchOptions = {
  *
  * [1] https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
  */
-export class SearchClient extends TinyEmitter {
+export class SearchClient extends EventEmitter<Events> {
   private _canceled: boolean;
   private _getPageSize: (pageIndex: number) => number;
   private _incremental: boolean;

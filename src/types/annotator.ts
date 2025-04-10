@@ -1,5 +1,6 @@
-import type { TinyEmitter } from 'tiny-emitter';
+import type { ToastMessage } from '@hypothesis/frontend-shared';
 
+import type { EventEmitter } from '../shared/event-emitter';
 import type { APIAnnotationData, Selector, Target } from './api';
 import type { ClientAnnotationData } from './shared';
 
@@ -105,13 +106,17 @@ export type AnchorPosition = {
   bottom: number;
 };
 
+export type FeatureFlagsEvents = {
+  flagsChanged(): void;
+};
+
 /**
  * Interface for querying a collection of feature flags and subscribing to
  * flag updates.
  *
  * Emits a "flagsChanged" event when the flags are updated.
  */
-export type FeatureFlags = TinyEmitter & {
+export type FeatureFlags = EventEmitter<FeatureFlagsEvents> & {
   flagEnabled(flag: string): boolean;
 };
 
@@ -309,7 +314,15 @@ export type IntegrationBase = {
   supportedTools(): AnnotationTool[];
 };
 
-export type Integration = Destroyable & TinyEmitter & IntegrationBase;
+/** Events which {@link Integration}s may emit. */
+export type IntegrationEvents = {
+  supportedToolsChanged(tools: string[]): void;
+  uriChanged(uri: string): void;
+};
+
+export type Integration = Destroyable &
+  EventEmitter<IntegrationEvents> &
+  IntegrationBase;
 
 /**
  * Destroyable classes implement the `destroy` method to properly remove all
@@ -427,3 +440,16 @@ export type SideBySideMode = SideBySideOptions['mode'];
  * - "point" - Indicate a region of the document using a point (or "pin")
  */
 export type AnnotationTool = 'selection' | 'rect' | 'point';
+
+/**
+ * Set of events dispatched on the shared event bus used by various annotator
+ * components.
+ */
+export type Events = {
+  openNotebook(groupId: string): void;
+  closeNotebook(): void;
+  openProfile(): void;
+  closeProfile(): void;
+  toastMessageAdded(message: ToastMessage): void;
+  toastMessageDismissed(id: string): void;
+};

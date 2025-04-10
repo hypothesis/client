@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import { addConfigFragment } from '../../shared/config-fragment';
+import type { Events } from '../../types/annotator';
 import { createAppConfig } from '../config/app';
 import type { EventBus, Emitter } from '../util/emitter';
 import ModalDialog from './ModalDialog';
@@ -43,7 +44,7 @@ function NotebookIframe({ config, groupId }: NotebookIframeProps) {
 }
 
 export type NotebookModalProps = {
-  eventBus: EventBus;
+  eventBus: EventBus<Events>;
   config: NotebookConfig;
 };
 
@@ -62,7 +63,7 @@ export default function NotebookModal({
   const [isHidden, setIsHidden] = useState(true);
   const [groupId, setGroupId] = useState<string | null>(null);
   const originalDocumentOverflowStyle = useRef('');
-  const emitterRef = useRef<Emitter | null>(null);
+  const emitterRef = useRef<Emitter<Events> | null>(null);
 
   // Stores the original overflow CSS property of document.body and reset it
   // when the component is destroyed

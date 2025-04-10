@@ -1,5 +1,4 @@
-import EventEmitter from 'tiny-emitter';
-
+import { EventEmitter } from '../../../shared/event-emitter';
 import { LoadAnnotationsService, $imports } from '../load-annotations';
 
 let searchClients;

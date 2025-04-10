@@ -1,6 +1,6 @@
 import { mount } from '@hypothesis/frontend-testing';
-import EventEmitter from 'tiny-emitter';
 
+import { EventEmitter } from '../../../shared/event-emitter';
 import { Emitter } from '../../util/emitter';
 import ToastMessages from '../ToastMessages';
 

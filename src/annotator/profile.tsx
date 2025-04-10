@@ -1,4 +1,4 @@
-import type { Destroyable } from '../types/annotator';
+import type { Destroyable, Events } from '../types/annotator';
 import type { ProfileConfig } from './components/ProfileModal';
 import ProfileModal from './components/ProfileModal';
 import type { EventBus } from './util/emitter';
@@ -7,7 +7,11 @@ import { PreactContainer } from './util/preact-container';
 export class Profile implements Destroyable {
   private _container: PreactContainer;
 
-  constructor(element: HTMLElement, eventBus: EventBus, config: ProfileConfig) {
+  constructor(
+    element: HTMLElement,
+    eventBus: EventBus<Events>,
+    config: ProfileConfig,
+  ) {
     this._container = new PreactContainer('profile', () => (
       <ProfileModal eventBus={eventBus} config={config} />
     ));

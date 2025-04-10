@@ -1,6 +1,5 @@
-import { TinyEmitter } from 'tiny-emitter';
-
 import { addConfigFragment } from '../../shared/config-fragment';
+import { EventEmitter } from '../../shared/event-emitter';
 import { Sidebar, MIN_RESIZE, $imports } from '../sidebar';
 import { Emitter } from '../util/emitter';
 
@@ -183,7 +182,7 @@ describe('Sidebar', () => {
 
     fakeSendErrorsTo = sinon.stub();
 
-    fakeEmitter = new Emitter(new TinyEmitter());
+    fakeEmitter = new Emitter(new EventEmitter());
 
     const fakeCreateAppConfig = sinon.spy((appURL, config) => {
       const appConfig = { ...config };

@@ -1,5 +1,4 @@
-import EventEmitter from 'tiny-emitter';
-
+import { EventEmitter } from '../../../shared/event-emitter';
 import { call, notify, $imports } from '../postmessage-json-rpc';
 
 class FakeWindow {

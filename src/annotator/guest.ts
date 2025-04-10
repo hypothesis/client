@@ -1,6 +1,6 @@
 import { ListenerCollection } from '@hypothesis/frontend-shared';
-import { TinyEmitter } from 'tiny-emitter';
 
+import { EventEmitter } from '../shared/event-emitter';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
 import { matchShortcut } from '../shared/shortcut';
@@ -171,6 +171,10 @@ export class ScrollToRangeEvent extends CustomEvent<Range> {
   }
 }
 
+export type Events = {
+  hostDisconnected(): void;
+};
+
 /**
  * `Guest` is the central class of the annotator that handles anchoring (locating)
  * annotations in the document when they are fetched by the sidebar, rendering
@@ -188,7 +192,10 @@ export class ScrollToRangeEvent extends CustomEvent<Range> {
  * each frame connects to the sidebar and host frames as part of its
  * initialization.
  */
-export class Guest extends TinyEmitter implements Annotator, Destroyable {
+export class Guest
+  extends EventEmitter<Events>
+  implements Annotator, Destroyable
+{
   public element: HTMLElement;
 
   /** Ranges of the current text selection. */
@@ -674,6 +681,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     removeAllHighlights(this.element);
 
     this._integration.destroy();
+
+    super.destroy();
   }
 
   /**
