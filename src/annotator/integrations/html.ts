@@ -1,10 +1,10 @@
-import { TinyEmitter } from 'tiny-emitter';
-
+import { EventEmitter } from '../../shared/event-emitter';
 import type {
   Anchor,
   AnnotationTool,
   FeatureFlags,
   Integration,
+  IntegrationEvents,
   Shape,
   SidebarLayout,
   SideBySideOptions,
@@ -31,7 +31,10 @@ const MIN_HTML_WIDTH = 480;
  * This integration is used for web pages and applications that are not handled
  * by a more specific integration (eg. for PDFs).
  */
-export class HTMLIntegration extends TinyEmitter implements Integration {
+export class HTMLIntegration
+  extends EventEmitter<IntegrationEvents>
+  implements Integration
+{
   container: HTMLElement;
   featureFlags: FeatureFlags;
 
@@ -151,6 +154,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     this._navObserver.disconnect();
     this._metaObserver.disconnect();
     this.featureFlags.off('flagsChanged', this._flagsChanged);
+    super.destroy();
   }
 
   contentContainer() {

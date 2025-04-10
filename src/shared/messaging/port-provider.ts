@@ -1,6 +1,6 @@
 import { ListenerCollection } from '@hypothesis/frontend-shared';
-import { TinyEmitter } from 'tiny-emitter';
 
+import { EventEmitter } from '../../shared/event-emitter';
 import type { Destroyable } from '../../types/annotator';
 import { captureErrors, sendError } from '../frame-error-capture';
 import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
@@ -61,7 +61,9 @@ type Channel =
  */
 export class PortProvider implements Destroyable {
   private _allowedMessages: Array<Partial<Message> & { allowedOrigin: string }>;
-  private _emitter: TinyEmitter;
+  private _emitter: EventEmitter<{
+    [event: string]: (...args: any) => void;
+  }>;
   private _hypothesisAppsOrigin: string;
 
   /**
@@ -87,7 +89,7 @@ export class PortProvider implements Destroyable {
    */
   constructor(hypothesisAppsOrigin: string) {
     this._hypothesisAppsOrigin = hypothesisAppsOrigin;
-    this._emitter = new TinyEmitter();
+    this._emitter = new EventEmitter();
 
     this._handledRequests = new Set();
 

@@ -1,7 +1,9 @@
-import { TinyEmitter } from 'tiny-emitter';
-
+import { EventEmitter } from '../shared/event-emitter';
 import { warnOnce } from '../shared/warn-once';
-import type { FeatureFlags as IFeatureFlags } from '../types/annotator';
+import type {
+  FeatureFlags as IFeatureFlags,
+  FeatureFlagsEvents,
+} from '../types/annotator';
 
 /**
  * List of feature flags that annotator code tests for.
@@ -11,7 +13,10 @@ const annotatorFlags = ['pdf_image_annotation', 'styled_highlight_clusters'];
 /**
  * An observable container of feature flags.
  */
-export class FeatureFlags extends TinyEmitter implements IFeatureFlags {
+export class FeatureFlags
+  extends EventEmitter<FeatureFlagsEvents>
+  implements IFeatureFlags
+{
   /** Map of flag name to enabled state. */
   private _flags: Map<string, boolean>;
   private _knownFlags: string[];

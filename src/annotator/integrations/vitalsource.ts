@@ -1,12 +1,13 @@
 import { ListenerCollection } from '@hypothesis/frontend-shared';
-import { TinyEmitter } from 'tiny-emitter';
 
 import { documentCFI, stripCFIAssertions } from '../../shared/cfi';
+import { EventEmitter } from '../../shared/event-emitter';
 import type {
   Anchor,
   AnnotationData,
   AnnotationTool,
   Integration,
+  IntegrationEvents,
   SegmentInfo,
   Shape,
   SidebarLayout,
@@ -222,7 +223,7 @@ function stripOrigin(url: string) {
  *    in the PDF image. This is similar to what PDF.js does for us in PDFs.
  */
 export class VitalSourceContentIntegration
-  extends TinyEmitter
+  extends EventEmitter<IntegrationEvents>
   implements Integration
 {
   private _bookElement: MosaicBookElement;
@@ -342,6 +343,7 @@ export class VitalSourceContentIntegration
     }
     this._listeners.removeAll();
     this._htmlIntegration.destroy();
+    super.destroy();
   }
 
   anchor(root: HTMLElement, selectors: Selector[]) {

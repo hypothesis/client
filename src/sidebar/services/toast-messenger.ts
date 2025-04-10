@@ -1,6 +1,6 @@
 import type { ToastMessage } from '@hypothesis/frontend-shared';
-import { TinyEmitter } from 'tiny-emitter';
 
+import { EventEmitter } from '../../shared/event-emitter';
 import { generateHexString } from '../../shared/random';
 import type { SidebarStore } from '../store';
 
@@ -34,12 +34,17 @@ type MessageData = {
   options: MessageOptions;
 };
 
+export type Events = {
+  toastMessageAdded(msg: ToastMessage): void;
+  toastMessageDismissed(id: string): void;
+};
+
 /**
  * A service for managing toast messages. Added messages may be manually
  * dismissed with the `#dismiss()` method.
  */
 // @inject
-export class ToastMessengerService extends TinyEmitter {
+export class ToastMessengerService extends EventEmitter<Events> {
   private _store: SidebarStore;
   private _window: Window;
 

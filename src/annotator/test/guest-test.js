@@ -1,6 +1,6 @@
 import { delay } from '@hypothesis/frontend-testing';
-import { TinyEmitter } from 'tiny-emitter';
 
+import { EventEmitter } from '../../shared/event-emitter';
 import { Guest, $imports } from '../guest';
 
 class FakeAdder {
@@ -174,7 +174,7 @@ describe('Guest', () => {
 
     fakeFrameFillsAncestor = sinon.stub().returns(true);
 
-    fakeIntegration = Object.assign(new TinyEmitter(), {
+    fakeIntegration = Object.assign(new EventEmitter(), {
       anchor: sinon.stub(),
       getAnnotatableRange: sinon.stub().returnsArg(0),
       canStyleClusteredHighlights: sinon.stub().returns(false),

@@ -1,6 +1,6 @@
 import { delay } from '@hypothesis/frontend-testing';
-import EventEmitter from 'tiny-emitter';
 
+import { EventEmitter } from '../../../shared/event-emitter';
 import { promiseWithResolvers } from '../../../shared/promise-with-resolvers';
 import { PDFMetadata } from '../pdf-metadata';
 

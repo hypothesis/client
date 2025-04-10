@@ -1,7 +1,7 @@
 import { ListenerCollection } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
-import { TinyEmitter } from 'tiny-emitter';
 
+import { EventEmitter } from '../../shared/event-emitter';
 import type {
   Anchor,
   AnnotationData,
@@ -11,6 +11,7 @@ import type {
   Destroyable,
   FeatureFlags,
   Integration,
+  IntegrationEvents,
   Shape,
   ShapeAnchor,
   SidebarLayout,
@@ -165,7 +166,10 @@ export type Options = {
 /**
  * Integration that works with PDF.js
  */
-export class PDFIntegration extends TinyEmitter implements Integration {
+export class PDFIntegration
+  extends EventEmitter<IntegrationEvents>
+  implements Integration
+{
   private _annotator: Annotator;
 
   /** Banners shown at the top of the PDF viewer. */
@@ -266,6 +270,8 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     this._observer.disconnect();
     this._banner.destroy();
     this._destroyed = true;
+
+    super.destroy();
   }
 
   /**
