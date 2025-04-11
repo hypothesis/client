@@ -33,7 +33,7 @@ import { LayoutChangeEvent } from './events';
 import { FeatureFlags } from './features';
 import { HighlightClusterController } from './highlight-clusters';
 import {
-  getHighlightsContainingNode,
+  getHighlightsFromPoint,
   highlightRange,
   highlightShape,
   removeAllHighlights,
@@ -66,15 +66,13 @@ function annotationsForSelection(): string[] {
 }
 
 /**
- * Return the annotation tags associated with any highlights that contain a given
- * DOM node.
+ * Return the annotation tags associated with highlights at given (clientX,
+ * clientY) coordinates.
  */
-function annotationsAt(node: Node): string[] {
-  const items = getHighlightsContainingNode(node)
-    .map(h => (h as AnnotationHighlight)._annotation)
-    .filter(ann => ann !== undefined)
-    .map(ann => ann?.$tag);
-  return items as string[];
+function annotationsAtPoint(x: number, y: number): string[] {
+  return getHighlightsFromPoint(x, y)
+    .map(h => (h as AnnotationHighlight)._annotation?.$tag)
+    .filter(tag => tag !== undefined) as string[];
 }
 
 function isRange(r: AbstractRange | ShapeAnchor): r is AbstractRange {
@@ -408,7 +406,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       }
 
       // Don't hide the sidebar if the event comes from an element that contains a highlight
-      if (annotationsAt(event.target as Element).length) {
+      if (annotationsAtPoint(event.clientX, event.clientY).length) {
         return;
       }
 
@@ -428,8 +426,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     };
 
     this._listeners.add(this.element, 'mouseup', event => {
-      const { target, metaKey, ctrlKey } = event;
-      const tags = annotationsAt(target as Element);
+      const { clientX, clientY, metaKey, ctrlKey } = event;
+      const tags = annotationsAtPoint(clientX, clientY);
       if (tags.length && this._highlightsVisible) {
         const toggle = metaKey || ctrlKey;
         this.selectAnnotations(tags, { toggle });
@@ -438,8 +436,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
 
     this._listeners.add(this.element, 'pointerdown', maybeCloseSidebar);
 
-    this._listeners.add(this.element, 'mouseover', ({ target }) => {
-      const tags = annotationsAt(target as Element);
+    this._listeners.add(this.element, 'mouseover', ({ clientX, clientY }) => {
+      const tags = annotationsAtPoint(clientX, clientY);
       if (tags.length && this._highlightsVisible) {
         this._sidebarRPC.call('hoverAnnotations', tags);
       }

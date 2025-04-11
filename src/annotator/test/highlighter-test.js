@@ -2,7 +2,7 @@ import { render } from 'preact';
 
 import {
   getBoundingClientRect,
-  getHighlightsContainingNode,
+  getHighlightsFromPoint,
   highlightRange,
   highlightShape,
   removeHighlights,
@@ -780,38 +780,34 @@ describe('annotator/highlighter', () => {
     });
   });
 
-  describe('getHighlightsContainingNode', () => {
-    const makeRange = (start, end = start) => {
-      const range = new Range();
-      range.setStartBefore(start);
-      range.setEndAfter(end);
-      return range;
-    };
+  describe('getHighlightsFromPoint', () => {
+    it('returns all the highlights at the given point', () => {
+      const container = document.createElement('div');
+      const elements = [
+        document.createElement('hypothesis-highlight'),
+        document.createElement('hypothesis-highlight'),
+        document.createElement('not-a-highlight'),
+      ];
+      document.body.append(container);
 
-    it('returns all the highlights containing the node', () => {
-      const root = document.createElement('div');
-      const text0 = document.createTextNode('One');
-      const text1 = document.createTextNode('Two');
-      root.appendChild(text0);
-      root.appendChild(text1);
+      for (const hl of elements) {
+        hl.style.position = 'absolute';
+        hl.style.left = '100px';
+        hl.style.top = '200px';
+        hl.style.width = '10px';
+        hl.style.height = '10px';
+        container.append(hl);
+      }
 
-      const [highlight0] = highlightRange(makeRange(text0, text1));
-      const [highlight1] = highlightRange(makeRange(text0));
-
-      const highlights = getHighlightsContainingNode(text0);
-
-      assert.deepEqual(highlights, [highlight1, highlight0]);
-    });
-
-    it('returns an empty array if the node is not contained in a highlight', () => {
-      const root = document.createElement('div');
-      root.textContent = 'Test text';
-      assert.deepEqual(getHighlightsContainingNode(root.childNodes[0]), []);
-    });
-
-    it('returns an empty array if node has no parent element', () => {
-      const text = document.createTextNode('foobar');
-      assert.deepEqual(getHighlightsContainingNode(text), []);
+      try {
+        assert.sameMembers(
+          getHighlightsFromPoint(105, 205),
+          elements.slice(0, 2),
+        );
+        assert.deepEqual(getHighlightsFromPoint(0, 0), []);
+      } finally {
+        container.remove();
+      }
     });
   });
 

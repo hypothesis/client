@@ -119,7 +119,7 @@ describe('Guest', () => {
   beforeEach(() => {
     guests = [];
     highlighter = {
-      getHighlightsContainingNode: sinon.stub().returns([]),
+      getHighlightsFromPoint: sinon.stub().returns([]),
       highlightRange: sinon.stub().returns([]),
       highlightShape: sinon.stub().returns([]),
       removeHighlights: sinon.stub(),
@@ -742,9 +742,7 @@ describe('Guest', () => {
       // Create a fake highlight as a target for hover and click events.
       fakeHighlight = document.createElement('hypothesis-highlight');
       const annotation = { $tag: 'highlight-ann-tag' };
-      highlighter.getHighlightsContainingNode
-        .withArgs(fakeHighlight)
-        .returns([{ _annotation: annotation }]);
+      highlighter.getHighlightsFromPoint.returns([{ _annotation: annotation }]);
 
       // Guest relies on event listeners on the root element, so all highlights must
       // be descendants of it.
@@ -766,6 +764,7 @@ describe('Guest', () => {
         );
 
       it('hides sidebar', () => {
+        highlighter.getHighlightsFromPoint.returns([]);
         createGuest();
         simulateClick();
         assert.isTrue(sidebarClosed());
@@ -786,6 +785,7 @@ describe('Guest', () => {
       });
 
       it('does not hide sidebar if host page reports side-by-side is active', () => {
+        highlighter.getHighlightsFromPoint.returns([]);
         const isActive = sinon.stub().returns(true);
         createGuest({
           sideBySide: {
@@ -818,6 +818,7 @@ describe('Guest', () => {
       });
 
       it('does not hide sidebar if event is inside a `<hypothesis-*>` element', () => {
+        highlighter.getHighlightsFromPoint.returns([]);
         createGuest();
 
         const hypothesisElement = document.createElement('hypothesis-sidebar');
@@ -859,8 +860,14 @@ describe('Guest', () => {
       createGuest();
 
       // Hover the highlight
-      fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
-      assert.calledWith(highlighter.getHighlightsContainingNode, fakeHighlight);
+      fakeHighlight.dispatchEvent(
+        new MouseEvent('mouseover', {
+          bubbles: true,
+          clientX: 50,
+          clientY: 60,
+        }),
+      );
+      assert.calledWith(highlighter.getHighlightsFromPoint, 50, 60);
       assert.calledWith(sidebarRPC().call, 'hoverAnnotations', [
         'highlight-ann-tag',
       ]);
@@ -871,10 +878,17 @@ describe('Guest', () => {
     });
 
     it('does not focus annotations in the sidebar when a non-highlight element is hovered', () => {
+      highlighter.getHighlightsFromPoint.returns([]);
       createGuest();
-      rootElement.dispatchEvent(new Event('mouseover', { bubbles: true }));
+      rootElement.dispatchEvent(
+        new MouseEvent('mouseover', {
+          bubbles: true,
+          clientX: 50,
+          clientY: 60,
+        }),
+      );
 
-      assert.calledWith(highlighter.getHighlightsContainingNode, rootElement);
+      assert.calledWith(highlighter.getHighlightsFromPoint, 50, 60);
       assert.notCalled(sidebarRPC().call);
     });
 
@@ -882,10 +896,18 @@ describe('Guest', () => {
       const guest = createGuest();
       guest.setHighlightsVisible(false);
 
-      fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
-      fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));
+      fakeHighlight.dispatchEvent(
+        new MouseEvent('mouseover', {
+          bubbles: true,
+          clientX: 50,
+          clientY: 60,
+        }),
+      );
+      fakeHighlight.dispatchEvent(
+        new MouseEvent('mouseup', { bubbles: true, clientX: 50, clientY: 60 }),
+      );
 
-      assert.calledWith(highlighter.getHighlightsContainingNode, fakeHighlight);
+      assert.calledWith(highlighter.getHighlightsFromPoint, 50, 60);
       assert.notCalled(sidebarRPC().call);
     });
 
