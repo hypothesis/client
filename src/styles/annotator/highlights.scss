@@ -89,9 +89,10 @@
   border: 3px solid transparent;
   position: absolute;
   z-index: 10;
-
-  // Allow interaction with content under the highlight when not visible.
   visibility: hidden;
+
+  // Enable interaction with content inside the shape.
+  pointer-events: none;
 }
 
 @mixin clusterHighlightStyles($clusterKey) {
