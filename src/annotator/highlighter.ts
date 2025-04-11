@@ -439,24 +439,17 @@ export function setHighlightsVisible(root: HTMLElement, visible: boolean) {
 }
 
 /**
- * Get the highlight elements that contain the given node.
+ * Get the highlight elements at the given client coordinates.
  */
-export function getHighlightsContainingNode(node: Node): HighlightElement[] {
-  let el =
-    node.nodeType === Node.ELEMENT_NODE
-      ? (node as Element)
-      : node.parentElement;
-
-  const highlights = [];
-
-  while (el) {
-    if (el.classList.contains('hypothesis-highlight')) {
-      highlights.push(el);
-    }
-    el = el.parentElement;
-  }
-
-  return highlights as HighlightElement[];
+export function getHighlightsFromPoint(
+  x: number,
+  y: number,
+): HighlightElement[] {
+  return document
+    .elementsFromPoint(x, y)
+    .filter(
+      el => el.localName === 'hypothesis-highlight',
+    ) as HighlightElement[];
 }
 
 // Subset of `DOMRect` interface
