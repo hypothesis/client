@@ -796,6 +796,10 @@ describe('annotator/highlighter', () => {
         hl.style.top = '200px';
         hl.style.width = '10px';
         hl.style.height = '10px';
+
+        // Disable pointer events to match real highlights.
+        hl.style.pointerEvents = 'none';
+
         container.append(hl);
       }
 

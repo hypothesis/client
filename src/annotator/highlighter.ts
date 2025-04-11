@@ -442,11 +442,22 @@ export function getHighlightsFromPoint(
   x: number,
   y: number,
 ): HighlightElement[] {
-  return document
-    .elementsFromPoint(x, y)
-    .filter(
-      el => el.localName === 'hypothesis-highlight',
-    ) as HighlightElement[];
+  // We test each `<hypothesis-highlight>` element rather than using
+  // `document.elementsFromPoint` here because shape highlights have
+  // `pointer-events: none` set on them, so that users can still interact with
+  // the content underneath. This has a side effect of making the elements
+  // invisible to hit-testing methods like `elementsFromPoint`.
+  //
+  // The downside is that we're iterating through all highlights every time
+  // this is called, which might get expensive if there are a lot.
+  return [...document.querySelectorAll('hypothesis-highlight')].filter(el => {
+    // Use `getClientRects` so that we test each line of a text highlight
+    // separately, rather than testing the bounding rect of all lines.
+    return [...el.getClientRects()].some(
+      rect =>
+        x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom,
+    );
+  }) as HighlightElement[];
 }
 
 // Subset of `DOMRect` interface
