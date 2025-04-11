@@ -85,6 +85,15 @@
   }
 }
 
+.hypothesis-shape-highlight {
+  border: 3px solid transparent;
+  position: absolute;
+  z-index: 10;
+
+  // Allow interaction with content under the highlight when not visible.
+  visibility: hidden;
+}
+
 @mixin clusterHighlightStyles($clusterKey) {
   .hypothesis-highlight.#{$clusterKey},
   .hypothesis-svg-highlight.#{$clusterKey} {
@@ -189,6 +198,14 @@
     @apply sr-only;
     content: ' annotation end ';
   }
+}
+
+.hypothesis-highlights-always-on .hypothesis-shape-highlight {
+  // This color is similar to the default highlight fill, but darker so it has
+  // more contrast when used as a border.
+  border-color: #edd72b;
+  cursor: pointer;
+  visibility: visible;
 }
 
 // Apply focused-highlight styling
