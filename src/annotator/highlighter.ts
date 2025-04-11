@@ -217,14 +217,11 @@ export function highlightShape(region: ShapeAnchor): HighlightElement[] {
     anchorOuterBox.height - 2 * borderWidth,
   );
 
-  const highlightBorderWidth = 3;
   const highlightEl = document.createElement('hypothesis-highlight');
-  highlightEl.style.position = 'absolute';
-  highlightEl.style.zIndex = '10';
 
-  // This color is similar to the default highlight fill, but darker so it has
-  // more contrast when used as a border.
-  highlightEl.style.border = `${highlightBorderWidth}px solid #edd72b`;
+  // Should match the width used by the `hypothesis-shape-highlight` class.
+  const highlightBorderWidth = 3;
+  highlightEl.className = 'hypothesis-shape-highlight';
 
   if (shape.type === 'rect') {
     const left = shape.left * anchorBox.width - borderWidth;
