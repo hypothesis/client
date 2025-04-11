@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Internet Archive BookReader</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mock BookReader book</h1>
+    <p>
+      This page simulates the essential parts of the <a href="https://github.com/internetarchive/bookreader">Internet Archive BookReader</a>. See <a href="https://archive.org/details/goodytwoshoes00newyiala"><i>Goody Two Shoes</i></a> for a real example.
+    </p>
+
+    <!-- JS dependencies -->
+    <script src="http://localhost:8000/BookReader/jquery-3.js"></script>
+
+    <!-- BookReader and any plugins -->
+    <link rel="stylesheet" href="http://localhost:8000/BookReader/BookReader.css" />
+    <script src="http://localhost:8000/BookReader/BookReader.js"></script>
+    <script src="http://localhost:8000/BookReader/plugins/plugin.text_selection.js"></script>
+
+    <!-- BookReader wrapper web component -->
+    <script type="module"
+      src="http://localhost:8000/BookReader/ia-bookreader-bundle.js"></script>
+
+    <style>
+      html {
+        /** This must be set because the nav menu uses rem and sets the fonts really big? */
+        font-size: 10px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+
+      ia-bookreader, .BookReader {
+        /** Set the size you want bookreader to be */
+        height: calc(100vh - 100px);
+      }
+    </style>
+
+    <ia-bookreader>
+      <div id="BookReader" class="BookReader" slot="main"></div>
+    </ia-bookreader>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Expose globally
+        br = new BookReader({
+          el: '#BookReader',
+          bookTitle: 'Goody Two Shoes',
+          bookUri: 'https://archive.org/details/goodytwoshoes00newyiala',
+          plugins: {
+            textSelection: {
+              enabled: true,
+              fullDjvuXmlUrl: 'https://cors.archive.org/cors/goodytwoshoes00newyiala/goodytwoshoes00newyiala_djvu.xml',
+            }
+          },
+
+          data: [
+            [
+              {
+                "width": 2454,
+                "height": 3192,
+                "uri": "https://archive.org/download/goodytwoshoes00newyiala/page/n0_s4.jpg",
+                "leafNum": 1,
+              }
+            ],
+            [
+              {
+                "width": 2346,
+                "height": 3140,
+                "uri": "https://archive.org/download/goodytwoshoes00newyiala/page/n1_s4.jpg",
+                "leafNum": 2,
+              },
+              {
+                "width": 2346,
+                "height": 3140,
+                "uri": "https://archive.org/download/goodytwoshoes00newyiala/page/n2_s4.jpg",
+                "leafNum": 3,
+              }
+            ],
+            [
+              {
+                "width": 2346,
+                "height": 3140,
+                "uri": "https://archive.org/download/goodytwoshoes00newyiala/page/n3_s4.jpg",
+                "leafNum": 4,
+              },
+              {
+                "width": 2346,
+                "height": 3140,
+                "uri": "https://archive.org/download/goodytwoshoes00newyiala/page/n4_s4.jpg",
+                "leafNum": 5,
+              }
+            ],
+            [
+              {
+                "width": 2346,
+                "height": 3140,
+                "uri": "https://archive.org/download/goodytwoshoes00newyiala/page/n5_s4.jpg",
+                "leafNum": 6,
+              },
+              {
+                "width": 2346,
+                "height": 3140,
+                "uri": "https://archive.org/download/goodytwoshoes00newyiala/page/n6_s4.jpg",
+                "leafNum": 7,
+              }
+            ]
+          ],
+        });
+
+        // Let's go!
+        br.init();
+      });
+    </script>
+
+    {{{hypothesisScript}}}
+  </body>
+</html>
