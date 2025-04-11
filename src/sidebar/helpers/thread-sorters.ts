@@ -91,11 +91,23 @@ export const sorters = {
       return 1;
     }
 
-    // If the chapter number is the same or for other document types, compare
-    // the text position instead. Missing positions sort after any present
-    // positions.
-    const aPos = aLocation.position ?? Number.MAX_SAFE_INTEGER;
-    const bPos = bLocation.position ?? Number.MAX_SAFE_INTEGER;
-    return Math.sign(aPos - bPos);
+    // If the chapter number is the same or for other document types, and
+    // at least one of the annotations has text position info, compare
+    // that instead. Missing positions sort after any present positions.
+    if (typeof aLocation.position === 'number' || typeof bLocation.position === 'number') {
+      const aPos = aLocation.position ?? Number.MAX_SAFE_INTEGER;
+      const bPos = bLocation.position ?? Number.MAX_SAFE_INTEGER;
+      return Math.sign(aPos - bPos);
+    }
+
+    // If text positions aren't specified, check for page numbers.
+    if (typeof aLocation.pageIndex === 'number' || typeof bLocation.pageIndex === 'number') {
+      const aPage = aLocation.pageIndex ?? Number.MAX_SAFE_INTEGER;
+      const bPage = bLocation.pageIndex ?? Number.MAX_SAFE_INTEGER;
+      return Math.sign(aPage - bPage);
+    }
+
+    // If nothing matches
+    return 0;
   },
 } satisfies Record<string, SortFunction>;
