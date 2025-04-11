@@ -781,28 +781,41 @@ describe('annotator/highlighter', () => {
   });
 
   describe('getHighlightsFromPoint', () => {
+    const createHighlight = type => {
+      const hl = document.createElement('hypothesis-highlight');
+      hl.style.position = 'absolute';
+      hl.style.left = '100px';
+      hl.style.top = '200px';
+      hl.style.width = '10px';
+      hl.style.height = '10px';
+
+      if (type === 'shape') {
+        // Disable pointer events to match real shape highlights.
+        hl.style.pointerEvents = 'none';
+        hl.classList.add('hypothesis-shape-highlight');
+      }
+
+      return hl;
+    };
+
     it('returns all the highlights at the given point', () => {
       const container = document.createElement('div');
       const elements = [
-        document.createElement('hypothesis-highlight'),
-        document.createElement('hypothesis-highlight'),
+        createHighlight('text'),
+        createHighlight('text'),
+        createHighlight('shape'),
         document.createElement('not-a-highlight'),
       ];
       document.body.append(container);
 
       for (const hl of elements) {
-        hl.style.position = 'absolute';
-        hl.style.left = '100px';
-        hl.style.top = '200px';
-        hl.style.width = '10px';
-        hl.style.height = '10px';
         container.append(hl);
       }
 
       try {
         assert.sameMembers(
           getHighlightsFromPoint(105, 205),
-          elements.slice(0, 2),
+          elements.filter(hl => hl.localName === 'hypothesis-highlight'),
         );
         assert.deepEqual(getHighlightsFromPoint(0, 0), []);
       } finally {

@@ -442,11 +442,30 @@ export function getHighlightsFromPoint(
   x: number,
   y: number,
 ): HighlightElement[] {
-  return document
+  // Text highlights can be found via `elementsFromPoint`.
+  const textHighlights = document
     .elementsFromPoint(x, y)
     .filter(
       el => el.localName === 'hypothesis-highlight',
     ) as HighlightElement[];
+
+  // Shape highlights have `pointer-events: none` so users can interact with
+  // the content underneath. This makes them invisible to `elementsFromPoint`.
+  // To handle this test each shape highlight individually.
+  const shapeHighlights = [];
+  for (const highlight of document.querySelectorAll(
+    'hypothesis-highlight.hypothesis-shape-highlight',
+  )) {
+    // Approximate the shape by its bounding rect. This works for the shapes we
+    // currently support, but won't work for more complex shapes (eg.
+    // arbitrary polygons) that we might introduce in future.
+    const rect = highlight.getBoundingClientRect();
+    if (x >= rect.left && x < rect.right && y >= rect.top && y < rect.bottom) {
+      shapeHighlights.push(highlight as HighlightElement);
+    }
+  }
+
+  return [...textHighlights, ...shapeHighlights];
 }
 
 // Subset of `DOMRect` interface
