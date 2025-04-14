@@ -13,10 +13,9 @@ export type EventMap = Record<string, (...args: any) => void>;
  * }
  * ```
  */
-export class EventEmitter<Event extends EventMap> {
+export class EventEmitter<out Event extends EventMap> {
   // Use a private field here to avoid conflicts with subclasses.
-  #listeners: Array<{ name: keyof Event; callback: (...args: any) => void }> =
-    [];
+  #listeners: Array<{ name: string; callback: (...args: any) => void }> = [];
 
   /** Remove all event listeners. */
   destroy() {
@@ -24,7 +23,7 @@ export class EventEmitter<Event extends EventMap> {
   }
 
   /** Add an event handler. */
-  on<K extends keyof Event>(name: K, callback: Event[K]) {
+  on<K extends keyof Event & string>(name: K, callback: Event[K]) {
     this.#listeners.push({ name, callback });
   }
 
