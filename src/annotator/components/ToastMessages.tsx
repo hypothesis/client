@@ -2,11 +2,15 @@ import { ToastMessages as BaseToastMessages } from '@hypothesis/frontend-shared'
 import type { ToastMessage } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useState } from 'preact/hooks';
 
-import type { Events } from '../../types/annotator';
 import type { Emitter } from '../util/emitter';
 
+export type ToastMessagesEvents = {
+  toastMessageAdded(msg: ToastMessage): void;
+  toastMessageDismissed(id: string): void;
+};
+
 export type ToastMessagesProps = {
-  emitter: Emitter<Events>;
+  emitter: Emitter<ToastMessagesEvents>;
 };
 
 /**
