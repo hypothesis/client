@@ -34,7 +34,7 @@ export class Emitter<Event extends EventMap> implements Destroyable {
   /**
    * Register an event listener.
    */
-  subscribe<K extends keyof Event>(event: K, callback: Event[K]) {
+  subscribe<K extends keyof Event & string>(event: K, callback: Event[K]) {
     this._emitter.on(event, callback);
     this._subscriptions.push([event as string, callback]);
   }
