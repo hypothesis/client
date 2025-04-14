@@ -1,6 +1,9 @@
-import type { Destroyable, Events } from '../types/annotator';
+import type { Destroyable } from '../types/annotator';
 import NotebookModal from './components/NotebookModal';
-import type { NotebookConfig } from './components/NotebookModal';
+import type {
+  NotebookConfig,
+  NotebookEvents,
+} from './components/NotebookModal';
 import type { EventBus } from './util/emitter';
 import { PreactContainer } from './util/preact-container';
 
@@ -13,7 +16,7 @@ export class Notebook implements Destroyable {
    */
   constructor(
     element: HTMLElement,
-    eventBus: EventBus<Events>,
+    eventBus: EventBus<NotebookEvents>,
     config: NotebookConfig,
   ) {
     this._container = new PreactContainer('notebook', () => (
