@@ -39,6 +39,7 @@ import { StreamFilter } from './services/stream-filter';
 import { StreamerService } from './services/streamer';
 import { TagsService } from './services/tags';
 import { ThreadsService } from './services/threads';
+import { ThumbnailService } from './services/thumbnail';
 import { ToastMessengerService } from './services/toast-messenger';
 import { createSidebarStore } from './store';
 import type { SidebarStore } from './store';
@@ -163,6 +164,7 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
     .register('streamFilter', StreamFilter)
     .register('tags', TagsService)
     .register('threadsService', ThreadsService)
+    .register('thumbnailService', ThumbnailService)
     .register('toastMessenger', ToastMessengerService)
     .register('store', { factory: createSidebarStore });
 

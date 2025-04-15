@@ -14,6 +14,7 @@ import type {
   Destroyable,
   DocumentInfo,
   Integration,
+  RenderToBitmapOptions,
   ShapeAnchor,
   SidebarLayout,
   SideBySideOptions,
@@ -651,6 +652,37 @@ export class Guest
 
     this._sidebarRPC.on('navigateToSegment', (annotation: AnnotationData) =>
       this._integration.navigateToSegment?.(annotation),
+    );
+
+    this._sidebarRPC.on(
+      'renderThumbnail',
+      (
+        tag: string,
+        options: RenderToBitmapOptions,
+        callback: (err: string | null, bitmap: ImageBitmap | null) => void,
+      ) => {
+        const renderThumbnail = async () => {
+          if (!this._integration.renderToBitmap) {
+            throw new Error(
+              'Thumbnail rendering not supported for document type',
+            );
+          }
+
+          // There is a race condition here that thumbnail rendering can fail if
+          // anchoring is still in progress. What we should do is defer rendering
+          // until anchoring completes.
+          const anchor = this.anchors.find(a => a.annotation.$tag === tag);
+          if (!anchor) {
+            throw new Error('Annotation not anchored in guest');
+          }
+
+          return this._integration.renderToBitmap(anchor, options);
+        };
+
+        renderThumbnail()
+          .then(bitmap => callback(null, bitmap))
+          .catch(err => callback(err.message, null));
+      },
     );
 
     // Connect to sidebar and send document info/URIs to it.

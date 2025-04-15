@@ -12,12 +12,17 @@ import type {
   FeatureFlags,
   Integration,
   IntegrationEvents,
+  RenderToBitmapOptions,
   Shape,
   ShapeAnchor,
   SidebarLayout,
 } from '../../types/annotator';
 import type { Selector } from '../../types/api';
-import type { PDFViewer, PDFViewerApplication } from '../../types/pdfjs';
+import type {
+  PageViewport,
+  PDFViewer,
+  PDFViewerApplication,
+} from '../../types/pdfjs';
 import {
   RenderingStates,
   anchor,
@@ -562,5 +567,71 @@ export class PDFIntegration
     }
     const highlight = anchor.highlights[0];
     return offsetRelativeTo(highlight, this.contentContainer());
+  }
+
+  async renderToBitmap(
+    anchor: Anchor,
+    opts: RenderToBitmapOptions,
+  ): Promise<ImageBitmap> {
+    const shape = anchor.target.selector?.find(s => s.type === 'ShapeSelector');
+    const page = anchor.target.selector?.find(s => s.type === 'PageSelector');
+    if (!page || !shape || shape.shape.type !== 'rect') {
+      throw new Error('Can only render bitmaps for anchors with shapes');
+    }
+
+    const pageView = this._pdfViewer.getPageView(page.index);
+    if (!pageView) {
+      throw new Error('Failed to get page view');
+    }
+
+    const { left, right, top, bottom } = shape.shape;
+
+    // Conversion factor from PDF pixels per inch to CSS pixels per inch.
+    // See https://github.com/mozilla/pdf.js/blob/2f7d163dfdf40225479d1cc8f6d8ebd9e5273ca6/src/display/display_utils.js#L31.
+    const CSS_PPI = 96.0;
+    const PDF_PPI = 72.0;
+    const PDF_TO_CSS_UNITS = CSS_PPI / PDF_PPI;
+
+    const devicePixelRatio = opts.devicePixelRatio ?? 1;
+
+    // Width of rect if rendered at 100% zoom, in CSS units.
+    const naturalWidth = (right - left) * PDF_TO_CSS_UNITS * devicePixelRatio;
+
+    // Create a `PageViewport` specifying which part of the page to draw and
+    // the scale, rotation etc.
+    const aspectRatio = (right - left) / (top - bottom);
+
+    const width =
+      typeof opts.maxWidth === 'number'
+        ? Math.min(opts.maxWidth, naturalWidth)
+        : naturalWidth;
+    const height = width / aspectRatio;
+    const viewport = pageView.pdfPage.getViewport({ scale: 1.0 });
+
+    const scaleFactor = width / naturalWidth;
+
+    // `PageViewport` has a method to clone it with different parameters, but
+    // that doesn't allow us to customize the `viewBox`. Hence we grab the
+    // constructor and invoke it manually.
+    const PageViewport = viewport.constructor as PageViewport;
+    const boxView = new PageViewport({
+      rotation: 0,
+      // Set scale so that rendered bitmap matches PDF canvas if zoom level is
+      // set to 100%.
+      scale: PDF_TO_CSS_UNITS * scaleFactor * devicePixelRatio,
+      userUnit: viewport.userUnit,
+      viewBox: [left, bottom, right, top],
+    });
+
+    // Render page into an offscreen canvas
+    const canvas = new OffscreenCanvas(width, height);
+    const context = canvas.getContext('2d')!;
+    const task = pageView.pdfPage.render({
+      canvasContext: context as unknown as CanvasRenderingContext2D,
+      viewport: boxView,
+    });
+    await task.promise;
+
+    return canvas.transferToImageBitmap();
   }
 }
