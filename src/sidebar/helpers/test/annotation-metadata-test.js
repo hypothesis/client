@@ -6,6 +6,7 @@ import {
   domainAndTitle,
   isSaved,
   pageLabel,
+  shape,
 } from '../annotation-metadata';
 
 describe('sidebar/helpers/annotation-metadata', () => {
@@ -586,6 +587,49 @@ describe('sidebar/helpers/annotation-metadata', () => {
         ],
       };
       assert.equal(annotationMetadata.quote(ann), null);
+    });
+  });
+
+  describe('shape', () => {
+    [
+      {
+        selectors: [],
+        expected: null,
+      },
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'rect',
+              left: 0,
+              top: 10,
+              right: 10,
+              bottom: 0,
+            },
+          },
+        ],
+        expected: {
+          type: 'rect',
+          left: 0,
+          top: 10,
+          right: 10,
+          bottom: 0,
+        },
+      },
+    ].forEach(({ selectors, expected }) => {
+      it('returns shape from shape selector', () => {
+        const annotation = {
+          target: [
+            {
+              source: 'https://example.org/dummy.pdf',
+              selector: selectors,
+            },
+          ],
+        };
+        const annShape = shape(annotation);
+        assert.deepEqual(annShape, expected);
+      });
     });
   });
 

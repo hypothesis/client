@@ -139,6 +139,33 @@ describe('Annotation', () => {
     });
   });
 
+  describe('annotation thumbnail', () => {
+    it('does not render a thumbnail if annotation has no shape selector', () => {
+      const wrapper = createComponent();
+      assert.isFalse(wrapper.exists('AnnotationThumbnail'));
+    });
+
+    it('renders a thumbnail if annotation has a shape selector', () => {
+      const annotation = fixtures.defaultAnnotation();
+      annotation.target[0].selector = [
+        {
+          type: 'ShapeSelector',
+          shape: {
+            type: 'rect',
+            left: 0,
+            top: 10,
+            right: 10,
+            bottom: 0,
+          },
+        },
+      ];
+      const wrapper = createComponent({ annotation });
+      const thumbnail = wrapper.find('AnnotationThumbnail');
+      assert.isTrue(thumbnail.exists());
+      assert.equal(thumbnail.prop('tag'), annotation.$tag);
+    });
+  });
+
   it('should show a "Saving" message when annotation is saving', () => {
     fakeStore.isSavingAnnotation.returns(true);
 

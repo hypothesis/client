@@ -721,6 +721,72 @@ describe('Guest', () => {
         });
       });
     });
+
+    describe('on "renderThumbnail" event', () => {
+      const makeCallback = () => {
+        const { promise, resolve, reject } = Promise.withResolvers();
+        const callback = (err, result) => (err ? reject(err) : resolve(result));
+        return { promise, callback };
+      };
+
+      it('returns error if thumbnail rendering is not supported', async () => {
+        createGuest();
+        const { callback, promise } = makeCallback();
+        emitSidebarEvent('renderThumbnail', 'ann123', {}, callback);
+
+        let err;
+        try {
+          await promise;
+        } catch (e) {
+          err = e;
+        }
+        assert.equal(
+          err,
+          'Thumbnail rendering not supported for document type',
+        );
+      });
+
+      it('returns error if annotation is not anchored', async () => {
+        fakeIntegration.renderToBitmap = sinon.stub().resolves({});
+        createGuest();
+        const { callback, promise } = makeCallback();
+
+        emitSidebarEvent('renderThumbnail', 'ann123', {}, callback);
+
+        let err;
+        try {
+          await promise;
+        } catch (e) {
+          err = e;
+        }
+
+        assert.equal(err, 'Annotation not anchored in guest');
+      });
+
+      it('renders thumbnail if supported by integration', async () => {
+        const fakeBitmap = {};
+        const renderOptions = {};
+        fakeIntegration.renderToBitmap = sinon.stub().resolves(fakeBitmap);
+
+        const guest = createGuest();
+        guest.anchors = [
+          {
+            annotation: { $tag: 'ann123' },
+          },
+        ];
+        const { callback, promise } = makeCallback();
+
+        emitSidebarEvent('renderThumbnail', 'ann123', renderOptions, callback);
+        const bitmap = await promise;
+
+        assert.calledWith(
+          fakeIntegration.renderToBitmap,
+          guest.anchors[0],
+          renderOptions,
+        );
+        assert.equal(bitmap, fakeBitmap);
+      });
+    });
   });
 
   describe('document events', () => {
