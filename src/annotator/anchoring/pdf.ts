@@ -747,7 +747,6 @@ export async function describe(range: Range): Promise<Selector[]> {
   ).relativeTo(textLayer);
 
   const startPageIndex = getSiblingIndex(textLayer.parentNode!);
-  const pageNumber = startPageIndex + 1;
   const pageOffset = await getPageOffset(startPageIndex);
 
   const pageView = await getPageView(startPageIndex);
@@ -759,12 +758,7 @@ export async function describe(range: Range): Promise<Selector[]> {
   } as TextPositionSelector;
 
   const quote = TextQuoteAnchor.fromRange(pageView.div, textRange).toSelector();
-
-  const pageSelector: PageSelector = {
-    type: 'PageSelector',
-    index: startPageIndex,
-    label: pageView.pageLabel ?? pageNumber.toString(),
-  };
+  const pageSelector = createPageSelector(pageView, startPageIndex);
 
   return [position, quote, pageSelector];
 }
@@ -805,6 +799,17 @@ async function mapViewportToPDF(
   return null;
 }
 
+function createPageSelector(
+  view: PDFPageView,
+  pageIndex: number,
+): PageSelector {
+  return {
+    type: 'PageSelector',
+    index: pageIndex,
+    label: view.pageLabel ?? `${pageIndex + 1}`,
+  };
+}
+
 export async function describeShape(shape: Shape): Promise<Selector[]> {
   switch (shape.type) {
     case 'rect': {
@@ -812,7 +817,6 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
         mapViewportToPDF(shape.left, shape.top),
         mapViewportToPDF(shape.right, shape.bottom),
       ]);
-
       if (!topLeft) {
         throw new Error('Top-left point is not in a page');
       }
@@ -824,11 +828,9 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
         throw new Error('Shape must start and end on same page');
       }
 
+      const pageView = await getPageView(topLeft.pageIndex);
       return [
-        {
-          type: 'PageSelector',
-          index: topLeft.pageIndex,
-        },
+        createPageSelector(pageView, topLeft.pageIndex),
         {
           type: 'ShapeSelector',
           shape: {
