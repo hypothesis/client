@@ -946,10 +946,17 @@ describe('annotator/anchoring/pdf', () => {
           },
           {
             type: 'ShapeSelector',
+            anchor: 'page',
             shape: {
               type: 'point',
               x: expected[0],
               y: expected[1],
+            },
+            view: {
+              bottom: 0,
+              left: 0,
+              right: 100,
+              top: 200,
             },
           },
         ]);
@@ -1013,12 +1020,19 @@ describe('annotator/anchoring/pdf', () => {
           },
           {
             type: 'ShapeSelector',
+            anchor: 'page',
             shape: {
               type: 'rect',
               left: expectedLeft,
               top: expectedTop,
               right: expectedRight,
               bottom: expectedBottom,
+            },
+            view: {
+              bottom: 0,
+              left: 0,
+              right: 100,
+              top: 200,
             },
           },
         ]);
