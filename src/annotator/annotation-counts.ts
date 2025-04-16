@@ -1,4 +1,5 @@
-import type { PortRPC } from '../shared/messaging';
+import type { CallMap, PortRPC } from '../shared/messaging';
+import type { SidebarToHostCalls } from '../types/port-rpc-calls';
 
 const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
 
@@ -17,7 +18,7 @@ const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
  */
 export function annotationCounts(
   rootEl: Element,
-  rpc: PortRPC<'publicAnnotationCountChanged', string>,
+  rpc: PortRPC<SidebarToHostCalls, CallMap>,
 ) {
   rpc.on('publicAnnotationCountChanged', updateAnnotationCountElems);
 

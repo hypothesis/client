@@ -15,11 +15,11 @@ import type {
 } from '../types/annotator';
 import type { Service } from '../types/config';
 import type {
-  GuestToHostEvent,
-  HostToGuestEvent,
-  HostToSidebarEvent,
-  SidebarToHostEvent,
-} from '../types/port-rpc-events';
+  GuestToHostCalls,
+  HostToGuestCalls,
+  HostToSidebarCalls,
+  SidebarToHostCalls,
+} from '../types/port-rpc-calls';
 import { annotationCounts } from './annotation-counts';
 import { BucketBar } from './bucket-bar';
 import ToastMessages from './components/ToastMessages';
@@ -121,15 +121,15 @@ export class Sidebar implements Destroyable {
    * the first connected guest frame.
    */
   private _guestWithSelection: PortRPC<
-    GuestToHostEvent,
-    HostToGuestEvent
+    GuestToHostCalls,
+    HostToGuestCalls
   > | null;
 
   /** Channel for host-sidebar communication. */
-  private _sidebarRPC: PortRPC<SidebarToHostEvent, HostToSidebarEvent>;
+  private _sidebarRPC: PortRPC<SidebarToHostCalls, HostToSidebarCalls>;
 
   /** Channels for host-guest communication. */
-  private _guestRPC: PortRPC<GuestToHostEvent, HostToGuestEvent>[];
+  private _guestRPC: PortRPC<GuestToHostCalls, HostToGuestCalls>[];
 
   bucketBar: BucketBar | null;
   features: FeatureFlags;
@@ -363,7 +363,7 @@ export class Sidebar implements Destroyable {
   }
 
   _connectGuest(port: MessagePort) {
-    const guestRPC = new PortRPC<GuestToHostEvent, HostToGuestEvent>();
+    const guestRPC = new PortRPC<GuestToHostCalls, HostToGuestCalls>();
 
     guestRPC.on('textSelected', () => {
       this._guestWithSelection = guestRPC;
@@ -482,8 +482,10 @@ export class Sidebar implements Destroyable {
 
     // Suppressing ban-types here because the functions are originally defined
     // as `Function` somewhere else. To be fixed when that is migrated to TS
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-    const eventHandlers: Array<[SidebarToHostEvent, Function | undefined]> = [
+    const eventHandlers: Array<
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+      [keyof SidebarToHostCalls, Function | undefined]
+    > = [
       ['loginRequested', this.onLoginRequest],
       ['logoutRequested', this.onLogoutRequest],
       ['signupRequested', this.onSignupRequest],
