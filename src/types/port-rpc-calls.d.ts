@@ -4,80 +4,99 @@
  * source frame (eg. the active feature flags changed, text was selected)
  * others are commands for the target frame (eg. "close the sidebar").
  */
+import type { ToastMessage } from '@hypothesis/frontend-shared';
+
+import type {
+  AnchorPosition,
+  AnnotationData,
+  AnnotationTool,
+  ContentInfoConfig,
+  DocumentInfo,
+  SidebarLayout,
+} from './annotator';
 
 /**
- * Events that guests send to the host.
+ * Handlers available on all RPC connections.
+ *
+ * These are invoked automatically when a connection is established or disconnected.
  */
-export type GuestToHostEvent =
+export type CommonCalls = {
+  /** Handler invoked when a connection is established. */
+  connect(): void;
+
+  /** Handler invoked when a connection is broken. */
+  close(): void;
+};
+
+/** Calls that guests make to the host. */
+export type GuestToHostCalls = CommonCalls & {
   /** Text has been deselected in the guest frame. */
-  | 'textUnselected'
+  textUnselected(): void;
 
   /** Text has been selected in the guest frame. */
-  | 'textSelected'
+  textSelected(): void;
 
   /** Anchors have changed in the guest frame. */
-  | 'anchorsChanged'
+  anchorsChanged(positions: AnchorPosition[]): void;
 
   /**
    * Visibility of highlights was toggled from the guest frame. This event is
    * not sent if highlights are turned on/off in the frame in response to a
    * command from the sidebar or host frames.
    */
-  | 'highlightsVisibleChanged'
+  highlightsVisibleChanged(visible: boolean): void;
 
   /** The annotation tools supported by this guest have changed. */
-  | 'supportedToolsChanged';
+  supportedToolsChanged(tools: AnnotationTool[]): void;
+};
 
 /**
  * Events that guests send to the sidebar.
  */
-export type GuestToSidebarEvent =
+export type GuestToSidebarCalls = CommonCalls & {
   /**
    * A new annotation was created in the guest frame via the Annotate/Highlight controls.
    */
-  | 'createAnnotation'
+  createAnnotation(ann: AnnotationData): void;
 
   /** Request to close the sidebar. */
-  | 'closeSidebar'
+  closeSidebar(): void;
 
   /**
    * Indicate in the sidebar which annotation cards correspond to hovered
    * highlights in the guest.
    */
-  | 'hoverAnnotations'
+  hoverAnnotations(tags: string[]): void;
 
   /** Request to open the sidebar. */
-  | 'openSidebar'
+  openSidebar(): void;
 
   /** The URIs or metadata of the document in the guest frame changed. */
-  | 'documentInfoChanged'
+  documentInfoChanged(info: DocumentInfo): void;
 
   /** Set the selected annotations. Emitted when the user clicks highlights in the guest frame. */
-  | 'showAnnotations'
+  showAnnotations(tags: string[], focusInSidebar: boolean): void;
 
   /** The anchoring status of annotations changed. */
-  | 'syncAnchoringStatus'
+  syncAnchoringStatus(ann: AnnotationData): void;
 
   /** Toggle whether annotations are selected. */
-  | 'toggleAnnotationSelection';
+  toggleAnnotationSelection(tags: string[]): void;
+};
 
-/**
- * Events that the host sends to guests.
- */
-export type HostToGuestEvent =
-  /**
-   * Create a new annotation in the guest.
-   */
-  | 'createAnnotation'
+/** Calls that the host makes to guest frames. */
+export type HostToGuestCalls = CommonCalls & {
+  /** Create a new annotation in the guest. */
+  createAnnotation(opts: { tool: AnnotationTool }): void;
 
   /** Clear the selection in the guest frame. */
-  | 'clearSelection'
+  clearSelection(): void;
 
   /**
    * Indicate in the guest which highlights correspond to hovered buckets in
    * the bucket bar.
    */
-  | 'hoverAnnotations'
+  hoverAnnotations(tags: string[]): void;
 
   /**
    * Select annotations in the guest frame.
@@ -85,85 +104,79 @@ export type HostToGuestEvent =
    * This is used to select annotations when the corresponding items in the
    * bucket bar are clicked.
    */
-  | 'selectAnnotations'
+  selectAnnotations(tags: string[], toggle: boolean): void;
 
   /** The layout (width, open/closed state) of the sidebar changed. */
-  | 'sidebarLayoutChanged'
+  sidebarLayoutChanged(layout: SidebarLayout): void;
 
   /** Scroll a highlight into view. */
-  | 'scrollToAnnotation';
+  scrollToAnnotation(tag: string): void;
+};
 
-/**
- * Events that the host sends to the sidebar.
- */
-export type HostToSidebarEvent =
-  /**
-   * Highlights have been toggled on/off.
-   */
-  | 'setHighlightsVisible'
-
+/** Calls that the host makes to the sidebar. */
+export type HostToSidebarCalls = {
+  /** Highlights have been toggled on/off. */
+  setHighlightsVisible(visible: boolean): void;
   /** Notify the sidebar iframe that it has become visible. */
-  | 'sidebarOpened'
-
+  sidebarOpened(): void;
   /** Notify the sidebar iframe that it has become hidden. */
-  | 'sidebarClosed';
+  sidebarClosed(): void;
+};
 
-/**
- * Events that the sidebar sends to guests.
- */
-export type SidebarToGuestEvent =
+/** Calls that the sidebar makes to guests. */
+export type SidebarToGuestCalls = {
   /** Remove an annotation from the guest frame. */
-  | 'deleteAnnotation'
+  deleteAnnotation(tag: string): void;
 
   /** The active feature flags changed. */
-  | 'featureFlagsUpdated'
+  featureFlagsUpdated(flags: Record<string, boolean>): void;
 
   /**
    * Indicate in the guest which highlights correspond to hovered annotations
    * in the sidebar.
    */
-  | 'hoverAnnotations'
+  hoverAnnotations(tags: string[]): void;
 
   /** Load new annotations into the guest frame. */
-  | 'loadAnnotations'
+  loadAnnotations(anns: AnnotationData[]): void;
 
   /** Navigate to the segment of a book associated with an annotation. */
-  | 'navigateToSegment'
+  navigateToSegment(ann: AnnotationData): void;
 
   /** Scroll an annotation into view. */
-  | 'scrollToAnnotation'
-  | 'setHighlightsVisible'
+  scrollToAnnotation(tag: string): void;
+
+  setHighlightsVisible(visible: boolean): void;
 
   /**
    * Show a banner with information about the current content.
    */
-  | 'showContentInfo'
+  showContentInfo(info: ContentInfoConfig | null): void;
 
   /**
    * Show a notice that the user is outside the region of the document for the
    * current activity / assignment.
    */
-  | 'setOutsideAssignmentNoticeVisible';
+  setOutsideAssignmentNoticeVisible(visible: boolean): void;
+};
 
-/**
- * Events that the sidebar sends to the host
- */
-export type SidebarToHostEvent =
+/** Calls that the sidebar makes to the host. */
+export type SidebarToHostCalls = CommonCalls & {
   /**
    * Request from the sidebar iframe to close (ie. hide/move offscreen) its
    * container in the host frame.
    */
-  | 'closeSidebar'
+  closeSidebar(): void;
 
   /** The active feature flags changed. */
-  | 'featureFlagsUpdated'
+  featureFlagsUpdated(flags: Record<string, boolean>): void;
 
   /**
    * Open the partner site help page.
    *
    * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onhelprequest
    */
-  | 'helpRequested'
+  helpRequested(): void;
 
   /**
    * Initiate a login.
@@ -174,7 +187,7 @@ export type SidebarToHostEvent =
    *
    * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onloginrequest
    */
-  | 'loginRequested'
+  loginRequested(): void;
 
   /**
    * Log the user out.
@@ -185,19 +198,19 @@ export type SidebarToHostEvent =
    *
    * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onlogoutrequest
    */
-  | 'logoutRequested'
+  logoutRequested(): void;
 
   /** Open the notebook dialog. */
-  | 'openNotebook'
+  openNotebook(groupId: string): void;
 
   /** Open the account settings dialog. */
-  | 'openProfile'
+  openProfile(): void;
 
   /** Open the sidebar container. */
-  | 'openSidebar'
+  openSidebar(): void;
 
   /** Make highlights visible in guest frames. */
-  | 'showHighlights'
+  showHighlights(): void;
 
   /**
    * Open the profile page for the current user.
@@ -208,14 +221,14 @@ export type SidebarToHostEvent =
    *
    * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onprofilerequest
    */
-  | 'profileRequested'
+  profileRequested(): void;
 
   /**
    * The count of public annotations on the current page changed.
    *
    * See https://h.readthedocs.io/projects/client/en/latest/publishers/host-page-integration/#cmdoption-arg-data-hypothesis-annotation-count
    */
-  | 'publicAnnotationCountChanged'
+  publicAnnotationCountChanged(newCount: number): void;
 
   /**
    * Initiate an account sign-up.
@@ -226,10 +239,11 @@ export type SidebarToHostEvent =
    *
    * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onsignuprequest
    */
-  | 'signupRequested'
+  signupRequested(): void;
 
   /** Display a toast message in the host frame. */
-  | 'toastMessageAdded'
+  toastMessageAdded(message: ToastMessage): void;
 
   /** Dismiss a toast message in the host frame. */
-  | 'toastMessageDismissed';
+  toastMessageDismissed(id: string): void;
+};

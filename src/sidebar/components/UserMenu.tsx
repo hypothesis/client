@@ -56,7 +56,10 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
   const isProfileEnabled = store.isFeatureEnabled('client_user_profile');
 
   const onSelectNotebook = () => {
-    frameSync.notifyHost('openNotebook', store.focusedGroupId());
+    const groupId = store.focusedGroupId();
+    if (groupId) {
+      frameSync.notifyHost('openNotebook', groupId);
+    }
   };
   const onSelectProfile = () => frameSync.notifyHost('openProfile');
 

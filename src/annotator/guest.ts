@@ -20,11 +20,11 @@ import type {
 } from '../types/annotator';
 import type { Target } from '../types/api';
 import type {
-  HostToGuestEvent,
-  GuestToHostEvent,
-  GuestToSidebarEvent,
-  SidebarToGuestEvent,
-} from '../types/port-rpc-events';
+  HostToGuestCalls,
+  GuestToHostCalls,
+  GuestToSidebarCalls,
+  SidebarToGuestCalls,
+} from '../types/port-rpc-calls';
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
@@ -247,10 +247,10 @@ export class Guest
   private _integration: Integration;
 
   /** Channel for host-guest communication. */
-  private _hostRPC: PortRPC<HostToGuestEvent, GuestToHostEvent>;
+  private _hostRPC: PortRPC<HostToGuestCalls, GuestToHostCalls>;
 
   /** Channel for guest-sidebar communication. */
-  private _sidebarRPC: PortRPC<SidebarToGuestEvent, GuestToSidebarEvent>;
+  private _sidebarRPC: PortRPC<SidebarToGuestCalls, GuestToSidebarCalls>;
 
   /**
    * The most recently received sidebar layout information from the host frame.

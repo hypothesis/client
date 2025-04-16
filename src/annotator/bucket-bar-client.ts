@@ -3,12 +3,12 @@ import { ListenerCollection } from '@hypothesis/frontend-shared';
 import type { PortRPC } from '../shared/messaging';
 import type { Anchor, Destroyable } from '../types/annotator';
 import type {
-  HostToGuestEvent,
-  GuestToHostEvent,
-} from '../types/port-rpc-events';
+  HostToGuestCalls,
+  GuestToHostCalls,
+} from '../types/port-rpc-calls';
 import { computeAnchorPositions } from './util/buckets';
 
-type HostRPC = PortRPC<HostToGuestEvent, GuestToHostEvent>;
+type HostRPC = PortRPC<HostToGuestCalls, GuestToHostCalls>;
 
 export type BucketBarClientOptions = {
   /**

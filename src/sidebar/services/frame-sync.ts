@@ -14,11 +14,11 @@ import type { Message } from '../../shared/messaging';
 import type { AnnotationData, DocumentInfo } from '../../types/annotator';
 import type { Annotation } from '../../types/api';
 import type {
-  SidebarToHostEvent,
-  HostToSidebarEvent,
-  SidebarToGuestEvent,
-  GuestToSidebarEvent,
-} from '../../types/port-rpc-events';
+  SidebarToHostCalls,
+  HostToSidebarCalls,
+  SidebarToGuestCalls,
+  GuestToSidebarCalls,
+} from '../../types/port-rpc-calls';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import {
   annotationMatchesSegment,
@@ -111,7 +111,7 @@ export class FrameSyncService {
    */
   private _guestRPC: Map<
     string | null,
-    PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>
+    PortRPC<GuestToSidebarCalls, SidebarToGuestCalls>
   >;
 
   /** Whether highlights are visible in guest frames. */
@@ -120,7 +120,7 @@ export class FrameSyncService {
   /**
    * Channel for sidebar-host communication.
    */
-  private _hostRPC: PortRPC<HostToSidebarEvent, SidebarToHostEvent>;
+  private _hostRPC: PortRPC<HostToSidebarCalls, SidebarToHostCalls>;
 
   /**
    * Tags of annotations that are currently loaded into guest frames.
@@ -353,7 +353,7 @@ export class FrameSyncService {
    * @param sourceId - Identifier for the guest frame
    */
   private _connectGuest(port: MessagePort, sourceId: string | null) {
-    const guestRPC = new PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>();
+    const guestRPC = new PortRPC<GuestToSidebarCalls, SidebarToGuestCalls>();
 
     this._guestRPC.set(sourceId, guestRPC);
 
@@ -598,7 +598,10 @@ export class FrameSyncService {
   /**
    * Send an RPC message to the host frame.
    */
-  notifyHost(method: SidebarToHostEvent, ...args: unknown[]) {
+  notifyHost<M extends keyof SidebarToHostCalls>(
+    method: M,
+    ...args: Parameters<SidebarToHostCalls[M]>
+  ) {
     this._hostRPC.call(method, ...args);
   }
 

@@ -160,6 +160,9 @@ function isCallback(value: any): value is Callback {
   return typeof value === 'function';
 }
 
+export type CallMap = Record<string, (...args: any) => void>;
+export type HandlerMap = Record<string, (...args: any) => void>;
+
 /**
  * PortRPC provides remote procedure calls between frames or workers. It uses
  * the Channel Messaging API [1] as a transport.
@@ -171,7 +174,7 @@ function isCallback(value: any): value is Callback {
  * port.
  *
  * In addition to the custom methods that a PortRPC handles, there are several
- * built-in events which are sent automatically:
+ * built-in handlers which are invoked automatically:
  *
  * - "connect" is sent when a PortRPC connects to a port. This event can
  *   be used to confirm that the sending frame has received the port and will
@@ -182,10 +185,12 @@ function isCallback(value: any): value is Callback {
  *
  * [1] https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API
  *
- * @template OnMethod - Names of RPC methods this client responds to
- * @template CallMethod - Names of RPC methods this client invokes
+ * @template Handlers - Object type describing the calls handled by this port,
+ *   using {@link PortRPC.on}.
+ * @template Calls - Object type describing the calls made by this port,
+ *   using {@link PortRPC.prototype.call}.
  */
-export class PortRPC<OnMethod extends string, CallMethod extends string>
+export class PortRPC<Handlers extends HandlerMap, Calls extends CallMap>
   implements Destroyable
 {
   /**
@@ -198,7 +203,7 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
   private _listeners: ListenerCollection;
 
   /** Map of method name to handler for RPC calls received by this instance. */
-  private _methods: Map<string, Callback>;
+  private _methods: Map<keyof Handlers, Callback>;
 
   /** The underlying communication channel. */
   private _port: MessagePort | null;
@@ -209,7 +214,7 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
   /**
    * Method and arguments of pending RPC calls made before a port was connected.
    */
-  private _pendingCalls: Array<[CallMethod, unknown[]]>;
+  private _pendingCalls: Array<[keyof Calls, unknown[]]>;
 
   private _receivedCloseEvent: boolean;
 
@@ -285,14 +290,11 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
    *
    * All handlers must be registered before {@link connect} is invoked.
    */
-  on<Handler extends (...args: any[]) => void>(
-    method: OnMethod | 'close' | 'connect',
-    handler: Handler,
-  ) {
+  on<M extends keyof Handlers>(method: M, handler: Handlers[M]) {
     if (this._port) {
       throw new Error('Cannot add a method handler after a port is connected');
     }
-    this._methods.set(method, handler as any);
+    this._methods.set(method, handler);
   }
 
   /**
@@ -318,7 +320,7 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
     sendCall(port, 'connect');
 
     for (const [method, args] of this._pendingCalls) {
-      this.call(method, ...args);
+      this.call(method, ...(args as Parameters<Calls[keyof Calls]>));
     }
     this._pendingCalls = [];
   }
@@ -344,7 +346,7 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
    * If the final argument in `args` is a function, it is treated as a callback
    * which is invoked with the response in the form of (error, result) arguments.
    */
-  call(method: CallMethod, ...args: unknown[]) {
+  call<M extends keyof Calls>(method: M, ...args: Parameters<Calls[M]>) {
     if (!this._port) {
       this._pendingCalls.push([method, args]);
     }
@@ -357,10 +359,10 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
     const finalArg = args[args.length - 1];
     if (isCallback(finalArg)) {
       this._callbacks.set(seq, finalArg);
-      args = args.slice(0, -1);
+      args = args.slice(0, -1) as Parameters<Calls[M]>;
     }
 
-    sendCall(this._port, method, args, seq);
+    sendCall(this._port, method as string, args, seq);
   }
 
   /**
