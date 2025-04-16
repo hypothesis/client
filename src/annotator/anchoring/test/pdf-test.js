@@ -1009,6 +1009,7 @@ describe('annotator/anchoring/pdf', () => {
           {
             type: 'PageSelector',
             index: 0,
+            label: '1',
           },
           {
             type: 'ShapeSelector',
