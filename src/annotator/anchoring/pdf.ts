@@ -8,7 +8,12 @@ import type {
   Selector,
   ShapeSelector,
 } from '../../types/api';
-import type { PDFPageView, PDFViewer, TextLayer } from '../../types/pdfjs';
+import type {
+  PDFPageProxy,
+  PDFPageView,
+  PDFViewer,
+  TextLayer,
+} from '../../types/pdfjs';
 import { translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
@@ -811,6 +816,16 @@ function createPageSelector(
 }
 
 export async function describeShape(shape: Shape): Promise<Selector[]> {
+  const pageBoundingBox = (page: PDFPageProxy) => {
+    const [viewLeft, viewBottom, viewRight, viewTop] = page.view;
+    return {
+      left: viewLeft,
+      top: viewTop,
+      right: viewRight,
+      bottom: viewBottom,
+    };
+  };
+
   switch (shape.type) {
     case 'rect': {
       const [topLeft, bottomRight] = await Promise.all([
@@ -829,10 +844,12 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
       }
 
       const pageView = await getPageView(topLeft.pageIndex);
+
       return [
         createPageSelector(pageView, topLeft.pageIndex),
         {
           type: 'ShapeSelector',
+          anchor: 'page',
           shape: {
             type: 'rect',
             left: topLeft.x,
@@ -840,6 +857,7 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
             right: bottomRight.x,
             bottom: bottomRight.y,
           },
+          view: pageBoundingBox(pageView.pdfPage),
         },
       ];
     }
@@ -849,6 +867,8 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
         throw new Error('Point is not in a page');
       }
 
+      const pageView = await getPageView(point.pageIndex);
+
       return [
         {
           type: 'PageSelector',
@@ -856,11 +876,13 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
         },
         {
           type: 'ShapeSelector',
+          anchor: 'page',
           shape: {
             type: 'point',
             x: point.x,
             y: point.y,
           },
+          view: pageBoundingBox(pageView.pdfPage),
         },
       ];
     }

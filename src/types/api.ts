@@ -153,13 +153,65 @@ export type Shape = RectShape | PointShape;
 /**
  * Selector which identifies a region of the document defined by a shape.
  *
- * TODO:
- *  - Specify the origin used by the shape coordinates (eg. page, document body)
- *  - Specify the coordinate system
+ * # Anchors
+ *
+ * The shape's coordinates may be relative to an _anchor_ element within the
+ * document. For example a page in a PDF or an `<img>` in an HTML document. For
+ * document types where a location can be fully specified by the shape
+ * coordinates alone (such as images, but not PDFs or HTML documents), the
+ * anchor is optional.
+ *
+ * # Coordinate systems
+ *
+ * Shape selectors should be defined using the natural coordinate system for the
+ * anchor element in the document, enabling an annotation made in one viewer to
+ * be resolved to the same location in a different viewer, with different view
+ * settings (zoom, rotation etc.). For common document and anchor types, these
+ * are as follows:
+ *
+ * - For PDFs, PDF user space coordinates (points), with the origin at the
+ *   bottom-left corner of the page.
+ * - For images, pixels with the origin at the top-left
  */
 export type ShapeSelector = {
   type: 'ShapeSelector';
+
   shape: Shape;
+
+  /**
+   * Specifies the element of the document that the shape is relative to.
+   *
+   * This can be omitted in document types such as images, where the coordinates
+   * on their own can specify a unique location in the document.
+   *
+   * Supported values:
+   *
+   * - "page" - The page identified by the annotation's {@link PageSelector}.
+   */
+  anchor?: 'page';
+
+  /**
+   * Specifies the bounding box of the visible area of the anchor element,
+   * in the same coordinates used by {@link ShapeSelector.shape}.
+   *
+   * This enables interpreting the coordinates in the shape relative to the
+   * anchor element as a whole.
+   *
+   * Examples of how the visible area is determined for common document and
+   * anchor types:
+   *
+   * - For a PDF page, the box is the intersection of the media and crop box,
+   *   which is usually equal to the crop box. See https://www.pdf2go.com/blog/what-are-pdf-boxes.
+   * - For an SVG, these are the coordinates of the `viewBox` element
+   * - For an image, `left` and `top` are zero and `right` and `bottom` are the
+   *   width and height of the image in pixels.
+   */
+  view?: {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+  };
 };
 
 /**
