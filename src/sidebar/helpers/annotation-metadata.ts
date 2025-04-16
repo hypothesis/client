@@ -291,6 +291,11 @@ type LocationKey = {
    * (ie. chapter).
    */
   position?: number;
+
+  /**
+   * Page index within the document.
+   */
+  pageIndex?: number;
 };
 
 /**
@@ -305,6 +310,7 @@ export function location(annotation: Annotation): LocationKey {
 
   let cfi;
   let position;
+  let pageIndex;
 
   // nb. We ignore the possibility of an annotation having multiple targets here.
   // h and the client only support one.
@@ -313,10 +319,12 @@ export function location(annotation: Annotation): LocationKey {
       position = selector.start;
     } else if (selector.type === 'EPUBContentSelector' && selector.cfi) {
       cfi = selector.cfi;
+    } else if (selector.type === 'PageSelector') {
+      pageIndex = selector.index;
     }
   }
 
-  return { cfi, position };
+  return { cfi, position, pageIndex };
 }
 
 /**
