@@ -55,7 +55,7 @@ describe('annotator/config/index', () => {
   );
 
   context("when there's no application/annotator+html <link>", () => {
-    beforeEach('remove the application/annotator+html <link>', () => {
+    beforeEach(() => {
       Object.defineProperty(fakeSettingsFrom(), 'sidebarAppUrl', {
         get: sinon.stub().throws(new Error("there's no link")),
       });

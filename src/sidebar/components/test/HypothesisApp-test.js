@@ -343,7 +343,7 @@ describe('HypothesisApp', () => {
     });
 
     context('when a third-party service is in use', () => {
-      beforeEach('configure a third-party service to be in use', () => {
+      beforeEach(() => {
         fakeServiceConfig.returns({});
       });
 
