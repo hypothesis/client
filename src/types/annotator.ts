@@ -192,6 +192,25 @@ export type ShapeAnchor = {
   coordinates: 'anchor';
 };
 
+export type RenderToBitmapOptions = {
+  /**
+   * Ratio of device pixels to CSS pixels.
+   *
+   * This is used when determining the natural width of the image. See
+   * {@link window.devicePixelRatio}.
+   */
+  devicePixelRatio?: number;
+
+  /**
+   * Maximum width to render the image at, in pixels.
+   *
+   * The size of the resulting image will be the smaller of this and the
+   * natural width, which is the width of the image in the PDF viewer at 100%
+   * zoom.
+   */
+  maxWidth?: number;
+};
+
 /**
  * Interface for document type/viewer integrations that handle all the details
  * of supporting a specific document type (web page, PDF, ebook, etc.).
@@ -312,6 +331,12 @@ export type IntegrationBase = {
 
   /** Query the annotation tools supported by this integration. */
   supportedTools(): AnnotationTool[];
+
+  /** Render an annotated region of the document to a bitmap. */
+  renderToBitmap?(
+    anchor: Anchor,
+    opts: RenderToBitmapOptions,
+  ): Promise<ImageBitmap>;
 };
 
 /** Events which {@link Integration}s may emit. */

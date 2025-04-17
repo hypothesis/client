@@ -1214,4 +1214,61 @@ describe('FrameSyncService', () => {
       assert.calledWith(hostRPC().call, 'toastMessageDismissed', messageId);
     });
   });
+
+  describe('#requestThumbnail', () => {
+    beforeEach(async () => {
+      await frameSync.connect();
+    });
+
+    it('requests thumbnail from guest', async () => {
+      await connectGuest();
+      const fakeBitmap = {};
+      guestRPC().call.callsFake((method, tag, options, callback) => {
+        if (method === 'renderThumbnail') {
+          delay(0).then(() => callback(null, fakeBitmap));
+        }
+      });
+
+      const thumbnail = await frameSync.requestThumbnail('ann123');
+
+      assert.calledWith(
+        guestRPC().call,
+        'renderThumbnail',
+        'ann123',
+        {},
+        sinon.match.func,
+      );
+      assert.equal(thumbnail, fakeBitmap);
+    });
+
+    it('rejects if guest is not connected', async () => {
+      let err;
+      try {
+        await frameSync.requestThumbnail('ann123');
+      } catch (e) {
+        err = e;
+      }
+      assert.instanceOf(err, Error);
+      assert.equal(err.message, 'No guest connected');
+    });
+
+    it('rejects if thumbnail rendering fails', async () => {
+      await connectGuest();
+      guestRPC().call.callsFake((method, tag, options, callback) => {
+        if (method === 'renderThumbnail') {
+          delay(0).then(() => callback('Something went wrong', null));
+        }
+      });
+
+      let err;
+      try {
+        await frameSync.requestThumbnail('ann123');
+      } catch (e) {
+        err = e;
+      }
+
+      assert.instanceOf(err, Error);
+      assert.equal(err.message, 'Something went wrong');
+    });
+  });
 });

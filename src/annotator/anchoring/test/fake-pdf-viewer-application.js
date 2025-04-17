@@ -115,6 +115,36 @@ class FakePDFPageProxy {
 
     return Promise.resolve(textContent);
   }
+
+  getViewport(options) {
+    return new FakePageViewport(options);
+  }
+
+  /** Render the page and return a task for tracking progress. */
+  render(options) {
+    return new FakeRenderTask(options);
+  }
+}
+
+class FakePageViewport {
+  constructor({
+    rotation = 0,
+    scale = 1.0,
+    userUnit = 1 / 72,
+    viewBox = [0, 0, 0, 0],
+  }) {
+    this.rotation = rotation;
+    this.scale = scale;
+    this.userUnit = userUnit;
+    this.viewBox = viewBox;
+  }
+}
+
+class FakeRenderTask {
+  constructor(options) {
+    this._options = options;
+    this.promise = Promise.resolve();
+  }
 }
 
 /**

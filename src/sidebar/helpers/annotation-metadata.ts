@@ -4,6 +4,8 @@ import type {
   EPUBContentSelector,
   PageSelector,
   SavedAnnotation,
+  Shape,
+  ShapeSelector,
   TextQuoteSelector,
 } from '../../types/api';
 
@@ -345,6 +347,19 @@ export function quote(annotation: APIAnnotationData): string | null {
     | TextQuoteSelector
     | undefined;
   return quoteSel ? quoteSel.exact : null;
+}
+
+/**
+ * Return the shape of an annotation's target, if there is one.
+ *
+ * This will return `null` if the annotation is associated with a text
+ * selection instead of a shape.
+ */
+export function shape(annotation: APIAnnotationData): Shape | null {
+  const shapeSelector = annotation.target[0]?.selector?.find(
+    s => s.type === 'ShapeSelector',
+  ) as ShapeSelector | undefined;
+  return shapeSelector?.shape ?? null;
 }
 
 /**

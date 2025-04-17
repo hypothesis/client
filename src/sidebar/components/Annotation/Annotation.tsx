@@ -8,6 +8,7 @@ import {
   isOrphan,
   isSaved,
   quote,
+  shape,
 } from '../../helpers/annotation-metadata';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import { withServices } from '../../service-context';
@@ -19,6 +20,7 @@ import AnnotationEditor from './AnnotationEditor';
 import AnnotationHeader from './AnnotationHeader';
 import AnnotationQuote from './AnnotationQuote';
 import AnnotationReplyToggle from './AnnotationReplyToggle';
+import AnnotationThumbnail from './AnnotationThumbnail';
 
 function SavingMessage() {
   return (
@@ -109,6 +111,8 @@ function Annotation({
     ? ' - Highlighted'
     : '';
 
+  const targetShape = shape(annotation);
+
   return (
     <article
       className="space-y-4"
@@ -120,7 +124,7 @@ function Annotation({
         replyCount={replyCount}
         threadIsCollapsed={threadIsCollapsed}
       />
-
+      {targetShape && <AnnotationThumbnail tag={annotation.$tag} />}
       {annotationQuote && (
         <AnnotationQuote
           quote={annotationQuote}

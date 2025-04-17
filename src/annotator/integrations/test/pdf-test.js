@@ -667,5 +667,129 @@ describe('annotator/integrations/pdf', () => {
         ]);
       });
     });
+
+    describe('#renderToBitmap', () => {
+      const pageIndex = 1;
+
+      const shapeSelector = {
+        type: 'ShapeSelector',
+        shape: {
+          type: 'rect',
+          left: 0,
+          top: 100,
+          bottom: 0,
+          right: 100,
+        },
+      };
+      const pageSelector = {
+        type: 'PageSelector',
+        index: pageIndex,
+      };
+
+      it('rejects if anchor has no shape selector', async () => {
+        pdfIntegration = createPDFIntegration();
+        const anchor = {
+          target: {
+            selector: [],
+          },
+        };
+        let err;
+        try {
+          await pdfIntegration.renderToBitmap(anchor, {});
+        } catch (e) {
+          err = e;
+        }
+        assert.instanceOf(err, Error);
+        assert.equal(
+          err.message,
+          'Can only render bitmaps for anchors with shapes',
+        );
+      });
+
+      it('rejects if page index is invalid', async () => {
+        pdfIntegration = createPDFIntegration();
+        fakePDFViewerApplication.pdfViewer.getPageView = () => undefined;
+        const invalidPageSelector = {
+          type: 'PageSelector',
+          index: 500,
+        };
+        const anchor = {
+          target: {
+            selector: [shapeSelector, invalidPageSelector],
+          },
+        };
+        let err;
+        try {
+          await pdfIntegration.renderToBitmap(anchor, {});
+        } catch (e) {
+          err = e;
+        }
+        assert.instanceOf(err, Error);
+        assert.equal(err.message, 'Failed to get page view');
+      });
+
+      [
+        // Rendering with no options
+        {
+          renderOptions: {},
+          expectedViewport: {
+            rotation: 0,
+            scale: 96 / 72,
+            userUnit: 1 / 72,
+            viewBox: [0, 0, 100, 100],
+          },
+        },
+        // Rendering on a HiDPI display
+        {
+          renderOptions: {
+            devicePixelRatio: 2,
+          },
+          expectedViewport: {
+            rotation: 0,
+            scale: (96 / 72) * 2,
+            userUnit: 1 / 72,
+            viewBox: [0, 0, 100, 100],
+          },
+        },
+        // Rendering with max width that is half of the natural width
+        {
+          renderOptions: {
+            maxWidth: 50,
+          },
+          expectedViewport: {
+            rotation: 0,
+            scale: 0.5,
+            userUnit: 1 / 72,
+            viewBox: [0, 0, 100, 100],
+          },
+        },
+      ].forEach(({ renderOptions, expectedViewport }) => {
+        it('renders bitmap with given options', async () => {
+          pdfIntegration = createPDFIntegration();
+          const anchor = {
+            target: {
+              selector: [shapeSelector, pageSelector],
+            },
+          };
+          const pageView =
+            fakePDFViewerApplication.pdfViewer.getPageView(pageIndex);
+          const renderSpy = sinon.spy(pageView.pdfPage, 'render');
+
+          const bitmap = await pdfIntegration.renderToBitmap(
+            anchor,
+            renderOptions,
+          );
+
+          assert.instanceOf(bitmap, ImageBitmap);
+          assert.calledOnce(renderSpy);
+          const renderArgs = renderSpy.lastCall.args[0];
+          assert.instanceOf(
+            renderArgs.canvasContext,
+            OffscreenCanvasRenderingContext2D,
+          );
+          assert.match(renderArgs.viewport, sinon.match(expectedViewport));
+        });
+      });
+    });
   });
 });

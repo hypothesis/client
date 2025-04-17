@@ -12,6 +12,7 @@ import type {
   AnnotationTool,
   ContentInfoConfig,
   DocumentInfo,
+  RenderToBitmapOptions,
   SidebarLayout,
 } from './annotator';
 
@@ -142,6 +143,16 @@ export type SidebarToGuestCalls = {
 
   /** Navigate to the segment of a book associated with an annotation. */
   navigateToSegment(ann: AnnotationData): void;
+
+  /**
+   * Render a thumbnail of the region of a document associated with an
+   * annotation.
+   */
+  renderThumbnail(
+    tag: string,
+    options: RenderToBitmapOptions,
+    callback: (err: string | null, bitmap: ImageBitmap | null) => void,
+  ): void;
 
   /** Scroll an annotation into view. */
   scrollToAnnotation(tag: string): void;

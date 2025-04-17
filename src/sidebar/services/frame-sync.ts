@@ -11,7 +11,11 @@ import {
   isMessageEqual,
 } from '../../shared/messaging';
 import type { Message } from '../../shared/messaging';
-import type { AnnotationData, DocumentInfo } from '../../types/annotator';
+import type {
+  AnnotationData,
+  DocumentInfo,
+  RenderToBitmapOptions,
+} from '../../types/annotator';
 import type { Annotation } from '../../types/api';
 import type {
   SidebarToHostCalls,
@@ -670,6 +674,34 @@ export class FrameSyncService {
     }
 
     guest.call('scrollToAnnotation', ann.$tag);
+  }
+
+  /** Request a thumbnail from an annotated region of the document. */
+  async requestThumbnail(
+    tag: string,
+    options: RenderToBitmapOptions = {},
+  ): Promise<ImageBitmap> {
+    // Get the guest for the main frame. This assumes that the annotation is
+    // anchored in the main frame.
+    const guest = this._guestRPC.get(null);
+    if (!guest) {
+      throw new Error('No guest connected');
+    }
+
+    return new Promise((resolve, reject) => {
+      guest.call(
+        'renderThumbnail',
+        tag,
+        options,
+        (err: string | null, bitmap: ImageBitmap | null) => {
+          if (!bitmap) {
+            reject(new Error(err ?? 'No bitmap received'));
+          } else {
+            resolve(bitmap);
+          }
+        },
+      );
+    });
   }
 
   // Only used to cleanup tests

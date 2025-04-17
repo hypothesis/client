@@ -91,14 +91,63 @@ export type TextContent = {
   items: TextContentItem[];
 };
 
+export type GetViewportParameters = {
+  scale: number;
+  rotation?: number;
+};
+
+export type PageViewportParameters = {
+  viewBox: number[];
+  userUnit: number;
+  scale: number;
+  rotation: number;
+};
+
+export type PageViewport = {
+  new (params: PageViewportParameters): PageViewport;
+
+  viewBox: number[];
+  userUnit: number;
+  width: number;
+  height: number;
+};
+
+/**
+ * Tracks page rendering progress.
+ *
+ * See https://github.com/mozilla/pdf.js/blob/2f7d163dfdf40225479d1cc8f6d8ebd9e5273ca6/src/display/api.js#L3267.
+ */
+export type RenderTask = {
+  get promise(): Promise<void>;
+};
+
+/**
+ * Page rendering parameters.
+ *
+ * See https://github.com/mozilla/pdf.js/blob/2f7d163dfdf40225479d1cc8f6d8ebd9e5273ca6/src/display/api.js#L1284.
+ */
+export type RenderParameters = {
+  canvasContext: CanvasRenderingContext2D;
+  viewport: PageViewport;
+};
+
 export type PDFPageProxy = {
   getTextContent(o?: GetTextContentParameters): Promise<TextContent>;
+
+  /**
+   * Render a page to a canvas context.
+   *
+   * See https://github.com/mozilla/pdf.js/blob/2f7d163dfdf40225479d1cc8f6d8ebd9e5273ca6/src/display/api.js#L1509.
+   */
+  render(params: RenderParameters): RenderTask;
 
   /**
    * Return the visible portion of this page in user space units as an
    * `[x1, y1, x2, y2]` tuple.
    */
   get view(): [number, number, number, number];
+
+  getViewport(params: GetViewportParameters): PageViewport;
 };
 
 export type PDFPageView = {
