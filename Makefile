@@ -105,4 +105,5 @@ build: node_modules/.uptodate
 
 node_modules/.uptodate: package.json yarn.lock
 	yarn install
+	yarn playwright install chromium
 	@touch $@
