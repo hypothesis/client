@@ -18,7 +18,7 @@ jobs:
         path: node_modules
         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
     - name: Install
-      run: yarn install --immutable
+      run: yarn install --immutable && yarn playwright install chromium
     - name: Format
       run: yarn checkformatting
     - name: Lint
@@ -27,7 +27,7 @@ jobs:
       run: |
         yarn typecheck
     - name: Test
-      run: yarn test
+      run: yarn test:vitest
     - name: Upload coverage report
       uses: codecov/codecov-action@v4
       with:
