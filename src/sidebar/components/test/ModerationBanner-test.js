@@ -1,6 +1,7 @@
 import {
   checkAccessibility,
   mockImportedComponents,
+  waitFor,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
 
@@ -121,7 +122,7 @@ describe('ModerationBanner', () => {
     assert.calledWith(fakeApi.annotation.hide, { id: 'ann-id' });
   });
 
-  it('reports an error if hiding the annotation fails', done => {
+  it('reports an error if hiding the annotation fails', async () => {
     const wrapper = createComponent({
       annotation: moderatedAnnotation({
         flagCount: 10,
@@ -130,10 +131,9 @@ describe('ModerationBanner', () => {
     fakeApi.annotation.hide.returns(Promise.reject(new Error('Network Error')));
     wrapper.find('button').simulate('click');
 
-    setTimeout(() => {
-      assert.calledWith(fakeToastMessenger.error, 'Failed to hide annotation');
-      done();
-    }, 0);
+    await waitFor(() =>
+      fakeToastMessenger.error.calledWith('Failed to hide annotation'),
+    );
   });
 
   it('unhides the annotation if "Unhide" is clicked', () => {
@@ -147,7 +147,7 @@ describe('ModerationBanner', () => {
     assert.calledWith(fakeApi.annotation.unhide, { id: 'ann-id' });
   });
 
-  it('reports an error if unhiding the annotation fails', done => {
+  it('reports an error if unhiding the annotation fails', async () => {
     const wrapper = createComponent({
       annotation: moderatedAnnotation({
         flagCount: 1,
@@ -158,13 +158,10 @@ describe('ModerationBanner', () => {
       Promise.reject(new Error('Network Error')),
     );
     wrapper.find('button').simulate('click');
-    setTimeout(() => {
-      assert.calledWith(
-        fakeToastMessenger.error,
-        'Failed to unhide annotation',
-      );
-      done();
-    }, 0);
+
+    await waitFor(() =>
+      fakeToastMessenger.error.calledWith('Failed to unhide annotation'),
+    );
   });
 
   it(

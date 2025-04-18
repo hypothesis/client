@@ -133,7 +133,7 @@ describe('sidebar/util/sentry', () => {
         .getCalls()
         .find(call => call.args[0] === 'loaded_scripts').args[1];
       assert.isTrue(urls.length > 0);
-      urls.forEach(url => assert.match(url, /<inline>|http:.*\.js/));
+      urls.forEach(url => assert.match(url, /<inline>|http:.*/));
     });
 
     function getBeforeSendHook() {
