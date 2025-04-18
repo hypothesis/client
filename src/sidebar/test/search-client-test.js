@@ -1,5 +1,6 @@
 import { delay } from '@hypothesis/frontend-testing';
 
+import { promiseWithResolvers } from '../../shared/promise-with-resolvers';
 import { ResultSizeError, SearchClient } from '../search-client';
 
 function awaitEvent(emitter, event) {
@@ -113,16 +114,15 @@ describe('SearchClient', () => {
     assert.calledWith(onResultCount, RESULTS.length);
   });
 
-  it('emits "end" only once', done => {
+  it('emits "end" only once', async () => {
     const client = new SearchClient(fakeSearchFn, { getPageSize: () => 2 });
     client.on('results', sinon.stub());
-    let emitEndCounter = 0;
-    client.on('end', () => {
-      emitEndCounter += 1;
-      assert.equal(emitEndCounter, 1);
-      done();
-    });
+    const { promise, resolve } = promiseWithResolvers();
+    client.on('end', () => resolve(1));
     client.get({ uri: 'http://example.com' });
+
+    const emitEndCounter = await promise;
+    assert.equal(emitEndCounter, 1);
   });
 
   it('emits "results" with pages in incremental mode', async () => {
