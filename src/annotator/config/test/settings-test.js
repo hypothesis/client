@@ -85,7 +85,7 @@ describe('annotator/config/settingsFrom', () => {
     context(
       'when the host page has a js-hypothesis-config with an annotations setting',
       () => {
-        beforeEach('add a js-hypothesis-config annotations setting', () => {
+        beforeEach(() => {
           fakeParseJsonConfig.returns({
             annotations: 'annotationsFromJSON',
           });
@@ -183,7 +183,7 @@ describe('annotator/config/settingsFrom', () => {
     context(
       'when the host page has a js-hypothesis-config with a query setting',
       () => {
-        beforeEach('add a js-hypothesis-config query setting', () => {
+        beforeEach(() => {
           fakeParseJsonConfig.returns({
             query: 'queryFromJSON',
           });

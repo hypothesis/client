@@ -3,7 +3,7 @@ import { configFuncSettingsFrom } from '../config-func-settings-from';
 describe('annotator.config.configFuncSettingsFrom', () => {
   const sandbox = sinon.createSandbox();
 
-  afterEach('reset the sandbox', () => {
+  afterEach(() => {
     sandbox.restore();
   });
 
@@ -16,7 +16,7 @@ describe('annotator.config.configFuncSettingsFrom', () => {
   });
 
   context("when window.hypothesisConfig() isn't a function", () => {
-    beforeEach('stub console.warn()', () => {
+    beforeEach(() => {
       sandbox.stub(console, 'warn');
     });
 
