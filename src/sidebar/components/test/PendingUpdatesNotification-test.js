@@ -1,7 +1,6 @@
 import { mount } from '@hypothesis/frontend-testing';
 import sinon from 'sinon';
 
-import { promiseWithResolvers } from '../../../shared/promise-with-resolvers';
 import PendingUpdatesNotification, {
   $imports,
 } from '../PendingUpdatesNotification';
@@ -65,7 +64,7 @@ describe('PendingUpdatesNotification', () => {
    * times.
    */
   function timeoutAsPromise() {
-    const { resolve, promise } = promiseWithResolvers();
+    const { resolve, promise } = Promise.withResolvers();
     fakeSetTimeout.callsFake(callback =>
       setTimeout(() => {
         callback();

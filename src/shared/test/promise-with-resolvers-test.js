@@ -2,7 +2,7 @@ import { promiseWithResolvers } from '../promise-with-resolvers';
 
 describe('promiseWithResolvers', () => {
   it('resolves returned promise with `resolve` callback', async () => {
-    const { promise, resolve } = promiseWithResolvers();
+    const { promise, resolve } = Promise.withResolvers();
     const expected = 'some value';
 
     resolve(expected);

@@ -1,7 +1,6 @@
 import { delay } from '@hypothesis/frontend-testing';
 
 import { EventEmitter } from '../../../shared/event-emitter';
-import { promiseWithResolvers } from '../../../shared/promise-with-resolvers';
 import { PDFMetadata } from '../pdf-metadata';
 
 /**
@@ -36,7 +35,7 @@ class FakePDFDocumentProxy {
     this._metadata = null;
     this.fingerprint = null;
 
-    const { resolve, promise } = promiseWithResolvers();
+    const { resolve, promise } = Promise.withResolvers();
     this._downloadInfoResolver = resolve;
     this._downloadInfoPromise = promise;
   }

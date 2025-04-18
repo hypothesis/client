@@ -85,7 +85,7 @@ describe('annotator/config/settingsFrom', () => {
     context(
       'when the host page has a js-hypothesis-config with an annotations setting',
       () => {
-        beforeEach('add a js-hypothesis-config annotations setting', () => {
+        beforeEach(() => {
           fakeParseJsonConfig.returns({
             annotations: 'annotationsFromJSON',
           });
@@ -101,19 +101,16 @@ describe('annotator/config/settingsFrom', () => {
         context(
           "when there's also an `annotations` in the URL fragment",
           () => {
-            specify(
-              'js-hypothesis-config annotations override URL ones',
-              () => {
-                const window_ = fakeWindow(
-                  'http://localhost:3000#annotations:annotationsFromURL',
-                );
+            it('overrides URLs with js-hypothesis-config annotations', () => {
+              const window_ = fakeWindow(
+                'http://localhost:3000#annotations:annotationsFromURL',
+              );
 
-                assert.equal(
-                  settingsFrom(window_).annotations,
-                  'annotationsFromJSON',
-                );
-              },
-            );
+              assert.equal(
+                settingsFrom(window_).annotations,
+                'annotationsFromJSON',
+              );
+            });
           },
         );
       },
@@ -183,7 +180,7 @@ describe('annotator/config/settingsFrom', () => {
     context(
       'when the host page has a js-hypothesis-config with a query setting',
       () => {
-        beforeEach('add a js-hypothesis-config query setting', () => {
+        beforeEach(() => {
           fakeParseJsonConfig.returns({
             query: 'queryFromJSON',
           });
@@ -194,7 +191,7 @@ describe('annotator/config/settingsFrom', () => {
         });
 
         context("when there's also a query in the URL fragment", () => {
-          specify('js-hypothesis-config queries override URL ones', () => {
+          it('overrides URL query with js-hypothesis-config ones', () => {
             const window_ = fakeWindow(
               'http://localhost:3000#annotations:query:queryFromUrl',
             );
@@ -338,15 +335,15 @@ describe('annotator/config/settingsFrom', () => {
     [
       {
         when: 'the client is embedded in a web page',
-        specify: 'it returns setting values from window.hypothesisConfig()',
+        title: 'returns setting values from window.hypothesisConfig()',
         configFuncSettings: { foo: 'configFuncValue' },
         jsonSettings: { foo: 'ignored' }, // hypothesisConfig() overrides js-hypothesis-config
         expected: 'configFuncValue',
       },
       {
         when: 'the client is embedded in a web page',
-        specify:
-          'it ignores settings from js-hypothesis-config if `ignoreOtherConfiguration` is present',
+        title:
+          'ignores settings from js-hypothesis-config if `ignoreOtherConfiguration` is present',
         isBrowserExtension: false,
         configFuncSettings: { ignoreOtherConfiguration: '1' },
         jsonSettings: { foo: 'ignored' },
@@ -354,38 +351,38 @@ describe('annotator/config/settingsFrom', () => {
       },
       {
         when: 'the client is embedded in a web page',
-        specify: 'it returns setting values from js-hypothesis-config objects',
+        title: 'returns setting values from js-hypothesis-config objects',
         configFuncSettings: {},
         jsonSettings: { foo: 'jsonValue' },
         expected: 'jsonValue',
       },
       {
         when: 'the client is embedded in a web page',
-        specify:
-          'hypothesisConfig() settings override js-hypothesis-config ones',
+        title:
+          'overrides js-hypothesis-config with hypothesisConfig() settings',
         configFuncSettings: { foo: 'configFuncValue' },
         jsonSettings: { foo: 'jsonValue' },
         expected: 'configFuncValue',
       },
       {
         when: 'the client is embedded in a web page',
-        specify:
-          'even a null from hypothesisConfig() overrides js-hypothesis-config',
+        title:
+          'overrides js-hypothesis-config even with null from hypothesisConfig()',
         configFuncSettings: { foo: null },
         jsonSettings: { foo: 'jsonValue' },
         expected: null,
       },
       {
         when: 'the client is embedded in a web page',
-        specify:
-          'even an undefined from hypothesisConfig() overrides js-hypothesis-config',
+        title:
+          'overrides js-hypothesis-config even with undefined from hypothesisConfig()',
         configFuncSettings: { foo: undefined },
         jsonSettings: { foo: 'jsonValue' },
         expected: undefined,
       },
     ].forEach(test => {
       context(test.when, () => {
-        specify(test.specify, () => {
+        it(test.title, () => {
           fakeConfigFuncSettingsFrom.returns(test.configFuncSettings);
           fakeParseJsonConfig.returns(test.jsonSettings);
           const settings = settingsFrom(fakeWindow());
