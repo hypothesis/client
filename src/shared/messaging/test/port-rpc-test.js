@@ -79,11 +79,12 @@ describe('PortRPC', () => {
     sinon.restore();
   });
 
-  it('should call the method `plusOne` on rpc2', done => {
-    rpc1.call('plusOne', 1, 2, 3, value => {
-      assert.deepEqual(value, [2, 3, 4]);
-      done();
-    });
+  it('should call the method `plusOne` on rpc2', async () => {
+    const { promise, resolve } = Promise.withResolvers();
+    rpc1.call('plusOne', 1, 2, 3, resolve);
+
+    const value = await promise;
+    assert.deepEqual(value, [2, 3, 4]);
   });
 
   it('should not call the method `plusOne` if rpc1 is destroyed', () => {
@@ -102,15 +103,18 @@ describe('PortRPC', () => {
     assert.notCalled(plusOne);
   });
 
-  it('should call the method `concat` on rpc1', done => {
-    rpc2.call('concat', 'hello', ' ', 'world', value => {
-      assert.equal(value, 'hello world');
-    });
+  it('should call the method `concat` on rpc1', async () => {
+    const { promise: promiseOne, resolve: resolvePromiseOne } =
+      Promise.withResolvers();
+    rpc2.call('concat', 'hello', ' ', 'world', resolvePromiseOne);
+    const valueOne = await promiseOne;
+    assert.equal(valueOne, 'hello world');
 
-    rpc2.call('concat', [1], [2], [3], value => {
-      assert.deepEqual(value, [1, 2, 3]);
-      done();
-    });
+    const { promise: promiseTwo, resolve: resolvePromiseTwo } =
+      Promise.withResolvers();
+    rpc2.call('concat', [1], [2], [3], resolvePromiseTwo);
+    const valueTwo = await promiseTwo;
+    assert.deepEqual(valueTwo, [1, 2, 3]);
   });
 
   it('should call method on valid message', async () => {

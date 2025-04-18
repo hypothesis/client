@@ -41,7 +41,9 @@ describe('sidebar/util/cfi', () => {
         expected: ['/2/4', '/2/4'],
       },
     ].forEach(({ range, expected }) => {
-      assert.deepEqual(splitCFIRange(range), expected);
+      it('splits range into expected pieces', () => {
+        assert.deepEqual(splitCFIRange(range), expected);
+      });
     });
   });
 

@@ -2,7 +2,6 @@ import { delay } from '@hypothesis/frontend-testing';
 import sinon from 'sinon';
 
 import { EventEmitter } from '../../../shared/event-emitter';
-import { promiseWithResolvers } from '../../../shared/promise-with-resolvers';
 import { fakeReduxStore } from '../../test/fake-redux-store';
 import { StreamerService, $imports } from '../streamer';
 
@@ -97,7 +96,7 @@ describe('StreamerService', () => {
   }
 
   function timeoutAsPromise() {
-    const { resolve, promise } = promiseWithResolvers();
+    const { resolve, promise } = Promise.withResolvers();
     fakeSetTimeout.callsFake(callback =>
       setTimeout(() => {
         callback();

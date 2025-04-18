@@ -29,7 +29,7 @@ describe('#parseJsonConfig', () => {
   });
 
   context("when there's JSON scripts with no top-level objects", () => {
-    beforeEach('add JSON scripts with no top-level objects', () => {
+    beforeEach(() => {
       appendJSHypothesisConfig(document, 'null');
       appendJSHypothesisConfig(document, '23');
       appendJSHypothesisConfig(document, 'true');
@@ -41,7 +41,7 @@ describe('#parseJsonConfig', () => {
   });
 
   context("when there's a JSON script with a top-level array", () => {
-    beforeEach('add a JSON script containing a top-level array', () => {
+    beforeEach(() => {
       appendJSHypothesisConfig(document, '["a", "b", "c"]');
     });
 
@@ -51,7 +51,7 @@ describe('#parseJsonConfig', () => {
   });
 
   context("when there's a JSON script with a top-level string", () => {
-    beforeEach('add a JSON script with a top-level string', () => {
+    beforeEach(() => {
       appendJSHypothesisConfig(document, '"hi"');
     });
 
@@ -61,11 +61,11 @@ describe('#parseJsonConfig', () => {
   });
 
   context("when there's a JSON script containing invalid JSON", () => {
-    beforeEach('stub console.warn()', () => {
+    beforeEach(() => {
       sandbox.stub(console, 'warn');
     });
 
-    beforeEach('add a JSON script containing invalid JSON', () => {
+    beforeEach(() => {
       appendJSHypothesisConfig(document, 'this is not valid json');
     });
 
@@ -87,7 +87,7 @@ describe('#parseJsonConfig', () => {
   });
 
   context("when there's a JSON script with an empty object", () => {
-    beforeEach('add a JSON script containing an empty object', () => {
+    beforeEach(() => {
       appendJSHypothesisConfig(document, '{}');
     });
 
@@ -97,7 +97,7 @@ describe('#parseJsonConfig', () => {
   });
 
   context("when there's a JSON script containing some settings", () => {
-    beforeEach('add a JSON script containing some settings', () => {
+    beforeEach(() => {
       appendJSHypothesisConfig(document, '{"foo": "FOO", "bar": "BAR"}');
     });
 
@@ -107,7 +107,7 @@ describe('#parseJsonConfig', () => {
   });
 
   context('when there are JSON scripts with different settings', () => {
-    beforeEach('add some JSON scripts with different settings', () => {
+    beforeEach(() => {
       appendJSHypothesisConfig(document, '{"foo": "FOO"}');
       appendJSHypothesisConfig(document, '{"bar": "BAR"}');
       appendJSHypothesisConfig(document, '{"gar": "GAR"}');
@@ -123,17 +123,14 @@ describe('#parseJsonConfig', () => {
   });
 
   context('when multiple JSON scripts contain the same setting', () => {
-    beforeEach('add some JSON scripts with different settings', () => {
+    beforeEach(() => {
       appendJSHypothesisConfig(document, '{"foo": "first"}');
       appendJSHypothesisConfig(document, '{"foo": "second"}');
       appendJSHypothesisConfig(document, '{"foo": "third"}');
     });
 
-    specify(
-      'settings from later in the page override ones from earlier',
-      () => {
-        assert.equal(parseJsonConfig(document).foo, 'third');
-      },
-    );
+    it('overrides settings from earlier in the page with later ones', () => {
+      assert.equal(parseJsonConfig(document).foo, 'third');
+    });
   });
 });

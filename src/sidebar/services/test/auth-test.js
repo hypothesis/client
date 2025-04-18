@@ -136,7 +136,7 @@ describe('AuthService', () => {
 
     context('when the access token request fails', () => {
       const expectedErr = new Error('Grant token exchange failed');
-      beforeEach('make access token requests fail', () => {
+      beforeEach(() => {
         fakeClient.exchangeGrantToken.rejects(expectedErr);
       });
 
@@ -291,7 +291,7 @@ describe('AuthService', () => {
     });
 
     context('when a refresh request fails', () => {
-      beforeEach('make refresh token requests fail', () => {
+      beforeEach(() => {
         fakeClient.refreshToken.returns(Promise.reject(new Error('failed')));
         fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
       });
