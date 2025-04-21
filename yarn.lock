@@ -2484,10 +2484,10 @@ __metadata:
   linkType: hard
 
 "@hypothesis/frontend-build@npm:^3.0.0":
-  version: 3.1.0
-  resolution: "@hypothesis/frontend-build@npm:3.1.0"
+  version: 3.2.1
+  resolution: "@hypothesis/frontend-build@npm:3.2.1"
   dependencies:
-    commander: ^12.0.0
+    commander: ^13.0.0
     fancy-log: ^2.0.0
     glob: ^11.0.0
   peerDependencies:
@@ -2497,10 +2497,15 @@ __metadata:
     rollup: ^4.0.2
     sass: ^1.43.2
     tailwindcss: ^3.0.11
+    vitest: ^3.1.1
   peerDependenciesMeta:
+    karma:
+      optional: true
     tailwindcss:
       optional: true
-  checksum: 56cdf9d33359c6f6663761a67fdb098afe86e3210fb286281e8865275a8c002747b06bd2aa36a121235c01d10416edad08c3b268e9025bf16ebec96b7994df6e
+    vitest:
+      optional: true
+  checksum: b5740a314aafe2afbacbf75ed44f0a7f880bf7d55490032bf6e9f09d010f871cc5eb1252be0c99f3be0a4c8c35d6f0e49839859c8677bdd4d43c383aac0b5f2a
   languageName: node
   linkType: hard
 
@@ -5993,13 +5998,6 @@ __metadata:
   bin:
     color-support: bin.js
   checksum: 9b7356817670b9a13a26ca5af1c21615463b500783b739b7634a0c2047c16cef4b2865d7576875c31c3cddf9dd621fa19285e628f20198b233a5cfdda6d0793b
-  languageName: node
-  linkType: hard
-
-"commander@npm:^12.0.0":
-  version: 12.1.0
-  resolution: "commander@npm:12.1.0"
-  checksum: 68e9818b00fc1ed9cdab9eb16905551c2b768a317ae69a5e3c43924c2b20ac9bb65b27e1cab36aeda7b6496376d4da908996ba2c0b5d79463e0fb1e77935d514
   languageName: node
   linkType: hard
 
