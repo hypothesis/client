@@ -146,7 +146,19 @@ export default function Toolbar({
   return (
     <div
       className={classnames(
-        'absolute left-[-33px] w-[33px] z-2',
+        {
+          // For minimal controls, display the toolbar to the left, fully
+          // outside the sidebar
+          'absolute right-full': useMinimalControls,
+          // When the full toolbar is displayed, we position it relative to its
+          // container, so that it takes vertical space and pushes next elements
+          // down (eg. the buckets list).
+          // The toolbar is wider than its parent, so we need to adjust the
+          // right position so that the right edge of the toolbar aligns with
+          // the right edge of the parent.
+          'relative right-[11px]': !useMinimalControls,
+        },
+        'w-[33px] z-2',
         'text-px-base leading-none', // non-scaling sizing
       )}
     >

@@ -164,6 +164,25 @@ export class Sidebar implements Destroyable {
     this.bucketBar = null;
     this.features = new FeatureFlags();
 
+    const iframeContainerId = 'sidebar-container';
+
+    // Set up the toolbar on the left edge of the sidebar.
+    const toolbarContainer = document.createElement('div');
+    toolbarContainer.setAttribute('data-testid', 'toolbar-container');
+    this.toolbar = new ToolbarController(toolbarContainer, {
+      sidebarContainerId: iframeContainerId,
+      createAnnotation: (tool: AnnotationTool) => {
+        if (this._guestRPC.length === 0) {
+          return;
+        }
+
+        const rpc = this._guestWithSelection ?? this._guestRPC[0];
+        rpc.call('createAnnotation', { tool });
+      },
+      setSidebarOpen: open => (open ? this.open() : this.close()),
+      setHighlightsVisible: show => this.setHighlightsVisible(show),
+    });
+
     if (config.externalContainerSelector) {
       this.externalFrame =
         document.querySelector(config.externalContainerSelector) ?? element;
@@ -172,10 +191,14 @@ export class Sidebar implements Destroyable {
       this.iframeContainer = document.createElement('div');
       this.iframeContainer.style.display = 'none';
       this.iframeContainer.className = 'sidebar-container';
-      this.iframeContainer.id = 'sidebar-container';
+      this.iframeContainer.id = iframeContainerId;
 
       if (config.theme === 'clean') {
         this.iframeContainer.classList.add('theme-clean');
+        // Append toolbar directly to the iframe container when clean theme is
+        // enabled
+        this.iframeContainer.append(toolbarContainer);
+        this.toolbar.useMinimalControls = true;
       } else {
         let bucketBarContainer: HTMLElement | undefined;
         if (config.bucketContainerSelector) {
@@ -200,11 +223,10 @@ export class Sidebar implements Destroyable {
           // See https://github.com/hypothesis/client/pull/2750.
           'absolute top-0 bottom-0 w-[23px] left-[-22px]',
 
-          // Make the bucket bar fill the container, with large padding on top
-          // so that buckets are below the toolbar, and small padding on the
+          // Make the bucket bar fill the container, with small padding on the
           // right to align the right edge of the buckets with the right edge
           // of toolbar icons.
-          'flex flex-col pt-[110px] pr-[5px]',
+          'flex flex-col pr-[5px]',
 
           // Use a grey background, with lower opacity with the sidebar is
           // collapsed, so the page content behind it can be read.
@@ -214,6 +236,11 @@ export class Sidebar implements Destroyable {
           // (eg. scroll bar thumbs) which are behind it.
           'pointer-events-none',
         );
+
+        // Allow pointer events in the toolbar
+        toolbarContainer.className = 'pointer-events-auto';
+        sidebarEdge.append(toolbarContainer);
+
         this.iframeContainer.append(sidebarEdge);
 
         if (!bucketBarContainer) {
@@ -256,31 +283,9 @@ export class Sidebar implements Destroyable {
 
     this._listeners = new ListenerCollection();
 
-    // Set up the toolbar on the left edge of the sidebar.
-    const toolbarContainer = document.createElement('div');
-    this.toolbar = new ToolbarController(toolbarContainer, {
-      sidebarContainerId: this.iframeContainer?.id,
-      createAnnotation: (tool: AnnotationTool) => {
-        if (this._guestRPC.length === 0) {
-          return;
-        }
-
-        const rpc = this._guestWithSelection ?? this._guestRPC[0];
-        rpc.call('createAnnotation', { tool });
-      },
-      setSidebarOpen: open => (open ? this.open() : this.close()),
-      setHighlightsVisible: show => this.setHighlightsVisible(show),
-    });
-
-    if (config.theme === 'clean') {
-      this.toolbar.useMinimalControls = true;
-    } else {
-      this.toolbar.useMinimalControls = false;
-    }
-
     if (this.iframeContainer) {
-      // If using our own container frame for the sidebar, add the toolbar to it.
-      this.iframeContainer.prepend(toolbarContainer);
+      // If using our own container frame for the sidebar, infer the width from
+      // it.
       this._toolbarWidth = this.toolbar.getWidth();
     } else {
       // If using a host-page provided container for the sidebar, the toolbar is
