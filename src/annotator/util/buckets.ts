@@ -191,7 +191,7 @@ export function computeBuckets(
   // Add an upper "navigation" bucket with offscreen-above anchors
   const above: Bucket = {
     anchors: aboveAnchors,
-    position: vMargin,
+    position: vMargin - 5,
   };
 
   // Add a lower "navigation" bucket with offscreen-below anchors
