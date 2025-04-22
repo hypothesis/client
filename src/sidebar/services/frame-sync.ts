@@ -676,7 +676,11 @@ export class FrameSyncService {
     guest.call('scrollToAnnotation', ann.$tag);
   }
 
-  /** Request a thumbnail from an annotated region of the document. */
+  /**
+   * Request a thumbnail from an annotated region of the document.
+   *
+   * @param tag - Annotation identifier. See {@link Annotation.$tag}.
+   */
   async requestThumbnail(
     tag: string,
     options: RenderToBitmapOptions = {},
