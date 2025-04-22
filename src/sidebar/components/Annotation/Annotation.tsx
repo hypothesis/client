@@ -111,7 +111,7 @@ function Annotation({
     ? ' - Highlighted'
     : '';
 
-  const targetShape = shape(annotation);
+  const targetShape = useMemo(() => shape(annotation), [annotation]);
 
   return (
     <article
