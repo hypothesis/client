@@ -207,6 +207,11 @@
   border-color: #edd72b;
   cursor: pointer;
   visibility: visible;
+
+  &.hypothesis-highlight-focused {
+    border-color: var(--hypothesis-highlight-focused-color);
+    background: var(--hypothesis-highlight-focused-color);
+  }
 }
 
 // Apply focused-highlight styling
