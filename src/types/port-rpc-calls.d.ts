@@ -29,6 +29,28 @@ export type CommonCalls = {
   close(): void;
 };
 
+/** Represents an operation that succeeded. */
+export type Success<T> = {
+  ok: true;
+  value: T;
+};
+
+/** Represents an operation that failed. */
+export type Failure<E> = {
+  ok: false;
+  error: E;
+};
+
+/**
+ * Result of an RPC call between frames.
+ *
+ * The payload on success or error must be a type that is serializable or
+ * transferable. For errors note that {@link Error} is *not* serializable in
+ * some older browsers. See
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error#browser_compatibility.
+ */
+export type Result<T, E = string> = Success<T> | Failure<E>;
+
 /** Calls that guests make to the host. */
 export type GuestToHostCalls = CommonCalls & {
   /** Text has been deselected in the guest frame. */
@@ -151,7 +173,7 @@ export type SidebarToGuestCalls = {
   renderThumbnail(
     tag: string,
     options: RenderToBitmapOptions,
-    callback: (err: string | null, bitmap: ImageBitmap | null) => void,
+    callback: (result: Result<ImageBitmap>) => void,
   ): void;
 
   /** Scroll an annotation into view. */

@@ -725,7 +725,8 @@ describe('Guest', () => {
     describe('on "renderThumbnail" event', () => {
       const makeCallback = () => {
         const { promise, resolve, reject } = Promise.withResolvers();
-        const callback = (err, result) => (err ? reject(err) : resolve(result));
+        const callback = result =>
+          result.ok ? resolve(result.value) : reject(result.error);
         return { promise, callback };
       };
 

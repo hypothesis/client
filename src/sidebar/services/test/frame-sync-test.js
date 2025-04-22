@@ -1225,7 +1225,7 @@ describe('FrameSyncService', () => {
       const fakeBitmap = {};
       guestRPC().call.callsFake((method, tag, options, callback) => {
         if (method === 'renderThumbnail') {
-          delay(0).then(() => callback(null, fakeBitmap));
+          delay(0).then(() => callback({ ok: true, value: fakeBitmap }));
         }
       });
 
@@ -1256,7 +1256,9 @@ describe('FrameSyncService', () => {
       await connectGuest();
       guestRPC().call.callsFake((method, tag, options, callback) => {
         if (method === 'renderThumbnail') {
-          delay(0).then(() => callback('Something went wrong', null));
+          delay(0).then(() =>
+            callback({ ok: false, error: 'Something went wrong' }),
+          );
         }
       });
 
