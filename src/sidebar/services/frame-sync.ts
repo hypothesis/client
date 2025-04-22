@@ -693,18 +693,13 @@ export class FrameSyncService {
     }
 
     return new Promise((resolve, reject) => {
-      guest.call(
-        'renderThumbnail',
-        tag,
-        options,
-        (err: string | null, bitmap: ImageBitmap | null) => {
-          if (!bitmap) {
-            reject(new Error(err ?? 'No bitmap received'));
-          } else {
-            resolve(bitmap);
-          }
-        },
-      );
+      guest.call('renderThumbnail', tag, options, result => {
+        if (result.ok) {
+          resolve(result.value);
+        } else {
+          reject(new Error(result.error));
+        }
+      });
     });
   }
 
