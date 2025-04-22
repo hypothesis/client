@@ -209,16 +209,32 @@ export class DrawTool implements Destroyable {
       // Normalize rect because SVG rects must have positive width and height.
       const rect = normalizeRect(this._shape);
       render(
-        <rect
-          stroke="black"
-          stroke-dasharray="3"
-          stroke-width="3px"
-          fill="none"
-          x={rect.left}
-          y={rect.top}
-          width={rect.right - rect.left}
-          height={rect.bottom - rect.top}
-        />,
+        // Draw rects with dashed strokes that combine to form one rect with a
+        // border of alternating colors.
+        <>
+          <rect
+            stroke="white"
+            stroke-dasharray="5"
+            stroke-width="1px"
+            fill="grey"
+            fill-opacity="0.5"
+            x={rect.left}
+            y={rect.top}
+            width={rect.right - rect.left}
+            height={rect.bottom - rect.top}
+          />
+          <rect
+            stroke="grey"
+            stroke-dasharray="5"
+            stroke-dashoffset="5"
+            stroke-width="1px"
+            fill="none"
+            x={rect.left}
+            y={rect.top}
+            width={rect.right - rect.left}
+            height={rect.bottom - rect.top}
+          />
+        </>,
         this._surface,
       );
     } else {
