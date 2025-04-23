@@ -36,12 +36,12 @@ describe('NavigationObserver', () => {
   context('when the Navigation API is not supported', () => {
     let origNavigation;
 
-    before(() => {
+    beforeAll(() => {
       origNavigation = window.navigation;
       window.navigation = null;
     });
 
-    after(() => {
+    afterAll(() => {
       window.navigation = origNavigation;
     });
 

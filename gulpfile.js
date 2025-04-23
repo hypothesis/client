@@ -157,23 +157,7 @@ gulp.task(
   gulp.parallel('build-css', () =>
     runTests({
       bootstrapFile: 'src/sidebar/test/bootstrap.js',
-      karmaConfig: 'src/karma.config.cjs',
-      rollupConfig: 'rollup-tests.config.js',
-      testsPattern: 'src/**/*-test.js',
-    }),
-  ),
-);
-
-// Unit and integration testing tasks.
-//
-// Some (eg. a11y) tests rely on CSS bundles. We assume that JS will always take
-// longer to build than CSS, so build in parallel.
-gulp.task(
-  'test:vitest',
-  gulp.parallel('build-css', () =>
-    runTests({
-      bootstrapFile: 'src/sidebar/test/bootstrap.js',
-      vitestConfig: './vitest.config.js',
+      vitestConfig: 'vitest.config.js',
       rollupConfig: 'rollup-tests.config.js',
       testsPattern: 'src/**/*-test.js',
     }),

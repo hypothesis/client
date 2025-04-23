@@ -27,7 +27,6 @@
   "exclude": [
     // Tests are not checked.
     "**/test/**/*.js",
-    "test-util/**/*.js",
-    "karma.config.js"
+    "test-util/**/*.js"
   ]
 }

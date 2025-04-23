@@ -30,13 +30,13 @@ describe('Sidebar', () => {
   let fakeSendErrorsTo;
   let fakeEmitter;
 
-  before(() => {
+  beforeAll(() => {
     // Make `requestAnimationFrame` invoke its callback synchronously. rAF is
     // used to debounce some internal actions.
     sinon.stub(window, 'requestAnimationFrame').yields();
   });
 
-  after(() => {
+  afterAll(() => {
     window.requestAnimationFrame.restore();
   });
 

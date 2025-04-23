@@ -442,12 +442,12 @@ describe('HTML anchoring', () => {
   describe('Web page baselines', () => {
     let frame;
 
-    before(() => {
+    beforeAll(() => {
       frame = document.createElement('iframe');
       document.body.appendChild(frame);
     });
 
-    after(() => {
+    afterAll(() => {
       frame.remove();
     });
 

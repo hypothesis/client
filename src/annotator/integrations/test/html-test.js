@@ -315,11 +315,11 @@ describe('HTMLIntegration', () => {
         document_.body.appendChild(el);
       }
 
-      before(() => {
+      beforeAll(() => {
         appendBodyStyles(document);
       });
 
-      after(() => {
+      afterAll(() => {
         // Remove test styles
         const elements = document.querySelectorAll('.js-style-test');
         for (let i = 0; i < elements.length; i++) {
