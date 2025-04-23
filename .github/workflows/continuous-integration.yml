@@ -27,7 +27,7 @@ jobs:
       run: |
         yarn typecheck
     - name: Test
-      run: yarn test:vitest
+      run: yarn test
     - name: Upload coverage report
       uses: codecov/codecov-action@v4
       with:

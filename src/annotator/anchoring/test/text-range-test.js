@@ -14,7 +14,7 @@ const html = `
 describe('annotator/anchoring/text-range', () => {
   describe('TextPosition', () => {
     let container;
-    before(() => {
+    beforeAll(() => {
       container = document.createElement('div');
       container.innerHTML = html;
     });

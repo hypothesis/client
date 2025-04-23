@@ -135,12 +135,12 @@ describe('AnnotationActivityService', () => {
       let clock;
       let now;
 
-      before(() => {
+      beforeAll(() => {
         now = new Date();
         clock = sinon.useFakeTimers(now);
       });
 
-      after(() => {
+      afterAll(() => {
         clock.restore();
       });
 

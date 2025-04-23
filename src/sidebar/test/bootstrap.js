@@ -11,13 +11,10 @@ import { patch } from '../../test-util/assert-methods';
 sinon.assert.expose(assert, { prefix: null });
 patch(assert);
 
-// Expose these globally, to avoid dependency on outdated karma-chai and
-// karma-sinon plugins
+// Expose these globally
 globalThis.assert = assert;
 globalThis.sinon = sinon;
 globalThis.context ??= globalThis.describe;
-globalThis.before ??= globalThis.beforeAll;
-globalThis.after ??= globalThis.afterAll;
 
 // Configure Enzyme for UI tests.
 configure({ adapter: new Adapter() });

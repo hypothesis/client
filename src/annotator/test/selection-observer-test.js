@@ -11,7 +11,7 @@ describe('SelectionObserver', () => {
     return testDocument.getSelection().getRangeAt(0);
   }
 
-  before(() => {
+  beforeAll(() => {
     frame = document.createElement('iframe');
     document.body.append(frame);
     testDocument = frame.contentDocument;
@@ -21,7 +21,7 @@ describe('SelectionObserver', () => {
     assert.isNotNull(getSelectedRange());
   });
 
-  after(() => {
+  afterAll(() => {
     frame.remove();
   });
 
