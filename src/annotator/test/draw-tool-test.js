@@ -8,6 +8,13 @@ describe('DrawTool', () => {
 
   beforeEach(() => {
     container = document.createElement('div');
+    Object.assign(container.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100px',
+      height: '100px',
+    });
     document.body.append(container);
     tool = new DrawTool(container);
   });
@@ -163,5 +170,44 @@ describe('DrawTool', () => {
         bottom: 7,
       });
     });
+  });
+
+  it('scrolls elements underneath drawing surface when "wheel" events are received', async () => {
+    // Add scrollable container that can scroll in both X and Y directions.
+    const scrollable = document.createElement('div');
+    Object.assign(scrollable.style, {
+      height: '100px',
+      width: '100px',
+      overflow: 'scroll',
+    });
+    const child = document.createElement('div');
+    Object.assign(child.style, {
+      width: '200px',
+      height: '200px',
+    });
+    scrollable.append(child);
+    container.append(scrollable);
+
+    const shapePromise = tool.draw('rect');
+
+    // Simulate user scrolling the drawing surface with a wheel or touchpad.
+    const event = new WheelEvent('wheel', {
+      clientX: 5,
+      clientY: 5,
+      deltaY: 10,
+      deltaX: 20,
+    });
+    getSurface().dispatchEvent(event);
+
+    // Check the scroll was transferred to the element underneath.
+    assert.equal(scrollable.scrollLeft, event.deltaX);
+    assert.equal(scrollable.scrollTop, event.deltaY);
+
+    tool.cancel();
+    try {
+      await shapePromise;
+    } catch {
+      /* noop */
+    }
   });
 });

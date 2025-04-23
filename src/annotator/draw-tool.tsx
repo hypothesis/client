@@ -154,6 +154,26 @@ export class DrawTool implements Destroyable {
       this._abortDraw?.abort();
     });
 
+    // Enable user to scroll elements under the drawing surface by translating
+    // wheel events to scroll actions.
+    this._surface.addEventListener('wheel', e => {
+      // Remaining amount of scroll delta.
+      let scrollDeltaY = Math.abs(e.deltaY);
+      let scrollDeltaX = Math.abs(e.deltaX);
+
+      // Visit elements from top-most to bottom-most and transfer remaining
+      // unused scroll delta to them.
+      for (const elem of document.elementsFromPoint(e.clientX, e.clientY)) {
+        const prevScrollLeft = elem.scrollLeft;
+        elem.scrollLeft += scrollDeltaX * Math.sign(e.deltaX);
+        scrollDeltaX -= Math.abs(elem.scrollLeft - prevScrollLeft);
+
+        const prevScrollTop = elem.scrollTop;
+        elem.scrollTop += scrollDeltaY * Math.sign(e.deltaY);
+        scrollDeltaY -= Math.abs(elem.scrollTop - prevScrollTop);
+      }
+    });
+
     // Cancel drawing if user presses "Escape"
     this._abortDraw = new AbortController();
     document.body.addEventListener(
