@@ -41,6 +41,31 @@ function oldestRootAnnotationDate(thread: Thread): string {
   }, '');
 }
 
+/**
+ * Compare optional numeric values.
+ */
+function compareNumbers(
+  a: number | undefined,
+  b: number | undefined,
+): number | undefined {
+  if (typeof a === 'number' && typeof b === 'number') {
+    return Math.sign(a - b);
+  } else {
+    return undefined;
+  }
+}
+
+/** Perform a lexicographic, locale-insensitive comparison of strings. */
+function compareStrings(a: string, b: string): number {
+  if (a === b) {
+    return 0;
+  } else if (a < b) {
+    return -1;
+  } else {
+    return 1;
+  }
+}
+
 type SortFunction = (a: Thread, b: Thread) => number;
 
 /**
@@ -51,51 +76,55 @@ export const sorters = {
   Newest: (a, b) => {
     const dateA = newestRootAnnotationDate(a);
     const dateB = newestRootAnnotationDate(b);
-    if (dateA > dateB) {
-      return -1;
-    } else if (dateA < dateB) {
-      return 1;
-    }
-    return 0;
+    return compareStrings(dateB, dateA);
   },
 
   Oldest: (a, b) => {
     const dateA = oldestRootAnnotationDate(a);
     const dateB = oldestRootAnnotationDate(b);
-    if (dateA < dateB) {
-      return -1;
-    } else if (dateA > dateB) {
-      return 1;
-    }
-    return 0;
+    return compareStrings(dateA, dateB);
   },
 
   Location: (a, b) => {
     if (!a.annotation || !b.annotation) {
       return compareHeadlessThreads(a, b);
     }
+
     const aLocation = location(a.annotation);
     const bLocation = location(b.annotation);
 
-    // If these annotations come from an EPUB and specify which chapter they
-    // came from via a CFI, compare the chapter order first.
+    // Compare by chapter. Applicable for annotations on EPUBs with CFIs.
     if (aLocation.cfi && bLocation.cfi) {
       const cfiResult = compareCFIs(aLocation.cfi, bLocation.cfi);
       if (cfiResult !== 0) {
         // Annotations are in different chapters.
         return Math.sign(cfiResult);
       }
-    } else if (aLocation.cfi) {
-      return -1;
-    } else if (bLocation.cfi) {
-      return 1;
     }
 
-    // If the chapter number is the same or for other document types, compare
-    // the text position instead. Missing positions sort after any present
-    // positions.
-    const aPos = aLocation.position ?? Number.MAX_SAFE_INTEGER;
-    const bPos = bLocation.position ?? Number.MAX_SAFE_INTEGER;
-    return Math.sign(aPos - bPos);
+    // Compare by page index.
+    const pageOrder = compareNumbers(aLocation.pageIndex, bLocation.pageIndex);
+    if (pageOrder !== undefined && pageOrder !== 0) {
+      return pageOrder;
+    }
+
+    // Compare by position relative to top of page.
+    const topOrder = compareNumbers(aLocation.top, bLocation.top);
+    if (topOrder !== undefined && topOrder !== 0) {
+      return topOrder;
+    }
+
+    // Compare by character offset within the document text.
+    const textOrder = compareNumbers(
+      aLocation.charOffset,
+      bLocation.charOffset,
+    );
+    if (textOrder !== undefined && textOrder !== 0) {
+      return textOrder;
+    }
+
+    // If we can't order the annotations by location, fall back to comparing
+    // by creation date.
+    return compareStrings(a.annotation.created, b.annotation.created);
   },
 } satisfies Record<string, SortFunction>;

@@ -77,100 +77,128 @@ describe('sidebar/util/thread-sorters', () => {
   });
 
   describe('sorting by document location', () => {
+    const oldDate = '2024-01-01T12:00:00';
+    const newDate = '2024-01-02T12:00:00';
+
+    function thread(location, created = oldDate) {
+      return { annotation: { location, created } };
+    }
+
     // Create a position-only location. This is the common case for a web page
     // or PDF.
-    function posLocation(pos) {
-      return { position: pos };
+    function charOffset(pos) {
+      return { charOffset: pos };
     }
 
     // Create a location with an EPUB CFI and position. This would occur in
     // an ebook.
     function cfiLocation(cfi, pos) {
-      return { cfi, position: pos };
+      return { cfi, charOffset: pos };
     }
 
-    [
-      {
-        a: { annotation: { location: posLocation(5) } },
-        b: { annotation: { location: posLocation(10) } },
-        expected: -1,
-      },
-      {
-        a: { annotation: { location: posLocation(10) } },
-        b: { annotation: { location: posLocation(10) } },
-        expected: 0,
-      },
-      {
-        a: { annotation: { location: posLocation(10) } },
-        b: { annotation: { location: posLocation(5) } },
-        expected: 1,
-      },
-      {
-        a: {},
-        b: { annotation: { location: posLocation(5) } },
-        expected: -1,
-      },
-      {
-        a: {},
-        b: {},
-        expected: 0,
-      },
-      {
-        a: { annotation: { location: posLocation(10) } },
-        b: {},
-        expected: 1,
-      },
-    ].forEach(testCase => {
-      it('sorts by annotation location', () => {
-        assert.equal(
-          // Disable eslint: `sorters` properties start with capital letters
-          // to match their displayed sort option values
-          /* eslint-disable-next-line new-cap */
-          sorters.Location(testCase.a, testCase.b),
-          testCase.expected,
-        );
-      });
+    const compareLocation = sorters.Location;
+
+    it('sorts by CFI', () => {
+      const a = thread(cfiLocation('/2/2'));
+      const b = thread(cfiLocation('/2/4'));
+      const c = thread(cfiLocation('/2/4'), newDate);
+
+      assert.equal(compareLocation(a, b), -1);
+      assert.equal(compareLocation(a, a), 0);
+      assert.equal(compareLocation(b, a), 1);
+      assert.equal(compareLocation(b, c), -1);
     });
 
-    [
-      // CFI only
-      {
-        a: { annotation: { location: cfiLocation('/2/2') } },
-        b: { annotation: { location: cfiLocation('/2/4') } },
-        expected: -1,
-      },
-      {
-        a: { annotation: { location: cfiLocation('/2/4') } },
-        b: { annotation: { location: cfiLocation('/2/4') } },
-        expected: 0,
-      },
-      {
-        a: { annotation: { location: cfiLocation('/2/4') } },
-        b: { annotation: { location: cfiLocation('/2/2') } },
-        expected: 1,
-      },
+    it('sorts by page index', () => {
+      const a = thread({ pageIndex: 1 });
+      const b = thread({ pageIndex: 2 });
+      const c = thread({ pageIndex: 2 }, newDate);
 
-      // CFI and position
-      {
-        a: { annotation: { location: cfiLocation('/2/2', 100) } },
-        b: { annotation: { location: cfiLocation('/2/4', 10) } },
-        expected: -1,
-      },
-      {
-        a: { annotation: { location: cfiLocation('/2/4', 100) } },
-        b: { annotation: { location: cfiLocation('/2/4', 10) } },
-        expected: 1,
-      },
-    ].forEach((testCase, index) => {
-      it(`sorts by CFI when present (${index})`, () => {
-        assert.equal(
-          // Disable eslint: `sorters` properties start with capital letters
-          // to match their displayed sort option values
-          /* eslint-disable-next-line new-cap */
-          sorters.Location(testCase.a, testCase.b),
-          testCase.expected,
-        );
+      assert.equal(compareLocation(a, b), -1);
+      assert.equal(compareLocation(a, a), 0);
+      assert.equal(compareLocation(b, a), 1);
+      assert.equal(compareLocation(b, c), -1);
+    });
+
+    it('sorts by distance from top of page', () => {
+      const a = thread({ top: 1 });
+      const b = thread({ top: 2 });
+      const c = thread({ top: 2 }, newDate);
+
+      assert.equal(compareLocation(a, b), -1);
+      assert.equal(compareLocation(a, a), 0);
+      assert.equal(compareLocation(b, a), 1);
+      assert.equal(compareLocation(b, c), -1);
+    });
+
+    it('sorts by character offset', () => {
+      const a = thread(charOffset(5));
+      const b = thread(charOffset(10));
+      const c = thread(charOffset(10), newDate);
+
+      assert.equal(compareLocation(a, b), -1);
+      assert.equal(compareLocation(a, a), 0);
+      assert.equal(compareLocation(b, a), 1);
+      assert.equal(compareLocation(b, c), -1);
+    });
+
+    it('sorts by creation date if annotations do not have comparable locations', () => {
+      const a = thread({}, oldDate);
+      const b = thread({}, newDate);
+
+      assert.equal(compareLocation(a, b), -1);
+      assert.equal(compareLocation(a, a), 0);
+      assert.equal(compareLocation(b, a), 1);
+    });
+
+    it('sorts by CFI > page > position > char offset > creation date', () => {
+      // Create annotations with all location properties, where `a < b` for
+      // each property.
+      const a = thread({
+        cfi: '/2/2',
+        pageIndex: 1,
+        top: 100,
+        charOffset: 10,
       });
+
+      const b = thread(
+        {
+          cfi: '/2/4',
+          pageIndex: 2,
+          top: 101,
+          charOffset: 15,
+        },
+        newDate,
+      );
+
+      const deleteFields = (thread, fields) => {
+        const clone = structuredClone(thread);
+        for (const field of fields) {
+          delete clone.annotation.location[field];
+        }
+        return clone;
+      };
+
+      // Incrementally remove the highest-priority sort fields, and check that
+      // sorting works as expected.
+      const fields = ['cfi', 'pageIndex', 'top', 'charOffset'];
+      for (let i = 0; i < fields.length; i++) {
+        const fieldsToDelete = fields.slice(0, i);
+        const aReduced = deleteFields(a, fieldsToDelete);
+        const bReduced = deleteFields(b, fieldsToDelete);
+
+        assert.equal(compareLocation(aReduced, bReduced), -1);
+        assert.equal(compareLocation(bReduced, aReduced), 1);
+      }
+    });
+
+    it('compares threads by annotation presence', () => {
+      const a = {};
+      const b = { annotation: { created: oldDate } };
+
+      assert.equal(compareLocation(a, b), -1);
+      assert.equal(compareLocation(b, a), 1);
+      assert.equal(compareLocation(a, a), 0);
     });
   });
 });
