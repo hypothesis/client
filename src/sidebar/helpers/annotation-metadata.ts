@@ -281,18 +281,32 @@ export function annotationRole(annotation: APIAnnotationData): string {
  */
 type LocationKey = {
   /**
-   * EPUB Canonical Fragment Identifier. For annotations on EPUBs, this
-   * identifies the location of the chapter within the book's table of contents.
+   * EPUB Canonical Fragment Identifier.
+   *
+   * For annotations on EPUBs, this identifies the location of the chapter
+   * within the book's table of contents.
    */
   cfi?: string;
 
   /**
-   * Text offset within the document segment, in UTF-16 code units. For web
-   * pages and PDFs this refers to the offset from the start of the document.
-   * In EPUBs this refers to the offset from the start of the Content Document
-   * (ie. chapter).
+   * Text offset within the document segment, in UTF-16 code units.
+   *
+   * For web pages and PDFs this refers to the offset from the start of the
+   * document. In EPUBs this refers to the offset from the start of the Content
+   * Document (ie. chapter).
    */
-  position?: number;
+  charOffset?: number;
+
+  /** Zero-based page index within the document. */
+  pageIndex?: number;
+
+  /**
+   * Distance from the top of the page or image.
+   *
+   * This is based on a comparison of the shape and anchor bounding boxes in
+   * a {@link ShapeSelector}.
+   */
+  top?: number;
 };
 
 /**
@@ -303,22 +317,54 @@ type LocationKey = {
  * that this function uses.
  */
 export function location(annotation: Annotation): LocationKey {
-  const targets = annotation.target;
+  // We only consider the first target, since h and the client only support
+  // a single target.
+  const target = annotation.target[0];
+  if (!target?.selector) {
+    return {};
+  }
 
   let cfi;
-  let position;
+  let charOffset;
+  let pageIndex;
+  let top;
 
   // nb. We ignore the possibility of an annotation having multiple targets here.
   // h and the client only support one.
-  for (const selector of targets[0]?.selector ?? []) {
-    if (selector.type === 'TextPositionSelector') {
-      position = selector.start;
-    } else if (selector.type === 'EPUBContentSelector' && selector.cfi) {
-      cfi = selector.cfi;
+  for (const selector of target.selector) {
+    switch (selector.type) {
+      case 'TextPositionSelector':
+        charOffset = selector.start;
+        break;
+      case 'EPUBContentSelector':
+        cfi = selector.cfi;
+        break;
+      case 'PageSelector':
+        pageIndex = selector.index;
+        break;
+      case 'ShapeSelector':
+        top = distanceFromTopOfView(selector);
+        break;
     }
   }
 
-  return { cfi, position };
+  return { cfi, charOffset, pageIndex, top };
+}
+
+/**
+ * Return the distance of the top of a shape from the top of the containing
+ * page, image or document.
+ */
+function distanceFromTopOfView(selector: ShapeSelector): number | undefined {
+  const pageTop = selector.view?.top ?? 0;
+  switch (selector.shape.type) {
+    case 'rect':
+      return Math.abs(pageTop - selector.shape.top);
+    case 'point':
+      return Math.abs(pageTop - selector.shape.y);
+    default:
+      return undefined;
+  }
 }
 
 /**

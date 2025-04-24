@@ -225,58 +225,174 @@ describe('sidebar/helpers/annotation-metadata', () => {
   });
 
   describe('location', () => {
-    it('returns position for annotations with a text position', () => {
-      assert.deepEqual(
-        annotationMetadata.location({
-          target: [
-            {
-              selector: [
-                {
-                  type: 'TextPositionSelector',
-                  start: 100,
-                },
-              ],
+    [
+      // TextPositionSelector
+      {
+        selectors: [
+          {
+            type: 'TextPositionSelector',
+            start: 100,
+          },
+        ],
+        expected: {
+          charOffset: 100,
+        },
+      },
+
+      // EPUBContentSelector
+      {
+        selectors: [
+          {
+            type: 'EPUBContentSelector',
+            cfi: '/2/4',
+            url: 'content/chapter2.xhtml',
+          },
+        ],
+        expected: {
+          cfi: '/2/4',
+        },
+      },
+
+      // PageSelector
+      {
+        selectors: [
+          {
+            type: 'PageSelector',
+            index: 2,
+          },
+        ],
+        expected: {
+          pageIndex: 2,
+        },
+      },
+
+      // ShapeSelector with rect shape
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'rect',
+              top: 100,
             },
-          ],
-        }),
-        { cfi: undefined, position: 100 },
-      );
+            view: {
+              top: 10,
+            },
+          },
+        ],
+        expected: {
+          top: 90,
+        },
+      },
+
+      // ShapeSelector with point shape
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'point',
+              y: 100,
+            },
+            view: {
+              top: 10,
+            },
+          },
+        ],
+        expected: {
+          top: 90,
+        },
+      },
+
+      // ShapeSelector with unsupported shape
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'circle',
+              centerY: 100,
+            },
+          },
+        ],
+        expected: {},
+      },
+
+      // ShapeSelector with no viewport information
+      {
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'point',
+              y: 100,
+            },
+          },
+        ],
+        expected: {
+          top: 100,
+        },
+      },
+
+      // All selectors
+      {
+        selectors: [
+          {
+            type: 'TextPositionSelector',
+            start: 100,
+          },
+          {
+            type: 'EPUBContentSelector',
+            cfi: '/2/4',
+            url: 'content/chapter2.xhtml',
+          },
+          {
+            type: 'PageSelector',
+            index: 1,
+          },
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'point',
+              y: 100,
+            },
+            view: {
+              top: 10,
+            },
+          },
+        ],
+        expected: {
+          charOffset: 100,
+          cfi: '/2/4',
+          pageIndex: 1,
+          top: 90,
+        },
+      },
+      // No selectors
+      {
+        selectors: [],
+        expected: {},
+      },
+    ].forEach(({ selectors, expected }) => {
+      it('returns location key', () => {
+        const loc = annotationMetadata.location({
+          target: [{ selector: selectors }],
+        });
+
+        // Compare only defined fields
+        for (const field of Object.keys(loc)) {
+          if (loc[field] === undefined) {
+            delete loc[field];
+          }
+        }
+
+        assert.deepEqual(loc, expected);
+      });
     });
 
-    it('returns CFI for annotations with a CFI', () => {
-      assert.deepEqual(
-        annotationMetadata.location({
-          target: [
-            {
-              selector: [
-                {
-                  type: 'EPUBContentSelector',
-                  cfi: '/2/4',
-                  url: 'content/chapter2.xhtml',
-                },
-                {
-                  type: 'TextPositionSelector',
-                  start: 200,
-                },
-              ],
-            },
-          ],
-        }),
-        { cfi: '/2/4', position: 200 },
-      );
-    });
-
-    it('returns undefined for annotations without a text position', () => {
-      assert.deepEqual(
-        annotationMetadata.location({
-          target: [
-            {
-              selector: undefined,
-            },
-          ],
-        }),
-        { cfi: undefined, position: undefined },
-      );
+    it('returns empty object if annotation has empty target list', () => {
+      const loc = annotationMetadata.location({ target: [] });
+      assert.deepEqual(loc, {});
     });
   });
 
