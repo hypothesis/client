@@ -121,11 +121,11 @@ describe('integration: annotation threading', () => {
 
   [
     {
-      sortKey: 'Oldest',
+      sortKey: 'oldest',
       expectedOrder: ['1', '2'],
     },
     {
-      sortKey: 'Newest',
+      sortKey: 'newest',
       expectedOrder: ['2', '1'],
     },
   ].forEach(testCase => {

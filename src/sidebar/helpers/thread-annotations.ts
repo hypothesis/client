@@ -7,7 +7,7 @@ import { filterAnnotations } from './filter-annotations';
 import { parseFilterQuery } from './query-parser';
 import type { FilterField, ParsedQuery } from './query-parser';
 import { tabForAnnotation } from './tabs';
-import { sorters } from './thread-sorters';
+import { compareThreads } from './thread-sorters';
 
 export type ThreadState = {
   annotations: Annotation[];
@@ -18,7 +18,7 @@ export type ThreadState = {
     filters: Partial<Record<FilterField, string>>;
     forcedVisible: string[];
     selected: string[];
-    sortKey: keyof typeof sorters;
+    sortKey: 'oldest' | 'newest' | 'location';
     selectedTab: 'annotation' | 'note' | 'orphan';
   };
 };
@@ -54,7 +54,8 @@ function threadAnnotationsImpl(
     expanded: selection.expanded,
     forcedVisible: selection.forcedVisible,
     selected: selection.selected,
-    sortCompareFn: sorters[selection.sortKey],
+    sortCompareFn: (a, b) =>
+      compareThreads(a, b, { sortBy: selection.sortKey }),
   };
 
   // Is there a filter query present, or an applied user (focus) filter?

@@ -1,8 +1,15 @@
 import { SortIcon } from '@hypothesis/frontend-shared';
 
 import { useSidebarStore } from '../store';
+import type { SortKey } from '../store/modules/selection';
 import Menu from './Menu';
 import MenuItem from './MenuItem';
+
+export const itemLabels: Record<SortKey, string> = {
+  newest: 'Newest',
+  oldest: 'Oldest',
+  location: 'Location',
+};
 
 /**
  * A drop-down menu of sorting options for a collection of annotations.
@@ -19,7 +26,7 @@ export default function SortMenu() {
     return (
       <MenuItem
         key={sortOption}
-        label={sortOption}
+        label={itemLabels[sortOption]}
         onClick={() => store.setSortKey(sortOption)}
         isSelected={sortOption === sortKey}
       />

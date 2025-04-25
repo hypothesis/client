@@ -234,43 +234,43 @@ describe('sidebar/store/modules/selection', () => {
 
     it('allows sorting annotations by time and document location', () => {
       store.selectTab('annotation');
-      assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest', 'Location']);
+      assert.deepEqual(store.sortKeys(), ['newest', 'oldest', 'location']);
     });
 
     it('allows sorting page notes by time', () => {
       store.selectTab('note');
-      assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest']);
+      assert.deepEqual(store.sortKeys(), ['newest', 'oldest']);
     });
 
     it('allows sorting orphans by time and document location', () => {
       store.selectTab('orphan');
-      assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest', 'Location']);
+      assert.deepEqual(store.sortKeys(), ['newest', 'oldest', 'location']);
     });
 
     it('sorts annotations by document location by default', () => {
       store.selectTab('annotation');
-      assert.deepEqual(getSelectionState().sortKey, 'Location');
+      assert.deepEqual(getSelectionState().sortKey, 'location');
     });
 
     it('sorts page notes from oldest to newest by default', () => {
       store.selectTab('note');
-      assert.deepEqual(getSelectionState().sortKey, 'Oldest');
+      assert.deepEqual(getSelectionState().sortKey, 'oldest');
     });
 
     it('sorts orphans by document location by default', () => {
       store.selectTab('orphan');
-      assert.deepEqual(getSelectionState().sortKey, 'Location');
+      assert.deepEqual(getSelectionState().sortKey, 'location');
     });
 
     it('does not reset the sort key unless necessary', () => {
       // Select the tab, setting sort key to 'Oldest', and then manually
       // override the sort key.
       store.selectTab('note');
-      store.setSortKey('Newest');
+      store.setSortKey('newest');
 
       store.selectTab('note');
 
-      assert.equal(getSelectionState().sortKey, 'Newest');
+      assert.equal(getSelectionState().sortKey, 'newest');
     });
   });
 

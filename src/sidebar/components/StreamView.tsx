@@ -51,7 +51,7 @@ function StreamView({ api, toastMessenger }: StreamViewProps) {
   // the search query is updated.
   useEffect(() => {
     // Sort the stream so that the newest annotations are at the top
-    store.setSortKey('Newest');
+    store.setSortKey('newest');
     store.clearAnnotations();
     loadAnnotations(currentQuery ?? '').catch(err => {
       toastMessenger.error(`Unable to fetch annotations: ${err.message}`);

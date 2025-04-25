@@ -9,15 +9,15 @@ import { countIf, trueKeys, toTrueMap } from '../../util/collections';
 import { createStoreModule, makeAction } from '../create-store';
 
 type BooleanMap = Record<string, boolean>;
-type SortKey = 'Location' | 'Newest' | 'Oldest';
+export type SortKey = 'location' | 'newest' | 'oldest';
 
 /**
  * Default sort keys for each tab.
  */
 const TAB_SORTKEY_DEFAULT: Record<TabName, SortKey> = {
-  annotation: 'Location',
-  note: 'Oldest',
-  orphan: 'Location',
+  annotation: 'location',
+  note: 'oldest',
+  orphan: 'location',
 };
 
 function initialSelection(settings: SidebarSettings): BooleanMap {
@@ -367,10 +367,10 @@ function sortKey(state: State) {
 const sortKeys = createSelector(
   (state: State) => state.selectedTab,
   selectedTab => {
-    const sortKeysForTab: SortKey[] = ['Newest', 'Oldest'];
+    const sortKeysForTab: SortKey[] = ['newest', 'oldest'];
     if (selectedTab !== 'note') {
       // Location is inapplicable to Notes tab
-      sortKeysForTab.push('Location');
+      sortKeysForTab.push('location');
     }
     return sortKeysForTab;
   },

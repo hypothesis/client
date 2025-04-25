@@ -1,7 +1,6 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import { immutable } from '../../util/immutable';
 import { threadAnnotations, $imports } from '../thread-annotations';
-import { sorters } from '../thread-sorters';
 
 const fixtures = immutable({
   emptyThread: {
@@ -17,6 +16,7 @@ const fixtures = immutable({
 
 describe('sidebar/helpers/thread-annotations', () => {
   let fakeBuildThread;
+  let fakeCompareThreads;
   let fakeFilterAnnotations;
   let fakeQueryParser;
   let fakeThreadState;
@@ -31,10 +31,12 @@ describe('sidebar/helpers/thread-annotations', () => {
         filters: {},
         filterQuery: null,
         selected: [],
-        sortKey: 'Location',
+        sortKey: 'location',
         selectedTab: 'annotation',
       },
     };
+
+    fakeCompareThreads = sinon.stub().returns(0);
 
     fakeBuildThread = sinon
       .stub()
@@ -48,6 +50,7 @@ describe('sidebar/helpers/thread-annotations', () => {
       './build-thread': { buildThread: fakeBuildThread },
       './query-parser': fakeQueryParser,
       './filter-annotations': { filterAnnotations: fakeFilterAnnotations },
+      './thread-sorters': { compareThreads: fakeCompareThreads },
     });
   });
 
@@ -104,15 +107,19 @@ describe('sidebar/helpers/thread-annotations', () => {
     });
 
     describe('when sort order changes', () => {
-      ['Location', 'Oldest', 'Newest'].forEach(testCase => {
-        it(`uses the appropriate sorting function when sorting by ${testCase}`, () => {
-          fakeThreadState.selection.sortKey = testCase;
+      ['location', 'oldest', 'newest'].forEach(sortKey => {
+        it(`uses the appropriate sorting function when sorting by ${sortKey}`, () => {
+          fakeThreadState.selection.sortKey = sortKey;
 
           threadAnnotations(fakeThreadState);
 
-          // The sort compare fn passed to `buildThread`
           const sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;
-          assert.equal(sortCompareFn, sorters[testCase]);
+          const threadA = {};
+          const threadB = {};
+          sortCompareFn(threadA, threadB);
+          assert.calledWith(fakeCompareThreads, threadA, threadB, {
+            sortBy: sortKey,
+          });
         });
       });
     });
