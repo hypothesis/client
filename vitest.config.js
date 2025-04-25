@@ -1,7 +1,11 @@
+import { SummaryReporter } from '@hypothesis/frontend-testing/vitest';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    globals: true,
+    reporters: [new SummaryReporter()],
+
     browser: {
       provider: 'playwright',
       enabled: true,
@@ -10,7 +14,6 @@ export default defineConfig({
       instances: [{ browser: 'chromium' }],
       viewport: { width: 1024, height: 768 },
     },
-    globals: true,
 
     // CSS bundles, relied upon by accessibility tests (eg. for color-contrast
     // checks).
