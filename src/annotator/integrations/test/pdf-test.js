@@ -671,7 +671,7 @@ describe('annotator/integrations/pdf', () => {
     describe('#renderToBitmap', () => {
       const pageIndex = 1;
 
-      const shapeSelector = {
+      const rectShapeSelector = {
         type: 'ShapeSelector',
         shape: {
           type: 'rect',
@@ -681,6 +681,16 @@ describe('annotator/integrations/pdf', () => {
           right: 100,
         },
       };
+
+      const pointShapeSelector = {
+        type: 'ShapeSelector',
+        shape: {
+          type: 'point',
+          x: 50,
+          y: 50,
+        },
+      };
+
       const pageSelector = {
         type: 'PageSelector',
         index: pageIndex,
@@ -706,6 +716,31 @@ describe('annotator/integrations/pdf', () => {
         );
       });
 
+      it('rejects if shape type is unknown', async () => {
+        pdfIntegration = createPDFIntegration();
+        const anchor = {
+          target: {
+            selector: [
+              pageSelector,
+              {
+                type: 'ShapeSelector',
+                shape: {
+                  type: 'star',
+                },
+              },
+            ],
+          },
+        };
+        let err;
+        try {
+          await pdfIntegration.renderToBitmap(anchor, {});
+        } catch (e) {
+          err = e;
+        }
+        assert.instanceOf(err, Error);
+        assert.equal(err.message, 'Unsupported shape type');
+      });
+
       it('rejects if page index is invalid', async () => {
         pdfIntegration = createPDFIntegration();
         fakePDFViewerApplication.pdfViewer.getPageView = () => undefined;
@@ -715,7 +750,7 @@ describe('annotator/integrations/pdf', () => {
         };
         const anchor = {
           target: {
-            selector: [shapeSelector, invalidPageSelector],
+            selector: [rectShapeSelector, invalidPageSelector],
           },
         };
         let err;
@@ -731,6 +766,7 @@ describe('annotator/integrations/pdf', () => {
       [
         // Rendering with no options
         {
+          shapeSelector: rectShapeSelector,
           renderOptions: {},
           expectedViewport: {
             rotation: 0,
@@ -739,8 +775,19 @@ describe('annotator/integrations/pdf', () => {
             viewBox: [0, 0, 100, 100],
           },
         },
+        {
+          shapeSelector: pointShapeSelector,
+          renderOptions: {},
+          expectedViewport: {
+            rotation: 0,
+            scale: 96 / 72,
+            userUnit: 1 / 72,
+            viewBox: [40, 40, 60, 60],
+          },
+        },
         // Rendering on a HiDPI display
         {
+          shapeSelector: rectShapeSelector,
           renderOptions: {
             devicePixelRatio: 2,
           },
@@ -753,6 +800,7 @@ describe('annotator/integrations/pdf', () => {
         },
         // Rendering with max width that is half of the natural width
         {
+          shapeSelector: rectShapeSelector,
           renderOptions: {
             maxWidth: 50,
           },
@@ -763,7 +811,7 @@ describe('annotator/integrations/pdf', () => {
             viewBox: [0, 0, 100, 100],
           },
         },
-      ].forEach(({ renderOptions, expectedViewport }) => {
+      ].forEach(({ renderOptions, shapeSelector, expectedViewport }) => {
         it('renders bitmap with given options', async () => {
           pdfIntegration = createPDFIntegration();
           const anchor = {

@@ -575,7 +575,7 @@ export class PDFIntegration
   ): Promise<ImageBitmap> {
     const shape = anchor.target.selector?.find(s => s.type === 'ShapeSelector');
     const page = anchor.target.selector?.find(s => s.type === 'PageSelector');
-    if (!page || !shape || shape.shape.type !== 'rect') {
+    if (!page || !shape) {
       throw new Error('Can only render bitmaps for anchors with shapes');
     }
 
@@ -584,7 +584,30 @@ export class PDFIntegration
       throw new Error('Failed to get page view');
     }
 
-    const { left, right, top, bottom } = shape.shape;
+    let left;
+    let right;
+    let top;
+    let bottom;
+
+    switch (shape.shape.type) {
+      case 'rect':
+        ({ left, right, top, bottom } = shape.shape);
+        break;
+      case 'point':
+        {
+          const { x, y } = shape.shape;
+          const [viewLeft, , viewRight] = pageView.pdfPage.view;
+          const pageWidth = Math.abs(viewRight - viewLeft);
+          const thumbnailSize = pageWidth * 0.1;
+          left = x - thumbnailSize;
+          top = y + thumbnailSize;
+          right = x + thumbnailSize;
+          bottom = y - thumbnailSize;
+        }
+        break;
+      default:
+        throw new Error('Unsupported shape type');
+    }
 
     // Conversion factor from PDF pixels per inch to CSS pixels per inch.
     // See https://github.com/mozilla/pdf.js/blob/2f7d163dfdf40225479d1cc8f6d8ebd9e5273ca6/src/display/display_utils.js#L31.
@@ -608,7 +631,10 @@ export class PDFIntegration
     const height = width / aspectRatio;
     const viewport = pageView.pdfPage.getViewport({ scale: 1.0 });
 
-    const scaleFactor = width / naturalWidth;
+    // Set scale so that rendered bitmap matches PDF canvas if zoom level is
+    // set to `width / naturalWidth` (100% if width == naturalWidth).
+    const scaleFactor =
+      (width / naturalWidth) * PDF_TO_CSS_UNITS * devicePixelRatio;
 
     // `PageViewport` has a method to clone it with different parameters, but
     // that doesn't allow us to customize the `viewBox`. Hence we grab the
@@ -616,21 +642,39 @@ export class PDFIntegration
     const PageViewport = viewport.constructor as PageViewport;
     const boxView = new PageViewport({
       rotation: 0,
-      // Set scale so that rendered bitmap matches PDF canvas if zoom level is
-      // set to 100%.
-      scale: PDF_TO_CSS_UNITS * scaleFactor * devicePixelRatio,
+      scale: scaleFactor,
       userUnit: viewport.userUnit,
       viewBox: [left, bottom, right, top],
     });
 
     // Render page into an offscreen canvas
     const canvas = new OffscreenCanvas(width, height);
-    const context = canvas.getContext('2d')!;
+    const ctx = canvas.getContext('2d')!;
     const task = pageView.pdfPage.render({
-      canvasContext: context as unknown as CanvasRenderingContext2D,
+      canvasContext: ctx as unknown as CanvasRenderingContext2D,
       viewport: boxView,
     });
     await task.promise;
+
+    // For point annotations, draw a dot to indicate where the annotated point
+    // is within the thumbnail.
+    if (shape.shape.type === 'point') {
+      ctx.save();
+
+      ctx.scale(scaleFactor, scaleFactor);
+      const x = shape.shape.x - left;
+      const y = shape.shape.y - bottom;
+      const radius = 5;
+
+      ctx.strokeStyle = 'black';
+      ctx.fillStyle = 'yellow';
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.restore();
+    }
 
     return canvas.transferToImageBitmap();
   }
