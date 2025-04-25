@@ -1,4 +1,4 @@
-import { sorters, $imports } from '../thread-sorters';
+import { compareThreads, $imports } from '../thread-sorters';
 
 describe('sidebar/util/thread-sorters', () => {
   let fakeRootAnnotations;
@@ -41,10 +41,10 @@ describe('sidebar/util/thread-sorters', () => {
       },
     ].forEach(testCase => {
       it('sorts by newest created root annotation', () => {
-        // Disable eslint: `sorters` properties start with capital letters
-        // to match their displayed sort option values
-        /* eslint-disable-next-line new-cap */
-        assert.equal(sorters.Newest(testCase.a, testCase.b), testCase.expected);
+        assert.equal(
+          compareThreads(testCase.a, testCase.b, { sortBy: 'newest' }),
+          testCase.expected,
+        );
       });
     });
   });
@@ -68,10 +68,10 @@ describe('sidebar/util/thread-sorters', () => {
       },
     ].forEach(testCase => {
       it('sorts by oldest created root annotation', () => {
-        // Disable eslint: `sorters` properties start with capital letters
-        // to match their displayed sort option values
-        /* eslint-disable-next-line new-cap */
-        assert.equal(sorters.Oldest(testCase.a, testCase.b), testCase.expected);
+        assert.equal(
+          compareThreads(testCase.a, testCase.b, { sortBy: 'oldest' }),
+          testCase.expected,
+        );
       });
     });
   });
@@ -96,7 +96,8 @@ describe('sidebar/util/thread-sorters', () => {
       return { cfi, charOffset: pos };
     }
 
-    const compareLocation = sorters.Location;
+    const compareLocation = (a, b) =>
+      compareThreads(a, b, { sortBy: 'location' });
 
     it('sorts by CFI', () => {
       const a = thread(cfiLocation('/2/2'));

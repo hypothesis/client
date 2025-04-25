@@ -1,7 +1,7 @@
 import { mockImportedComponents } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
 
-import SortMenu from '../SortMenu';
+import SortMenu, { itemLabels } from '../SortMenu';
 import { $imports } from '../SortMenu';
 
 describe('SortMenu', () => {
@@ -14,8 +14,8 @@ describe('SortMenu', () => {
   beforeEach(() => {
     fakeStore = {
       setSortKey: sinon.stub(),
-      sortKey: sinon.stub().returns('Location'),
-      sortKeys: sinon.stub().returns(['Newest', 'Oldest', 'Location']),
+      sortKey: sinon.stub().returns('location'),
+      sortKeys: sinon.stub().returns(['newest', 'oldest', 'location']),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -36,7 +36,7 @@ describe('SortMenu', () => {
     assert.lengthOf(menuItems, fakeStore.sortKeys().length);
     fakeStore.sortKeys().forEach(sortKey => {
       assert.lengthOf(
-        menuItems.filterWhere(menuItem => menuItem.prop('label') === sortKey),
+        menuItems.filterWhere(menuItem => menuItem.key() === sortKey),
         1,
       );
     });
@@ -47,7 +47,9 @@ describe('SortMenu', () => {
 
     const currentSortKeyMenuItem = wrapper
       .find('MenuItem')
-      .filterWhere(menuItem => menuItem.prop('label') === fakeStore.sortKey());
+      .filterWhere(
+        menuItem => menuItem.prop('label') === itemLabels[fakeStore.sortKey()],
+      );
     assert.isTrue(currentSortKeyMenuItem.prop('isSelected'));
   });
 
@@ -61,7 +63,7 @@ describe('SortMenu', () => {
       callback();
 
       const lastCall = fakeStore.setSortKey.lastCall;
-      assert.calledWith(lastCall, menuItem.prop('label'));
+      assert.calledWith(lastCall, menuItem.key());
     });
   });
 });

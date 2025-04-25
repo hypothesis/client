@@ -77,7 +77,7 @@ describe('NotebookView', () => {
         onError: sinon.match.func,
       }),
     );
-    assert.calledWith(fakeStore.setSortKey, 'Newest');
+    assert.calledWith(fakeStore.setSortKey, 'newest');
   });
 
   it('loads annotations for the direct-linked group if there is no focused group', () => {

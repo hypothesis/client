@@ -66,65 +66,76 @@ function compareStrings(a: string, b: string): number {
   }
 }
 
-type SortFunction = (a: Thread, b: Thread) => number;
+export type Options = {
+  /**
+   * Specifies which field to sort by.
+   *
+   * "newest" - Sort by creation date, newest first
+   * "oldest" - Sort by creation date, oldest first
+   * "location" - Sort by location with the document
+   */
+  sortBy: 'newest' | 'oldest' | 'location';
+};
 
 /**
- * Sorting comparison functions for the three defined application options for
- * sorting annotation (threads)
+ * Return a number indicating the sort ordering for two annotation threads.
  */
-export const sorters = {
-  Newest: (a, b) => {
-    const dateA = newestRootAnnotationDate(a);
-    const dateB = newestRootAnnotationDate(b);
-    return compareStrings(dateB, dateA);
-  },
-
-  Oldest: (a, b) => {
-    const dateA = oldestRootAnnotationDate(a);
-    const dateB = oldestRootAnnotationDate(b);
-    return compareStrings(dateA, dateB);
-  },
-
-  Location: (a, b) => {
-    if (!a.annotation || !b.annotation) {
-      return compareHeadlessThreads(a, b);
+export function compareThreads(a: Thread, b: Thread, options: Options): number {
+  switch (options.sortBy) {
+    case 'newest': {
+      const dateA = newestRootAnnotationDate(a);
+      const dateB = newestRootAnnotationDate(b);
+      return compareStrings(dateB, dateA);
     }
-
-    const aLocation = location(a.annotation);
-    const bLocation = location(b.annotation);
-
-    // Compare by chapter. Applicable for annotations on EPUBs with CFIs.
-    if (aLocation.cfi && bLocation.cfi) {
-      const cfiResult = compareCFIs(aLocation.cfi, bLocation.cfi);
-      if (cfiResult !== 0) {
-        // Annotations are in different chapters.
-        return Math.sign(cfiResult);
-      }
+    case 'oldest': {
+      const dateA = oldestRootAnnotationDate(a);
+      const dateB = oldestRootAnnotationDate(b);
+      return compareStrings(dateA, dateB);
     }
+    case 'location':
+      return compareByLocation(a, b);
+    /* istanbul ignore next */
+    default:
+      return 0;
+  }
+}
 
-    // Compare by page index.
-    const pageOrder = compareNumbers(aLocation.pageIndex, bLocation.pageIndex);
-    if (pageOrder !== undefined && pageOrder !== 0) {
-      return pageOrder;
+function compareByLocation(a: Thread, b: Thread): number {
+  if (!a.annotation || !b.annotation) {
+    return compareHeadlessThreads(a, b);
+  }
+
+  const aLocation = location(a.annotation);
+  const bLocation = location(b.annotation);
+
+  // Compare by chapter. Applicable for annotations on EPUBs with CFIs.
+  if (aLocation.cfi && bLocation.cfi) {
+    const cfiResult = compareCFIs(aLocation.cfi, bLocation.cfi);
+    if (cfiResult !== 0) {
+      // Annotations are in different chapters.
+      return Math.sign(cfiResult);
     }
+  }
 
-    // Compare by position relative to top of page.
-    const topOrder = compareNumbers(aLocation.top, bLocation.top);
-    if (topOrder !== undefined && topOrder !== 0) {
-      return topOrder;
-    }
+  // Compare by page index.
+  const pageOrder = compareNumbers(aLocation.pageIndex, bLocation.pageIndex);
+  if (pageOrder !== undefined && pageOrder !== 0) {
+    return pageOrder;
+  }
 
-    // Compare by character offset within the document text.
-    const textOrder = compareNumbers(
-      aLocation.charOffset,
-      bLocation.charOffset,
-    );
-    if (textOrder !== undefined && textOrder !== 0) {
-      return textOrder;
-    }
+  // Compare by position relative to top of page.
+  const topOrder = compareNumbers(aLocation.top, bLocation.top);
+  if (topOrder !== undefined && topOrder !== 0) {
+    return topOrder;
+  }
 
-    // If we can't order the annotations by location, fall back to comparing
-    // by creation date.
-    return compareStrings(a.annotation.created, b.annotation.created);
-  },
-} satisfies Record<string, SortFunction>;
+  // Compare by character offset within the document text.
+  const textOrder = compareNumbers(aLocation.charOffset, bLocation.charOffset);
+  if (textOrder !== undefined && textOrder !== 0) {
+    return textOrder;
+  }
+
+  // If we can't order the annotations by location, fall back to comparing
+  // by creation date.
+  return compareStrings(a.annotation.created, b.annotation.created);
+}

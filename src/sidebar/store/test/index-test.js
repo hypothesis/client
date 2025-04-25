@@ -87,7 +87,7 @@ describe('createSidebarStore', () => {
     it('sets `sortKey` to default annotation sort key if set to Orphans', () => {
       store.selectTab('orphan');
       store.clearSelection();
-      assert.equal(store.getState().selection.sortKey, 'Location');
+      assert.equal(store.getState().selection.sortKey, 'location');
     });
 
     it('does not change `selectedTab` if set to something other than Orphans', () => {

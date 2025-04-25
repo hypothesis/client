@@ -79,7 +79,7 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
     // within the Notebook to change the `focusedGroup`. If the focused group
     // is changed within the sidebar and the Notebook re-opened, an entirely
     // new iFrame/app is created. This will need to be revisited.
-    store.setSortKey('Newest');
+    store.setSortKey('newest');
     if (groupId) {
       loadAnnotationsService.load({
         groupId,
