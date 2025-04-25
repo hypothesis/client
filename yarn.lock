@@ -4356,6 +4356,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vitest/eslint-plugin@npm:^1.1.43":
+  version: 1.1.43
+  resolution: "@vitest/eslint-plugin@npm:1.1.43"
+  peerDependencies:
+    "@typescript-eslint/utils": ">= 8.24.0"
+    eslint: ">= 8.57.0"
+    typescript: ">= 5.0.0"
+    vitest: "*"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+    vitest:
+      optional: true
+  checksum: dd036629703c53f5608afe503069f82719bf79c83ad067275e746d40e3c8e65735ed2a6a7d8692d3656cf530caa247b6447f9b2a0fae559e22af2a4ce43b32ec
+  languageName: node
+  linkType: hard
+
 "@vitest/expect@npm:3.1.1":
   version: 3.1.1
   resolution: "@vitest/expect@npm:3.1.1"
@@ -7533,6 +7550,7 @@ __metadata:
     "@types/sinon": ^17.0.3
     "@vitest/browser": ^3.1.1
     "@vitest/coverage-istanbul": ^3.1.1
+    "@vitest/eslint-plugin": ^1.1.43
     approx-string-match: ^2.0.0
     autoprefixer: ^10.0.1
     axe-core: ^4.0.0
