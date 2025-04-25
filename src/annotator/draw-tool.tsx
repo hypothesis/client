@@ -3,10 +3,6 @@ import { render } from 'preact';
 import { promiseWithResolvers } from '../shared/promise-with-resolvers';
 import type { Destroyable, Rect, Shape } from '../types/annotator';
 
-function isPositioned(el: HTMLElement) {
-  return getComputedStyle(el).position !== 'static';
-}
-
 /** Normalize a rect so that `left <= right` and `top <= bottom`. */
 function normalizeRect(r: Rect): Rect {
   const minX = Math.min(r.left, r.right);
@@ -64,14 +60,14 @@ export class DrawTool implements Destroyable {
   private _abortDraw?: AbortController;
 
   /**
-   * @param root - Container in which the user can draw a shape
+   * @param root - Container in which the user can draw a shape. The drawing
+   *   layer is positioned to fill the container using `position: absolute`.
+   *   It is the caller's responsibility to make sure the container is
+   *   positioned if needed.
    */
   constructor(root: HTMLElement) {
     this._container = root;
     this._tool = 'rect';
-    if (!isPositioned(root)) {
-      root.style.position = 'relative';
-    }
   }
 
   destroy() {
@@ -97,13 +93,20 @@ export class DrawTool implements Destroyable {
       'svg',
     );
     surface.setAttribute('data-testid', 'surface');
+    surface.style.cursor = 'crosshair';
+
+    // Make the drawing surface fill the container.
+    surface.style.position = 'absolute';
     surface.setAttribute('width', '100%');
     surface.setAttribute('height', '100%');
-    surface.style.cursor = 'crosshair';
-    surface.style.position = 'absolute';
     surface.style.left = '0px';
     surface.style.top = '0px';
+
+    // Raise the drawing surface above other content. The initial value here is
+    // "good enough" for use in PDF.js but will have to change when we support
+    // image annotation in other formats.
     surface.style.zIndex = '10';
+
     this._container.append(surface);
     this._surface = surface;
 
