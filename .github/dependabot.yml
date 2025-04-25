@@ -29,3 +29,7 @@ updates:
           - 'redux'
           - 'redux-thunk'
           - 'reselect'
+      vitest:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
