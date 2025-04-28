@@ -59,6 +59,14 @@ export type GuestToHostCalls = CommonCalls & {
   /** Text has been selected in the guest frame. */
   textSelected(): void;
 
+  /**
+   * The active annotation tool changed.
+   *
+   * This is emitted when a tool like rect or point selection is activated and
+   * the guest is waiting for the user to make a selection.
+   */
+  activeToolChanged(tool: AnnotationTool | null): void;
+
   /** Anchors have changed in the guest frame. */
   anchorsChanged(positions: AnchorPosition[]): void;
 

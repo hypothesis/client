@@ -164,6 +164,7 @@ describe('Sidebar', () => {
 
     const toggleButton = document.createElement('button');
     fakeToolbar = {
+      activeTool: null,
       getWidth: sinon.stub().returns(100),
       useMinimalControls: false,
       sidebarOpen: false,
@@ -374,6 +375,16 @@ describe('Sidebar', () => {
 
       emitGuestEvent('highlightsVisibleChanged', false);
       assert.isFalse(fakeToolbar.highlightsVisible);
+    });
+
+    it('updates pressed button when active tool changes', () => {
+      const sidebar = createSidebar();
+      connectGuest(sidebar);
+      assert.isNull(fakeToolbar.activeTool);
+
+      emitGuestEvent('activeToolChanged', 'rect');
+
+      assert.equal(fakeToolbar.activeTool, 'rect');
     });
   });
 

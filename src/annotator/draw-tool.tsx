@@ -19,11 +19,23 @@ function normalizeRect(r: Rect): Rect {
 }
 
 /**
+ * Reason why drawing was canceled.
+ *
+ * "canceled" - The drawing was canceled, eg. by pressing Escape.
+ * "restarted" - A new drawing operation was started, canceling the existing one.
+ */
+export type DrawErrorKind = 'canceled' | 'restarted';
+
+/**
  * Errors while drawing a shape using {@link DrawTool}.
  */
 export class DrawError extends Error {
-  constructor(message = 'Drawing failed') {
+  kind: DrawErrorKind;
+
+  constructor(kind: DrawErrorKind, message = 'Drawing failed') {
     super(message);
+
+    this.kind = kind;
   }
 }
 
@@ -84,7 +96,7 @@ export class DrawTool implements Destroyable {
     this._tool = tool;
 
     // Only one drawing operation can be in progress at a time.
-    this.cancel();
+    this.cancel('restarted');
 
     // Create a transparent SVG canvas overlaid on top of the container, with
     // a crosshair cursor to indicate the user can click to draw.
@@ -186,7 +198,7 @@ export class DrawTool implements Destroyable {
           return;
         }
         if (this._drawError) {
-          this._drawError(new DrawError('Drawing canceled'));
+          this._drawError(new DrawError('canceled', 'Drawing canceled'));
         }
         this._abortDraw?.abort();
       },
@@ -216,9 +228,9 @@ export class DrawTool implements Destroyable {
    *
    * Pending promises returned by {@link DrawTool.draw} will reject.
    */
-  cancel() {
+  cancel(kind: DrawErrorKind = 'canceled') {
     if (this._drawError) {
-      this._drawError(new DrawError('Drawing canceled'));
+      this._drawError(new DrawError(kind, 'Drawing canceled'));
     }
     this._abortDraw?.abort();
   }

@@ -100,6 +100,16 @@ describe('ToolbarController', () => {
     assert.deepEqual(toolbarProps.supportedTools, ['selection', 'rect']);
   });
 
+  it('re-renders when `activeTool` changes', () => {
+    const controller = createToolbar();
+    assert.equal(controller.activeTool, null);
+    assert.equal(toolbarProps.activeTool, null);
+
+    controller.activeTool = 'rect';
+
+    assert.equal(toolbarProps.activeTool, 'rect');
+  });
+
   it('calls `setSidebarOpen` callback when sidebar toggle button is clicked', () => {
     const setSidebarOpen = sinon.stub();
     const controller = createToolbar({ setSidebarOpen });

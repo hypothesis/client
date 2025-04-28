@@ -19,6 +19,7 @@ export type ToolbarOptions = {
  */
 export class ToolbarController {
   private _container: HTMLElement;
+  private _activeTool: AnnotationTool | null;
   private _newAnnotationType: 'annotation' | 'note';
   private _useMinimalControls: boolean;
   private _highlightsVisible: boolean;
@@ -38,6 +39,7 @@ export class ToolbarController {
     const { createAnnotation, setSidebarOpen, setHighlightsVisible } = options;
 
     this._container = container;
+    this._activeTool = null;
     this._useMinimalControls = false;
     this._newAnnotationType = 'note';
     this._highlightsVisible = false;
@@ -71,6 +73,16 @@ export class ToolbarController {
   getWidth() {
     const content = this._container.firstChild as HTMLElement;
     return content.getBoundingClientRect().width;
+  }
+
+  /** Set which annotation tool is displayed as pressed in the toolbar. */
+  set activeTool(tool) {
+    this._activeTool = tool;
+    this.render();
+  }
+
+  get activeTool() {
+    return this._activeTool;
   }
 
   /**
@@ -146,6 +158,7 @@ export class ToolbarController {
   render() {
     render(
       <Toolbar
+        activeTool={this._activeTool}
         closeSidebar={this._closeSidebar}
         createAnnotation={this._createAnnotation}
         newAnnotationType={this._newAnnotationType}

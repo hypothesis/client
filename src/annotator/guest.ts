@@ -28,7 +28,7 @@ import type {
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
-import { DrawTool } from './draw-tool';
+import { DrawTool, DrawError } from './draw-tool';
 import { LayoutChangeEvent } from './events';
 import { FeatureFlags } from './features';
 import { HighlightClusterController } from './highlight-clusters';
@@ -859,29 +859,42 @@ export class Guest
     if (tool === 'selection') {
       return this.createAnnotationFromSelection();
     } else if (['rect', 'point'].includes(tool)) {
-      // Draw the shape for the new annotation's region.
-      const shape = await this._drawTool.draw(tool);
+      // True if drawing was canceled by another `createAnnotation` call while
+      // one was already in progress.
+      let restarted = false;
+      try {
+        this._hostRPC.call('activeToolChanged', tool);
 
-      // Create annotation data and send to sidebar.
-      const info = await this.getDocumentInfo();
-      const target: Target[] = [
-        {
-          source: info.uri,
-          selector: await this._integration.describe(this.element, shape),
-        },
-      ];
+        // Draw the shape for the new annotation's region.
+        const shape = await this._drawTool.draw(tool);
 
-      const annotation: AnnotationData = {
-        uri: info.uri,
-        document: info.metadata,
-        target,
-        $tag: 'a:' + generateHexString(8),
-      };
+        // Create annotation data and send to sidebar.
+        const info = await this.getDocumentInfo();
+        const target: Target[] = [
+          {
+            source: info.uri,
+            selector: await this._integration.describe(this.element, shape),
+          },
+        ];
 
-      this._sidebarRPC.call('createAnnotation', annotation);
-      this.anchor(annotation);
+        const annotation: AnnotationData = {
+          uri: info.uri,
+          document: info.metadata,
+          target,
+          $tag: 'a:' + generateHexString(8),
+        };
 
-      return annotation;
+        this._sidebarRPC.call('createAnnotation', annotation);
+        this.anchor(annotation);
+        return annotation;
+      } catch (err) {
+        restarted = err instanceof DrawError && err.kind === 'restarted';
+        throw err;
+      } finally {
+        if (!restarted) {
+          this._hostRPC.call('activeToolChanged', null);
+        }
+      }
     } else {
       throw new Error('Unsupported annotation tool');
     }
