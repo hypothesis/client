@@ -26,18 +26,26 @@ type ToolbarButtonProps = PresentationalProps &
   ButtonProps &
   Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'icon' | 'size'> & {
     icon: IconComponent;
+  } & {
+    /** True if the button changes background when pressed. */
+    pressedBackground?: boolean;
   };
 
 /**
  * Style an IconButton for use on the Toolbar
  */
-function ToolbarButton({ icon: Icon, ...buttonProps }: ToolbarButtonProps) {
+function ToolbarButton({
+  icon: Icon,
+  pressedBackground = true,
+  ...buttonProps
+}: ToolbarButtonProps) {
   return (
     <Button
       classes={classnames(
         'justify-center rounded',
         'w-[30px] h-[30px]',
         'shadow border bg-white text-grey-6 hover:text-grey-9',
+        pressedBackground && 'aria-pressed:bg-grey-3',
       )}
       {...buttonProps}
       size="custom"
@@ -64,6 +72,9 @@ function StatusNotifier({ highlightsVisible }: { highlightsVisible: boolean }) {
 }
 
 export type ToolbarProps = {
+  /** Sets which annotation tool is shown as active/pressed. */
+  activeTool?: AnnotationTool | null;
+
   /**
    * Callback for the "Close sidebar" button. This button is only shown when
    * `useMinimalControls` is true and the sidebar is open.
@@ -131,6 +142,7 @@ export type ToolbarProps = {
  * properly scale with user/browser zooming.
  */
 export default function Toolbar({
+  activeTool = null,
   closeSidebar,
   createAnnotation,
   isSidebarOpen,
@@ -213,6 +225,8 @@ export default function Toolbar({
               title="Show highlights"
               icon={showHighlights ? ShowIcon : HideIcon}
               pressed={showHighlights}
+              // Button changes icon when pressed rather than changing background.
+              pressedBackground={false}
               onClick={toggleHighlights}
             />
             {supportedTools.includes('selection') && (
@@ -230,6 +244,7 @@ export default function Toolbar({
             {supportedTools.includes('rect') && (
               <ToolbarButton
                 data-testid="rect-annotation"
+                pressed={activeTool === 'rect'}
                 title="Rectangle annotation"
                 icon={SelectionIcon}
                 onClick={() => createAnnotation('rect')}
@@ -238,6 +253,7 @@ export default function Toolbar({
             {supportedTools.includes('point') && (
               <ToolbarButton
                 data-testid="point-annotation"
+                pressed={activeTool === 'point'}
                 title="Pin annotation"
                 icon={PinIcon}
                 onClick={() => createAnnotation('point')}

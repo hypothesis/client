@@ -158,6 +158,34 @@ describe('Toolbar', () => {
     assert.calledWith(createAnnotation, 'point');
   });
 
+  it('displays active tool as pressed', () => {
+    const wrapper = createToolbar({
+      supportedTools: ['selection', 'rect', 'point'],
+    });
+
+    const pressedButton = () => {
+      const rectButton = wrapper.find('button[data-testid="rect-annotation"]');
+      if (rectButton.prop('aria-pressed')) {
+        return 'rect';
+      }
+      const pointButton = wrapper.find(
+        'button[data-testid="point-annotation"]',
+      );
+      if (pointButton.prop('aria-pressed')) {
+        return 'point';
+      }
+      return null;
+    };
+
+    assert.equal(pressedButton(), null);
+
+    wrapper.setProps({ activeTool: 'rect' });
+    assert.equal(pressedButton(), 'rect');
+
+    wrapper.setProps({ activeTool: 'point' });
+    assert.equal(pressedButton(), 'point');
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

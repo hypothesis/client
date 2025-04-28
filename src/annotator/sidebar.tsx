@@ -386,6 +386,10 @@ export class Sidebar implements Destroyable {
         .forEach(rpc => rpc.call('clearSelection'));
     });
 
+    guestRPC.on('activeToolChanged', tool => {
+      this.toolbar.activeTool = tool;
+    });
+
     guestRPC.on('highlightsVisibleChanged', (visible: boolean) => {
       this.setHighlightsVisible(visible);
     });

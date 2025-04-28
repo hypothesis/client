@@ -1,6 +1,7 @@
 import { delay } from '@hypothesis/frontend-testing';
 
 import { EventEmitter } from '../../shared/event-emitter';
+import { DrawError } from '../draw-tool';
 import { Guest, $imports } from '../guest';
 
 class FakeAdder {
@@ -569,15 +570,19 @@ describe('Guest', () => {
     describe('on "createAnnotation" event', () => {
       it('creates an annotation if `tool` is "selection"', async () => {
         createGuest();
+        hostRPC().call.resetHistory();
 
         emitHostEvent('createAnnotation', { tool: 'selection' });
         await delay(0);
 
+        assert.notCalled(hostRPC().call);
         assert.calledWith(sidebarRPC().call, 'createAnnotation');
       });
 
       it('creates annotation if `tool` is "rect"', async () => {
         const guest = createGuest();
+        hostRPC().call.resetHistory();
+
         const rectShape = {
           type: 'rect',
           left: 0,
@@ -598,8 +603,10 @@ describe('Guest', () => {
         const annotation = await emitHostEvent('createAnnotation', {
           tool: 'rect',
         });
+        assert.calledWith(hostRPC().call, 'activeToolChanged', 'rect');
         assert.calledWith(fakeDrawTool.draw, 'rect');
         assert.calledWith(fakeIntegration.describe, guest.element, rectShape);
+        assert.calledWith(hostRPC().call, 'activeToolChanged', null);
         assert.calledWith(anchorSpy, annotation);
 
         assert.calledWith(
@@ -617,6 +624,8 @@ describe('Guest', () => {
 
       it('creates annotation if `tool` is "point"', async () => {
         const guest = createGuest();
+        hostRPC().call.resetHistory();
+
         const pointShape = { type: 'point', x: 0, y: 0 };
         const pointSelectors = [
           {
@@ -631,9 +640,11 @@ describe('Guest', () => {
         const annotation = await emitHostEvent('createAnnotation', {
           tool: 'point',
         });
+        assert.calledWith(hostRPC().call, 'activeToolChanged', 'point');
         assert.calledWith(fakeDrawTool.draw, 'point');
         assert.calledWith(fakeIntegration.describe, guest.element, pointShape);
         assert.calledWith(anchorSpy, annotation);
+        assert.calledWith(hostRPC().call, 'activeToolChanged', null);
 
         assert.calledWith(
           sidebarRPC().call,
@@ -646,6 +657,25 @@ describe('Guest', () => {
             ],
           }),
         );
+      });
+
+      it('does not reset active tool if drawing is canceled by subsequent `createAnnotation` call', async () => {
+        createGuest();
+
+        // Simulate draw call failing due to a new `createAnnotation` call
+        // being made while this one is in progress.
+        fakeDrawTool.draw.rejects(new DrawError('restarted'));
+        emitHostEvent('createAnnotation', { tool: 'point' }).catch(() => {
+          // Ignore error
+        });
+        // Allow async cancelation to propagate.
+        await delay(0);
+
+        const toolChangedCalls = hostRPC()
+          .call.getCalls()
+          .filter(c => c.args[0] === 'activeToolChanged')
+          .map(call => call.args[1]);
+        assert.deepEqual(toolChangedCalls, ['point']);
       });
 
       it('reports error if annotation tool is unsupported', async () => {

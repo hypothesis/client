@@ -76,7 +76,26 @@ describe('DrawTool', () => {
     }
 
     assert.instanceOf(err, DrawError);
+    assert.equal(err.kind, 'canceled');
     assert.notOk(getSurface());
+  });
+
+  it('cancels drawing if a new drawing is started', async () => {
+    const shape = tool.draw('rect');
+    const newShape = tool.draw('point');
+    newShape.catch(() => {
+      // Ignore error
+    });
+
+    let err;
+    try {
+      await shape;
+    } catch (e) {
+      err = e;
+    }
+
+    assert.instanceOf(err, DrawError);
+    assert.equal(err.kind, 'restarted');
   });
 
   it('cancels drawing if `Escape` is pressed', async () => {
@@ -101,6 +120,7 @@ describe('DrawTool', () => {
     }
 
     assert.instanceOf(err, DrawError);
+    assert.equal(err.kind, 'canceled');
     assert.notOk(getSurface());
   });
 
