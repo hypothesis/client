@@ -88,6 +88,7 @@ export default {
               '**/node_modules/**',
               '**/test/**/*.js',
               '**/test-util/**',
+              'src/**/index.{ts,tsx}',
             ],
 
             // These two configuration options needed to match the values that

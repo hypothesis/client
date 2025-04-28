@@ -29,7 +29,12 @@ export default defineConfig({
       reportsDirectory: './coverage',
       reporter: ['json', 'html'],
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['**/node_modules/**', '**/test/**/*.js', '**/test-util/**'],
+      exclude: [
+        '**/node_modules/**',
+        '**/test/**/*.js',
+        '**/test-util/**',
+        'src/**/index.{ts,tsx}',
+      ],
     },
   },
 });
