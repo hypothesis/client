@@ -5,7 +5,7 @@ import {
   CaretRightIcon,
   CaretLeftIcon,
   HideIcon,
-  ImageIcon,
+  SelectionIcon,
   NoteIcon,
   PinIcon,
   ShowIcon,
@@ -231,14 +231,14 @@ export default function Toolbar({
               <ToolbarButton
                 data-testid="rect-annotation"
                 title="Rectangle annotation"
-                icon={ImageIcon}
+                icon={SelectionIcon}
                 onClick={() => createAnnotation('rect')}
               />
             )}
             {supportedTools.includes('point') && (
               <ToolbarButton
                 data-testid="point-annotation"
-                title="Point annotation"
+                title="Pin annotation"
                 icon={PinIcon}
                 onClick={() => createAnnotation('point')}
               />
