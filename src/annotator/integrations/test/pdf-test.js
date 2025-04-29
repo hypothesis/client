@@ -44,6 +44,7 @@ describe('annotator/integrations/pdf', () => {
     let viewerContainer;
 
     let fakeAnnotator;
+    let fakeHighlighter;
     let fakePDFAnchoring;
     let fakePDFMetadata;
     let fakePDFViewerApplication;
@@ -80,6 +81,10 @@ describe('annotator/integrations/pdf', () => {
         anchoring: null,
       };
 
+      fakeHighlighter = {
+        getHighlightsFromPoint: sinon.stub().returns([]),
+      };
+
       fakePDFAnchoring = {
         RenderingStates,
         anchor: sinon.stub(),
@@ -107,6 +112,7 @@ describe('annotator/integrations/pdf', () => {
         },
         '../anchoring/pdf': fakePDFAnchoring,
         '../anchoring/text-range': { TextRange: FakeTextRange },
+        '../highlighter': fakeHighlighter,
         '../util/scroll': fakeScrollUtils,
 
         // Disable debouncing of updates.
@@ -362,6 +368,32 @@ describe('annotator/integrations/pdf', () => {
         banner.shadowRoot.textContent,
         'This PDF does not contain selectable text',
       );
+    });
+
+    it('makes links in the PDF open in a new tab', () => {
+      const link = document.createElement('a');
+      fakePDFViewerApplication.pdfViewer.viewer.appendChild(link);
+      pdfIntegration = createPDFIntegration();
+
+      const event = new Event('click', { bubbles: true, cancelable: true });
+      link.dispatchEvent(event);
+
+      assert.equal(link.target, 'blank');
+      assert.isFalse(event.defaultPrevented);
+    });
+
+    it('prevents default behavior when a link is clicked that is part of a highlight', () => {
+      const link = document.createElement('a');
+      fakePDFViewerApplication.pdfViewer.viewer.appendChild(link);
+      fakeHighlighter.getHighlightsFromPoint.returns([
+        document.createElement('dummy-highlight'),
+      ]);
+      pdfIntegration = createPDFIntegration();
+
+      const event = new Event('click', { bubbles: true, cancelable: true });
+      link.dispatchEvent(event);
+
+      assert.isTrue(event.defaultPrevented);
     });
 
     context('when the PDF viewer content changes', () => {
