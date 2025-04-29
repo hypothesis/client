@@ -206,37 +206,25 @@ export function highlightShape(region: ShapeAnchor): HighlightElement[] {
   const anchorStyles = getComputedStyle(anchor);
   const borderWidth = parseInt(anchorStyles.borderWidth);
 
-  // "Outer" rect of the anchor that includes the border.
-  const anchorOuterBox = anchor.getBoundingClientRect();
-
-  // Inner rect of the anchor that does not include the border.
-  const anchorBox = new DOMRect(
-    anchorOuterBox.left,
-    anchorOuterBox.top,
-    anchorOuterBox.width - 2 * borderWidth,
-    anchorOuterBox.height - 2 * borderWidth,
-  );
-
   const highlightEl = document.createElement('hypothesis-highlight');
 
   // Should match the width used by the `hypothesis-shape-highlight` class.
   const highlightBorderWidth = 3;
   highlightEl.className = 'hypothesis-shape-highlight';
 
+  // The highlight shape is positioned relative to the anchor element using
+  // `calc` so that it stays in the same position if the anchor element is
+  // resized, eg. as a result of zooming the page.
   if (shape.type === 'rect') {
-    const left = shape.left * anchorBox.width - borderWidth;
-    const top = shape.top * anchorBox.height - borderWidth;
-    const width = (shape.right - shape.left) * anchorBox.width;
-    const height = (shape.bottom - shape.top) * anchorBox.height;
-    highlightEl.style.left = `${left}px`;
-    highlightEl.style.top = `${top}px`;
-    highlightEl.style.width = `${width - 2 * highlightBorderWidth}px`;
-    highlightEl.style.height = `${height - 2 * highlightBorderWidth}px`;
+    const width = shape.right - shape.left;
+    const height = shape.bottom - shape.top;
+    highlightEl.style.left = `calc(${shape.left * 100}% - ${borderWidth}px)`;
+    highlightEl.style.top = `calc(${shape.top * 100}% - ${borderWidth}px)`;
+    highlightEl.style.width = `calc(${width * 100}% - ${2 * highlightBorderWidth}px)`;
+    highlightEl.style.height = `calc(${height * 100}% - ${2 * highlightBorderWidth}px)`;
   } else if (shape.type === 'point') {
-    const x = shape.x * anchorBox.width - borderWidth;
-    const y = shape.y * anchorBox.height - borderWidth;
-    highlightEl.style.left = `${x}px`;
-    highlightEl.style.top = `${y}px`;
+    highlightEl.style.left = `calc(${shape.x * 100}% - ${borderWidth}px)`;
+    highlightEl.style.top = `calc(${shape.y * 100}% - ${borderWidth}px)`;
     highlightEl.style.width = '10px';
     highlightEl.style.height = '10px';
   }
