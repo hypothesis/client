@@ -870,10 +870,7 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
       const pageView = await getPageView(point.pageIndex);
 
       return [
-        {
-          type: 'PageSelector',
-          index: point.pageIndex,
-        },
+        createPageSelector(pageView, point.pageIndex),
         {
           type: 'ShapeSelector',
           anchor: 'page',
