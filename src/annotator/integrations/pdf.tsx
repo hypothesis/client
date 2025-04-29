@@ -37,6 +37,7 @@ import { TextRange } from '../anchoring/text-range';
 import Banners from '../components/Banners';
 import ContentInfoBanner from '../components/ContentInfoBanner';
 import WarningBanner from '../components/WarningBanner';
+import { getHighlightsFromPoint } from '../highlighter';
 import { PreactContainer } from '../util/preact-container';
 import { offsetRelativeTo, scrollElement } from '../util/scroll';
 import { PDFMetadata } from './pdf-metadata';
@@ -258,6 +259,24 @@ export class PDFIntegration
     this._features = features;
     this._features.on('flagsChanged', () => {
       this.emit('supportedToolsChanged', this.supportedTools());
+    });
+
+    // Override default behavior of links inside the PDF.
+    this._pdfViewer.viewer.addEventListener('click', event => {
+      // Make links in the PDF open in a new tab. This avoids accidentally
+      // navigating away from the PDF when trying to perform annotation actions.
+      const target = event.target as HTMLElement;
+      if (target instanceof HTMLAnchorElement) {
+        target.target = 'blank';
+      }
+
+      // Disable the link entirely if there is a highlight where the click
+      // happened. This avoids triggering the link when the user is trying to
+      // focus a highlight.
+      const highlights = getHighlightsFromPoint(event.clientX, event.clientY);
+      if (highlights.length > 0) {
+        event.preventDefault();
+      }
     });
   }
 
