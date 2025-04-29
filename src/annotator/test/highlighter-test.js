@@ -378,20 +378,20 @@ describe('annotator/highlighter', () => {
           bottom: 1,
         },
         expected: {
-          top: '-5px',
-          left: '-5px',
-          // 100 anchor width - 2 * 5 anchor border - 2 * 3 highlight border
-          width: '84px',
-          // 200 anchor height - 2 * 5 anchor border - 2 * 3 highlight border
-          height: '184px',
+          top: 'calc(0% - 5px)',
+          left: 'calc(0% - 5px)',
+          // 100% anchor width - 2 * 3px highlight border
+          width: 'calc(100% - 6px)',
+          // 100% anchor height - 2 * 3px highlight border
+          height: 'calc(100% - 6px)',
         },
       },
       {
         // Point at top-left corner of anchor element.
         shape: { type: 'point', x: 0, y: 0 },
         expected: {
-          top: '-5px',
-          left: '-5px',
+          top: 'calc(0% - 5px)',
+          left: 'calc(0% - 5px)',
           width: '10px',
           height: '10px',
         },
