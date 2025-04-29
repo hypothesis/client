@@ -421,26 +421,32 @@ export function setHighlightsFocused(
   });
 }
 
+/** Class set on root element to make highlights visible. */
+const showHighlightsClass = 'hypothesis-highlights-always-on';
+
 /**
  * Set whether highlights under the given root element should be visible.
  */
 export function setHighlightsVisible(root: HTMLElement, visible: boolean) {
-  const showHighlightsClass = 'hypothesis-highlights-always-on';
   root.classList.toggle(showHighlightsClass, visible);
 }
 
 /**
- * Get the highlight elements at the given client coordinates.
+ * Get the visible highlight elements at the given client coordinates.
  */
 export function getHighlightsFromPoint(
   x: number,
   y: number,
 ): HighlightElement[] {
+  const showHighlightsSelector = `.${showHighlightsClass}`;
+
   // Text highlights can be found via `elementsFromPoint`.
   const textHighlights = document
     .elementsFromPoint(x, y)
     .filter(
-      el => el.localName === 'hypothesis-highlight',
+      el =>
+        el.localName === 'hypothesis-highlight' &&
+        el.closest(showHighlightsSelector),
     ) as HighlightElement[];
 
   // Shape highlights have `pointer-events: none` so users can interact with
@@ -450,6 +456,10 @@ export function getHighlightsFromPoint(
   for (const highlight of document.querySelectorAll(
     'hypothesis-highlight.hypothesis-shape-highlight',
   )) {
+    if (!highlight.closest(showHighlightsSelector)) {
+      continue;
+    }
+
     // Approximate the shape by its bounding rect. This works for the shapes we
     // currently support, but won't work for more complex shapes (eg.
     // arbitrary polygons) that we might introduce in future.

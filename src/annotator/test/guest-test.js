@@ -989,25 +989,6 @@ describe('Guest', () => {
       assert.notCalled(sidebarRPC().call);
     });
 
-    it('does not focus or select annotations in the sidebar if highlights are hidden', () => {
-      const guest = createGuest();
-      guest.setHighlightsVisible(false);
-
-      fakeHighlight.dispatchEvent(
-        new MouseEvent('mouseover', {
-          bubbles: true,
-          clientX: 50,
-          clientY: 60,
-        }),
-      );
-      fakeHighlight.dispatchEvent(
-        new MouseEvent('mouseup', { bubbles: true, clientX: 50, clientY: 60 }),
-      );
-
-      assert.calledWith(highlighter.getHighlightsFromPoint, 50, 60);
-      assert.notCalled(sidebarRPC().call);
-    });
-
     it('selects annotations in the sidebar when clicking on a highlight', () => {
       createGuest();
       fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));

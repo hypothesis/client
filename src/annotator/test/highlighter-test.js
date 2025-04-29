@@ -836,7 +836,7 @@ describe('annotator/highlighter', () => {
       return hl;
     };
 
-    it('returns all the highlights at the given point', () => {
+    it('returns all the visible highlights at the given point', () => {
       const container = document.createElement('div');
       const elements = [
         createHighlight('text'),
@@ -851,11 +851,21 @@ describe('annotator/highlighter', () => {
       }
 
       try {
+        // Position with highlights, when visible.
+        const x = 105;
+        const y = 205;
+        setHighlightsVisible(container, true);
         assert.sameMembers(
-          getHighlightsFromPoint(105, 205),
+          getHighlightsFromPoint(x, y),
           elements.filter(hl => hl.localName === 'hypothesis-highlight'),
         );
+
+        // Position with no highlights, when visible.
         assert.deepEqual(getHighlightsFromPoint(0, 0), []);
+
+        // Position with highlights, when hidden.
+        setHighlightsVisible(container, false);
+        assert.deepEqual(getHighlightsFromPoint(x, y), []);
       } finally {
         container.remove();
       }
