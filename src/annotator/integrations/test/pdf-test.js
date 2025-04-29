@@ -696,6 +696,16 @@ describe('annotator/integrations/pdf', () => {
         index: pageIndex,
       };
 
+      const createShapeSelector = (type, coords) => {
+        return {
+          type: 'ShapeSelector',
+          shape: {
+            type,
+            ...coords,
+          },
+        };
+      };
+
       it('rejects if anchor has no shape selector', async () => {
         pdfIntegration = createPDFIntegration();
         const anchor = {
@@ -813,16 +823,12 @@ describe('annotator/integrations/pdf', () => {
         },
         // Empty rectangle
         {
-          shapeSelector: {
-            type: 'ShapeSelector',
-            shape: {
-              type: 'rect',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-            },
-          },
+          shapeSelector: createShapeSelector('rect', {
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+          }),
           expectedViewport: {
             rotation: 0,
             scale: 96 / 72,
@@ -832,21 +838,36 @@ describe('annotator/integrations/pdf', () => {
         },
         // Rectangle with negative width and height
         {
-          shapeSelector: {
-            type: 'ShapeSelector',
-            shape: {
-              type: 'rect',
-              left: 100,
-              right: 0,
-              top: 0,
-              bottom: 100,
-            },
-          },
+          shapeSelector: createShapeSelector('rect', {
+            left: 100,
+            right: 0,
+            top: 0,
+            bottom: 100,
+          }),
           expectedViewport: {
             rotation: 0,
             scale: 96 / 72,
             userUnit: 1 / 72,
             viewBox: [0, 0, 100, 100],
+          },
+        },
+        // Rectangle with a very wide aspect ratio, such that after scaling
+        // the thumbnail to fit `maxWidth`, the height is zero.
+        {
+          shapeSelector: createShapeSelector('rect', {
+            left: 0,
+            right: 101,
+            top: 0,
+            bottom: 0,
+          }),
+          renderOptions: {
+            maxWidth: 100,
+          },
+          expectedViewport: {
+            rotation: 0,
+            scale: sinon.match.number,
+            userUnit: 1 / 72,
+            viewBox: [0, 0, 101, 1],
           },
         },
       ].forEach(({ renderOptions = {}, shapeSelector, expectedViewport }) => {

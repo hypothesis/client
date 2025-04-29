@@ -661,7 +661,9 @@ export class PDFIntegration
     });
 
     // Render page into an offscreen canvas
-    const canvas = new OffscreenCanvas(width, height);
+    const canvasWidth = Math.max(width, 1);
+    const canvasHeight = Math.max(height, 1);
+    const canvas = new OffscreenCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext('2d')!;
     const task = pageView.pdfPage.render({
       canvasContext: ctx as unknown as CanvasRenderingContext2D,
