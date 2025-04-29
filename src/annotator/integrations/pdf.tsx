@@ -609,6 +609,19 @@ export class PDFIntegration
         throw new Error('Unsupported shape type');
     }
 
+    // Ensure rect is non-empty and normalized such that right > left and top >
+    // bottom (since Y goes up).
+    const minSize = 1;
+    if (right < left) {
+      [left, right] = [right, left];
+    }
+    right = Math.max(right, left + minSize);
+
+    if (top < bottom) {
+      [top, bottom] = [bottom, top];
+    }
+    top = Math.max(top, bottom + minSize);
+
     // Conversion factor from PDF pixels per inch to CSS pixels per inch.
     // See https://github.com/mozilla/pdf.js/blob/2f7d163dfdf40225479d1cc8f6d8ebd9e5273ca6/src/display/display_utils.js#L31.
     const CSS_PPI = 96.0;

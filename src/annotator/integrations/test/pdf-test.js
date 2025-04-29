@@ -811,7 +811,45 @@ describe('annotator/integrations/pdf', () => {
             viewBox: [0, 0, 100, 100],
           },
         },
-      ].forEach(({ renderOptions, shapeSelector, expectedViewport }) => {
+        // Empty rectangle
+        {
+          shapeSelector: {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'rect',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+            },
+          },
+          expectedViewport: {
+            rotation: 0,
+            scale: 96 / 72,
+            userUnit: 1 / 72,
+            viewBox: [0, 0, 1, 1],
+          },
+        },
+        // Rectangle with negative width and height
+        {
+          shapeSelector: {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'rect',
+              left: 100,
+              right: 0,
+              top: 0,
+              bottom: 100,
+            },
+          },
+          expectedViewport: {
+            rotation: 0,
+            scale: 96 / 72,
+            userUnit: 1 / 72,
+            viewBox: [0, 0, 100, 100],
+          },
+        },
+      ].forEach(({ renderOptions = {}, shapeSelector, expectedViewport }) => {
         it('renders bitmap with given options', async () => {
           pdfIntegration = createPDFIntegration();
           const anchor = {
