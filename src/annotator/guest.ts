@@ -66,8 +66,8 @@ function annotationsForSelection(): string[] {
 }
 
 /**
- * Return the annotation tags associated with highlights at given (clientX,
- * clientY) coordinates.
+ * Return the annotation tags associated with visible highlights at given
+ * (clientX, clientY) coordinates.
  */
 function annotationsAtPoint(x: number, y: number): string[] {
   return getHighlightsFromPoint(x, y)
@@ -435,7 +435,7 @@ export class Guest
     this._listeners.add(this.element, 'mouseup', event => {
       const { clientX, clientY, metaKey, ctrlKey } = event;
       const tags = annotationsAtPoint(clientX, clientY);
-      if (tags.length && this._highlightsVisible) {
+      if (tags.length) {
         const toggle = metaKey || ctrlKey;
         this.selectAnnotations(tags, { toggle });
       }
@@ -445,7 +445,7 @@ export class Guest
 
     this._listeners.add(this.element, 'mouseover', ({ clientX, clientY }) => {
       const tags = annotationsAtPoint(clientX, clientY);
-      if (tags.length && this._highlightsVisible) {
+      if (tags.length) {
         this._sidebarRPC.call('hoverAnnotations', tags);
       }
     });
