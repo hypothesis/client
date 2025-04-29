@@ -20,14 +20,31 @@ import {
  */
 function PDFPage({ showPlaceholder = false }) {
   return (
-    <div className="page">
+    <div
+      className="page"
+      style={{ position: 'relative', width: '100px', height: '100px' }}
+    >
       <div className="canvasWrapper">
         {/* Canvas where PDF.js renders the visual PDF output. */}
-        <canvas />
+        <canvas
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
       </div>
       {/* Transparent text layer created by PDF.js to enable text selection */}
       {!showPlaceholder && (
-        <div className="textLayer">
+        <div
+          className="textLayer"
+          style={{
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
+          }}
+        >
           {/* Text span created to correspond to some text rendered into the canvas.
             Hypothesis creates `<hypothesis-highlight>` elements here. */}
           <span className="testText">Text to highlight</span>
@@ -61,23 +78,36 @@ function highlightPDFRange(pageContainer, cssClass = '') {
   return highlightRange(range, cssClass);
 }
 
-/**
- * Render a fake PDF.js page (`PDFPage`) and return its container.
- *
- * @param {string} [cssClass] additional CSS class(es) to apply to the highlight
- *   and SVG rect elements
- * @return {HTMLElement}
- */
-function createPDFPageWithHighlight(cssClass = '') {
-  const container = document.createElement('div');
-  render(<PDFPage />, container);
-
-  highlightPDFRange(container, cssClass);
-
-  return container;
-}
-
 describe('annotator/highlighter', () => {
+  let containers;
+
+  /**
+   * Render a fake PDF.js page (`PDFPage`) and return its container.
+   *
+   * @param {string} [cssClass] additional CSS class(es) to apply to the highlight
+   *   and SVG rect elements
+   * @return {HTMLElement}
+   */
+  function createPDFPageWithHighlight(cssClass = '') {
+    const container = document.createElement('div');
+    containers.push(container);
+    document.body.append(container);
+
+    render(<PDFPage />, container);
+
+    highlightPDFRange(container, cssClass);
+
+    return container;
+  }
+
+  beforeEach(() => {
+    containers = [];
+  });
+
+  afterEach(() => {
+    containers.forEach(c => c.remove());
+  });
+
   describe('highlightRange', () => {
     it('wraps a highlight span around the given range', () => {
       const text = document.createTextNode('test highlight span');
@@ -311,6 +341,14 @@ describe('annotator/highlighter', () => {
         assert.ok(svgRect);
         assert.equal(highlight.svgHighlight, svgRect);
         assert.equal(svgRect.getAttribute('class'), 'hypothesis-svg-highlight');
+
+        // The two highlight representations should be positioned in the same place.
+        const svgRectBox = svgRect.getBoundingClientRect();
+        const highlightBox = highlight.getBoundingClientRect();
+        assert.closeTo(svgRectBox.left, highlightBox.left, 1);
+        assert.closeTo(svgRectBox.top, highlightBox.top, 1);
+        assert.closeTo(svgRectBox.width, highlightBox.width, 1);
+        assert.closeTo(svgRectBox.height, highlightBox.height, 1);
       });
 
       it('re-uses the existing SVG layer for the page if present', () => {

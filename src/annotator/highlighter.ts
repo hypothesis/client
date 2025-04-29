@@ -117,10 +117,16 @@ function drawHighlightsAbovePDFCanvas(
 
     // Create SVG element for the current highlight element.
     const rect = document.createElementNS(SVG_NAMESPACE, 'rect');
-    rect.setAttribute('x', (highlightRect.left - canvasRect.left).toString());
-    rect.setAttribute('y', (highlightRect.top - canvasRect.top).toString());
-    rect.setAttribute('width', highlightRect.width.toString());
-    rect.setAttribute('height', highlightRect.height.toString());
+
+    const x = (highlightRect.left - canvasRect.left) / canvasRect.width;
+    const y = (highlightRect.top - canvasRect.top) / canvasRect.height;
+    const width = highlightRect.width / canvasRect.width;
+    const height = highlightRect.height / canvasRect.height;
+
+    rect.setAttribute('x', `${x * 100}%`);
+    rect.setAttribute('y', `${y * 100}%`);
+    rect.setAttribute('width', `${width * 100}%`);
+    rect.setAttribute('height', `${height * 100}%`);
     rect.setAttribute(
       'class',
       classnames('hypothesis-svg-highlight', cssClass),
