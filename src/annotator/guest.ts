@@ -854,8 +854,13 @@ export class Guest
     }
   }
 
-  /** Create a new annotation using the specified tool. */
-  async createAnnotation(tool: AnnotationTool): Promise<AnnotationData> {
+  /**
+   * Create a new annotation using the specified tool.
+   *
+   * @return The new annotation that was created or `null` if the user canceled
+   *   creation.
+   */
+  async createAnnotation(tool: AnnotationTool): Promise<AnnotationData | null> {
     if (tool === 'selection') {
       return this.createAnnotationFromSelection();
     } else if (['rect', 'point'].includes(tool)) {
@@ -888,8 +893,15 @@ export class Guest
         this.anchor(annotation);
         return annotation;
       } catch (err) {
-        restarted = err instanceof DrawError && err.kind === 'restarted';
-        throw err;
+        if (
+          err instanceof DrawError &&
+          ['canceled', 'restarted'].includes(err.kind)
+        ) {
+          restarted = err.kind === 'restarted';
+          return null;
+        } else {
+          throw err;
+        }
       } finally {
         if (!restarted) {
           this._hostRPC.call('activeToolChanged', null);
