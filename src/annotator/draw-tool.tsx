@@ -182,6 +182,11 @@ export class DrawTool implements Destroyable {
           break;
       }
       this._abortDraw?.abort();
+
+      // Prevent event from propagating to the Guest's event handlers, as this
+      // will trigger selection of any existing highlights containing the
+      // position of this event.
+      e.stopPropagation();
     });
 
     // Enable user to scroll elements under the drawing surface by translating
