@@ -44,6 +44,7 @@ describe('DrawTool', () => {
   it('removes SVG when drawing ends', async () => {
     const shape = tool.draw('point');
     sendMouseEvent('mousedown');
+    sendMouseEvent('mouseup');
     await shape;
     assert.notOk(getSurface());
   });
@@ -125,31 +126,18 @@ describe('DrawTool', () => {
   });
 
   describe('drawing a point', () => {
-    it('finishes drawing when mouse is pressed', async () => {
+    it('finishes drawing when mouse is released', async () => {
       const shapePromise = tool.draw('point');
-      sendMouseEvent('mousedown');
+      sendMouseEvent('mousedown', 5, 5);
+      sendMouseEvent('mousemove', 10, 10);
+      sendMouseEvent('mouseup', 15, 20);
 
       const shape = await shapePromise;
 
       assert.deepEqual(shape, {
         type: 'point',
-        x: 0,
-        y: 0,
-      });
-    });
-
-    it('ignores mousemove and mouseup events while drawing a point', async () => {
-      const shapePromise = tool.draw('point');
-
-      sendMouseEvent('mouseup');
-      sendMouseEvent('mousemove');
-      sendMouseEvent('mousedown', 20, 30);
-
-      const shape = await shapePromise;
-      assert.deepEqual(shape, {
-        type: 'point',
-        x: 20,
-        y: 30,
+        x: 15,
+        y: 20,
       });
     });
   });
