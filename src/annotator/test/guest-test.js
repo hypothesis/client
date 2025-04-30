@@ -579,6 +579,33 @@ describe('Guest', () => {
         assert.calledWith(sidebarRPC().call, 'createAnnotation');
       });
 
+      ['canceled', 'restarted'].forEach(kind => {
+        it('does not create annotation if `tool` is "rect" and drawing is canceled', async () => {
+          createGuest();
+          fakeDrawTool.draw.rejects(new DrawError(kind));
+          const annotation = await emitHostEvent('createAnnotation', {
+            tool: 'rect',
+          });
+          assert.isNull(annotation);
+          assert.notCalled(sidebarRPC().call);
+        });
+      });
+
+      it('throws if unexpected error occurs during drawing', async () => {
+        const expectedError = new Error('Oh no');
+        createGuest();
+        fakeDrawTool.draw.rejects(expectedError);
+
+        let err;
+        try {
+          await emitHostEvent('createAnnotation', { tool: 'rect' });
+        } catch (e) {
+          err = e;
+        }
+
+        assert.equal(err, expectedError);
+      });
+
       it('creates annotation if `tool` is "rect"', async () => {
         const guest = createGuest();
         hostRPC().call.resetHistory();
