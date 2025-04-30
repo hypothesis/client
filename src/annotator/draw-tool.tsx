@@ -1,7 +1,7 @@
 import { render } from 'preact';
 
 import { promiseWithResolvers } from '../shared/promise-with-resolvers';
-import type { Destroyable, Rect, Shape } from '../types/annotator';
+import type { Destroyable, Rect, Point, Shape } from '../types/annotator';
 
 /** Normalize a rect so that `left <= right` and `top <= bottom`. */
 function normalizeRect(r: Rect): Rect {
@@ -60,7 +60,7 @@ export class DrawTool implements Destroyable {
   private _tool: Tool;
 
   /** Current drawing shape. */
-  private _shape?: Rect;
+  private _shape?: Rect | Point;
 
   /** Callback for when draw operation ends successfully. */
   private _drawEnd?: (s: Shape) => void;
@@ -136,26 +136,32 @@ export class DrawTool implements Destroyable {
             right: e.clientX,
             bottom: e.clientY,
           };
-          this._renderSurface();
           break;
         case 'point':
-          resolve({
+          this._shape = {
             type: 'point',
             x: e.clientX,
             y: e.clientY,
-          });
-          this._abortDraw?.abort();
+          };
           break;
       }
+      this._renderSurface();
     });
 
     this._surface.addEventListener('mousemove', e => {
       if (!this._shape) {
         return;
       }
-
-      this._shape.right = e.clientX;
-      this._shape.bottom = e.clientY;
+      switch (this._shape.type) {
+        case 'rect':
+          this._shape.right = e.clientX;
+          this._shape.bottom = e.clientY;
+          break;
+        case 'point':
+          this._shape.x = e.clientX;
+          this._shape.y = e.clientY;
+          break;
+      }
       this._renderSurface();
     });
 
@@ -163,9 +169,18 @@ export class DrawTool implements Destroyable {
       if (!this._shape) {
         return;
       }
-      this._shape.right = e.clientX;
-      this._shape.bottom = e.clientY;
-      resolve(normalizeRect(this._shape));
+      switch (this._shape.type) {
+        case 'rect':
+          this._shape.right = e.clientX;
+          this._shape.bottom = e.clientY;
+          resolve(normalizeRect(this._shape));
+          break;
+        case 'point':
+          this._shape.x = e.clientX;
+          this._shape.y = e.clientY;
+          resolve(this._shape);
+          break;
+      }
       this._abortDraw?.abort();
     });
 
@@ -270,6 +285,19 @@ export class DrawTool implements Destroyable {
             height={rect.bottom - rect.top}
           />
         </>,
+        this._surface,
+      );
+    } else if (this._shape?.type === 'point') {
+      const point = this._shape;
+      render(
+        <circle
+          stroke="black"
+          stroke-width="1px"
+          fill="yellow"
+          cx={point.x}
+          cy={point.y}
+          r={5}
+        />,
         this._surface,
       );
     } else {
