@@ -352,16 +352,15 @@ export function location(annotation: Annotation): LocationKey {
 }
 
 /**
- * Return the distance of the top of a shape from the top of the containing
- * page, image or document.
+ * Return the relative distance of the top of a shape from the top of the
+ * containing page, image or document.
  */
 function distanceFromTopOfView(selector: ShapeSelector): number | undefined {
-  const pageTop = selector.view?.top ?? 0;
   switch (selector.shape.type) {
     case 'rect':
-      return Math.abs(pageTop - selector.shape.top);
+      return Math.abs(selector.shape.top);
     case 'point':
-      return Math.abs(pageTop - selector.shape.y);
+      return Math.abs(selector.shape.y);
     default:
       return undefined;
   }

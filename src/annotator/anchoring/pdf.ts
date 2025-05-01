@@ -626,6 +626,10 @@ export async function anchor(
   }
 }
 
+function clamp(x: number, min: number, max: number) {
+  return Math.min(Math.max(x, min), max);
+}
+
 async function anchorShape(
   pageSelector: PageSelector,
   shapeSelector: ShapeSelector,
@@ -641,20 +645,6 @@ async function anchorShape(
   const pageView = await getPageView(pageSelector.index);
   const anchor = pageView.div;
 
-  // Get page bounding box in user-space coordinates.
-  //
-  // Note that the origin is at the bottom-left corner of the page, with Y
-  // going up.
-  const [pageLeft, pageBottom, pageRight, pageTop] = pageView.pdfPage.view;
-  const pageWidth = pageRight - pageLeft;
-  const pageHeight = pageTop - pageBottom;
-
-  const mapX = (x: number) => (x - pageLeft) / pageWidth;
-  const mapY = (y: number) => (pageTop - y) / pageHeight;
-
-  // Map the user-space coordinates of the shape to coordinates relative to the
-  // PDF page container, where the top-left is (0, 0) and the bottom right is
-  // (1, 1).
   let shape: Shape;
   switch (shapeSelector.shape.type) {
     case 'rect':
@@ -662,17 +652,17 @@ async function anchorShape(
         const s = shapeSelector.shape;
         shape = {
           type: 'rect',
-          left: mapX(s.left),
-          right: mapX(s.right),
-          top: mapY(s.top),
-          bottom: mapY(s.bottom),
+          left: clamp(s.left, 0, 1),
+          right: clamp(s.right, 0, 1),
+          top: clamp(s.top, 0, 1),
+          bottom: clamp(s.bottom, 0, 1),
         };
       }
       break;
     case 'point':
       {
         const s = shapeSelector.shape;
-        shape = { type: 'point', x: mapX(s.x), y: mapY(s.y) };
+        shape = { type: 'point', x: clamp(s.x, 0, 1), y: clamp(s.y, 0, 1) };
       }
       break;
     default:
@@ -816,14 +806,16 @@ function createPageSelector(
 }
 
 export async function describeShape(shape: Shape): Promise<Selector[]> {
-  const pageBoundingBox = (page: PDFPageProxy) => {
-    const [viewLeft, viewBottom, viewRight, viewTop] = page.view;
-    return {
-      left: viewLeft,
-      top: viewTop,
-      right: viewRight,
-      bottom: viewBottom,
-    };
+  // Convert PDF page coordinates to relative coordinates where (0, 0) is the
+  // top-left corner of the page and (1, 1) is the bottom-right corner.
+  const pageToRelativeX = (page: PDFPageProxy, x: number) => {
+    const [viewLeft, , viewRight] = page.view;
+    return (x - viewLeft) / (viewRight - viewLeft);
+  };
+
+  const pageToRelativeY = (page: PDFPageProxy, y: number) => {
+    const [, viewBottom, , viewTop] = page.view;
+    return (viewTop - y) / (viewTop - viewBottom);
   };
 
   switch (shape.type) {
@@ -852,12 +844,11 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
           anchor: 'page',
           shape: {
             type: 'rect',
-            left: topLeft.x,
-            top: topLeft.y,
-            right: bottomRight.x,
-            bottom: bottomRight.y,
+            left: pageToRelativeX(pageView.pdfPage, topLeft.x),
+            top: pageToRelativeY(pageView.pdfPage, topLeft.y),
+            right: pageToRelativeX(pageView.pdfPage, bottomRight.x),
+            bottom: pageToRelativeY(pageView.pdfPage, bottomRight.y),
           },
-          view: pageBoundingBox(pageView.pdfPage),
         },
       ];
     }
@@ -876,10 +867,9 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
           anchor: 'page',
           shape: {
             type: 'point',
-            x: point.x,
-            y: point.y,
+            x: pageToRelativeX(pageView.pdfPage, point.x),
+            y: pageToRelativeY(pageView.pdfPage, point.y),
           },
-          view: pageBoundingBox(pageView.pdfPage),
         },
       ];
     }

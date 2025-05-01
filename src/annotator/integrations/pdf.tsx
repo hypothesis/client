@@ -602,6 +602,14 @@ export class PDFIntegration
     if (!pageView) {
       throw new Error('Failed to get page view');
     }
+    const [viewLeft, viewBottom, viewRight, viewTop] = pageView.pdfPage.view;
+
+    // Convert relative coordinates with (0, 0) at the top-left of the page
+    // and (1, 1) at the bottom right to PDF units.
+    const relativeToPageX = (x: number) =>
+      viewLeft + x * (viewRight - viewLeft);
+    const relativeToPageY = (y: number) =>
+      viewBottom + (1 - y) * (viewTop - viewBottom);
 
     let left;
     let right;
@@ -610,18 +618,22 @@ export class PDFIntegration
 
     switch (shape.shape.type) {
       case 'rect':
-        ({ left, right, top, bottom } = shape.shape);
+        {
+          const rect = shape.shape;
+          left = relativeToPageX(rect.left);
+          right = relativeToPageX(rect.right);
+          top = relativeToPageY(rect.top);
+          bottom = relativeToPageY(rect.bottom);
+        }
         break;
       case 'point':
         {
           const { x, y } = shape.shape;
-          const [viewLeft, , viewRight] = pageView.pdfPage.view;
-          const pageWidth = Math.abs(viewRight - viewLeft);
-          const thumbnailSize = pageWidth * 0.1;
-          left = x - thumbnailSize;
-          top = y + thumbnailSize;
-          right = x + thumbnailSize;
-          bottom = y - thumbnailSize;
+          const thumbnailSize = 0.1;
+          left = relativeToPageX(x - thumbnailSize);
+          top = relativeToPageY(y - thumbnailSize);
+          right = relativeToPageX(x + thumbnailSize);
+          bottom = relativeToPageY(y + thumbnailSize);
         }
         break;
       default:
@@ -696,8 +708,8 @@ export class PDFIntegration
       ctx.save();
 
       ctx.scale(scaleFactor, scaleFactor);
-      const x = shape.shape.x - left;
-      const y = shape.shape.y - bottom;
+      const x = shape.shape.x * (right - left);
+      const y = shape.shape.y * (top - bottom);
       const radius = 5;
 
       ctx.strokeStyle = 'black';

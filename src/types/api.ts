@@ -161,17 +161,25 @@ export type Shape = RectShape | PointShape;
  * coordinates alone (such as images, but not PDFs or HTML documents), the
  * anchor is optional.
  *
- * # Coordinate systems
+ * # Coordinates
  *
- * Shape selectors should be defined using the natural coordinate system for the
- * anchor element in the document, enabling an annotation made in one viewer to
- * be resolved to the same location in a different viewer, with different view
- * settings (zoom, rotation etc.). For common document and anchor types, these
- * are as follows:
+ * Coordinates are relative either to the anchor element or the document as a
+ * whole, with coordinates of (0, 0) at the top-left corner and (1, 1) at the
+ * bottom right corner of the page or image.
  *
- * - For PDFs, PDF user space coordinates (points), with the origin at the
- *   bottom-left corner of the page.
- * - For images, pixels with the origin at the top-left
+ * For viewers which allow rotation of pages or the whole document, coordinates
+ * are expressed in terms of the un-rotated page. This means that to translate
+ * a coordinate from an annotation to the view, you need to:
+ *
+ * 1. Map the coordinate to the document's native units (eg. PDF points or
+ *    image pixels), relative to the top-left corner of the page.
+ * 2. Map the native units to the viewport, according to the current transform
+ *    (scale, rotation etc.) of the view.
+ *
+ * Some formats may define multiple bounding boxes for a page. For PDFs, the
+ * page corners are based on the crop box. This is the area of the page that PDF
+ * viewers display on screen. See
+ * https://www.pdf2go.com/blog/what-are-pdf-boxes.
  */
 export type ShapeSelector = {
   type: 'ShapeSelector';
@@ -189,29 +197,6 @@ export type ShapeSelector = {
    * - "page" - The page identified by the annotation's {@link PageSelector}.
    */
   anchor?: 'page';
-
-  /**
-   * Specifies the bounding box of the visible area of the anchor element,
-   * in the same coordinates used by {@link ShapeSelector.shape}.
-   *
-   * This enables interpreting the coordinates in the shape relative to the
-   * anchor element as a whole.
-   *
-   * Examples of how the visible area is determined for common document and
-   * anchor types:
-   *
-   * - For a PDF page, the box is the intersection of the media and crop box,
-   *   which is usually equal to the crop box. See https://www.pdf2go.com/blog/what-are-pdf-boxes.
-   * - For an SVG, these are the coordinates of the `viewBox` element
-   * - For an image, `left` and `top` are zero and `right` and `bottom` are the
-   *   width and height of the image in pixels.
-   */
-  view?: {
-    left: number;
-    top: number;
-    right: number;
-    bottom: number;
-  };
 };
 
 /**
