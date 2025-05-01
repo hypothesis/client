@@ -110,6 +110,9 @@ export type PageViewport = {
   userUnit: number;
   width: number;
   height: number;
+
+  /** Convert an (x, y) coordinate in PDF units to viewport coordinates. */
+  convertToViewportPoint(x: number, y: number): [number, number];
 };
 
 /**
@@ -165,6 +168,12 @@ export type PDFPageView = {
   textLayer: TextLayer | null;
   /** See `RenderingStates` enum in src/annotator/anchoring/pdf.js */
   renderingState: number;
+
+  /**
+   * Return the viewport describing the transformation between the PDF page
+   * coordinate space and the view.
+   */
+  viewport: PageViewport;
 
   /**
    * Return the `[x, y]` coordinates in PDF user space that correspond to a

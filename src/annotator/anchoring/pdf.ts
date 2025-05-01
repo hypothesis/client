@@ -645,19 +645,9 @@ async function anchorShape(
 
   const pageView = await getPageView(pageSelector.index);
   const anchor = pageView.div;
+  const viewport = pageView.viewport;
 
-  // Get page bounding box in user-space coordinates.
-  //
-  // Note that the origin is at the bottom-left corner of the page, with Y
-  // going up.
-  const [pageLeft, pageBottom, pageRight, pageTop] = pageView.pdfPage.view;
-  const pageWidth = pageRight - pageLeft;
-  const pageHeight = pageTop - pageBottom;
-
-  // Convert coordinates in PDF user space units to viewport-relative units,
-  // where 0 is the left/top and 1 is the bottom/right.
-  const pdfToRelativeX = (x: number) => clamp((x - pageLeft) / pageWidth, 0, 1);
-  const pdfToRelativeY = (y: number) => clamp((pageTop - y) / pageHeight, 0, 1);
+  const clampCoord = (coord: number) => clamp(coord, 0, 1);
 
   // Map the user-space coordinates of the shape to coordinates relative to the
   // PDF page container, where the top-left is (0, 0) and the bottom right is
@@ -667,22 +657,34 @@ async function anchorShape(
     case 'rect':
       {
         const s = shapeSelector.shape;
+        let [left, top] = viewport.convertToViewportPoint(s.left, s.top);
+        let [right, bottom] = viewport.convertToViewportPoint(
+          s.right,
+          s.bottom,
+        );
+        if (right < left) {
+          [left, right] = [right, left];
+        }
+        if (bottom < top) {
+          [top, bottom] = [bottom, top];
+        }
         shape = {
           type: 'rect',
-          left: pdfToRelativeX(s.left),
-          right: pdfToRelativeX(s.right),
-          top: pdfToRelativeY(s.top),
-          bottom: pdfToRelativeY(s.bottom),
+          left: clampCoord(left / viewport.width),
+          top: clampCoord(top / viewport.height),
+          right: clampCoord(right / viewport.width),
+          bottom: clampCoord(bottom / viewport.height),
         };
       }
       break;
     case 'point':
       {
         const s = shapeSelector.shape;
+        const [x, y] = pageView.viewport.convertToViewportPoint(s.x, s.y);
         shape = {
           type: 'point',
-          x: pdfToRelativeX(s.x),
-          y: pdfToRelativeY(s.y),
+          x: clampCoord(x / viewport.width),
+          y: clampCoord(y / viewport.height),
         };
       }
       break;
