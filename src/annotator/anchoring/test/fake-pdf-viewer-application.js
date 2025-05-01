@@ -31,9 +31,10 @@ import { RenderingStates } from '../pdf';
  * @param {PDFJSConfig} config
  * @return {Element} - The root Element for the page
  */
-function createPage(content, rendered, config) {
+function createPage(index, content, rendered, config) {
   const pageEl = document.createElement('div');
   pageEl.classList.add('page');
+  pageEl.setAttribute('data-page-number', index + 1);
 
   if (!rendered) {
     return pageEl;
@@ -161,11 +162,12 @@ class FakeRenderTask {
  */
 class FakePDFPageView {
   /**
+   * @param {number} index - Index of the page
    * @param {string} text - Text of the page
    * @param {FakePDFPageViewOptions} options
    */
-  constructor(text, { rendered, config }) {
-    const pageEl = createPage(text, rendered, config);
+  constructor(index, text, { rendered, config }) {
+    const pageEl = createPage(index, text, rendered, config);
     const textLayerEl = pageEl.querySelector('.textLayer');
 
     this.div = pageEl;
@@ -250,7 +252,7 @@ class FakePDFViewer {
 
     const pages = this._content.map(
       (text, idx) =>
-        new FakePDFPageView(text, {
+        new FakePDFPageView(idx, text, {
           rendered: idx >= index && idx <= lastRenderedPage,
           config: this._config,
         }),
