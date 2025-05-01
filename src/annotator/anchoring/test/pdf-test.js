@@ -729,9 +729,39 @@ describe('annotator/anchoring/pdf', () => {
           shape: {
             type: 'rect',
             left: 0,
-            top: 1,
+            top: 0.95,
             right: 0.1,
-            bottom: 0.95,
+            bottom: 1,
+          },
+          coordinates: 'anchor',
+        },
+      },
+      // Rect annotation with inverted left / right
+      {
+        pageBoundingBox: [5, 9, 105, 209],
+        selectors: [
+          {
+            type: 'ShapeSelector',
+
+            // Rect at bottom-left corner of page.
+            shape: {
+              type: 'rect',
+              left: 15,
+              top: 9,
+              right: 5,
+              bottom: 19,
+            },
+          },
+          { type: 'PageSelector', index: 0 },
+        ],
+        expected: {
+          anchor: 0,
+          shape: {
+            type: 'rect',
+            left: 0,
+            top: 0.95,
+            right: 0.1,
+            bottom: 1,
           },
           coordinates: 'anchor',
         },
@@ -818,10 +848,8 @@ describe('annotator/anchoring/pdf', () => {
       },
     ].forEach(({ pageBoundingBox, selectors, expected }) => {
       it('anchors shape selectors', async () => {
+        initViewer(fixtures.pdfPages, { pageBoundingBox });
         const pageView = viewer.pdfViewer.getPageView(expected.anchor);
-
-        // Set page bounding box in PDF user space coordinates.
-        pageView.pdfPage.setPageBoundingBox(pageBoundingBox);
 
         const anchor = await pdfAnchoring.anchor(selectors);
         const expectedAnchor = {

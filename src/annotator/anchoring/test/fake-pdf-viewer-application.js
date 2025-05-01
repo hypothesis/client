@@ -19,6 +19,8 @@ import { RenderingStates } from '../pdf';
  * @typedef PDFJSConfig
  * @prop {boolean} newTextRendering - Whether to emulate the PDF.js text rendering
  *   changes added in v2.9.359.
+ * @prop {[number, number, number, number]} pageBoundingBox - The [x0, y0,
+ *   x1, y1] coordinates of the crop box for PDF pages.
  */
 
 /**
@@ -70,14 +72,7 @@ class FakePDFPageProxy {
   constructor(pageText, config) {
     this.pageText = pageText;
     this._config = config;
-    this._view = [0, 0, 100, 200]; // [left, bottom, right, top]
-  }
-
-  /**
-   * Set the page bounding box. This is not part of the `PDFPageProxy` API.
-   */
-  setPageBoundingBox(box) {
-    this._view = box;
+    this._view = config.pageBoundingBox ?? [0, 0, 100, 200]; // [left, bottom, right, top]
   }
 
   get view() {
@@ -117,7 +112,10 @@ class FakePDFPageProxy {
   }
 
   getViewport(options) {
-    return new FakePageViewport(options);
+    return new FakePageViewport({
+      viewBox: this._view,
+      ...options,
+    });
   }
 
   /** Render the page and return a task for tracking progress. */
@@ -137,6 +135,33 @@ class FakePageViewport {
     this.scale = scale;
     this.userUnit = userUnit;
     this.viewBox = viewBox;
+
+    const [left, bottom, right, top] = viewBox;
+    this.width = right - left;
+    this.height = top - bottom;
+
+    this._pdfToViewportTransform = new DOMMatrix();
+
+    // Flip Y axis and shift. In PDF space the bottom left is (0, 0) and the
+    // Y axis goes up. In viewport space the top left is (0, 0) and the Y axis
+    // goes down.
+    this._pdfToViewportTransform.translateSelf(left, top);
+    this._pdfToViewportTransform.scaleSelf(1, -1);
+
+    // nb. We don't currently apply the rotation or scale to the transform here,
+    // so behavior is only correct if rotation=0 and scale=1.
+  }
+
+  convertToViewportPoint(x, y) {
+    const pdfPoint = this._pdfToViewportTransform
+      .inverse()
+      .transformPoint({ x, y });
+    return [pdfPoint.x, pdfPoint.y];
+  }
+
+  convertToPdfPoint(x, y) {
+    const viewPoint = this._pdfToViewportTransform.transformPoint({ x, y });
+    return [viewPoint.x, viewPoint.y];
   }
 }
 
@@ -177,6 +202,7 @@ class FakePDFPageView {
       : RenderingStates.INITIAL;
     this.pdfPage = new FakePDFPageProxy(text, config);
     this.pageLabel = null;
+    this.viewport = this.pdfPage.getViewport({});
   }
 
   dispose() {
@@ -184,13 +210,7 @@ class FakePDFPageView {
   }
 
   getPagePoint(x, y) {
-    const userSpaceX = x * 2;
-
-    // PDF user space coordinates have the origin at the bottom left corner,
-    // with Y increasing going up the page.
-    const userSpaceY = 100 - y;
-
-    return [userSpaceX, userSpaceY];
+    return this.viewport.convertToPdfPoint(x, y);
   }
 }
 
