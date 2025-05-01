@@ -71,18 +71,6 @@ function quotePositionCacheKey(quote: string, pos?: number) {
 }
 
 /**
- * Return offset of `node` among its siblings.
- */
-function getSiblingIndex(node: Node) {
-  let index = 0;
-  while (node.previousSibling) {
-    ++index;
-    node = node.previousSibling;
-  }
-  return index;
-}
-
-/**
  * Return the text layer element of the PDF page containing `node`.
  */
 function getNodeTextLayer(node: Node | Element): Element | null {
@@ -742,6 +730,22 @@ export function canDescribe(range: Range) {
   }
 }
 
+/** Return the index of the PDF page which contains `el`. */
+function getContainingPageIndex(el: Element): number {
+  const page = el.closest('.page');
+
+  // `data-page-number` contains the 1-based page number. If the visible page
+  // number is not numeric (eg. "i"), that will be stored in `data-page-label`.
+  const pageNumber = parseInt(page?.getAttribute('data-page-number') ?? '');
+
+  /* istanbul ignore next */
+  if (!Number.isInteger(pageNumber)) {
+    throw new Error('Unable to get page number from element');
+  }
+
+  return pageNumber - 1;
+}
+
 /**
  * Convert a DOM Range object into a set of selectors.
  *
@@ -764,7 +768,7 @@ export async function describe(range: Range): Promise<Selector[]> {
     textRange.endOffset,
   ).relativeTo(textLayer);
 
-  const startPageIndex = getSiblingIndex(textLayer.parentNode!);
+  const startPageIndex = getContainingPageIndex(textLayer);
   const pageOffset = await getPageOffset(startPageIndex);
 
   const pageView = await getPageView(startPageIndex);
@@ -801,7 +805,7 @@ async function mapViewportToPDF(
     if (!el.classList.contains('page')) {
       continue;
     }
-    const pageIndex = getSiblingIndex(el);
+    const pageIndex = getContainingPageIndex(el);
     const pageViewRect = el.getBoundingClientRect();
     const pageViewX = x - pageViewRect.left;
     const pageViewY = y - pageViewRect.top;
