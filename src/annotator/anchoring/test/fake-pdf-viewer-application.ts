@@ -10,33 +10,49 @@
  * to the corresponding interfaces defined in `src/types/pdfjs.js`.
  */
 import { EventEmitter } from '../../../shared/event-emitter';
+import type {
+  GetViewportParameters,
+  RenderParameters,
+  RenderTask,
+  PDFPageProxy,
+  PDFPageView,
+  PageViewportParameters,
+  PageViewport,
+  PDFViewer,
+  ViewBox,
+} from '../../../types/pdfjs';
 import { RenderingStates } from '../pdf';
 
 /**
  * Options that control global aspects of the PDF.js fake, such as which
  * version of PDF.js is being emulated.
- *
- * @typedef PDFJSConfig
- * @prop {boolean} newTextRendering - Whether to emulate the PDF.js text rendering
- *   changes added in v2.9.359.
- * @prop {[number, number, number, number]} pageBoundingBox - The [x0, y0,
- *   x1, y1] coordinates of the crop box for PDF pages.
  */
+export type PDFJSConfig = {
+  /** Emulate PDF.js text rendering changes added in v2.9.359. */
+  newTextRendering: boolean;
+
+  /** The [x0, y0, x1, y1] coordinates of the crop box for PDF pages. */
+  pageBoundingBox?: [number, number, number, number];
+};
 
 /**
  * Create the DOM structure for a page which matches the structure produced by
  * PDF.js
  *
- * @param {string} content - The text content for the page
- * @param {boolean} rendered - True if the page should be "rendered" or false if
+ * @param content - The text content for the page
+ * @param rendered - True if the page should be "rendered" or false if
  *        it should be an empty placeholder for a not-yet-rendered page
- * @param {PDFJSConfig} config
- * @return {Element} - The root Element for the page
+ * @return Root Element for the page
  */
-function createPage(index, content, rendered, config) {
+function createPage(
+  index: number,
+  content: string,
+  rendered: boolean,
+  config: PDFJSConfig,
+): HTMLElement {
   const pageEl = document.createElement('div');
   pageEl.classList.add('page');
-  pageEl.setAttribute('data-page-number', index + 1);
+  pageEl.setAttribute('data-page-number', (index + 1).toString());
 
   if (!rendered) {
     return pageEl;
@@ -65,12 +81,13 @@ function createPage(index, content, rendered, config) {
  *
  * The original is defined at https://github.com/mozilla/pdf.js/blob/master/src/display/api.js
  */
-class FakePDFPageProxy {
-  /**
-   * @param {string} pageText
-   * @param {PDFJSConfig} config
-   */
-  constructor(pageText, config) {
+class FakePDFPageProxy implements PDFPageProxy {
+  pageText: string;
+
+  private _config: PDFJSConfig;
+  private _view: [number, number, number, number];
+
+  constructor(pageText: string, config: PDFJSConfig) {
     this.pageText = pageText;
     this._config = config;
     this._view = config.pageBoundingBox ?? [0, 0, 100, 200]; // [left, bottom, right, top]
@@ -80,15 +97,14 @@ class FakePDFPageProxy {
     return this._view;
   }
 
-  getTextContent(params = {}) {
+  getTextContent(params: { normalizeWhitespace?: boolean } = {}) {
     if (!params.normalizeWhitespace) {
       return Promise.reject(
         new Error('Expected `normalizeWhitespace` to be true'),
       );
     }
 
-    /** @param {string} str */
-    const makeTextItem = str => {
+    const makeTextItem = (str: string) => {
       if (this._config.newTextRendering) {
         // The `hasEOL` property was added in https://github.com/mozilla/pdf.js/pull/13257
         // and its existence is used to feature-detect whether whitespace-only
@@ -112,7 +128,7 @@ class FakePDFPageProxy {
     return Promise.resolve(textContent);
   }
 
-  getViewport(options) {
+  getViewport(options: GetViewportParameters): PageViewport {
     return new FakePageViewport({
       viewBox: this._view,
       ...options,
@@ -120,26 +136,32 @@ class FakePDFPageProxy {
   }
 
   /** Render the page and return a task for tracking progress. */
-  render(options) {
+  render(options: RenderParameters) {
     return new FakeRenderTask(options);
   }
 }
 
-class FakePageViewport {
+class FakePageViewport implements PageViewport {
+  rotation: number;
+  scale: number;
+  userUnit: number;
+  viewBox: ViewBox;
+
+  private _pdfToViewportTransform: DOMMatrix;
+
   constructor({
     rotation = 0,
     scale = 1.0,
     userUnit = 1 / 72,
     viewBox = [0, 0, 0, 0],
-  }) {
+  }: PageViewportParameters) {
     this.rotation = rotation;
     this.scale = scale;
     this.userUnit = userUnit;
     this.viewBox = viewBox;
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [left, bottom, right, top] = viewBox;
-    this.width = right - left;
-    this.height = top - bottom;
 
     this._pdfToViewportTransform = new DOMMatrix();
 
@@ -153,47 +175,73 @@ class FakePageViewport {
     // so behavior is only correct if rotation=0 and scale=1.
   }
 
-  convertToViewportPoint(x, y) {
+  convertToViewportPoint(x: number, y: number): [number, number] {
     const pdfPoint = this._pdfToViewportTransform
       .inverse()
       .transformPoint({ x, y });
     return [pdfPoint.x, pdfPoint.y];
   }
 
-  convertToPdfPoint(x, y) {
+  convertToPdfPoint(x: number, y: number): [number, number] {
     const viewPoint = this._pdfToViewportTransform.transformPoint({ x, y });
     return [viewPoint.x, viewPoint.y];
   }
+
+  /* istanbul ignore next */
+  get width() {
+    const [left, , right] = this.viewBox;
+    return right - left;
+  }
+
+  /* istanbul ignore next */
+  get height() {
+    const [, bottom, , top] = this.viewBox;
+    return top - bottom;
+  }
 }
 
-class FakeRenderTask {
-  constructor(options) {
-    this._options = options;
+class FakeRenderTask implements RenderTask {
+  promise: Promise<void>;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  constructor(options: RenderParameters) {
     this.promise = Promise.resolve();
   }
 }
 
-/**
- * @typedef FakePDFPageViewOptions
- * @prop {boolean} rendered - Whether this page is "rendered", as if it were
- *   near the viewport, or not.
- * @prop {PDFJSConfig} config
- */
+export type FakePDFPageViewOptions = {
+  /** Whether this page is "rendered", as if it were near the viewport. */
+  rendered: boolean;
+  config: PDFJSConfig;
+};
 
 /**
  * Fake implementation of PDF.js `PDFPageView` class.
  *
  * The original is defined at https://github.com/mozilla/pdf.js/blob/master/web/pdf_page_view.js
  */
-class FakePDFPageView {
+class FakePDFPageView implements PDFPageView {
+  div: HTMLElement;
+  textLayer: {
+    textLayerDiv: HTMLElement;
+    renderingDone: boolean;
+  } | null;
+  renderingState: number;
+  pageLabel: string | null;
+  pdfPage: FakePDFPageProxy;
+  viewport: PageViewport;
+
   /**
-   * @param {number} index - Index of the page
-   * @param {string} text - Text of the page
-   * @param {FakePDFPageViewOptions} options
+   * @param index - Index of the page
+   * @param text - Text of the page
    */
-  constructor(index, text, { rendered, config }) {
+  constructor(
+    index: number,
+    text: string,
+    { rendered, config }: FakePDFPageViewOptions,
+  ) {
     const pageEl = createPage(index, text, rendered, config);
-    const textLayerEl = pageEl.querySelector('.textLayer');
+    const textLayerEl = pageEl.querySelector('.textLayer') as HTMLElement;
 
     this.div = pageEl;
     this.textLayer = textLayerEl
@@ -204,14 +252,14 @@ class FakePDFPageView {
       : RenderingStates.INITIAL;
     this.pdfPage = new FakePDFPageProxy(text, config);
     this.pageLabel = null;
-    this.viewport = this.pdfPage.getViewport({});
+    this.viewport = this.pdfPage.getViewport({ scale: 1.0 });
   }
 
   dispose() {
     this.div.remove();
   }
 
-  getPagePoint(x, y) {
+  getPagePoint(x: number, y: number) {
     return this.viewport.convertToPdfPoint(x, y);
   }
 }
@@ -221,26 +269,31 @@ class FakePDFPageView {
  *
  * The original is defined at https://github.com/mozilla/pdf.js/blob/master/web/pdf_viewer.js
  */
-class FakePDFViewer {
-  /**
-   * @param {Options} options
-   */
-  constructor({ config, container, content }) {
+class FakePDFViewer implements PDFViewer {
+  viewer: HTMLElement;
+  eventBus: EventEmitter<any>;
+  currentScaleValue: 'auto' | 'page-fit' | 'page-width';
+  update: () => void;
+
+  private _container: HTMLElement;
+  private _config: PDFJSConfig;
+  private _content: string[];
+  private _pages: FakePDFPageView[];
+
+  constructor({ config, container, content }: Options) {
     this._config = config;
     this._container = container;
     this._content = content;
 
-    /** @type {FakePDFPageView} */
     this._pages = [];
 
     this.viewer = this._container;
 
     this.eventBus = new EventEmitter();
 
-    /** @type {'auto'|'page-fit'|'page-width'} */
     this.currentScaleValue = 'auto';
 
-    this.update = sinon.stub();
+    this.update = globalThis.sinon.stub();
   }
 
   get pagesCount() {
@@ -254,7 +307,7 @@ class FakePDFViewer {
    * During PDF.js startup when the document is still being loaded, this may
    * return a nullish value even when the PDF page index is valid.
    */
-  getPageView(index) {
+  getPageView(index: number) {
     this._checkBounds(index);
     return this._pages[index];
   }
@@ -267,7 +320,7 @@ class FakePDFViewer {
    * with no text layer available, but only a placeholder element for the whole
    * page.
    */
-  setCurrentPage(index, lastRenderedPage = index) {
+  setCurrentPage(index: number, lastRenderedPage = index) {
     this._checkBounds(index);
 
     const pages = this._content.map(
@@ -291,7 +344,7 @@ class FakePDFViewer {
    * Dispatch an event to notify observers that some event has occurred
    * in the PDF viewer.
    */
-  notify(eventName, { eventDispatch = 'eventBus' } = {}) {
+  notify(eventName: string, { eventDispatch = 'eventBus' } = {}) {
     if (eventDispatch === 'eventBus') {
       this.eventBus.emit(eventName);
     } else if (eventDispatch === 'dom') {
@@ -301,21 +354,20 @@ class FakePDFViewer {
     }
   }
 
-  _checkBounds(index) {
+  _checkBounds(index: number) {
     if (index < 0 || index >= this._content.length) {
       throw new Error('Invalid page index ' + index.toString());
     }
   }
 }
 
-/**
- * @typedef Options
- * @prop {Element} container - The container into which the fake PDF viewer
- *       should render the content
- * @prop {string[]} content - Array of strings containing the text for each
- *       page
- * @prop {PDFJSConfig} [config]
- */
+export type Options = {
+  /** Container into which fake PDF viewer should render. */
+  container: HTMLElement;
+  /** Text for each page. */
+  content: string[];
+  config: PDFJSConfig;
+};
 
 /**
  * A minimal fake implementation of PDF.js' PDFViewerApplication interface.
@@ -325,10 +377,12 @@ class FakePDFViewer {
  * The original is defined at https://github.com/mozilla/pdf.js/blob/master/web/app.js
  */
 export class FakePDFViewerApplication {
-  /**
-   * @param {Options} options
-   */
-  constructor(options) {
+  appConfig: {
+    appContainer: HTMLElement;
+  };
+  pdfViewer: FakePDFViewer;
+
+  constructor(options: Options) {
     if (!options.config) {
       options.config = { newTextRendering: true };
     }

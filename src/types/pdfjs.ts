@@ -97,22 +97,31 @@ export type GetViewportParameters = {
 };
 
 export type PageViewportParameters = {
-  viewBox: number[];
-  userUnit: number;
-  scale: number;
-  rotation: number;
+  viewBox?: ViewBox;
+  userUnit?: number;
+  scale?: number;
+  rotation?: number;
 };
 
-export type PageViewport = {
-  new (params: PageViewportParameters): PageViewport;
+/** Tuple of `[left, bottom, right, top]` coordinates. */
+export type ViewBox = [number, number, number, number];
 
-  viewBox: number[];
+export type PageViewport = {
+  viewBox: ViewBox;
   userUnit: number;
   width: number;
   height: number;
 
   /** Convert an (x, y) coordinate in PDF units to viewport coordinates. */
   convertToViewportPoint(x: number, y: number): [number, number];
+
+  /** Convert an (x, y) coordinate in viewport coordinates to PDF units. */
+  convertToPdfPoint(x: number, y: number): [number, number];
+};
+
+// See https://www.typescriptlang.org/docs/handbook/interfaces.html#difference-between-the-static-and-instance-sides-of-classes
+export type PageViewportConstructor = {
+  new (params: PageViewportParameters): PageViewport;
 };
 
 /**
@@ -148,7 +157,7 @@ export type PDFPageProxy = {
    * Return the visible portion of this page in user space units as an
    * `[x1, y1, x2, y2]` tuple.
    */
-  get view(): [number, number, number, number];
+  get view(): ViewBox;
 
   getViewport(params: GetViewportParameters): PageViewport;
 };
