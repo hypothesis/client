@@ -19,7 +19,7 @@ import type {
 } from '../../types/annotator';
 import type { Selector } from '../../types/api';
 import type {
-  PageViewport,
+  PageViewportConstructor,
   PDFViewer,
   PDFViewerApplication,
 } from '../../types/pdfjs';
@@ -673,7 +673,7 @@ export class PDFIntegration
     // `PageViewport` has a method to clone it with different parameters, but
     // that doesn't allow us to customize the `viewBox`. Hence we grab the
     // constructor and invoke it manually.
-    const PageViewport = viewport.constructor as PageViewport;
+    const PageViewport = viewport.constructor as PageViewportConstructor;
     const boxView = new PageViewport({
       rotation: 0,
       scale: scaleFactor,
