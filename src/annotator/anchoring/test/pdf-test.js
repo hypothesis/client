@@ -771,6 +771,51 @@ describe('annotator/anchoring/pdf', () => {
           coordinates: 'anchor',
         },
       },
+      // Point outside page bounding box. Coordinates should be clamped.
+      {
+        pageBoundingBox: [5, 9, 105, 209],
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: { type: 'point', x: 0, y: 0 },
+          },
+          { type: 'PageSelector', index: 1 },
+        ],
+        expected: {
+          anchor: 1,
+          shape: { type: 'point', x: 0, y: 1 },
+          coordinates: 'anchor',
+        },
+      },
+      // Rect which extends beyond page bounding box. Coordinates should be
+      // clamped.
+      {
+        pageBoundingBox: [5, 9, 105, 209],
+        selectors: [
+          {
+            type: 'ShapeSelector',
+            shape: {
+              type: 'rect',
+              left: 0,
+              top: 300,
+              right: 300,
+              bottom: 0,
+            },
+          },
+          { type: 'PageSelector', index: 0 },
+        ],
+        expected: {
+          anchor: 0,
+          shape: {
+            type: 'rect',
+            left: 0,
+            top: 0,
+            right: 1,
+            bottom: 1,
+          },
+          coordinates: 'anchor',
+        },
+      },
     ].forEach(({ pageBoundingBox, selectors, expected }) => {
       it('anchors shape selectors', async () => {
         const pageView = viewer.pdfViewer.getPageView(expected.anchor);
@@ -787,27 +832,27 @@ describe('annotator/anchoring/pdf', () => {
       });
     });
 
+    const createPageSelector = index => ({ type: 'PageSelector', index });
+    const createPointShapeSelector = (x, y) => ({
+      type: 'ShapeSelector',
+      shape: {
+        type: 'point',
+        x,
+        y,
+      },
+    });
+
     [
       {
-        selectors: [
-          {
-            type: 'ShapeSelector',
-            shape: { type: 'point', x: 0, y: 0 },
-          },
-        ],
+        selectors: [createPointShapeSelector(0, 0)],
         expected: 'Cannot anchor a shape selector without a page',
       },
       {
-        selectors: [
-          {
-            type: 'ShapeSelector',
-            shape: { type: 'point', x: 0, y: 0 },
-          },
-          {
-            type: 'PageSelector',
-            index: 100,
-          },
-        ],
+        selectors: [createPointShapeSelector(0, 0), createPageSelector(100)],
+        expected: 'PDF page index is invalid',
+      },
+      {
+        selectors: [createPointShapeSelector(0, 0), createPageSelector(-2)],
         expected: 'PDF page index is invalid',
       },
       {
@@ -816,10 +861,7 @@ describe('annotator/anchoring/pdf', () => {
             type: 'ShapeSelector',
             shape: { type: 'circle', center: 0, radius: 5 },
           },
-          {
-            type: 'PageSelector',
-            index: 0,
-          },
+          createPageSelector(0),
         ],
         expected: 'Unsupported shape in shape selector',
       },
