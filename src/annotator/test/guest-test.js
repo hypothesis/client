@@ -1026,6 +1026,13 @@ describe('Guest', () => {
       assert.calledWith(sidebarRPC().call, 'openSidebar');
     });
 
+    it('does not select annotations in the sidebar if there is a selection', () => {
+      sandbox.stub(document, 'getSelection').returns({ isCollapsed: false });
+      createGuest();
+      fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));
+      assert.notCalled(sidebarRPC().call);
+    });
+
     it('toggles selected annotations in the sidebar when Ctrl/Cmd-clicking a highlight', () => {
       createGuest();
       fakeHighlight.dispatchEvent(
