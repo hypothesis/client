@@ -102,7 +102,7 @@ describe('annotator/integrations/pdf', () => {
       };
 
       fakeScrollUtils = {
-        offsetRelativeTo: sinon.stub().returns(0),
+        computeScrollOffset: sinon.stub().returns(0),
         scrollElement: sinon.stub().resolves(),
       };
 
@@ -553,8 +553,10 @@ describe('annotator/integrations/pdf', () => {
         const highlight = document.createElement('div');
         const offset = 42;
         const integration = createPDFIntegration();
-        fakeScrollUtils.offsetRelativeTo
-          .withArgs(highlight, integration.contentContainer())
+        fakeScrollUtils.computeScrollOffset
+          .withArgs(integration.contentContainer(), highlight, {
+            position: 'center',
+          })
           .returns(offset);
 
         const anchor = { highlights: [highlight] };
@@ -592,8 +594,8 @@ describe('annotator/integrations/pdf', () => {
       it('waits for anchors in placeholders to be re-anchored and scrolls to final highlight', async () => {
         const placeholderHighlight = createPlaceholderHighlight();
         const integration = createPDFIntegration();
-        fakeScrollUtils.offsetRelativeTo
-          .withArgs(placeholderHighlight, integration.contentContainer())
+        fakeScrollUtils.computeScrollOffset
+          .withArgs(integration.contentContainer(), placeholderHighlight)
           .returns(50);
         const annotation = { $tag: 'tag1' };
         const anchor = { annotation, highlights: [placeholderHighlight] };
@@ -618,8 +620,8 @@ describe('annotator/integrations/pdf', () => {
           annotation,
           highlights: [finalHighlight],
         });
-        fakeScrollUtils.offsetRelativeTo
-          .withArgs(finalHighlight, integration.contentContainer())
+        fakeScrollUtils.computeScrollOffset
+          .withArgs(integration.contentContainer(), finalHighlight)
           .returns(150);
 
         await scrollDone;
