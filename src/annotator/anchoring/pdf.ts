@@ -626,6 +626,10 @@ export async function anchor(
   }
 }
 
+function clamp(x: number, min: number, max: number): number {
+  return Math.max(Math.min(x, max), min);
+}
+
 async function anchorShape(
   pageSelector: PageSelector,
   shapeSelector: ShapeSelector,
@@ -633,6 +637,7 @@ async function anchorShape(
   const viewer = getPDFViewer();
   if (
     typeof pageSelector.index !== 'number' ||
+    pageSelector.index < 0 ||
     pageSelector.index >= viewer.pagesCount
   ) {
     throw new Error('PDF page index is invalid');
@@ -649,8 +654,10 @@ async function anchorShape(
   const pageWidth = pageRight - pageLeft;
   const pageHeight = pageTop - pageBottom;
 
-  const mapX = (x: number) => (x - pageLeft) / pageWidth;
-  const mapY = (y: number) => (pageTop - y) / pageHeight;
+  // Convert coordinates in PDF user space units to viewport-relative units,
+  // where 0 is the left/top and 1 is the bottom/right.
+  const pdfToRelativeX = (x: number) => clamp((x - pageLeft) / pageWidth, 0, 1);
+  const pdfToRelativeY = (y: number) => clamp((pageTop - y) / pageHeight, 0, 1);
 
   // Map the user-space coordinates of the shape to coordinates relative to the
   // PDF page container, where the top-left is (0, 0) and the bottom right is
@@ -662,17 +669,21 @@ async function anchorShape(
         const s = shapeSelector.shape;
         shape = {
           type: 'rect',
-          left: mapX(s.left),
-          right: mapX(s.right),
-          top: mapY(s.top),
-          bottom: mapY(s.bottom),
+          left: pdfToRelativeX(s.left),
+          right: pdfToRelativeX(s.right),
+          top: pdfToRelativeY(s.top),
+          bottom: pdfToRelativeY(s.bottom),
         };
       }
       break;
     case 'point':
       {
         const s = shapeSelector.shape;
-        shape = { type: 'point', x: mapX(s.x), y: mapY(s.y) };
+        shape = {
+          type: 'point',
+          x: pdfToRelativeX(s.x),
+          y: pdfToRelativeY(s.y),
+        };
       }
       break;
     default:
