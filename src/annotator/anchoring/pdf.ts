@@ -806,9 +806,14 @@ async function mapViewportToPDF(
       continue;
     }
     const pageIndex = getContainingPageIndex(el);
+
+    const pageStyle = getComputedStyle(el);
+    const leftBorder = parseFloat(pageStyle.borderLeftWidth);
+    const topBorder = parseFloat(pageStyle.borderTopWidth);
+
     const pageViewRect = el.getBoundingClientRect();
-    const pageViewX = x - pageViewRect.left;
-    const pageViewY = y - pageViewRect.top;
+    const pageViewX = x - pageViewRect.left - leftBorder;
+    const pageViewY = y - pageViewRect.top - topBorder;
     const pdfPageView = await getPageView(pageIndex);
     const [userX, userY] = pdfPageView.getPagePoint(pageViewX, pageViewY);
 

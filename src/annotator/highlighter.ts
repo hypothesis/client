@@ -209,9 +209,6 @@ function wholeTextNodesInRange(range: Range): Text[] {
 export function highlightShape(region: ShapeAnchor): HighlightElement[] {
   const { shape, anchor } = region;
 
-  const anchorStyles = getComputedStyle(anchor);
-  const borderWidth = parseInt(anchorStyles.borderWidth);
-
   const highlightEl = document.createElement('hypothesis-highlight');
 
   // Should match the width used by the `hypothesis-shape-highlight` class.
@@ -224,15 +221,17 @@ export function highlightShape(region: ShapeAnchor): HighlightElement[] {
   if (shape.type === 'rect') {
     const width = shape.right - shape.left;
     const height = shape.bottom - shape.top;
-    highlightEl.style.left = `calc(${shape.left * 100}% - ${borderWidth}px)`;
-    highlightEl.style.top = `calc(${shape.top * 100}% - ${borderWidth}px)`;
+    highlightEl.style.left = `${shape.left * 100}%`;
+    highlightEl.style.top = `${shape.top * 100}%`;
     highlightEl.style.width = `calc(${width * 100}% - ${2 * highlightBorderWidth}px)`;
     highlightEl.style.height = `calc(${height * 100}% - ${2 * highlightBorderWidth}px)`;
   } else if (shape.type === 'point') {
-    highlightEl.style.left = `calc(${shape.x * 100}% - ${borderWidth}px)`;
-    highlightEl.style.top = `calc(${shape.y * 100}% - ${borderWidth}px)`;
-    highlightEl.style.width = '10px';
-    highlightEl.style.height = '10px';
+    const radius = 5;
+    highlightEl.style.left = `calc(${shape.x * 100}% - ${radius + highlightBorderWidth}px)`;
+    highlightEl.style.top = `calc(${shape.y * 100}% - ${radius + highlightBorderWidth}px)`;
+    highlightEl.style.width = `${radius * 2}px`;
+    highlightEl.style.height = `${radius * 2}px`;
+    highlightEl.style.borderRadius = '50%';
   }
 
   anchor.append(highlightEl);

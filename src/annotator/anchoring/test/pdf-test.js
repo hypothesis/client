@@ -965,7 +965,16 @@ describe('annotator/anchoring/pdf', () => {
   describe('describeShape', () => {
     let elementsFromPoint;
 
+    const borderLeft = 5;
+    const borderTop = 8;
+
     beforeEach(() => {
+      for (let i = 0; i < viewer.pdfViewer.pagesCount; i++) {
+        const pageDiv = viewer.pdfViewer.getPageView(i).div;
+        pageDiv.style.borderLeftWidth = `${borderLeft}px`;
+        pageDiv.style.borderTopWidth = `${borderTop}px`;
+      }
+
       // Dummy element to check that elements returned by `elementsFromPoint`,
       // which are not a PDF page container, are ignored.
       const dummy = document.createElement('div');
@@ -983,7 +992,9 @@ describe('annotator/anchoring/pdf', () => {
         if (pageIndex >= viewer.pdfViewer.pagesCount) {
           return [];
         }
-        return [dummy, viewer.pdfViewer.getPageView(pageIndex).div];
+
+        const pageDiv = viewer.pdfViewer.getPageView(pageIndex).div;
+        return [dummy, pageDiv];
       });
     });
 
@@ -1007,7 +1018,11 @@ describe('annotator/anchoring/pdf', () => {
         const pageView = viewer.pdfViewer.getPageView(0);
         const expected = pageView.getPagePoint(10, 10);
 
-        const selectors = await describeShape({ type: 'point', x: 10, y: 10 });
+        const selectors = await describeShape({
+          type: 'point',
+          x: 10 + borderLeft,
+          y: 10 + borderTop,
+        });
 
         assert.deepEqual(selectors, [
           {
@@ -1077,10 +1092,10 @@ describe('annotator/anchoring/pdf', () => {
 
         const selectors = await describeShape({
           type: 'rect',
-          left: 10,
-          top: 10,
-          right: 30,
-          bottom: 50,
+          left: 10 + borderLeft,
+          top: 10 + borderTop,
+          right: 30 + borderLeft,
+          bottom: 50 + borderTop,
         });
 
         assert.deepEqual(selectors, [
