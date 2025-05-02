@@ -1,5 +1,5 @@
 import {
-  offsetRelativeTo,
+  computeScrollOffset,
   scrollElement,
   scrollElementIntoView,
 } from '../scroll';
@@ -25,32 +25,51 @@ describe('annotator/util/scroll', () => {
     return el;
   }
 
-  describe('offsetRelativeTo', () => {
+  describe('computeScrollOffset', () => {
     it('returns the offset of an element relative to the given ancestor', () => {
-      const parent = createContainer();
-      parent.style.position = 'relative';
+      const container = createContainer();
+      container.style.position = 'relative';
 
       const child = document.createElement('div');
       child.style.position = 'absolute';
       child.style.top = '100px';
-      parent.append(child);
+      container.append(child);
 
       const grandchild = document.createElement('div');
       grandchild.style.position = 'absolute';
       grandchild.style.top = '150px';
       child.append(grandchild);
 
-      assert.equal(offsetRelativeTo(child, parent), 100);
-      assert.equal(offsetRelativeTo(grandchild, parent), 250);
+      assert.equal(computeScrollOffset(container, child), 100);
+      assert.equal(computeScrollOffset(container, grandchild), 250);
     });
 
     it('returns 0 if the parent is not an ancestor of the element', () => {
-      const parent = document.createElement('div');
+      const container = document.createElement('div');
       const child = document.createElement('div');
       child.style.position = 'absolute';
       child.style.top = '100px';
 
-      assert.equal(offsetRelativeTo(child, parent), 0);
+      assert.equal(computeScrollOffset(container, child), 0);
+    });
+
+    it('adjusts offset if `position: center` is specified', () => {
+      const container = createContainer();
+      container.style.position = 'relative';
+      container.style.height = '100px';
+
+      const child = document.createElement('div');
+      child.style.position = 'absolute';
+      child.style.top = '150px';
+      child.style.height = '20px';
+      container.append(child);
+
+      const adjustment = 100 / 2 - 20 / 2;
+
+      assert.equal(
+        computeScrollOffset(container, child, { position: 'center' }),
+        150 - adjustment,
+      );
     });
   });
 

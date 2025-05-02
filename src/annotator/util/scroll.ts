@@ -18,20 +18,41 @@ function interpolate(a: number, b: number, fraction: number): number {
   return a + fraction * (b - a);
 }
 
+export type ScrollOffsetOptions = {
+  /**
+   * Specifies how to position the target relative to the visible area of the
+   * container.
+   */
+  position?: 'top' | 'center';
+};
+
 /**
- * Return the offset of `element` from the top of a positioned ancestor `parent`.
+ * Return the offset that a container element should be scrolled to in order
+ * to make a target element visible.
  *
- * @param parent - Positioned ancestor of `element`
+ * @param container - Container, which must be a positioned ancestor of `target`
+ * @param target - Descendant element
  */
-export function offsetRelativeTo(
-  element: HTMLElement,
-  parent: HTMLElement,
+export function computeScrollOffset(
+  container: HTMLElement,
+  target: HTMLElement,
+  options: ScrollOffsetOptions = {},
 ): number {
   let offset = 0;
-  while (element !== parent && parent.contains(element)) {
+
+  let element = target;
+  while (element !== container && container.contains(element)) {
     offset += element.offsetTop;
     element = element.offsetParent as HTMLElement;
   }
+
+  if (options.position === 'center') {
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const adjustment = containerRect.height / 2 - targetRect.height / 2;
+    offset -= adjustment;
+  }
+
   return offset;
 }
 

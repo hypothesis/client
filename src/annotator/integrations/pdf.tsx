@@ -39,7 +39,7 @@ import ContentInfoBanner from '../components/ContentInfoBanner';
 import WarningBanner from '../components/WarningBanner';
 import { getHighlightsFromPoint } from '../highlighter';
 import { PreactContainer } from '../util/preact-container';
-import { offsetRelativeTo, scrollElement } from '../util/scroll';
+import { computeScrollOffset, scrollElement } from '../util/scroll';
 import { PDFMetadata } from './pdf-metadata';
 
 /**
@@ -574,8 +574,8 @@ export class PDFIntegration
   }
 
   /**
-   * Return the offset that the PDF content container would need to be scrolled
-   * to, in order to make an anchor visible.
+   * Return a scroll offset for the PDF content container that would make an
+   * anchor visible.
    *
    * @return - Target offset or `null` if this anchor was not resolved
    */
@@ -585,7 +585,9 @@ export class PDFIntegration
       return null;
     }
     const highlight = anchor.highlights[0];
-    return offsetRelativeTo(highlight, this.contentContainer());
+    return computeScrollOffset(this.contentContainer(), highlight, {
+      position: 'center',
+    });
   }
 
   async renderToBitmap(
