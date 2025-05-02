@@ -433,6 +433,12 @@ export class Guest
     };
 
     this._listeners.add(this.element, 'mouseup', event => {
+      // Don't select annotations if user makes a selection using the mouse
+      // which ends inside a highlight.
+      if (!document.getSelection()?.isCollapsed) {
+        return;
+      }
+
       const { clientX, clientY, metaKey, ctrlKey } = event;
       const tags = annotationsAtPoint(clientX, clientY);
       if (tags.length) {
