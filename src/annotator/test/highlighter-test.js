@@ -416,8 +416,8 @@ describe('annotator/highlighter', () => {
           bottom: 1,
         },
         expected: {
-          top: 'calc(0% - 5px)',
-          left: 'calc(0% - 5px)',
+          top: '0%',
+          left: '0%',
           // 100% anchor width - 2 * 3px highlight border
           width: 'calc(100% - 6px)',
           // 100% anchor height - 2 * 3px highlight border
@@ -428,8 +428,9 @@ describe('annotator/highlighter', () => {
         // Point at top-left corner of anchor element.
         shape: { type: 'point', x: 0, y: 0 },
         expected: {
-          top: 'calc(0% - 5px)',
-          left: 'calc(0% - 5px)',
+          // Offset = 3px for highlight border, 5px for radius
+          top: 'calc(0% - 8px)',
+          left: 'calc(0% - 8px)',
           width: '10px',
           height: '10px',
         },
