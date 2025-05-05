@@ -84,6 +84,10 @@ describe('sidebar/util/thread-sorters', () => {
       return { annotation: { location, created } };
     }
 
+    // Thread whose annotation has no location information. This should always
+    // sort before annotations with location info.
+    const noLocationThread = thread({});
+
     // Create a position-only location. This is the common case for a web page
     // or PDF.
     function charOffset(pos) {
@@ -99,48 +103,48 @@ describe('sidebar/util/thread-sorters', () => {
     const compareLocation = (a, b) =>
       compareThreads(a, b, { sortBy: 'location' });
 
-    it('sorts by CFI', () => {
-      const a = thread(cfiLocation('/2/2'));
-      const b = thread(cfiLocation('/2/4'));
-      const c = thread(cfiLocation('/2/4'), newDate);
-
+    // Check comparison of three threads by a certain location field where:
+    //
+    // - a and b have different values for the field and a < b.
+    // - b and c have equal values for the field, but b was created first
+    const checkOrdering = (a, b, c) => {
       assert.equal(compareLocation(a, b), -1);
       assert.equal(compareLocation(a, a), 0);
       assert.equal(compareLocation(b, a), 1);
       assert.equal(compareLocation(b, c), -1);
+
+      // A thread without the location field is treated as having a minimum
+      // value for that field.
+      assert.equal(compareLocation(noLocationThread, a), -1);
+      assert.equal(compareLocation(a, noLocationThread), 1);
+    };
+
+    it('sorts by CFI', () => {
+      const a = thread(cfiLocation('/2/2'));
+      const b = thread(cfiLocation('/2/4'));
+      const c = thread(cfiLocation('/2/4'), newDate);
+      checkOrdering(a, b, c);
     });
 
     it('sorts by page index', () => {
       const a = thread({ pageIndex: 1 });
       const b = thread({ pageIndex: 2 });
       const c = thread({ pageIndex: 2 }, newDate);
-
-      assert.equal(compareLocation(a, b), -1);
-      assert.equal(compareLocation(a, a), 0);
-      assert.equal(compareLocation(b, a), 1);
-      assert.equal(compareLocation(b, c), -1);
+      checkOrdering(a, b, c);
     });
 
     it('sorts by distance from top of page', () => {
       const a = thread({ top: 1 });
       const b = thread({ top: 2 });
       const c = thread({ top: 2 }, newDate);
-
-      assert.equal(compareLocation(a, b), -1);
-      assert.equal(compareLocation(a, a), 0);
-      assert.equal(compareLocation(b, a), 1);
-      assert.equal(compareLocation(b, c), -1);
+      checkOrdering(a, b, c);
     });
 
     it('sorts by character offset', () => {
       const a = thread(charOffset(5));
       const b = thread(charOffset(10));
       const c = thread(charOffset(10), newDate);
-
-      assert.equal(compareLocation(a, b), -1);
-      assert.equal(compareLocation(a, a), 0);
-      assert.equal(compareLocation(b, a), 1);
-      assert.equal(compareLocation(b, c), -1);
+      checkOrdering(a, b, c);
     });
 
     it('sorts by creation date if annotations do not have comparable locations', () => {

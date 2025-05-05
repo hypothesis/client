@@ -43,16 +43,14 @@ function oldestRootAnnotationDate(thread: Thread): string {
 
 /**
  * Compare optional numeric values.
+ *
+ * To provide a total ordering, missing values sort before non-missing values
+ * and all missing values are considered equal.
  */
-function compareNumbers(
-  a: number | undefined,
-  b: number | undefined,
-): number | undefined {
-  if (typeof a === 'number' && typeof b === 'number') {
-    return Math.sign(a - b);
-  } else {
-    return undefined;
-  }
+function compareNumbers(a: number | undefined, b: number | undefined): number {
+  const aNum = a ?? Number.MIN_SAFE_INTEGER;
+  const bNum = b ?? Number.MIN_SAFE_INTEGER;
+  return Math.sign(aNum - bNum);
 }
 
 /** Perform a lexicographic, locale-insensitive comparison of strings. */
@@ -100,6 +98,14 @@ export function compareThreads(a: Thread, b: Thread, options: Options): number {
   }
 }
 
+/**
+ * Compare annotations by location in the document.
+ *
+ * This function must define a consistent total ordering for annotations, even
+ * if they have different selectors, so that {@link Array.sort} will behave
+ * predictably. To achieve this, default values are used to fill in missing
+ * fields.
+ */
 function compareByLocation(a: Thread, b: Thread): number {
   if (!a.annotation || !b.annotation) {
     return compareHeadlessThreads(a, b);
@@ -109,8 +115,12 @@ function compareByLocation(a: Thread, b: Thread): number {
   const bLocation = location(b.annotation);
 
   // Compare by chapter. Applicable for annotations on EPUBs with CFIs.
-  if (aLocation.cfi && bLocation.cfi) {
-    const cfiResult = compareCFIs(aLocation.cfi, bLocation.cfi);
+  if (aLocation.cfi || bLocation.cfi) {
+    const defaultCFI = '/0';
+    const cfiResult = compareCFIs(
+      aLocation.cfi ?? defaultCFI,
+      bLocation.cfi ?? defaultCFI,
+    );
     if (cfiResult !== 0) {
       // Annotations are in different chapters.
       return Math.sign(cfiResult);
@@ -119,23 +129,22 @@ function compareByLocation(a: Thread, b: Thread): number {
 
   // Compare by page index.
   const pageOrder = compareNumbers(aLocation.pageIndex, bLocation.pageIndex);
-  if (pageOrder !== undefined && pageOrder !== 0) {
+  if (pageOrder !== 0) {
     return pageOrder;
   }
 
   // Compare by position relative to top of page.
   const topOrder = compareNumbers(aLocation.top, bLocation.top);
-  if (topOrder !== undefined && topOrder !== 0) {
+  if (topOrder !== 0) {
     return topOrder;
   }
 
   // Compare by character offset within the document text.
   const textOrder = compareNumbers(aLocation.charOffset, bLocation.charOffset);
-  if (textOrder !== undefined && textOrder !== 0) {
+  if (textOrder !== 0) {
     return textOrder;
   }
 
-  // If we can't order the annotations by location, fall back to comparing
-  // by creation date.
+  // If annotations have the same location, order by creation date.
   return compareStrings(a.annotation.created, b.annotation.created);
 }
