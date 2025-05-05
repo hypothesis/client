@@ -8,8 +8,12 @@ describe('annotator.util.url', () => {
     });
 
     it('resolves relative URLs against the document URI, if no base URI is provided', () => {
+      const baseURI = new URL(document.baseURI);
+      // Remove query params
+      baseURI.search = '';
+
       // Strip filename from base URI.
-      const base = document.baseURI.replace(/\/[^/]*$/, '');
+      const base = baseURI.toString().replace(/\/[^/]*$/, '');
       assert.equal(normalizeURI('foo.html'), `${base}/foo.html`);
     });
 
