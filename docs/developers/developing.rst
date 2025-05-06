@@ -103,7 +103,7 @@ the client into a browser extension is the easiest option.
 Running the Tests
 -----------------
 
-Hypothesis uses Karma and mocha for testing. To run all the tests once, run:
+Hypothesis uses Vitest for testing. To run all the tests once, run:
 
 .. code-block:: sh
 
