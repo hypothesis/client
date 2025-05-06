@@ -22,6 +22,195 @@ export const clusterValues: HighlightCluster[] = [
 ];
 
 /**
+ * Manages a collection of highlights under a given root element.
+ */
+export class Highlighter {
+  /** The root element within which all highlighted content and highlights live. */
+  root: HTMLElement;
+
+  constructor(root: HTMLElement = document.body) {
+    this.root = root;
+  }
+
+  /**
+   * Create highlights for an annotated region defined by a shape.
+   */
+  highlightShape(region: ShapeAnchor): HighlightElement[] {
+    const { shape, anchor } = region;
+
+    const highlightEl = document.createElement('hypothesis-highlight');
+
+    // Should match the width used by the `hypothesis-shape-highlight` class.
+    const highlightBorderWidth = 3;
+    highlightEl.className = 'hypothesis-shape-highlight';
+
+    // The highlight shape is positioned relative to the anchor element using
+    // `calc` so that it stays in the same position if the anchor element is
+    // resized, eg. as a result of zooming the page.
+    if (shape.type === 'rect') {
+      const width = shape.right - shape.left;
+      const height = shape.bottom - shape.top;
+      highlightEl.style.left = `${shape.left * 100}%`;
+      highlightEl.style.top = `${shape.top * 100}%`;
+      highlightEl.style.width = `calc(${width * 100}% - ${2 * highlightBorderWidth}px)`;
+      highlightEl.style.height = `calc(${height * 100}% - ${2 * highlightBorderWidth}px)`;
+    } else if (shape.type === 'point') {
+      const radius = 5;
+      highlightEl.style.left = `calc(${shape.x * 100}% - ${radius + highlightBorderWidth}px)`;
+      highlightEl.style.top = `calc(${shape.y * 100}% - ${radius + highlightBorderWidth}px)`;
+      highlightEl.style.width = `${radius * 2}px`;
+      highlightEl.style.height = `${radius * 2}px`;
+      highlightEl.style.borderRadius = '50%';
+    }
+
+    anchor.append(highlightEl);
+
+    return [highlightEl];
+  }
+
+  /**
+   * Wraps the DOM Nodes within the provided range with a highlight
+   * element of the specified class and returns the highlight Elements.
+   *
+   * @param range - Range to be highlighted
+   * @param [cssClass] - CSS class(es) to add to the highlight elements
+   * @return Elements wrapping text in `normedRange` to add a highlight effect
+   */
+  highlightRange(range: Range, cssClass?: string): HighlightElement[] {
+    const textNodes = wholeTextNodesInRange(range);
+
+    // Check if this range refers to a placeholder for not-yet-rendered content in
+    // a PDF. These highlights should be invisible.
+    const inPlaceholder = textNodes.length > 0 && isInPlaceholder(textNodes[0]);
+
+    // Group text nodes into spans of adjacent nodes. If a group of text nodes are
+    // adjacent, we only need to create one highlight element for the group.
+    let textNodeSpans: Text[][] = [];
+    let prevNode: Node | null = null;
+    let currentSpan = null;
+
+    textNodes.forEach(node => {
+      if (prevNode && prevNode.nextSibling === node) {
+        currentSpan.push(node);
+      } else {
+        currentSpan = [node];
+        textNodeSpans.push(currentSpan);
+      }
+      prevNode = node;
+    });
+
+    // Filter out text node spans that consist only of white space. This avoids
+    // inserting highlight elements in places that can only contain a restricted
+    // subset of nodes such as table rows and lists.
+    const whitespace = /^\s*$/;
+    textNodeSpans = textNodeSpans.filter(span => {
+      const parentElement = span[0].parentElement;
+      return (
+        // Whitespace <span>s should be highlighted since they affect layout in
+        // some code editors
+        (parentElement?.childNodes.length === 1 &&
+          parentElement?.tagName === 'SPAN') ||
+        // Otherwise ignore white-space only Text node spans
+        span.some(node => !whitespace.test(node.data))
+      );
+    });
+
+    // Wrap each text node span with a `<hypothesis-highlight>` element.
+    const highlights: HighlightElement[] = [];
+    textNodeSpans.forEach(nodes => {
+      // A custom element name is used here rather than `<span>` to reduce the
+      // likelihood of highlights being hidden by page styling.
+
+      const highlightEl = document.createElement('hypothesis-highlight');
+      highlightEl.className = classnames('hypothesis-highlight', cssClass);
+
+      const parent = nodes[0].parentNode as ParentNode;
+      parent.replaceChild(highlightEl, nodes[0]);
+      nodes.forEach(node => highlightEl.appendChild(node));
+
+      highlights.push(highlightEl);
+    });
+
+    // For PDF highlights, create the highlight effect by using an SVG placed
+    // above the page's canvas rather than CSS `background-color` on the highlight
+    // element. This enables more control over blending of the highlight with the
+    // content below.
+    //
+    // Drawing these SVG highlights involves measuring the `<hypothesis-highlight>`
+    // elements, so we create them only after those elements have all been created
+    // to reduce the number of forced reflows. We also skip creating them for
+    // unrendered pages for performance reasons.
+    if (!inPlaceholder) {
+      drawHighlightsAbovePDFCanvas(highlights, cssClass);
+    }
+
+    return highlights;
+  }
+
+  /**
+   * Remove all highlights under a given root element.
+   */
+  removeAllHighlights() {
+    const highlights = Array.from(
+      this.root.querySelectorAll('hypothesis-highlight'),
+    );
+    this.removeHighlights(highlights as HighlightElement[]);
+  }
+
+  /**
+   * Remove highlights from a range previously highlighted with `highlightRange`.
+   */
+  removeHighlights(highlights: HighlightElement[]) {
+    // Explicitly un-focus highlights to be removed. This ensures associated
+    // focused elements are removed from the document.
+    setHighlightsFocused(highlights, false);
+    for (const h of highlights) {
+      if (h.parentNode) {
+        const children = Array.from(h.childNodes);
+        replaceWith(h, children);
+      }
+      if (h.svgHighlight) {
+        h.svgHighlight.remove();
+      }
+    }
+  }
+
+  /**
+   * Set whether the given highlight elements should appear "focused".
+   *
+   * A highlight can be displayed in a different ("focused") style to indicate
+   * that it is current in some other context - for example the user has selected
+   * the corresponding annotation in the sidebar.
+   */
+  setHighlightsFocused(highlights: HighlightElement[], focused: boolean) {
+    highlights.forEach(h => {
+      // In PDFs the visible highlight is created by an SVG element, so the focused
+      // effect is applied to that. In other documents the effect is applied to the
+      // `<hypothesis-highlight>` element.
+      if (h.svgHighlight) {
+        setSVGHighlightFocused(h.svgHighlight, focused);
+      } else {
+        h.classList.toggle('hypothesis-highlight-focused', focused);
+      }
+    });
+  }
+
+  /**
+   * Set whether highlights under the given root element should be visible.
+   */
+  setHighlightsVisible(visible: boolean) {
+    this.root.classList.toggle(showHighlightsClass, visible);
+  }
+
+  /**
+   * Get the visible highlight elements at the given client coordinates.
+   */
+  getHighlightsFromPoint(x: number, y: number): HighlightElement[] {
+    return getHighlightsFromPoint(x, y);
+  }
+}
+
+/**
  * Return the canvas element underneath a highlight element in a PDF page's
  * text layer.
  *
@@ -204,124 +393,6 @@ function wholeTextNodesInRange(range: Range): Text[] {
 }
 
 /**
- * Create highlights for an annotated region defined by a shape.
- */
-export function highlightShape(region: ShapeAnchor): HighlightElement[] {
-  const { shape, anchor } = region;
-
-  const highlightEl = document.createElement('hypothesis-highlight');
-
-  // Should match the width used by the `hypothesis-shape-highlight` class.
-  const highlightBorderWidth = 3;
-  highlightEl.className = 'hypothesis-shape-highlight';
-
-  // The highlight shape is positioned relative to the anchor element using
-  // `calc` so that it stays in the same position if the anchor element is
-  // resized, eg. as a result of zooming the page.
-  if (shape.type === 'rect') {
-    const width = shape.right - shape.left;
-    const height = shape.bottom - shape.top;
-    highlightEl.style.left = `${shape.left * 100}%`;
-    highlightEl.style.top = `${shape.top * 100}%`;
-    highlightEl.style.width = `calc(${width * 100}% - ${2 * highlightBorderWidth}px)`;
-    highlightEl.style.height = `calc(${height * 100}% - ${2 * highlightBorderWidth}px)`;
-  } else if (shape.type === 'point') {
-    const radius = 5;
-    highlightEl.style.left = `calc(${shape.x * 100}% - ${radius + highlightBorderWidth}px)`;
-    highlightEl.style.top = `calc(${shape.y * 100}% - ${radius + highlightBorderWidth}px)`;
-    highlightEl.style.width = `${radius * 2}px`;
-    highlightEl.style.height = `${radius * 2}px`;
-    highlightEl.style.borderRadius = '50%';
-  }
-
-  anchor.append(highlightEl);
-
-  return [highlightEl];
-}
-
-/**
- * Wraps the DOM Nodes within the provided range with a highlight
- * element of the specified class and returns the highlight Elements.
- *
- * @param range - Range to be highlighted
- * @param [cssClass] - CSS class(es) to add to the highlight elements
- * @return Elements wrapping text in `normedRange` to add a highlight effect
- */
-export function highlightRange(
-  range: Range,
-  cssClass?: string,
-): HighlightElement[] {
-  const textNodes = wholeTextNodesInRange(range);
-
-  // Check if this range refers to a placeholder for not-yet-rendered content in
-  // a PDF. These highlights should be invisible.
-  const inPlaceholder = textNodes.length > 0 && isInPlaceholder(textNodes[0]);
-
-  // Group text nodes into spans of adjacent nodes. If a group of text nodes are
-  // adjacent, we only need to create one highlight element for the group.
-  let textNodeSpans: Text[][] = [];
-  let prevNode: Node | null = null;
-  let currentSpan = null;
-
-  textNodes.forEach(node => {
-    if (prevNode && prevNode.nextSibling === node) {
-      currentSpan.push(node);
-    } else {
-      currentSpan = [node];
-      textNodeSpans.push(currentSpan);
-    }
-    prevNode = node;
-  });
-
-  // Filter out text node spans that consist only of white space. This avoids
-  // inserting highlight elements in places that can only contain a restricted
-  // subset of nodes such as table rows and lists.
-  const whitespace = /^\s*$/;
-  textNodeSpans = textNodeSpans.filter(span => {
-    const parentElement = span[0].parentElement;
-    return (
-      // Whitespace <span>s should be highlighted since they affect layout in
-      // some code editors
-      (parentElement?.childNodes.length === 1 &&
-        parentElement?.tagName === 'SPAN') ||
-      // Otherwise ignore white-space only Text node spans
-      span.some(node => !whitespace.test(node.data))
-    );
-  });
-
-  // Wrap each text node span with a `<hypothesis-highlight>` element.
-  const highlights: HighlightElement[] = [];
-  textNodeSpans.forEach(nodes => {
-    // A custom element name is used here rather than `<span>` to reduce the
-    // likelihood of highlights being hidden by page styling.
-
-    const highlightEl = document.createElement('hypothesis-highlight');
-    highlightEl.className = classnames('hypothesis-highlight', cssClass);
-
-    const parent = nodes[0].parentNode as ParentNode;
-    parent.replaceChild(highlightEl, nodes[0]);
-    nodes.forEach(node => highlightEl.appendChild(node));
-
-    highlights.push(highlightEl);
-  });
-
-  // For PDF highlights, create the highlight effect by using an SVG placed
-  // above the page's canvas rather than CSS `background-color` on the highlight
-  // element. This enables more control over blending of the highlight with the
-  // content below.
-  //
-  // Drawing these SVG highlights involves measuring the `<hypothesis-highlight>`
-  // elements, so we create them only after those elements have all been created
-  // to reduce the number of forced reflows. We also skip creating them for
-  // unrendered pages for performance reasons.
-  if (!inPlaceholder) {
-    drawHighlightsAbovePDFCanvas(highlights, cssClass);
-  }
-
-  return highlights;
-}
-
-/**
  * Replace a child `node` with `replacements`.
  *
  * nb. This is like `ChildNode.replaceWith` but it works in older browsers.
@@ -330,32 +401,6 @@ function replaceWith(node: ChildNode, replacements: Node[]) {
   const parent = node.parentNode as ParentNode;
   replacements.forEach(r => parent.insertBefore(r, node));
   node.remove();
-}
-
-/**
- * Remove all highlights under a given root element.
- */
-export function removeAllHighlights(root: HTMLElement) {
-  const highlights = Array.from(root.querySelectorAll('hypothesis-highlight'));
-  removeHighlights(highlights as HighlightElement[]);
-}
-
-/**
- * Remove highlights from a range previously highlighted with `highlightRange`.
- */
-export function removeHighlights(highlights: HighlightElement[]) {
-  // Explicitly un-focus highlights to be removed. This ensures associated
-  // focused elements are removed from the document.
-  setHighlightsFocused(highlights, false);
-  for (const h of highlights) {
-    if (h.parentNode) {
-      const children = Array.from(h.childNodes);
-      replaceWith(h, children);
-    }
-    if (h.svgHighlight) {
-      h.svgHighlight.remove();
-    }
-  }
 }
 
 /**
@@ -397,14 +442,7 @@ function setSVGHighlightFocused(svgEl: SVGElement, focused: boolean) {
   }
 }
 
-/**
- * Set whether the given highlight elements should appear "focused".
- *
- * A highlight can be displayed in a different ("focused") style to indicate
- * that it is current in some other context - for example the user has selected
- * the corresponding annotation in the sidebar.
- */
-export function setHighlightsFocused(
+function setHighlightsFocused(
   highlights: HighlightElement[],
   focused: boolean,
 ) {
@@ -422,13 +460,6 @@ export function setHighlightsFocused(
 
 /** Class set on root element to make highlights visible. */
 const showHighlightsClass = 'hypothesis-highlights-always-on';
-
-/**
- * Set whether highlights under the given root element should be visible.
- */
-export function setHighlightsVisible(root: HTMLElement, visible: boolean) {
-  root.classList.toggle(showHighlightsClass, visible);
-}
 
 /**
  * Get the visible highlight elements at the given client coordinates.

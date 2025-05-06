@@ -32,15 +32,7 @@ import { DrawTool, DrawError } from './draw-tool';
 import { LayoutChangeEvent } from './events';
 import { FeatureFlags } from './features';
 import { HighlightClusterController } from './highlight-clusters';
-import {
-  getHighlightsFromPoint,
-  highlightRange,
-  highlightShape,
-  removeAllHighlights,
-  removeHighlights,
-  setHighlightsFocused,
-  setHighlightsVisible,
-} from './highlighter';
+import { Highlighter } from './highlighter';
 import { createIntegration } from './integrations';
 import { OutsideAssignmentNoticeController } from './outside-assignment-notice';
 import {
@@ -69,8 +61,13 @@ function annotationsForSelection(): string[] {
  * Return the annotation tags associated with visible highlights at given
  * (clientX, clientY) coordinates.
  */
-function annotationsAtPoint(x: number, y: number): string[] {
-  return getHighlightsFromPoint(x, y)
+function annotationsAtPoint(
+  highlighter: Highlighter,
+  x: number,
+  y: number,
+): string[] {
+  return highlighter
+    .getHighlightsFromPoint(x, y)
     .map(h => (h as AnnotationHighlight)._annotation?.$tag)
     .filter(tag => tag !== undefined) as string[];
 }
@@ -237,6 +234,7 @@ export class Guest
    * the guest.
    */
   private _annotations: Set<string>;
+  private _highlighter: Highlighter;
   private _frameIdentifier: string | null;
   private _portFinder: PortFinder;
 
@@ -294,6 +292,7 @@ export class Guest
     this._informHostOnNextSelectionClear = true;
     this.selectedRanges = [];
     this._outsideAssignmentNotice = null;
+    this._highlighter = new Highlighter(this.element);
 
     this._adder = new Adder(this.element, {
       onAnnotate: () => this.createAnnotationFromSelection(),
@@ -413,7 +412,10 @@ export class Guest
       }
 
       // Don't hide the sidebar if the event comes from an element that contains a highlight
-      if (annotationsAtPoint(event.clientX, event.clientY).length) {
+      if (
+        annotationsAtPoint(this._highlighter, event.clientX, event.clientY)
+          .length
+      ) {
         return;
       }
 
@@ -440,7 +442,7 @@ export class Guest
       }
 
       const { clientX, clientY, metaKey, ctrlKey } = event;
-      const tags = annotationsAtPoint(clientX, clientY);
+      const tags = annotationsAtPoint(this._highlighter, clientX, clientY);
       if (tags.length) {
         const toggle = metaKey || ctrlKey;
         this.selectAnnotations(tags, { toggle });
@@ -450,7 +452,7 @@ export class Guest
     this._listeners.add(this.element, 'pointerdown', maybeCloseSidebar);
 
     this._listeners.add(this.element, 'mouseover', ({ clientX, clientY }) => {
-      const tags = annotationsAtPoint(clientX, clientY);
+      const tags = annotationsAtPoint(this._highlighter, clientX, clientY);
       if (tags.length) {
         this._sidebarRPC.call('hoverAnnotations', tags);
       }
@@ -708,7 +710,7 @@ export class Guest
     this._clusterToolbar?.destroy();
     this._outsideAssignmentNotice?.destroy();
 
-    removeAllHighlights(this.element);
+    this._highlighter.removeAllHighlights();
 
     this._integration.destroy();
 
@@ -780,12 +782,14 @@ export class Guest
 
       let highlights;
       if (region instanceof Range) {
-        highlights = highlightRange(
+        highlights = this._highlighter.highlightRange(
           region,
           anchor.annotation?.$cluster /* cssClass */,
         ) as AnnotationHighlight[];
       } else {
-        highlights = highlightShape(region) as AnnotationHighlight[];
+        highlights = this._highlighter.highlightShape(
+          region,
+        ) as AnnotationHighlight[];
       }
       highlights.forEach(h => {
         h._annotation = anchor.annotation;
@@ -793,7 +797,7 @@ export class Guest
       anchor.highlights = highlights;
 
       if (this._hoveredAnnotations.has(anchor.annotation.$tag)) {
-        setHighlightsFocused(highlights, true);
+        this._highlighter.setHighlightsFocused(highlights, true);
       }
     };
 
@@ -846,7 +850,7 @@ export class Guest
       if (anchor.annotation.$tag !== tag) {
         anchors.push(anchor);
       } else if (anchor.highlights) {
-        removeHighlights(anchor.highlights);
+        this._highlighter.removeHighlights(anchor.highlights);
       }
     }
     this._updateAnchors(anchors, notify);
@@ -977,7 +981,7 @@ export class Guest
     for (const anchor of this.anchors) {
       if (anchor.highlights) {
         const toggle = tags.includes(anchor.annotation.$tag);
-        setHighlightsFocused(anchor.highlights, toggle);
+        this._highlighter.setHighlightsFocused(anchor.highlights, toggle);
       }
     }
 
@@ -1057,7 +1061,7 @@ export class Guest
    *   visibility is coming from the host frame.
    */
   setHighlightsVisible(visible: boolean, notifyHost = true) {
-    setHighlightsVisible(this.element, visible);
+    this._highlighter.setHighlightsVisible(visible);
     this._highlightsVisible = visible;
     if (notifyHost) {
       this._hostRPC.call('highlightsVisibleChanged', visible);

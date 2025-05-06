@@ -33,7 +33,6 @@ class FakeTextRange {
 describe('Guest', () => {
   const sandbox = sinon.createSandbox();
   let guests;
-  let highlighter;
   let hostFrame;
   let notifySelectionChanged;
   let rangeUtil;
@@ -42,6 +41,8 @@ describe('Guest', () => {
   let fakeBucketBarClient;
   let FakeDrawTool;
   let fakeDrawTool;
+  let FakeHighlighter;
+  let fakeHighlighter;
   let fakeHighlightClusterController;
   let FakeHighlightClusterController;
   let fakeCreateIntegration;
@@ -119,7 +120,7 @@ describe('Guest', () => {
 
   beforeEach(() => {
     guests = [];
-    highlighter = {
+    fakeHighlighter = {
       getHighlightsFromPoint: sinon.stub().returns([]),
       highlightRange: sinon.stub().returns([]),
       highlightShape: sinon.stub().returns([]),
@@ -128,6 +129,7 @@ describe('Guest', () => {
       setHighlightsFocused: sinon.stub(),
       setHighlightsVisible: sinon.stub(),
     };
+    FakeHighlighter = sinon.stub().returns(fakeHighlighter);
     hostFrame = {
       postMessage: sinon.stub(),
     };
@@ -232,7 +234,9 @@ describe('Guest', () => {
       './highlight-clusters': {
         HighlightClusterController: FakeHighlightClusterController,
       },
-      './highlighter': highlighter,
+      './highlighter': {
+        Highlighter: FakeHighlighter,
+      },
       './integrations': {
         createIntegration: fakeCreateIntegration,
       },
@@ -482,7 +486,7 @@ describe('Guest', () => {
         emitSidebarEvent('hoverAnnotations', ['tag1']);
 
         assert.calledWith(
-          highlighter.setHighlightsFocused,
+          fakeHighlighter.setHighlightsFocused,
           guest.anchors[0].highlights,
           true,
         );
@@ -500,7 +504,7 @@ describe('Guest', () => {
         emitSidebarEvent('hoverAnnotations', ['tag1']);
 
         assert.calledWith(
-          highlighter.setHighlightsFocused,
+          fakeHighlighter.setHighlightsFocused,
           guest.anchors[1].highlights,
           false,
         );
@@ -527,21 +531,13 @@ describe('Guest', () => {
 
     describe('on "setHighlightsVisible" event', () => {
       it('sets visibility of highlights in document', () => {
-        const guest = createGuest();
+        createGuest();
 
         emitSidebarEvent('setHighlightsVisible', true);
-        assert.calledWith(
-          highlighter.setHighlightsVisible,
-          guest.element,
-          true,
-        );
+        assert.calledWith(fakeHighlighter.setHighlightsVisible, true);
 
         emitSidebarEvent('setHighlightsVisible', false);
-        assert.calledWith(
-          highlighter.setHighlightsVisible,
-          guest.element,
-          false,
-        );
+        assert.calledWith(fakeHighlighter.setHighlightsVisible, false);
       });
     });
 
@@ -866,7 +862,9 @@ describe('Guest', () => {
       // Create a fake highlight as a target for hover and click events.
       fakeHighlight = document.createElement('hypothesis-highlight');
       const annotation = { $tag: 'highlight-ann-tag' };
-      highlighter.getHighlightsFromPoint.returns([{ _annotation: annotation }]);
+      fakeHighlighter.getHighlightsFromPoint.returns([
+        { _annotation: annotation },
+      ]);
 
       // Guest relies on event listeners on the root element, so all highlights must
       // be descendants of it.
@@ -888,7 +886,7 @@ describe('Guest', () => {
         );
 
       it('hides sidebar', () => {
-        highlighter.getHighlightsFromPoint.returns([]);
+        fakeHighlighter.getHighlightsFromPoint.returns([]);
         createGuest();
         simulateClick();
         assert.isTrue(sidebarClosed());
@@ -909,7 +907,7 @@ describe('Guest', () => {
       });
 
       it('does not hide sidebar if host page reports side-by-side is active', () => {
-        highlighter.getHighlightsFromPoint.returns([]);
+        fakeHighlighter.getHighlightsFromPoint.returns([]);
         const isActive = sinon.stub().returns(true);
         createGuest({
           sideBySide: {
@@ -942,7 +940,7 @@ describe('Guest', () => {
       });
 
       it('does not hide sidebar if event is inside a `<hypothesis-*>` element', () => {
-        highlighter.getHighlightsFromPoint.returns([]);
+        fakeHighlighter.getHighlightsFromPoint.returns([]);
         createGuest();
 
         const hypothesisElement = document.createElement('hypothesis-sidebar');
@@ -991,7 +989,7 @@ describe('Guest', () => {
           clientY: 60,
         }),
       );
-      assert.calledWith(highlighter.getHighlightsFromPoint, 50, 60);
+      assert.calledWith(fakeHighlighter.getHighlightsFromPoint, 50, 60);
       assert.calledWith(sidebarRPC().call, 'hoverAnnotations', [
         'highlight-ann-tag',
       ]);
@@ -1002,7 +1000,7 @@ describe('Guest', () => {
     });
 
     it('does not focus annotations in the sidebar when a non-highlight element is hovered', () => {
-      highlighter.getHighlightsFromPoint.returns([]);
+      fakeHighlighter.getHighlightsFromPoint.returns([]);
       createGuest();
       rootElement.dispatchEvent(
         new MouseEvent('mouseover', {
@@ -1012,7 +1010,7 @@ describe('Guest', () => {
         }),
       );
 
-      assert.calledWith(highlighter.getHighlightsFromPoint, 50, 60);
+      assert.calledWith(fakeHighlighter.getHighlightsFromPoint, 50, 60);
       assert.notCalled(sidebarRPC().call);
     });
 
@@ -1532,7 +1530,7 @@ describe('Guest', () => {
       await guest.anchor(annotation);
 
       assert.equal(
-        highlighter.highlightRange.lastCall.args[1],
+        fakeHighlighter.highlightRange.lastCall.args[1],
         'user-annotations',
       );
     });
@@ -1541,7 +1539,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const highlights = [document.createElement('span')];
       fakeIntegration.anchor.returns(Promise.resolve(range));
-      highlighter.highlightRange.returns(highlights);
+      fakeHighlighter.highlightRange.returns(highlights);
       const target = {
         selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
       };
@@ -1558,7 +1556,7 @@ describe('Guest', () => {
         anchor: document.createElement('div'),
         shape: { type: 'point', x: 0, y: 0 },
       });
-      highlighter.highlightShape.returns(highlights);
+      fakeHighlighter.highlightShape.returns(highlights);
       const target = {
         selector: [
           { type: 'ShapeSelector', shape: { type: 'point', x: 0, y: 100 } },
@@ -1572,7 +1570,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const highlights = [document.createElement('span')];
       fakeIntegration.anchor.returns(Promise.resolve(range));
-      highlighter.highlightRange.returns(highlights);
+      fakeHighlighter.highlightRange.returns(highlights);
       const target = {
         selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
       };
@@ -1592,7 +1590,7 @@ describe('Guest', () => {
       const highlights = [];
       const guest = createGuest();
       guest.anchors = [{ annotation, target, highlights }];
-      const { removeHighlights } = highlighter;
+      const { removeHighlights } = fakeHighlighter;
 
       return guest.anchor(annotation).then(() => {
         assert.equal(guest.anchors.length, 0);
@@ -1605,7 +1603,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const highlights = [document.createElement('span')];
       fakeIntegration.anchor.resolves(range);
-      highlighter.highlightRange.returns(highlights);
+      fakeHighlighter.highlightRange.returns(highlights);
       const target = {
         selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
       };
@@ -1621,7 +1619,7 @@ describe('Guest', () => {
       // Check that the new highlights are already in the focused state.
       assert.equal(anchors.length, 1);
       assert.calledWith(
-        highlighter.setHighlightsFocused,
+        fakeHighlighter.setHighlightsFocused,
         anchors[0].highlights,
         true,
       );
@@ -1686,7 +1684,7 @@ describe('Guest', () => {
     it('removes any highlights associated with the annotation', () => {
       const guest = createGuest();
       const anchor = createAnchor();
-      const { removeHighlights } = highlighter;
+      const { removeHighlights } = fakeHighlighter;
       guest.anchors.push(anchor);
 
       guest.detach(anchor.annotation.$tag);
@@ -1705,7 +1703,7 @@ describe('Guest', () => {
 
       assert.include(guest.anchors, anchorB);
       assert.isFalse(
-        highlighter.removeHighlights.calledWith(anchorB.highlights),
+        fakeHighlighter.removeHighlights.calledWith(anchorB.highlights),
       );
     });
 
@@ -1745,7 +1743,7 @@ describe('Guest', () => {
     it('removes all highlights', () => {
       const guest = createGuest();
       guest.destroy();
-      assert.calledWith(highlighter.removeAllHighlights, guest.element);
+      assert.calledWith(fakeHighlighter.removeAllHighlights);
     });
 
     it('disconnects from sidebar', () => {

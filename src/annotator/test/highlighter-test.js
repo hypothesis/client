@@ -2,13 +2,7 @@ import { render } from 'preact';
 
 import {
   getBoundingClientRect,
-  getHighlightsFromPoint,
-  highlightRange,
-  highlightShape,
-  removeHighlights,
-  removeAllHighlights,
-  setHighlightsFocused,
-  setHighlightsVisible,
+  Highlighter,
   updateClusters,
 } from '../highlighter';
 
@@ -70,12 +64,12 @@ function PDFPage({ showPlaceholder = false }) {
  *   and SVG rect elements
  * @return {HighlightElement[]} - `<hypothesis-highlight>` element
  */
-function highlightPDFRange(pageContainer, cssClass = '') {
+function highlightPDFRange(highlighter, pageContainer, cssClass = '') {
   const textSpan = pageContainer.querySelector('.testText');
   const range = new Range();
   range.setStartBefore(textSpan.childNodes[0]);
   range.setEndAfter(textSpan.childNodes[0]);
-  return highlightRange(range, cssClass);
+  return highlighter.highlightRange(range, cssClass);
 }
 
 describe('annotator/highlighter', () => {
@@ -88,14 +82,14 @@ describe('annotator/highlighter', () => {
    *   and SVG rect elements
    * @return {HTMLElement}
    */
-  function createPDFPageWithHighlight(cssClass = '') {
+  function createPDFPageWithHighlight(highlighter, cssClass = '') {
     const container = document.createElement('div');
     containers.push(container);
     document.body.append(container);
 
     render(<PDFPage />, container);
 
-    highlightPDFRange(container, cssClass);
+    highlightPDFRange(highlighter, container, cssClass);
 
     return container;
   }
@@ -117,7 +111,8 @@ describe('annotator/highlighter', () => {
       range.setStartBefore(text);
       range.setEndAfter(text);
 
-      const result = highlightRange(range, 'extra-css-class');
+      const hl = new Highlighter();
+      const result = hl.highlightRange(range, 'extra-css-class');
 
       assert.equal(result.length, 1);
       assert.strictEqual(el.childNodes[0], result[0]);
@@ -147,7 +142,8 @@ describe('annotator/highlighter', () => {
         const range = new Range();
         range.setStart(el.firstChild, startPos);
         range.setEnd(el.firstChild, endPos);
-        const result = highlightRange(range);
+        const hl = new Highlighter();
+        const result = hl.highlightRange(range);
 
         const highlightedText = result.reduce(
           (str, el) => str + el.textContent,
@@ -177,7 +173,8 @@ describe('annotator/highlighter', () => {
       const range = new Range();
       range.setStart(el.firstChild, 4);
       range.setEnd(el, 1);
-      highlightRange(range, '' /* cssClass */);
+      const hl = new Highlighter();
+      hl.highlightRange(range, '' /* cssClass */);
 
       assert.equal(
         el.innerHTML,
@@ -191,7 +188,8 @@ describe('annotator/highlighter', () => {
       const range = new Range();
       range.setStart(el, 0);
       range.setEnd(el, 0);
-      const highlights = highlightRange(range);
+      const hl = new Highlighter();
+      const highlights = hl.highlightRange(range);
 
       assert.deepEqual(highlights, []);
     });
@@ -202,7 +200,8 @@ describe('annotator/highlighter', () => {
       const range = new Range();
       range.setStart(text, 0);
       range.setEnd(text, text.data.length);
-      const highlights = highlightRange(range);
+      const hl = new Highlighter();
+      const highlights = hl.highlightRange(range);
 
       assert.deepEqual(highlights, []);
     });
@@ -221,7 +220,8 @@ describe('annotator/highlighter', () => {
       const range = new Range();
       range.setStartBefore(textNodes[0]);
       range.setEndAfter(textNodes[textNodes.length - 1]);
-      const result = highlightRange(range);
+      const hl = new Highlighter();
+      const result = hl.highlightRange(range);
 
       assert.equal(result.length, textNodes.length);
       result.forEach((highlight, i) => {
@@ -240,7 +240,8 @@ describe('annotator/highlighter', () => {
       const range = new Range();
       range.setStartBefore(textNodes[0]);
       range.setEndAfter(textNodes[textNodes.length - 1]);
-      const result = highlightRange(range);
+      const hl = new Highlighter();
+      const result = hl.highlightRange(range);
 
       assert.equal(result.length, 1);
       assert.equal(el.childNodes.length, 1);
@@ -260,7 +261,8 @@ describe('annotator/highlighter', () => {
       const range = new Range();
       range.setStartBefore(txt);
       range.setEndAfter(txt2);
-      const result = highlightRange(range);
+      const hl = new Highlighter();
+      const result = hl.highlightRange(range);
 
       assert.equal(result.length, 1);
       assert.equal(result[0].textContent, 'one two');
@@ -275,7 +277,8 @@ describe('annotator/highlighter', () => {
       range.setStartBefore(el.childNodes[0]);
       range.setEndAfter(el.childNodes[2]);
 
-      const result = highlightRange(range);
+      const hl = new Highlighter();
+      const result = hl.highlightRange(range);
 
       assert.equal(result.length, 0);
     });
@@ -304,7 +307,8 @@ describe('annotator/highlighter', () => {
       range.setStartBefore(word1.childNodes[0]);
       range.setEndAfter(word2.childNodes[0]);
 
-      const result = highlightRange(range);
+      const hl = new Highlighter();
+      const result = hl.highlightRange(range);
       assert.equal(result.length, 3);
       assert.equal(result[0].textContent, 'one');
       assert.equal(result[1].textContent, ' ');
@@ -313,13 +317,15 @@ describe('annotator/highlighter', () => {
 
     context('when the highlighted text is part of a PDF.js text layer', () => {
       it("removes the highlight element's background color", () => {
-        const page = createPDFPageWithHighlight();
+        const hl = new Highlighter();
+        const page = createPDFPageWithHighlight(hl);
         const highlight = page.querySelector('hypothesis-highlight');
         assert.isTrue(highlight.classList.contains('is-transparent'));
       });
 
       it('add extra CSS classes to both the highlight and SVG rect', () => {
-        const page = createPDFPageWithHighlight('extra-css-class');
+        const hl = new Highlighter();
+        const page = createPDFPageWithHighlight(hl, 'extra-css-class');
         const highlight = page.querySelector('hypothesis-highlight');
         const svgRect = page.querySelector('rect');
         assert.isTrue(highlight.classList.contains('extra-css-class'));
@@ -327,7 +333,8 @@ describe('annotator/highlighter', () => {
       });
 
       it('creates an SVG layer above the PDF canvas and draws a highlight in that', () => {
-        const page = createPDFPageWithHighlight();
+        const hl = new Highlighter();
+        const page = createPDFPageWithHighlight(hl);
         const canvas = page.querySelector('canvas');
         const svgLayer = page.querySelector('svg.hypothesis-highlight-layer');
 
@@ -353,10 +360,11 @@ describe('annotator/highlighter', () => {
 
       it('re-uses the existing SVG layer for the page if present', () => {
         // Create a PDF page with a single highlight.
-        const page = createPDFPageWithHighlight();
+        const hl = new Highlighter();
+        const page = createPDFPageWithHighlight(hl);
 
         // Create a second highlight on the same page.
-        highlightPDFRange(page);
+        highlightPDFRange(hl, page);
 
         // There should be multiple highlights.
         assert.equal(page.querySelectorAll('hypothesis-highlight').length, 2);
@@ -372,6 +380,7 @@ describe('annotator/highlighter', () => {
 
       it('does not create an SVG highlight if the canvas is not found', () => {
         const container = document.createElement('div');
+        const hl = new Highlighter(container);
         render(<PDFPage />, container);
 
         // Remove canvas. This might be missing if the DOM structure looks like
@@ -380,7 +389,7 @@ describe('annotator/highlighter', () => {
         // regular CSS-based highlighting.
         container.querySelector('canvas').remove();
 
-        const [highlight] = highlightPDFRange(container);
+        const [highlight] = highlightPDFRange(hl, container);
 
         assert.isFalse(highlight.classList.contains('is-transparent'));
         assert.isNull(container.querySelector('rect'));
@@ -389,8 +398,9 @@ describe('annotator/highlighter', () => {
 
       it('does not create an SVG highlight for placeholder highlights', () => {
         const container = document.createElement('div');
+        const hl = new Highlighter(container);
         render(<PDFPage showPlaceholder={true} />, container);
-        const [highlight] = highlightPDFRange(container);
+        const [highlight] = highlightPDFRange(hl, container);
 
         // If the highlight is a placeholder, the highlight element should still
         // be created.
@@ -460,7 +470,8 @@ describe('annotator/highlighter', () => {
             anchor,
             shape,
           };
-          const highlights = highlightShape(shapeAnchor);
+          const hl = new Highlighter();
+          const highlights = hl.highlightShape(shapeAnchor);
           assert.equal(highlights.length, 1);
 
           const highlight = highlights[0];
@@ -480,34 +491,37 @@ describe('annotator/highlighter', () => {
     it('unwraps all the elements', () => {
       const txt = document.createTextNode('word');
       const el = document.createElement('span');
-      const hl = document.createElement('span');
+      const highlight = document.createElement('span');
       const div = document.createElement('div');
       el.appendChild(txt);
-      hl.appendChild(el);
-      div.appendChild(hl);
+      highlight.appendChild(el);
+      div.appendChild(highlight);
 
-      removeHighlights([hl]);
+      const hl = new Highlighter();
+      hl.removeHighlights([highlight]);
 
-      assert.isNull(hl.parentNode);
+      assert.isNull(highlight.parentNode);
       assert.strictEqual(el.parentNode, div);
     });
 
     it('does not fail on nodes with no parent', () => {
       const txt = document.createTextNode('no parent');
-      const hl = document.createElement('span');
-      hl.appendChild(txt);
+      const highlight = document.createElement('span');
+      highlight.appendChild(txt);
 
-      removeHighlights([hl]);
+      const hl = new Highlighter();
+      hl.removeHighlights([highlight]);
     });
 
     it('removes any associated SVG elements external to the highlight element', () => {
-      const page = createPDFPageWithHighlight();
+      const hl = new Highlighter();
+      const page = createPDFPageWithHighlight(hl);
       const highlight = page.querySelector('hypothesis-highlight');
 
       assert.instanceOf(highlight.svgHighlight, SVGElement);
       assert.equal(page.querySelectorAll('rect').length, 1);
 
-      removeHighlights([highlight]);
+      hl.removeHighlights([highlight]);
 
       assert.equal(page.querySelectorAll('rect').length, 0);
     });
@@ -518,7 +532,7 @@ describe('annotator/highlighter', () => {
    *
    * Returns all the highlight elements.
    */
-  function createHighlights(root, cssClass = '') {
+  function createHighlights(highlighter, root, cssClass = '') {
     const highlights = [];
 
     for (let i = 0; i < 3; i++) {
@@ -528,7 +542,7 @@ describe('annotator/highlighter', () => {
       range.setStartBefore(span.childNodes[0]);
       range.setEndAfter(span.childNodes[0]);
       root.appendChild(span);
-      highlights.push(...highlightRange(range, cssClass));
+      highlights.push(...highlighter.highlightRange(range, cssClass));
     }
 
     return highlights;
@@ -542,13 +556,14 @@ describe('annotator/highlighter', () => {
 
     it('sets nesting data on highlight elements', () => {
       const container = document.createElement('div');
+      const hl = new Highlighter(container);
       render(<PDFPage />, container);
 
       const highlights = [
-        ...highlightPDFRange(container, 'user-annotations'),
-        ...highlightPDFRange(container, 'user-annotations'),
-        ...highlightPDFRange(container, 'user-annotations'),
-        ...highlightPDFRange(container, 'other-content'),
+        ...highlightPDFRange(hl, container, 'user-annotations'),
+        ...highlightPDFRange(hl, container, 'user-annotations'),
+        ...highlightPDFRange(hl, container, 'user-annotations'),
+        ...highlightPDFRange(hl, container, 'other-content'),
       ];
 
       updateClusters(container);
@@ -566,11 +581,12 @@ describe('annotator/highlighter', () => {
 
     it('sets nesting data on SVG highlights', () => {
       const container = document.createElement('div');
+      const hl = new Highlighter(container);
       render(<PDFPage />, container);
 
       const highlights = [
-        ...highlightPDFRange(container, 'user-annotations'),
-        ...highlightPDFRange(container, 'user-annotations'),
+        ...highlightPDFRange(hl, container, 'user-annotations'),
+        ...highlightPDFRange(hl, container, 'user-annotations'),
       ];
 
       updateClusters(container);
@@ -584,15 +600,16 @@ describe('annotator/highlighter', () => {
 
     it('reorders SVG highlights based on nesting level', () => {
       const container = document.createElement('div');
+      const hl = new Highlighter(container);
       render(<PDFPage />, container);
 
       // SVG highlights for these highlights will be added in order.
       // These first three highlights will nest.
-      highlightPDFRange(container, 'user-annotations');
-      highlightPDFRange(container, 'user-annotations');
-      highlightPDFRange(container, 'other-content');
+      highlightPDFRange(hl, container, 'user-annotations');
+      highlightPDFRange(hl, container, 'user-annotations');
+      highlightPDFRange(hl, container, 'other-content');
       // these second three highlights are outer highlights
-      createHighlights(container.querySelector('.textLayer'));
+      createHighlights(hl, container.querySelector('.textLayer'));
 
       updateClusters(container);
 
@@ -605,15 +622,16 @@ describe('annotator/highlighter', () => {
 
     it('orders focused SVG highlights last regardless of nesting level', () => {
       const container = document.createElement('div');
+      const hl = new Highlighter(container);
       render(<PDFPage />, container);
 
       const svgEls = () => Array.from(container.querySelectorAll('rect'));
       const orderedNestingLevels = () => svgEls().map(el => nestingLevel(el));
 
       // This highlight has a nesting level of 0
-      const toFocus = highlightPDFRange(container, 'user-annotations');
-      highlightPDFRange(container, 'user-annotations'); // Nesting level 1
-      highlightPDFRange(container, 'other-content'); // Nesting level 2
+      const toFocus = highlightPDFRange(hl, container, 'user-annotations');
+      highlightPDFRange(hl, container, 'user-annotations'); // Nesting level 1
+      highlightPDFRange(hl, container, 'other-content'); // Nesting level 2
 
       // Initial nesting-based ordering
       updateClusters(container);
@@ -622,7 +640,7 @@ describe('annotator/highlighter', () => {
       assert.deepEqual(orderedNestingLevels(), [0, 1, 2]);
 
       // Focus the first, outermost highlight
-      setHighlightsFocused(toFocus, true);
+      hl.setHighlightsFocused(toFocus, true);
 
       assert.equal(
         svgEls().length,
@@ -638,7 +656,7 @@ describe('annotator/highlighter', () => {
         'Focused highlight remains at end after re-ordering',
       );
 
-      setHighlightsFocused(toFocus, false);
+      hl.setHighlightsFocused(toFocus, false);
 
       assert.equal(svgEls().length, 3, 'Cloned element removed when unfocused');
       assert.deepEqual(orderedNestingLevels(), [0, 1, 2]);
@@ -648,13 +666,14 @@ describe('annotator/highlighter', () => {
   describe('removeAllHighlights', () => {
     it('removes all highlight elements under the root element', () => {
       const root = document.createElement('div');
+      const hl = new Highlighter(root);
 
-      createHighlights(root);
+      createHighlights(hl, root);
 
       const textContent = root.textContent;
       assert.equal(root.querySelectorAll('hypothesis-highlight').length, 3);
 
-      removeAllHighlights(root);
+      hl.removeAllHighlights();
 
       assert.equal(root.querySelectorAll('hypothesis-highlight').length, 0);
       assert.equal(root.textContent, textContent);
@@ -664,7 +683,8 @@ describe('annotator/highlighter', () => {
       const root = document.createElement('div');
       root.innerHTML = '<span>one</span>-<span>two</span>-<span>three</span>';
 
-      removeAllHighlights(root);
+      const hl = new Highlighter(root);
+      hl.removeAllHighlights();
 
       assert.equal(root.textContent, 'one-two-three');
     });
@@ -673,9 +693,10 @@ describe('annotator/highlighter', () => {
   describe('setHighlightsFocused', () => {
     it('adds class to HTML highlights when focused', () => {
       const root = document.createElement('div');
-      const highlights = createHighlights(root);
+      const hl = new Highlighter(root);
+      const highlights = createHighlights(hl, root);
 
-      setHighlightsFocused(highlights, true);
+      hl.setHighlightsFocused(highlights, true);
 
       highlights.forEach(h =>
         assert.isTrue(h.classList.contains('hypothesis-highlight-focused')),
@@ -684,10 +705,11 @@ describe('annotator/highlighter', () => {
 
     it('removes class from HTML highlights when not focused', () => {
       const root = document.createElement('div');
-      const highlights = createHighlights(root);
+      const hl = new Highlighter();
+      const highlights = createHighlights(hl, root);
 
-      setHighlightsFocused(highlights, true);
-      setHighlightsFocused(highlights, false);
+      hl.setHighlightsFocused(highlights, true);
+      hl.setHighlightsFocused(highlights, false);
 
       highlights.forEach(h =>
         assert.isFalse(h.classList.contains('hypothesis-highlight-focused')),
@@ -696,10 +718,11 @@ describe('annotator/highlighter', () => {
 
     it('leaves highlights focused if they are focused again', () => {
       const root = document.createElement('div');
-      const highlights = createHighlights(root);
+      const hl = new Highlighter();
+      const highlights = createHighlights(hl, root);
 
-      setHighlightsFocused(highlights, true);
-      setHighlightsFocused(highlights, true);
+      hl.setHighlightsFocused(highlights, true);
+      hl.setHighlightsFocused(highlights, true);
 
       highlights.forEach(h =>
         assert.isTrue(h.classList.contains('hypothesis-highlight-focused')),
@@ -708,17 +731,18 @@ describe('annotator/highlighter', () => {
 
     it('clones and sets focus class on focused SVG highlights in PDFs', () => {
       const root = document.createElement('div');
+      const hl = new Highlighter();
       render(<PDFPage />, root);
       const highlights = [
-        ...highlightPDFRange(root),
-        ...highlightPDFRange(root),
+        ...highlightPDFRange(hl, root),
+        ...highlightPDFRange(hl, root),
       ];
       const svgLayer = root.querySelector('svg');
 
       assert.equal(svgLayer.lastChild, highlights[1].svgHighlight);
       assert.equal(svgLayer.children.length, highlights.length);
 
-      setHighlightsFocused([highlights[0]], true);
+      hl.setHighlightsFocused([highlights[0]], true);
 
       assert.equal(svgLayer.children.length, highlights.length + 1);
       assert.isTrue(svgLayer.lastChild.hasAttribute('data-is-focused'));
@@ -730,18 +754,19 @@ describe('annotator/highlighter', () => {
 
     it('leaves SVG highlights focused if highlights are focused again', () => {
       const root = document.createElement('div');
+      const hl = new Highlighter(root);
       render(<PDFPage />, root);
       const highlights = [
-        ...highlightPDFRange(root),
-        ...highlightPDFRange(root),
+        ...highlightPDFRange(hl, root),
+        ...highlightPDFRange(hl, root),
       ];
       const svgLayer = root.querySelector('svg');
 
-      setHighlightsFocused([highlights[0]], true);
+      hl.setHighlightsFocused([highlights[0]], true);
 
       assert.equal(svgLayer.children.length, highlights.length + 1);
 
-      setHighlightsFocused([highlights[0]], true);
+      hl.setHighlightsFocused([highlights[0]], true);
 
       assert.equal(
         svgLayer.children.length,
@@ -756,15 +781,16 @@ describe('annotator/highlighter', () => {
 
     it('removes cloned SVG highlights when associated highlight is unfocused', () => {
       const root = document.createElement('div');
+      const hl = new Highlighter(root);
       render(<PDFPage />, root);
       const highlights = [
-        ...highlightPDFRange(root),
-        ...highlightPDFRange(root),
+        ...highlightPDFRange(hl, root),
+        ...highlightPDFRange(hl, root),
       ];
       const svgLayer = root.querySelector('svg');
 
-      setHighlightsFocused([highlights[0]], true);
-      setHighlightsFocused([highlights[0]], false);
+      hl.setHighlightsFocused([highlights[0]], true);
+      hl.setHighlightsFocused([highlights[0]], false);
 
       assert.equal(svgLayer.querySelectorAll('rect').length, highlights.length);
       assert.equal(svgLayer.querySelectorAll('[data-focused-id]').length, 0);
@@ -773,14 +799,15 @@ describe('annotator/highlighter', () => {
 
     it('removes focused SVG highlights when associated highlight is removed', () => {
       const root = document.createElement('div');
+      const hl = new Highlighter();
       render(<PDFPage />, root);
       const highlights = [
-        ...highlightPDFRange(root),
-        ...highlightPDFRange(root),
+        ...highlightPDFRange(hl, root),
+        ...highlightPDFRange(hl, root),
       ];
       const svgLayer = root.querySelector('svg');
 
-      setHighlightsFocused([highlights[0]], true);
+      hl.setHighlightsFocused([highlights[0]], true);
 
       // Both the "original" SVG highlight and its cloned focused element
       // get a `data-focused-id` attribute to associate them
@@ -789,7 +816,7 @@ describe('annotator/highlighter', () => {
       assert.equal(svgLayer.querySelectorAll('[data-is-focused]').length, 1);
 
       // Removing a highlight without unfocusing it first
-      removeHighlights([highlights[0]]);
+      hl.removeHighlights([highlights[0]]);
 
       assert.equal(
         svgLayer.querySelectorAll('rect').length,
@@ -803,15 +830,17 @@ describe('annotator/highlighter', () => {
   describe('setHighlightsVisible', () => {
     it('adds class to root when `visible` is `true`', () => {
       const root = document.createElement('div');
-      setHighlightsVisible(root, true);
+      const hl = new Highlighter(root);
+      hl.setHighlightsVisible(true);
       assert.isTrue(root.classList.contains('hypothesis-highlights-always-on'));
     });
 
     it('removes class from root when `visible` is `false`', () => {
       const root = document.createElement('div');
+      const hl = new Highlighter(root);
 
-      setHighlightsVisible(root, true);
-      setHighlightsVisible(root, false);
+      hl.setHighlightsVisible(true);
+      hl.setHighlightsVisible(false);
 
       assert.isFalse(
         root.classList.contains('hypothesis-highlights-always-on'),
@@ -839,6 +868,7 @@ describe('annotator/highlighter', () => {
 
     it('returns all the visible highlights at the given point', () => {
       const container = document.createElement('div');
+      const hl = new Highlighter(container);
       const elements = [
         createHighlight('text'),
         createHighlight('text'),
@@ -855,18 +885,18 @@ describe('annotator/highlighter', () => {
         // Position with highlights, when visible.
         const x = 105;
         const y = 205;
-        setHighlightsVisible(container, true);
+        hl.setHighlightsVisible(true);
         assert.sameMembers(
-          getHighlightsFromPoint(x, y),
+          hl.getHighlightsFromPoint(x, y),
           elements.filter(hl => hl.localName === 'hypothesis-highlight'),
         );
 
         // Position with no highlights, when visible.
-        assert.deepEqual(getHighlightsFromPoint(0, 0), []);
+        assert.deepEqual(hl.getHighlightsFromPoint(0, 0), []);
 
         // Position with highlights, when hidden.
-        setHighlightsVisible(container, false);
-        assert.deepEqual(getHighlightsFromPoint(x, y), []);
+        hl.setHighlightsVisible(false);
+        assert.deepEqual(hl.getHighlightsFromPoint(x, y), []);
       } finally {
         container.remove();
       }
