@@ -438,11 +438,11 @@ describe('annotator/highlighter', () => {
         // Point at top-left corner of anchor element.
         shape: { type: 'point', x: 0, y: 0 },
         expected: {
-          // Offset = 3px for highlight border, 5px for radius
-          top: 'calc(0% - 8px)',
-          left: 'calc(0% - 8px)',
-          width: '10px',
-          height: '10px',
+          // Offset = 3px for highlight border, 7px for radius
+          top: 'calc(0% - 10px)',
+          left: 'calc(0% - 10px)',
+          width: '14px',
+          height: '14px',
         },
       },
       // Unsupported shapes currently generate highlights with no position
