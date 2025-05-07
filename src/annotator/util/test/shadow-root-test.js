@@ -1,7 +1,6 @@
 import { createShadowRoot } from '../shadow-root';
 
 describe('annotator/util/shadow-root', () => {
-  let applyFocusVisiblePolyfill;
   let container;
   let preloadedStylesheet;
 
@@ -14,15 +13,11 @@ describe('annotator/util/shadow-root', () => {
     document.head.append(preloadedStylesheet);
 
     container = document.createElement('div');
-    applyFocusVisiblePolyfill = window.applyFocusVisiblePolyfill;
-    window.applyFocusVisiblePolyfill = sinon.stub();
   });
 
   afterEach(() => {
     preloadedStylesheet.remove();
-
     container.remove();
-    window.applyFocusVisiblePolyfill = applyFocusVisiblePolyfill;
   });
 
   describe('createShadowRoot', () => {
@@ -39,12 +34,6 @@ describe('annotator/util/shadow-root', () => {
       const linkEl = container.shadowRoot.querySelector('link[rel=stylesheet]');
       assert.ok(linkEl);
       assert.include(linkEl.href, 'annotator.css');
-    });
-
-    it('applies the applyFocusVisiblePolyfill if exists', () => {
-      const shadowRoot = createShadowRoot(container);
-
-      assert.calledWith(window.applyFocusVisiblePolyfill, shadowRoot);
     });
 
     it('does not inject stylesheets into the shadow root if style is not found', () => {

@@ -6944,13 +6944,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"focus-visible@npm:^5.0.0":
-  version: 5.2.1
-  resolution: "focus-visible@npm:5.2.1"
-  checksum: 9da7388e703315a8f933bb4fec4e2be5f1d655dfc91c388d1802ad53a99e1fa31a5be90866b7db83d48d8f7f771dd2df7d51445a37f48f7069823eceb5f34e64
-  languageName: node
-  linkType: hard
-
 "for-each@npm:^0.3.3":
   version: 0.3.3
   resolution: "for-each@npm:0.3.3"
@@ -7712,7 +7705,6 @@ __metadata:
     express: ^5.0.1
     fancy-log: ^2.0.0
     fetch-mock: 11
-    focus-visible: ^5.0.0
     globals: ^16.0.0
     gulp: ^5.0.0
     gulp-changed: ^5.0.1
