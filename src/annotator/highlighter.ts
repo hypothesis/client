@@ -55,7 +55,7 @@ export class Highlighter {
       highlightEl.style.width = `calc(${width * 100}% - ${2 * highlightBorderWidth}px)`;
       highlightEl.style.height = `calc(${height * 100}% - ${2 * highlightBorderWidth}px)`;
     } else if (shape.type === 'point') {
-      const radius = 5;
+      const radius = 7;
       highlightEl.style.left = `calc(${shape.x * 100}% - ${radius + highlightBorderWidth}px)`;
       highlightEl.style.top = `calc(${shape.y * 100}% - ${radius + highlightBorderWidth}px)`;
       highlightEl.style.width = `${radius * 2}px`;

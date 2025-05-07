@@ -204,12 +204,14 @@
 .hypothesis-highlights-always-on .hypothesis-shape-highlight {
   // This color is similar to the default highlight fill, but darker so it has
   // more contrast when used as a border.
-  border-color: #edd72b;
+  --highlight-color: #edd72b;
+  border-color: var(--highlight-color);
+  background-color: color-mix(in srgb, var(--highlight-color) 30%, transparent);
   cursor: pointer;
   visibility: visible;
 
   &.hypothesis-highlight-focused {
-    border-color: var(--hypothesis-highlight-focused-color);
+    --highlight-color: var(--hypothesis-highlight-focused-color);
     background: var(--hypothesis-highlight-focused-color);
   }
 }
