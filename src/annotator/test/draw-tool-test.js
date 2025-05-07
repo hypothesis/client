@@ -28,9 +28,9 @@ describe('DrawTool', () => {
   // drawing.
   const getSurface = () => container.querySelector('svg[data-testid=surface]');
 
-  const sendMouseEvent = (event, x = 0, y = 0) => {
+  const sendPointerEvent = (event, x = 0, y = 0) => {
     getSurface().dispatchEvent(
-      new MouseEvent(event, { clientX: x, clientY: y }),
+      new PointerEvent(event, { clientX: x, clientY: y }),
     );
   };
 
@@ -43,8 +43,8 @@ describe('DrawTool', () => {
 
   it('removes SVG when drawing ends', async () => {
     const shape = tool.draw('point');
-    sendMouseEvent('mousedown');
-    sendMouseEvent('mouseup');
+    sendPointerEvent('pointerdown');
+    sendPointerEvent('pointerup');
     await shape;
     assert.notOk(getSurface());
   });
@@ -128,9 +128,9 @@ describe('DrawTool', () => {
   describe('drawing a point', () => {
     it('finishes drawing when mouse is released', async () => {
       const shapePromise = tool.draw('point');
-      sendMouseEvent('mousedown', 5, 5);
-      sendMouseEvent('mousemove', 10, 10);
-      sendMouseEvent('mouseup', 15, 20);
+      sendPointerEvent('pointerdown', 5, 5);
+      sendPointerEvent('pointermove', 10, 10);
+      sendPointerEvent('pointerup', 15, 20);
 
       const shape = await shapePromise;
 
@@ -145,9 +145,9 @@ describe('DrawTool', () => {
   describe('drawing a rect', () => {
     it('finishes drawing when mouse is released', async () => {
       const shapePromise = tool.draw('rect');
-      sendMouseEvent('mousedown');
-      sendMouseEvent('mousemove', 5, 5);
-      sendMouseEvent('mouseup', 10, 20);
+      sendPointerEvent('pointerdown');
+      sendPointerEvent('pointermove', 5, 5);
+      sendPointerEvent('pointerup', 10, 20);
 
       const shape = await shapePromise;
 
@@ -160,14 +160,14 @@ describe('DrawTool', () => {
       });
     });
 
-    it('ignores "mousemove" and "mouseup" events before an initial "mousedown"', async () => {
+    it('ignores "pointermove" and "pointerup" events before an initial "pointerdown"', async () => {
       const shapePromise = tool.draw('rect');
-      sendMouseEvent('mousemove', 5, 5);
-      sendMouseEvent('mouseup', 10, 20);
+      sendPointerEvent('pointermove', 5, 5);
+      sendPointerEvent('pointerup', 10, 20);
 
-      sendMouseEvent('mousedown');
-      sendMouseEvent('mousemove', 3, 3);
-      sendMouseEvent('mouseup', 6, 7);
+      sendPointerEvent('pointerdown');
+      sendPointerEvent('pointermove', 3, 3);
+      sendPointerEvent('pointerup', 6, 7);
       const shape = await shapePromise;
 
       assert.deepEqual(shape, {

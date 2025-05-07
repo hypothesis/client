@@ -107,6 +107,10 @@ export class DrawTool implements Destroyable {
     surface.setAttribute('data-testid', 'surface');
     surface.style.cursor = 'crosshair';
 
+    // Allow the user to draw on the surface on touch devices using finger or
+    // stylus.
+    surface.style.touchAction = 'none';
+
     // Make the drawing surface fill the container.
     surface.style.position = 'absolute';
     surface.setAttribute('width', '100%');
@@ -126,7 +130,7 @@ export class DrawTool implements Destroyable {
     this._drawEnd = resolve;
     this._drawError = reject;
 
-    this._surface.addEventListener('mousedown', e => {
+    this._surface.addEventListener('pointerdown', e => {
       switch (this._tool) {
         case 'rect':
           this._shape = {
@@ -148,7 +152,7 @@ export class DrawTool implements Destroyable {
       this._renderSurface();
     });
 
-    this._surface.addEventListener('mousemove', e => {
+    this._surface.addEventListener('pointermove', e => {
       if (!this._shape) {
         return;
       }
@@ -165,7 +169,7 @@ export class DrawTool implements Destroyable {
       this._renderSurface();
     });
 
-    this._surface.addEventListener('mouseup', e => {
+    this._surface.addEventListener('pointerup', e => {
       if (!this._shape) {
         return;
       }
