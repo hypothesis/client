@@ -84,7 +84,7 @@ export type ToolbarProps = {
   /**
    * Callback for a button that creates an annotation.
    */
-  createAnnotation: (tool: AnnotationTool) => void;
+  createAnnotation: (tool: AnnotationTool | null) => void;
 
   /** Is the sidebar currently open? */
   isSidebarOpen: boolean;
@@ -247,7 +247,9 @@ export default function Toolbar({
                 pressed={activeTool === 'rect'}
                 title="Rectangle annotation"
                 icon={SelectionIcon}
-                onClick={() => createAnnotation('rect')}
+                onClick={() =>
+                  createAnnotation(activeTool === 'rect' ? null : 'rect')
+                }
               />
             )}
             {supportedTools.includes('point') && (
@@ -256,7 +258,9 @@ export default function Toolbar({
                 pressed={activeTool === 'point'}
                 title="Pin annotation"
                 icon={PinIcon}
-                onClick={() => createAnnotation('point')}
+                onClick={() =>
+                  createAnnotation(activeTool === 'point' ? null : 'point')
+                }
               />
             )}
           </div>

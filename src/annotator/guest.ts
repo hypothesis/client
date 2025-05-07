@@ -519,9 +519,14 @@ export class Guest
       }
     });
 
-    this._hostRPC.on('createAnnotation', ({ tool }: { tool: AnnotationTool }) =>
-      this.createAnnotation(tool),
-    );
+    this._hostRPC.on('createAnnotation', ({ tool }) => {
+      if (tool) {
+        return this.createAnnotation(tool);
+      } else {
+        this._drawTool.cancel();
+        return null;
+      }
+    });
 
     this._hostRPC.on('hoverAnnotations', (tags: string[]) =>
       this._hoverAnnotations(tags),

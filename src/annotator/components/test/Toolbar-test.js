@@ -186,6 +186,20 @@ describe('Toolbar', () => {
     assert.equal(pressedButton(), 'point');
   });
 
+  ['rect', 'point'].forEach(tool => {
+    it('cancels annotation creation if active tool is pressed again', () => {
+      const createAnnotation = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect', 'point'],
+        activeTool: tool,
+        createAnnotation,
+      });
+      const button = wrapper.find(`button[data-testid="${tool}-annotation"]`);
+      button.simulate('click');
+      assert.calledWith(createAnnotation, null);
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([
