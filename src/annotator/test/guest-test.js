@@ -163,6 +163,7 @@ describe('Guest', () => {
     FakeBucketBarClient = sinon.stub().returns(fakeBucketBarClient);
 
     fakeDrawTool = {
+      cancel: sinon.stub(),
       destroy: sinon.stub(),
       draw: sinon.stub().resolves({ type: 'point', x: 0, y: 0 }),
     };
@@ -699,6 +700,15 @@ describe('Guest', () => {
           .filter(c => c.args[0] === 'activeToolChanged')
           .map(call => call.args[1]);
         assert.deepEqual(toolChangedCalls, ['point']);
+      });
+
+      it('cancels annotation creation if tool is `null`', async () => {
+        createGuest();
+        emitHostEvent('createAnnotation', {
+          tool: 'point',
+        });
+        emitHostEvent('createAnnotation', { tool: null });
+        assert.calledOnce(fakeDrawTool.cancel);
       });
 
       it('reports error if annotation tool is unsupported', async () => {

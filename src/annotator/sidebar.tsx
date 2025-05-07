@@ -171,7 +171,7 @@ export class Sidebar implements Destroyable {
     toolbarContainer.setAttribute('data-testid', 'toolbar-container');
     this.toolbar = new ToolbarController(toolbarContainer, {
       sidebarContainerId: iframeContainerId,
-      createAnnotation: (tool: AnnotationTool) => {
+      createAnnotation: (tool: AnnotationTool | null) => {
         if (this._guestRPC.length === 0) {
           return;
         }

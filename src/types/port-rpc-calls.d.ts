@@ -117,8 +117,11 @@ export type GuestToSidebarCalls = CommonCalls & {
 
 /** Calls that the host makes to guest frames. */
 export type HostToGuestCalls = CommonCalls & {
-  /** Create a new annotation in the guest. */
-  createAnnotation(opts: { tool: AnnotationTool }): void;
+  /**
+   * Initiate creation of a new annotation in the guest using the specified
+   * tool, or cancel creation if `tool` is `null`.
+   */
+  createAnnotation(opts: { tool: AnnotationTool | null }): void;
 
   /** Clear the selection in the guest frame. */
   clearSelection(): void;

@@ -5,7 +5,8 @@ import type { AnnotationTool } from '../types/annotator';
 import Toolbar from './components/Toolbar';
 
 export type ToolbarOptions = {
-  createAnnotation: (tool: AnnotationTool) => void;
+  /** Initiate or cancel creation of a new annotation. */
+  createAnnotation: (tool: AnnotationTool | null) => void;
   setSidebarOpen: (open: boolean) => void;
   setHighlightsVisible: (visible: boolean) => void;
   sidebarContainerId?: string;
@@ -28,7 +29,7 @@ export class ToolbarController {
   private _closeSidebar: () => void;
   private _toggleSidebar: () => void;
   private _toggleHighlights: () => void;
-  private _createAnnotation: (tool: AnnotationTool) => void;
+  private _createAnnotation: (tool: AnnotationTool | null) => void;
   private _sidebarToggleButton: RefObject<HTMLButtonElement>;
   private _supportedAnnotationTools: AnnotationTool[];
 
@@ -51,7 +52,7 @@ export class ToolbarController {
     this._toggleSidebar = () => setSidebarOpen(!this._sidebarOpen);
     this._toggleHighlights = () =>
       setHighlightsVisible(!this._highlightsVisible);
-    this._createAnnotation = (tool: AnnotationTool) => {
+    this._createAnnotation = (tool: AnnotationTool | null) => {
       createAnnotation(tool);
 
       // For the text selection tool, the selection already exists so we can
