@@ -43,7 +43,11 @@ function ToolbarButton({
     <Button
       classes={classnames(
         'justify-center rounded',
-        'w-[30px] h-[30px]',
+        // On mobile, 40px is slightly smaller than the 44px minimum we usually
+        // use, but works in this context as the buttons have spacing between
+        // them. The width is not changed on mobile as this requires additional
+        // work to make the whole toolbar wider.
+        'w-[30px] h-[30px] touch:h-[40px]',
         'shadow border bg-white text-grey-6 hover:text-grey-9',
         pressedBackground && 'aria-pressed:bg-grey-3',
       )}
