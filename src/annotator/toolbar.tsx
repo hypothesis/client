@@ -19,7 +19,8 @@ export type ToolbarOptions = {
  * highlight visibility etc.
  */
 export class ToolbarController {
-  private _container: HTMLElement;
+  container: HTMLElement;
+
   private _activeTool: AnnotationTool | null;
   private _newAnnotationType: 'annotation' | 'note';
   private _useMinimalControls: boolean;
@@ -39,7 +40,7 @@ export class ToolbarController {
   constructor(container: HTMLElement, options: ToolbarOptions) {
     const { createAnnotation, setSidebarOpen, setHighlightsVisible } = options;
 
-    this._container = container;
+    this.container = container;
     this._activeTool = null;
     this._useMinimalControls = false;
     this._newAnnotationType = 'note';
@@ -72,7 +73,7 @@ export class ToolbarController {
   }
 
   getWidth() {
-    const content = this._container.firstChild as HTMLElement;
+    const content = this.container.firstChild as HTMLElement;
     return content.getBoundingClientRect().width;
   }
 
@@ -172,7 +173,7 @@ export class ToolbarController {
         toggleSidebarRef={this._sidebarToggleButton}
         useMinimalControls={this.useMinimalControls}
       />,
-      this._container,
+      this.container,
     );
   }
 }
