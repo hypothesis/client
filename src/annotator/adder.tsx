@@ -280,13 +280,18 @@ export class Adder implements Destroyable {
       ...document.elementsFromPoint(left + adderWidth, top + adderHeight),
     ]);
 
-    const zIndexes = [...elements]
-      .map(element => +getComputedStyle(element).zIndex)
-      .filter(Number.isInteger);
+    const elementZIndex = (el: Element) => +getComputedStyle(el).zIndex;
 
-    // Make sure the array contains at least one element,
-    // otherwise `Math.max(...[])` results in +Infinity
-    zIndexes.push(0);
+    const zIndexes = [...elements].map(elementZIndex).filter(Number.isInteger);
+
+    // Make sure adder appears above any shape highlights. These are not found
+    // by `elementsFromPoint` because they have `pointer-events: none` set on
+    // them.
+    let minZIndex = 0;
+    for (const hl of document.querySelectorAll('hypothesis-highlight')) {
+      minZIndex = Math.max(minZIndex, elementZIndex(hl));
+    }
+    zIndexes.push(minZIndex);
 
     return Math.max(...zIndexes) + 1;
   }

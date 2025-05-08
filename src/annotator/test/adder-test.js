@@ -265,12 +265,12 @@ describe('Adder', () => {
       document.elementsFromPoint = elementsFromPointBackup;
     });
 
-    it('returns value of 1 if not elements are found', () => {
+    it('returns value of 1 if no elements are found', () => {
       assert.strictEqual(getAdderZIndex(-100000, -100000), 1);
       assert.strictEqual(getAdderZIndex(100000, 100000), 1);
     });
 
-    it('returns the greatest zIndex', () => {
+    it('returns a z-index greater than any elements under the adder', () => {
       const createComponent = (left, top, zIndex, attachTo) =>
         mount(
           <div
@@ -326,6 +326,18 @@ describe('Adder', () => {
       assert.strictEqual(getAdderZIndex(initLeft, initTop), 9);
 
       wrapper.unmount();
+    });
+
+    it('returns a z-index greater than any highlights', () => {
+      const fakeHighlight = document.createElement('hypothesis-highlight');
+      fakeHighlight.style.zIndex = '20';
+
+      try {
+        document.body.append(fakeHighlight);
+        assert.equal(getAdderZIndex(0, 0), 21);
+      } finally {
+        fakeHighlight.remove();
+      }
     });
   });
 
