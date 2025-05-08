@@ -165,6 +165,7 @@ describe('Sidebar', () => {
     const toggleButton = document.createElement('button');
     fakeToolbar = {
       activeTool: null,
+      container: document.createElement('div'),
       getWidth: sinon.stub().returns(100),
       useMinimalControls: false,
       sidebarOpen: false,
@@ -691,7 +692,7 @@ describe('Sidebar', () => {
         assert.isTrue(
           sidebar.iframeContainer.classList.contains('sidebar-no-transition'),
         );
-        assert.equal(sidebar.iframeContainer.style.pointerEvents, 'none');
+        assert.equal(fakeToolbar.container.style.pointerEvents, 'none');
       });
     });
 
@@ -708,7 +709,7 @@ describe('Sidebar', () => {
         assert.isFalse(
           sidebar.iframeContainer.classList.contains('sidebar-no-transition'),
         );
-        assert.equal(sidebar.iframeContainer.style.pointerEvents, '');
+        assert.equal(fakeToolbar.container.style.pointerEvents, '');
       });
 
       it('opens sidebar if final width is above threshold', () => {

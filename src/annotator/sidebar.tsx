@@ -637,8 +637,9 @@ export class Sidebar implements Destroyable {
         // Disable animated transition of sidebar position
         frame.classList.add('sidebar-no-transition');
 
-        // Disable pointer events on the iframe.
-        frame.style.pointerEvents = 'none';
+        // Disable pointer events on the toolbar, so toolbar buttons don't
+        // receive clicks when the drag ends.
+        this.toolbar.container.style.pointerEvents = 'none';
 
         this._dragResizeState.initial = parseInt(
           getComputedStyle(frame).marginLeft,
@@ -648,8 +649,8 @@ export class Sidebar implements Destroyable {
       case 'dragend':
         frame.classList.remove('sidebar-no-transition');
 
-        // Re-enable pointer events on the iframe.
-        frame.style.pointerEvents = '';
+        // Re-enable pointer events on the toolbar.
+        this.toolbar.container.style.pointerEvents = '';
 
         // Snap open or closed.
         if (
