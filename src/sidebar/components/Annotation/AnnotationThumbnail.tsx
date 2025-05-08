@@ -88,7 +88,7 @@ function AnnotationThumbnail({
         <span data-testid="placeholder">Loading thumbnail...</span>
       )}
       {!thumbnail && error && (
-        <span data-testid="error">Unable to render thumbnail</span>
+        <span data-testid="error">Unable to render thumbnail: {error}</span>
       )}
     </div>
   );

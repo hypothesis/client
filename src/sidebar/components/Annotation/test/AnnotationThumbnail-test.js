@@ -46,9 +46,13 @@ describe('AnnotationThumbnail', () => {
   });
 
   it('renders error indicator if thumbnail rendering failed', async () => {
-    fakeThumbnailService.fetch.rejects(new Error('Thumbnail rendering failed'));
+    fakeThumbnailService.fetch.rejects(new Error('Something went wrong'));
     const wrapper = createComponent();
     await new Promise(resolve => setTimeout(resolve, 1));
-    await waitForElement(wrapper, '[data-testid="error"]');
+    const error = await waitForElement(wrapper, '[data-testid="error"]');
+    assert.equal(
+      error.text(),
+      'Unable to render thumbnail: Something went wrong',
+    );
   });
 });
