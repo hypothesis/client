@@ -1,3 +1,5 @@
+import { delay } from '@hypothesis/frontend-testing';
+
 import { DragHandler } from '../drag-handler';
 
 describe('DragHandler', () => {
@@ -74,6 +76,35 @@ describe('DragHandler', () => {
     onDrag.resetHistory();
     firePointerMove(20);
     assert.calledWith(onDrag, { type: 'dragmove', deltaX: 20 });
+  });
+
+  it('suppresses "click" events that immediately follow a drag end', async () => {
+    beginDrag(threshold + 5);
+    firePointerUp();
+
+    let clickCount = 0;
+    const btn = document.createElement('button');
+    document.body.append(btn);
+
+    try {
+      // Simulate click on button, as if drag end finished with the pointer on
+      // that element. This should be suppressed.
+      btn.onclick = () => (clickCount += 1);
+      const click = new MouseEvent('click', { bubbles: true });
+      btn.dispatchEvent(click);
+
+      await delay(0);
+      assert.equal(clickCount, 0);
+
+      // Simulate a later click after the suppression period has ended. This
+      // should not be suppressed.
+      const click2 = new MouseEvent('click', { bubbles: true });
+      btn.dispatchEvent(click2);
+
+      assert.equal(clickCount, 1);
+    } finally {
+      btn.remove();
+    }
   });
 
   it('does not fire "dragmove" or "dragend" if a drag is not active', () => {

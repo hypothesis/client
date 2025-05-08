@@ -65,6 +65,10 @@ export class DragHandler implements Destroyable {
       if (this._startX !== null && this._dragActive) {
         const deltaX = event.clientX - this._startX;
         onDrag({ type: 'dragend', deltaX });
+
+        // If the user dragged a button or other clickable item, suppress the
+        // "click" event that is delivered after releasing the mouse.
+        suppressEvent(window, 'click');
       }
       this._startX = null;
       this._dragActive = false;
@@ -92,4 +96,20 @@ export class DragHandler implements Destroyable {
   destroy() {
     this._listeners.removeAll();
   }
+}
+
+/** Suppress delivery of an event for a brief period of time. */
+function suppressEvent(
+  target: EventTarget,
+  type: string,
+  duration: number = 0,
+) {
+  const ctrl = new AbortController();
+  target.addEventListener('click', e => e.stopPropagation(), {
+    capture: true,
+    signal: ctrl.signal,
+  });
+  setTimeout(() => {
+    ctrl.abort();
+  }, duration);
 }
