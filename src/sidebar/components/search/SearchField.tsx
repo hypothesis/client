@@ -98,7 +98,7 @@ export default function SearchField({
           disabled={disabled}
         />
         <Input
-          aria-label="Search annotations"
+          aria-label="Search"
           classes={classnames(
             'pl-8 pr-8', // Add padding so input does not overlap search/clear buttons.
             'disabled:text-grey-6', // Dim text when input is disabled
@@ -107,7 +107,7 @@ export default function SearchField({
           data-testid="search-input"
           dir="auto"
           name="query"
-          placeholder={(isLoading && 'Loading…') || 'Search annotations…'}
+          placeholder={(isLoading && 'Loading…') || 'Search…'}
           disabled={disabled || isLoading}
           elementRef={input}
           value={pendingQuery || ''}
