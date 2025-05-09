@@ -84,11 +84,14 @@ function createPage(
 class FakePDFPageProxy implements PDFPageProxy {
   pageText: string;
 
+  rotate: number;
+
   private _config: PDFJSConfig;
   private _view: [number, number, number, number];
 
   constructor(pageText: string, config: PDFJSConfig) {
     this.pageText = pageText;
+    this.rotate = 0;
     this._config = config;
     this._view = config.pageBoundingBox ?? [0, 0, 100, 200]; // [left, bottom, right, top]
   }

@@ -144,6 +144,9 @@ export type RenderParameters = {
 };
 
 export type PDFPageProxy = {
+  /** Return the number of degrees the page is rotated clockwise. */
+  get rotate(): number;
+
   getTextContent(o?: GetTextContentParameters): Promise<TextContent>;
 
   /**
