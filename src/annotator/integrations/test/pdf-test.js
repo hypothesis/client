@@ -904,33 +904,54 @@ describe('annotator/integrations/pdf', () => {
             viewBox: [0, 0, 101, 1],
           },
         },
-      ].forEach(({ renderOptions = {}, shapeSelector, expectedViewport }) => {
-        it('renders bitmap with given options', async () => {
-          pdfIntegration = createPDFIntegration();
-          const anchor = {
-            target: {
-              selector: [shapeSelector, pageSelector],
-            },
-          };
-          const pageView =
-            fakePDFViewerApplication.pdfViewer.getPageView(pageIndex);
-          const renderSpy = sinon.spy(pageView.pdfPage, 'render');
+        // Rotated page
+        {
+          shapeSelector: rectShapeSelector,
+          renderOptions: {},
+          pageRotation: 90,
+          expectedViewport: {
+            rotation: 90,
+            scale: 96 / 72,
+            userUnit: 1 / 72,
+            viewBox: [0, 0, 100, 100],
+          },
+        },
+      ].forEach(
+        ({
+          renderOptions = {},
+          shapeSelector,
+          expectedViewport,
+          pageRotation = 0,
+        }) => {
+          it('renders bitmap with given options', async () => {
+            pdfIntegration = createPDFIntegration();
+            const anchor = {
+              target: {
+                selector: [shapeSelector, pageSelector],
+              },
+            };
+            const pageView =
+              fakePDFViewerApplication.pdfViewer.getPageView(pageIndex);
+            pageView.pdfPage.rotate = pageRotation;
 
-          const bitmap = await pdfIntegration.renderToBitmap(
-            anchor,
-            renderOptions,
-          );
+            const renderSpy = sinon.spy(pageView.pdfPage, 'render');
 
-          assert.instanceOf(bitmap, ImageBitmap);
-          assert.calledOnce(renderSpy);
-          const renderArgs = renderSpy.lastCall.args[0];
-          assert.instanceOf(
-            renderArgs.canvasContext,
-            OffscreenCanvasRenderingContext2D,
-          );
-          assert.match(renderArgs.viewport, sinon.match(expectedViewport));
-        });
-      });
+            const bitmap = await pdfIntegration.renderToBitmap(
+              anchor,
+              renderOptions,
+            );
+
+            assert.instanceOf(bitmap, ImageBitmap);
+            assert.calledOnce(renderSpy);
+            const renderArgs = renderSpy.lastCall.args[0];
+            assert.instanceOf(
+              renderArgs.canvasContext,
+              OffscreenCanvasRenderingContext2D,
+            );
+            assert.match(renderArgs.viewport, sinon.match(expectedViewport));
+          });
+        },
+      );
     });
   });
 });

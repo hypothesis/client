@@ -643,6 +643,24 @@ export class PDFIntegration
     }
     top = Math.max(top, bottom + minSize);
 
+    const rotation = pageView.pdfPage.rotate % 360;
+
+    /* istanbul ignore next */
+    if (rotation % 90 !== 0) {
+      throw new Error('Page rotation is not a multiple of 90 degrees');
+    }
+
+    // Get width and height in user space units.
+    let userWidth;
+    let userHeight;
+    if (rotation === 0 || rotation === 180) {
+      userWidth = Math.abs(right - left);
+      userHeight = Math.abs(bottom - top);
+    } else {
+      userWidth = Math.abs(bottom - top);
+      userHeight = Math.abs(right - left);
+    }
+
     // Conversion factor from PDF pixels per inch to CSS pixels per inch.
     // See https://github.com/mozilla/pdf.js/blob/2f7d163dfdf40225479d1cc8f6d8ebd9e5273ca6/src/display/display_utils.js#L31.
     const CSS_PPI = 96.0;
@@ -652,11 +670,11 @@ export class PDFIntegration
     const devicePixelRatio = opts.devicePixelRatio ?? 1;
 
     // Width of rect if rendered at 100% zoom, in CSS units.
-    const naturalWidth = (right - left) * PDF_TO_CSS_UNITS * devicePixelRatio;
+    const naturalWidth = userWidth * PDF_TO_CSS_UNITS * devicePixelRatio;
 
     // Create a `PageViewport` specifying which part of the page to draw and
     // the scale, rotation etc.
-    const aspectRatio = (right - left) / (top - bottom);
+    const aspectRatio = userWidth / userHeight;
 
     const width =
       typeof opts.maxWidth === 'number'
@@ -675,7 +693,7 @@ export class PDFIntegration
     // constructor and invoke it manually.
     const PageViewport = viewport.constructor as PageViewportConstructor;
     const boxView = new PageViewport({
-      rotation: 0,
+      rotation,
       scale: scaleFactor,
       userUnit: viewport.userUnit,
       viewBox: [left, bottom, right, top],
