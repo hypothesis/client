@@ -9,10 +9,36 @@ import type { FrameSyncService } from './frame-sync';
 export class ThumbnailService {
   /** Map of annotation tag to thumbnail image. */
   #cache = new Map<string, ImageBitmap>();
+
+  /** Max thumbnails to keep in cache. */
+  #cacheSize = 30;
+
   #frameSync: FrameSyncService;
 
   constructor(frameSync: FrameSyncService) {
     this.#frameSync = frameSync;
+  }
+
+  /** Return the number of thumbnails that are cached. */
+  get cacheSize() {
+    return this.#cacheSize;
+  }
+
+  /** Set the number of thumbnails that are cached. */
+  set cacheSize(size: number) {
+    this.#cacheSize = size;
+    this.#pruneCache();
+  }
+
+  #pruneCache() {
+    // Keys are visited in insertion order, so the least recently used entry
+    // will be visited first.
+    for (const tag of this.#cache.keys()) {
+      this.#cache.delete(tag);
+      if (this.#cache.size <= this.cacheSize) {
+        break;
+      }
+    }
   }
 
   /**
@@ -28,16 +54,18 @@ export class ThumbnailService {
     tag: string,
     options: RenderToBitmapOptions = {},
   ): Promise<ImageBitmap> {
-    const entry = this.#cache.get(tag);
+    const entry = this.get(tag);
     if (entry) {
       return entry;
     }
 
-    // TODO - Implement a mechanism to remove old cache entries when annotations
-    // are unloaded or thumbnails have been unused for long enough.
-
     const bitmap = await this.#frameSync.requestThumbnail(tag, options);
     this.#cache.set(tag, bitmap);
+
+    if (this.#cache.size > this.cacheSize) {
+      this.#pruneCache();
+    }
+
     return bitmap;
   }
 
@@ -49,6 +77,24 @@ export class ThumbnailService {
    * thumbnail.
    */
   get(tag: string): ImageBitmap | null {
-    return this.#cache.get(tag) ?? null;
+    const bitmap = this.#cache.get(tag);
+    if (!bitmap) {
+      return null;
+    }
+
+    // Move this entry to the back of the cache's key list, so it becomes
+    // the most recently used.
+    this.#cache.delete(tag);
+    this.#cache.set(tag, bitmap);
+
+    return bitmap;
+  }
+
+  /**
+   * Return the annotation tags associated with cached thumbnails, in
+   * least-recently-used order.
+   */
+  cachedThumbnailTags() {
+    return [...this.#cache.keys()];
   }
 }
