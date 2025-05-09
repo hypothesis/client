@@ -99,7 +99,7 @@ describe('SearchField', () => {
     const wrapper = createSearchField();
     const { placeholder, disabled } = wrapper.find('Input').props();
 
-    assert.equal(placeholder, 'Search annotations…');
+    assert.equal(placeholder, 'Search…');
     assert.isFalse(disabled);
   });
 
