@@ -726,15 +726,18 @@ describe('sidebar/helpers/annotation-metadata', () => {
           },
         ],
         expected: {
-          type: 'rect',
-          left: 0,
-          top: 10,
-          right: 10,
-          bottom: 0,
+          type: 'ShapeSelector',
+          shape: {
+            type: 'rect',
+            left: 0,
+            top: 10,
+            right: 10,
+            bottom: 0,
+          },
         },
       },
     ].forEach(({ selectors, expected }) => {
-      it('returns shape from shape selector', () => {
+      it('returns shape selector', () => {
         const annotation = {
           target: [
             {
