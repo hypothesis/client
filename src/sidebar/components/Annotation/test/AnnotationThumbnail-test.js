@@ -38,6 +38,24 @@ describe('AnnotationThumbnail', () => {
     assert.isTrue(wrapper.exists('BitmapImage'));
   });
 
+  [
+    {
+      textInImage: undefined,
+      expectedAlt: 'Thumbnail',
+    },
+    {
+      textInImage: 'Foo bar',
+      expectedAlt: 'Thumbnail. Contains text: Foo bar',
+    },
+  ].forEach(({ textInImage, expectedAlt }) => {
+    it('sets alt text for thumbnail', () => {
+      fakeThumbnailService.get.returns(fakeThumbnail);
+      const wrapper = createComponent({ textInImage });
+      const image = wrapper.find('canvas');
+      assert.equal(image.prop('aria-label'), expectedAlt);
+    });
+  });
+
   it('requests thumbnail and then renders it if not cached', async () => {
     const wrapper = createComponent();
     assert.calledOnce(fakeThumbnailService.fetch);
