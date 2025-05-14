@@ -17,6 +17,7 @@ import type {
 import { translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
+import { textInDOMRect } from './text-in-rect';
 import { TextPosition, TextRange } from './text-range';
 import { TextQuoteAnchor } from './types';
 
@@ -126,6 +127,12 @@ async function getPageView(pageIndex: number): Promise<PDFPageView> {
   }
 
   return pageView!;
+}
+
+function getTextLayerFromPoint(x: number, y: number): HTMLElement | undefined {
+  return document
+    .elementsFromPoint(x, y)
+    .find(el => el.classList.contains('textLayer')) as HTMLElement | undefined;
 }
 
 /**
@@ -848,6 +855,13 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
     };
   };
 
+  const textFromRect = (textLayer: HTMLElement, rect: DOMRect) => {
+    // Set a limit on how much text is included in thumbnails, to avoid shape
+    // selector objects becoming too large.
+    const maxTextLen = 256;
+    return textInDOMRect(textLayer, rect).slice(0, maxTextLen);
+  };
+
   switch (shape.type) {
     case 'rect': {
       const [topLeft, bottomRight] = await Promise.all([
@@ -866,20 +880,34 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
       }
 
       const pageView = await getPageView(topLeft.pageIndex);
+      const pdfRect = {
+        type: 'rect',
+        left: topLeft.x,
+        top: topLeft.y,
+        right: bottomRight.x,
+        bottom: bottomRight.y,
+      } as const;
+
+      const textLayer = getTextLayerFromPoint(shape.left, shape.top);
+      let text;
+      if (textLayer) {
+        const rect = new DOMRect(
+          shape.left,
+          shape.top,
+          shape.right - shape.left,
+          shape.bottom - shape.top,
+        );
+        text = textFromRect(textLayer, rect);
+      }
 
       return [
         createPageSelector(pageView, topLeft.pageIndex),
         {
           type: 'ShapeSelector',
           anchor: 'page',
-          shape: {
-            type: 'rect',
-            left: topLeft.x,
-            top: topLeft.y,
-            right: bottomRight.x,
-            bottom: bottomRight.y,
-          },
+          shape: pdfRect,
           view: pageBoundingBox(pageView.pdfPage),
+          text,
         },
       ];
     }
@@ -889,8 +917,14 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
         throw new Error('Point is not in a page');
       }
 
-      const pageView = await getPageView(point.pageIndex);
+      const textLayer = getTextLayerFromPoint(shape.x, shape.y);
+      let text;
+      if (textLayer) {
+        const rect = new DOMRect(shape.x, shape.y, 1, 1);
+        text = textFromRect(textLayer, rect);
+      }
 
+      const pageView = await getPageView(point.pageIndex);
       return [
         createPageSelector(pageView, point.pageIndex),
         {
@@ -901,6 +935,7 @@ export async function describeShape(shape: Shape): Promise<Selector[]> {
             x: point.x,
             y: point.y,
           },
+          text,
           view: pageBoundingBox(pageView.pdfPage),
         },
       ];
