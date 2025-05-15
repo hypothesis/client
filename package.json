@@ -96,7 +96,7 @@
     "vitest": "^3.1.1",
     "wrap-text": "^1.0.7"
   },
-  "browserslist": "chrome 92, firefox 90, safari 14.1",
+  "browserslist": "chrome 110, firefox 115, safari 16.4",
   "prettier": {
     "arrowParens": "avoid",
     "singleQuote": true,
