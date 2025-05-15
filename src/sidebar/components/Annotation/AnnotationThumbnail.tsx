@@ -31,7 +31,14 @@ function BitmapImage({ alt, bitmap, classes, scale = 1.0 }: BitmapImageProps) {
       width={bitmap.width}
       height={bitmap.height}
       role="img"
+      // The `alt` attribute on an `<img>` maps to aria-label. We might want to
+      // split this into a separate concise label and longer description in
+      // future.
       aria-label={alt}
+      // Set the title attribute to make it easy to inspect the alt text on
+      // desktop. Screen readers will only read `aria-label` since it has the
+      // same value.
+      title={alt}
       className={classes}
       style={{
         width: `${bitmap.width / scale}px`,
@@ -44,9 +51,17 @@ function BitmapImage({ alt, bitmap, classes, scale = 1.0 }: BitmapImageProps) {
 export type AnnotationThumbnailProps = {
   tag: string;
   thumbnailService: ThumbnailService;
+
+  /**
+   * Text contained in the thumbnail.
+   *
+   * This is used when generating alt text for the thumbnail.
+   */
+  textInImage?: string;
 };
 
 function AnnotationThumbnail({
+  textInImage,
   tag,
   thumbnailService,
 }: AnnotationThumbnailProps) {
@@ -69,6 +84,13 @@ function AnnotationThumbnail({
     }
   }, [error, devicePixelRatio, tag, thumbnail, thumbnailService]);
 
+  let altText;
+  if (textInImage) {
+    altText = `Thumbnail. Contains text: ${textInImage}`;
+  } else {
+    altText = 'Thumbnail';
+  }
+
   return (
     <div
       className="flex flex-row justify-center"
@@ -76,7 +98,7 @@ function AnnotationThumbnail({
     >
       {thumbnail && (
         <BitmapImage
-          alt="annotated content thumbnail"
+          alt={altText}
           bitmap={thumbnail}
           classes="border rounded-md"
           scale={devicePixelRatio}

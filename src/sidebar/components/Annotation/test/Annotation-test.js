@@ -157,12 +157,14 @@ describe('Annotation', () => {
             right: 10,
             bottom: 0,
           },
+          text: 'Some text',
         },
       ];
       const wrapper = createComponent({ annotation });
       const thumbnail = wrapper.find('AnnotationThumbnail');
       assert.isTrue(thumbnail.exists());
       assert.equal(thumbnail.prop('tag'), annotation.$tag);
+      assert.equal(thumbnail.prop('textInImage'), 'Some text');
     });
   });
 

@@ -212,6 +212,9 @@ export type ShapeSelector = {
     right: number;
     bottom: number;
   };
+
+  /** The text contained inside this shape. */
+  text?: string;
 };
 
 /**

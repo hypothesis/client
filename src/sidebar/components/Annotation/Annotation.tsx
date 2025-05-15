@@ -124,7 +124,12 @@ function Annotation({
         replyCount={replyCount}
         threadIsCollapsed={threadIsCollapsed}
       />
-      {targetShape && <AnnotationThumbnail tag={annotation.$tag} />}
+      {targetShape && (
+        <AnnotationThumbnail
+          tag={annotation.$tag}
+          textInImage={targetShape.text}
+        />
+      )}
       {annotationQuote && (
         <AnnotationQuote
           quote={annotationQuote}

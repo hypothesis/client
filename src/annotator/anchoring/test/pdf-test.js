@@ -964,9 +964,25 @@ describe('annotator/anchoring/pdf', () => {
 
   describe('describeShape', () => {
     let elementsFromPoint;
+    let textLayer;
+    let fakeTextInDOMRect;
 
     const borderLeft = 5;
     const borderTop = 8;
+
+    // Create a matcher for a `DOMRect`.
+    //
+    // Note that if you pass a `DOMRect` directly to eg. `assert.calledWith`,
+    // the match will always succeed, whether the values are equal or not.
+    const matchRect = expected =>
+      sinon.match(
+        rect =>
+          rect.x === expected.x &&
+          rect.y === expected.y &&
+          rect.width === expected.width &&
+          rect.height === expected.height,
+        `DOMRect { x=${expected.x}, y=${expected.y} width=${expected.width} height=${expected.height} }`,
+      );
 
     beforeEach(() => {
       for (let i = 0; i < viewer.pdfViewer.pagesCount; i++) {
@@ -978,6 +994,9 @@ describe('annotator/anchoring/pdf', () => {
       // Dummy element to check that elements returned by `elementsFromPoint`,
       // which are not a PDF page container, are ignored.
       const dummy = document.createElement('div');
+
+      textLayer = document.createElement('div');
+      textLayer.className = 'textLayer';
 
       // Override `elementsFromPoint` to control how viewport coordinates are
       // mapped to pages.
@@ -994,7 +1013,13 @@ describe('annotator/anchoring/pdf', () => {
         }
 
         const pageDiv = viewer.pdfViewer.getPageView(pageIndex).div;
-        return [dummy, pageDiv];
+        return [dummy, textLayer, pageDiv];
+      });
+
+      fakeTextInDOMRect = sinon.stub().returns('text-in-shape');
+
+      pdfAnchoring.$imports.$mock({
+        './text-in-rect': { textInDOMRect: fakeTextInDOMRect },
       });
     });
 
@@ -1024,6 +1049,11 @@ describe('annotator/anchoring/pdf', () => {
           y: 10 + borderTop,
         });
 
+        assert.calledWith(
+          fakeTextInDOMRect,
+          textLayer,
+          matchRect(new DOMRect(10 + borderLeft, 10 + borderTop, 1, 1)),
+        );
         assert.deepEqual(selectors, [
           {
             type: 'PageSelector',
@@ -1044,8 +1074,20 @@ describe('annotator/anchoring/pdf', () => {
               right: 100,
               top: 200,
             },
+            text: 'text-in-shape',
           },
         ]);
+      });
+
+      it('does not extract text if there is no text layer', async () => {
+        textLayer.className = 'notTheTextLayer';
+        const selectors = await describeShape({
+          type: 'point',
+          x: 10 + borderLeft,
+          y: 10 + borderTop,
+        });
+        const shapeSelector = selectors.find(s => s.type === 'ShapeSelector');
+        assert.isUndefined(shapeSelector.text);
       });
     });
 
@@ -1090,14 +1132,29 @@ describe('annotator/anchoring/pdf', () => {
         const [expectedLeft, expectedTop] = pageView.getPagePoint(10, 10);
         const [expectedRight, expectedBottom] = pageView.getPagePoint(30, 50);
 
-        const selectors = await describeShape({
-          type: 'rect',
+        const rect = {
           left: 10 + borderLeft,
           top: 10 + borderTop,
           right: 30 + borderLeft,
           bottom: 50 + borderTop,
+        };
+        const selectors = await describeShape({
+          type: 'rect',
+          ...rect,
         });
 
+        assert.calledWith(
+          fakeTextInDOMRect,
+          textLayer,
+          matchRect(
+            new DOMRect(
+              rect.left,
+              rect.top,
+              rect.right - rect.left,
+              rect.bottom - rect.top,
+            ),
+          ),
+        );
         assert.deepEqual(selectors, [
           {
             type: 'PageSelector',
@@ -1120,9 +1177,36 @@ describe('annotator/anchoring/pdf', () => {
               right: 100,
               top: 200,
             },
+            text: 'text-in-shape',
           },
         ]);
       });
+    });
+
+    it('does not extract text if there is no text layer', async () => {
+      textLayer.className = 'notTheTextLayer';
+      const selectors = await describeShape({
+        type: 'rect',
+        left: 10 + borderLeft,
+        top: 10 + borderTop,
+        right: 30 + borderLeft,
+        bottom: 50 + borderTop,
+      });
+      const shapeSelector = selectors.find(s => s.type === 'ShapeSelector');
+      assert.isUndefined(shapeSelector.text);
+    });
+
+    it('truncates extracted text', async () => {
+      fakeTextInDOMRect.returns('a'.repeat(300));
+      const selectors = await describeShape({
+        type: 'rect',
+        left: 10 + borderLeft,
+        top: 10 + borderTop,
+        right: 100,
+        bottom: 100,
+      });
+      const shapeSelector = selectors.find(s => s.type === 'ShapeSelector');
+      assert.equal(shapeSelector.text, 'a'.repeat(256));
     });
 
     it('throws if shape is unsupported', async () => {
