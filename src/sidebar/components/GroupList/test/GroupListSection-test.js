@@ -43,6 +43,15 @@ describe('GroupListSection', () => {
     assert.equal(wrapper.find('GroupListItem').length, testGroups.length);
   });
 
+  [true, false].forEach(showIcons => {
+    it('renders icons if `showIcons` is true', () => {
+      const wrapper = createGroupListSection({ showIcons });
+      wrapper
+        .find('GroupListItem')
+        .forEach(item => assert.equal(item.prop('showIcon'), showIcons));
+    });
+  });
+
   it('expands group specified by `expandedGroup` prop', () => {
     const wrapper = createGroupListSection();
     for (let i = 0; i < testGroups.length; i++) {

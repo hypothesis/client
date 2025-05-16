@@ -48,6 +48,9 @@ export type GroupListItemProps = {
   /** Callback invoked to expand or collapse the current group. */
   onExpand: (expand: boolean) => void;
 
+  /** Whether to show the group type icon. */
+  showIcon?: boolean;
+
   groups: GroupsService;
   toastMessenger: ToastMessengerService;
 };
@@ -63,6 +66,7 @@ function GroupListItem({
   group,
   groups: groupsService,
   onExpand,
+  showIcon = true,
   toastMessenger,
 }: GroupListItemProps) {
   const activityUrl = group.links.html;
@@ -130,7 +134,7 @@ function GroupListItem({
       label={
         <div className="grow flex items-center justify-between gap-x-2">
           {group.name}
-          <GroupIcon type={group.type} />
+          {showIcon && <GroupIcon type={group.type} />}
         </div>
       }
       leftChannelContent={leftChannelContent}
