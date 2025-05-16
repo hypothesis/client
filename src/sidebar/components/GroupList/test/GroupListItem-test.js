@@ -378,6 +378,10 @@ describe('GroupListItem', () => {
     assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
   });
 
+  const getIcon = label => {
+    return label.find('[data-testid="group-icon"]');
+  };
+
   [
     {
       type: 'private',
@@ -398,7 +402,7 @@ describe('GroupListItem', () => {
     it('shows the right icon for the group type', () => {
       const wrapper = createGroupListItem({ ...fakeGroup, type });
       const label = mount(wrapper.find('MenuItem').prop('label'));
-      const groupIcon = label.find('[data-testid="group-icon"]');
+      const groupIcon = getIcon(label);
 
       try {
         assert.equal(groupIcon.prop('title'), expectedTitle);
@@ -407,5 +411,20 @@ describe('GroupListItem', () => {
         label.unmount();
       }
     });
+  });
+
+  it('does not render group type icon if `showIcon` is false', () => {
+    const wrapper = createGroupListItem(
+      {
+        ...fakeGroup,
+        type: 'private',
+      },
+      {
+        showIcon: false,
+      },
+    );
+    const label = mount(wrapper.find('MenuItem').prop('label'));
+    const groupIcon = getIcon(label);
+    assert.isFalse(groupIcon.exists());
   });
 });

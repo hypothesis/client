@@ -12,6 +12,9 @@ export type GroupListSectionProps = {
   /** Heading displayed at top of section. */
   heading?: string;
 
+  /** Whether to show icons to indicate group types. */
+  showIcons?: boolean;
+
   /**
    * Callback invoked when a group is expanded or collapsed.
    *
@@ -29,6 +32,7 @@ export default function GroupListSection({
   onExpandGroup,
   groups,
   heading,
+  showIcons,
 }: GroupListSectionProps) {
   return (
     <MenuSection heading={heading}>
@@ -38,6 +42,7 @@ export default function GroupListSection({
           isExpanded={group === expandedGroup}
           onExpand={expanded => onExpandGroup(expanded ? group : null)}
           group={group}
+          showIcon={showIcons}
         />
       ))}
     </MenuSection>

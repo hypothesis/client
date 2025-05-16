@@ -169,6 +169,14 @@ describe('GroupList', () => {
     assert.equal(newGroupButton.props().href, 'https://example.com/groups/new');
   });
 
+  it('shows group type icons', () => {
+    populateGroupSections();
+    const wrapper = createGroupList();
+    const sections = wrapper.find('GroupListSection');
+    assert.isTrue(sections.exists());
+    sections.forEach(section => assert.isTrue(section.prop('showIcons')));
+  });
+
   context('when `isThirdPartyService` is true', () => {
     beforeEach(() => {
       $imports.$mock({
@@ -194,6 +202,14 @@ describe('GroupList', () => {
       testGroup.organization = {};
       const wrapper = createGroupList();
       assert.equal(wrapper.find('img').prop('alt'), '');
+    });
+
+    it('does not show group icons', () => {
+      populateGroupSections();
+      const wrapper = createGroupList();
+      const sections = wrapper.find('GroupListSection');
+      assert.isTrue(sections.exists());
+      sections.forEach(section => assert.isFalse(section.prop('showIcons')));
     });
   });
 
