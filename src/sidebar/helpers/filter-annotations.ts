@@ -33,9 +33,13 @@ type Matcher<T = string> = {
 
 /**
  * Normalize a string query term or field value.
+ *
+ * The normalization eliminates differences of Unicode composition, case and
+ * accent. This means for example that a search for "eclair" will match an
+ * annotation containing "Éclair".
  */
 function normalizeStr(val: string): string {
-  return unicodeUtils.fold(unicodeUtils.normalize(val)).toLowerCase();
+  return unicodeUtils.removeMarks(unicodeUtils.normalize(val)).toLowerCase();
 }
 
 /**
