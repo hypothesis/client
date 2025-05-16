@@ -109,9 +109,15 @@ function GroupList({ settings }: GroupListProps) {
     label = <span>…</span>;
   }
 
+  const isThirdParty = isThirdPartyService(settings);
+
+  // We don't show group type icons in the third-party context because the
+  // meaning may be unclear. See https://github.com/hypothesis/support/issues/183.
+  const showIcons = !isThirdParty;
+
   // If there is only one group and no actions available for that group,
   // just show the group name as a label.
-  const actionsAvailable = !isThirdPartyService(settings);
+  const actionsAvailable = !isThirdParty;
   if (
     !actionsAvailable &&
     currentGroups.length + featuredGroups.length + myGroups.length < 2
@@ -138,6 +144,7 @@ function GroupList({ settings }: GroupListProps) {
           onExpandGroup={setExpandedGroup}
           heading="Currently Viewing"
           groups={currentGroupsSorted}
+          showIcons={showIcons}
         />
       )}
       {featuredGroupsSorted.length > 0 && (
@@ -146,6 +153,7 @@ function GroupList({ settings }: GroupListProps) {
           onExpandGroup={setExpandedGroup}
           heading="Featured Groups"
           groups={featuredGroupsSorted}
+          showIcons={showIcons}
         />
       )}
       {myGroupsSorted.length > 0 && (
@@ -154,6 +162,7 @@ function GroupList({ settings }: GroupListProps) {
           onExpandGroup={setExpandedGroup}
           heading="My Groups"
           groups={myGroupsSorted}
+          showIcons={showIcons}
         />
       )}
 
