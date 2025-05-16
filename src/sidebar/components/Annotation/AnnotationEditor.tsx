@@ -28,6 +28,7 @@ import { useSidebarStore } from '../../store';
 import type { Draft } from '../../store/modules/drafts';
 import MarkdownEditor from '../MarkdownEditor';
 import TagEditor from '../TagEditor';
+import { useUnsavedChanges } from '../hooks/unsaved-changes';
 import AnnotationLicense from './AnnotationLicense';
 import AnnotationPublishControl from './AnnotationPublishControl';
 
@@ -74,6 +75,12 @@ function AnnotationEditor({
   const tags = draft.tags;
   const text = draft.text;
   const isEmpty = !text && !tags.length;
+
+  // Warn user if they try to close the tab while there is an open, non-empty
+  // draft.
+  //
+  // WARNING: This does not work in all browsers. See hook docs for details.
+  useUnsavedChanges(!isEmpty);
 
   const onEditTags = useCallback(
     (tags: string[]) => {
