@@ -22,7 +22,7 @@ describe('sidebar/helpers/filter-annotations', () => {
 
   beforeEach(() => {
     fakeUnicode = {
-      fold: sinon.stub().returnsArg(0),
+      removeMarks: sinon.stub().returnsArg(0),
       normalize: sinon.stub().returnsArg(0),
     };
 
@@ -43,7 +43,7 @@ describe('sidebar/helpers/filter-annotations', () => {
 
       filterAnnotations([], filters);
 
-      assert.calledWith(fakeUnicode.fold, 'Tiger');
+      assert.calledWith(fakeUnicode.removeMarks, 'Tiger');
     });
   });
 
