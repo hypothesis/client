@@ -18,6 +18,7 @@ describe('AnnotationEditor', () => {
   let fakeSettings;
   let fakeToastMessenger;
   let fakeGroupsService;
+  let fakeUseUnsavedChanges;
 
   let fakeStore;
 
@@ -74,8 +75,13 @@ describe('AnnotationEditor', () => {
       defaultAuthority: sinon.stub().returns(''),
     };
 
+    fakeUseUnsavedChanges = sinon.stub();
+
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      '../hooks/unsaved-changes': {
+        useUnsavedChanges: fakeUseUnsavedChanges,
+      },
       '../../store': { useSidebarStore: () => fakeStore },
       '../../helpers/theme': { applyTheme: fakeApplyTheme },
     });
@@ -277,6 +283,19 @@ describe('AnnotationEditor', () => {
         .simulate('keydown', { key: 'Enter', metaKey: true });
 
       assert.notCalled(fakeAnnotationsService.save);
+    });
+
+    it('warns if user closes tab while there is a non-empty draft', () => {
+      // If the draft is empty, the warning is disabled.
+      const wrapper = createComponent();
+      assert.calledWith(fakeUseUnsavedChanges, false);
+
+      // If the draft changes to non-empty, the warning is enabled.
+      fakeUseUnsavedChanges.resetHistory();
+      const draft = fixtures.defaultDraft();
+      draft.text = 'something is here';
+      wrapper.setProps({ draft });
+      assert.calledWith(fakeUseUnsavedChanges, true);
     });
 
     describe('handling publish options', () => {
