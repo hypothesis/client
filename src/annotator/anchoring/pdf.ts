@@ -11,6 +11,7 @@ import type {
 import type {
   PDFPageProxy,
   PDFPageView,
+  PDFJSLibrary,
   PDFViewer,
   TextLayer,
 } from '../../types/pdfjs';
@@ -88,6 +89,19 @@ function getPDFViewer(): PDFViewer {
 }
 
 /**
+ * Get the `pdfjsLib` API that PDF.js exposes as a global when loaded into a
+ * web page.
+ */
+function getPDFJSLib(): PDFJSLibrary {
+  const window_ = window as Window & { pdfjsLib?: PDFJSLibrary };
+  // istanbul ignore next
+  if (typeof window_.pdfjsLib !== 'object') {
+    throw new Error('PDF.js library not available');
+  }
+  return window_.pdfjsLib;
+}
+
+/**
  * Returns the view into which a PDF page is drawn.
  *
  * If called while the PDF document is still loading, this will delay until
@@ -151,6 +165,17 @@ export async function documentHasText() {
   return hasText;
 }
 
+function normalizeUnicode(str: string) {
+  const normalize = getPDFJSLib().normalizeUnicode;
+  if (typeof normalize === 'function') {
+    return normalize(str);
+  } else {
+    // In older versions of PDF.js which don't have this API, both extracted
+    // text and the text layer are already normalized.
+    return str;
+  }
+}
+
 /**
  * Return the text of a given PDF page.
  *
@@ -171,6 +196,10 @@ function getPageTextContent(pageIndex: number): Promise<string> {
     const textContent = await pageView.pdfPage.getTextContent({
       // Deprecated option, set for compatibility with older PDF.js releases.
       normalizeWhitespace: true,
+
+      // There is a `disableNormalization` option which defaults to false.
+      // The result is that `textContent` will be normalized as if passed to
+      // `normalizeUnicode(textContent)`.
     });
     return textContent.items.map(it => it.str).join('');
   };
@@ -283,6 +312,58 @@ export function isTextLayerRenderingDone(textLayer: TextLayer): boolean {
 }
 
 /**
+ * A cache of text layer elements which have been normalized.
+ *
+ * Text layer elements are assumed to be immutable, ie. their text content
+ * doesn't change after PDF.js initially renders them.
+ */
+const normalizedTextLayers = new WeakSet<HTMLElement>();
+
+/**
+ * Apply Unicode normalization to the content of a text layer.
+ *
+ * The purpose of this function is to ensure that the content of the text layer
+ * matches that returned by PDF.js's text extraction APIs, except for
+ * differences in whitespace which are handled via {@link translateOffsets}.
+ * This allows for text annotations to be anchored using text extracted via
+ * PDF.js's text extraction APIs, then the anchored positions can be later used
+ * to locate the corresponding parts of the text layer.
+ *
+ * In older versions of PDF.js, the text extraction APIs and text layer had the
+ * same normalization applied to them. This changed, as described in
+ * https://github.com/hypothesis/client/issues/6784#issuecomment-2624697567. By
+ * applying the same normalization ourselves, we can support both old and new
+ * versions of PDF.js simultaneously. The downside of doing this is that the
+ * normalized text may not align as well with the visual text in the rendered
+ * PDF page. As a result the user may be more likely to make a selection that
+ * selects different text than what the user expected.
+ */
+function normalizeTextLayer(textLayer: HTMLElement) {
+  if (normalizedTextLayers.has(textLayer)) {
+    return;
+  }
+
+  const nodeIter: NodeIterator = textLayer.ownerDocument!.createNodeIterator(
+    textLayer,
+    NodeFilter.SHOW_TEXT,
+  );
+  let currentNode;
+  while ((currentNode = nodeIter.nextNode())) {
+    const text = currentNode as Text;
+    const textContent = text.data;
+    const normalizedText = normalizeUnicode(textContent);
+
+    // Only assign to `text.data` if the normalized text is different, to avoid
+    // potentially triggering unnecessary work inside the browser.
+    if (normalizedText !== textContent) {
+      text.data = normalizedText;
+    }
+  }
+
+  normalizedTextLayers.add(textLayer);
+}
+
+/**
  * Locate the DOM Range which a position selector refers to.
  *
  * If the page is off-screen it may be in an unrendered state, in which case
@@ -312,15 +393,17 @@ async function anchorByPosition(
   ) {
     // The page has been rendered. Locate the position in the text layer.
     //
-    // We allow for differences in whitespace between the text returned by
-    // `getPageTextContent` and the text layer content. Any other differences
-    // will cause mis-anchoring.
+    // We allow for differences in whitespace and Unicode normalization between
+    // the text returned by `getPageTextContent` and the text layer content. Any
+    // other differences will cause mis-anchoring.
 
     const root = page.textLayer.textLayerDiv ?? page.textLayer.div;
     if (!root) {
       /* istanbul ignore next */
       throw new Error('Unable to find PDF.js text layer root');
     }
+
+    normalizeTextLayer(root);
 
     const textLayerStr = root.textContent!;
 

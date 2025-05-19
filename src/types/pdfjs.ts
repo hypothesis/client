@@ -287,3 +287,23 @@ export type TextLayer = {
   /** Old name for root element of text layer. */
   textLayerDiv?: HTMLElement;
 };
+
+/**
+ * Type of the `pdfjsLib` global.
+ *
+ * See https://github.com/mozilla/pdf.js/blob/fc68a9f3ee3cfe5d9e80a260a157dc6ef28fbff8/src/pdf.js#L97.
+ */
+export type PDFJSLibrary = {
+  /**
+   * Apply PDF.js's custom Unicode normalization.
+   *
+   * This is effectively NFKC normalization, but only applied to a subset of
+   * characters.
+   *
+   * This function is not available in older versions of PDF.js (pre-2023).
+   * Those older versions always apply normalization to both the text layer and
+   * extracted text. Newer versions, which do have this API, normalize extracted
+   * text by default, but not the text layer.
+   */
+  normalizeUnicode?(str: string): string;
+};

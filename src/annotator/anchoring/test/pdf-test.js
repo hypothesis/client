@@ -79,7 +79,12 @@ describe('annotator/anchoring/pdf', () => {
     delete window.PDFViewerApplication;
   }
 
+  let fakePDFJSLib;
   beforeEach(() => {
+    fakePDFJSLib = {
+      normalizeUnicode: str => str,
+    };
+    globalThis.pdfjsLib = fakePDFJSLib;
     container = document.createElement('div');
     document.body.appendChild(container);
     initViewer(fixtures.pdfPages);
@@ -89,6 +94,7 @@ describe('annotator/anchoring/pdf', () => {
     pdfAnchoring.$imports.$restore();
     cleanupViewer();
     container.remove();
+    delete globalThis.pdfjsLib;
   });
 
   describe('describe', () => {
@@ -340,6 +346,7 @@ describe('annotator/anchoring/pdf', () => {
 
     it('anchors text in older PDF.js versions', async () => {
       initViewer(fixtures.pdfPages, { newTextRendering: false });
+      fakePDFJSLib.normalizeUnicode = undefined;
 
       // Choose a quote in the first page, which has blank text items in it.
       const quote = { type: 'TextQuoteSelector', exact: 'Jane Austen' };
@@ -563,6 +570,24 @@ describe('annotator/anchoring/pdf', () => {
         anchoredRange.toString(),
         'z o m b i e   i n   p o s s e s s i o n',
       );
+    });
+
+    it('normalizes text layer before anchoring', async () => {
+      viewer.pdfViewer.setCurrentPage(1);
+      const selection = 'zombie in possession';
+      const range = findText(container, selection);
+      const [, quote] = await pdfAnchoring.describe(range);
+
+      // Simulate text layer containing un-normalized text which is different
+      // to normalized text returned by PDF.js APIs.
+      const textLayerEl =
+        viewer.pdfViewer.getPageView(1).textLayer.textLayerDiv;
+      textLayerEl.textContent = textLayerEl.textContent.toUpperCase();
+
+      fakePDFJSLib.normalizeUnicode = sinon.spy(str => str.toLowerCase());
+      const anchoredRange = await pdfAnchoring.anchor([quote]);
+      assert.called(fakePDFJSLib.normalizeUnicode);
+      assert.equal(anchoredRange.toString(), 'zombie in possession');
     });
 
     it('anchors with mismatch if text layer differs from PDF.js text API output', async () => {
