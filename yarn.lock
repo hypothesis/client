@@ -5955,6 +5955,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"diff@npm:^8.0.1":
+  version: 8.0.1
+  resolution: "diff@npm:8.0.1"
+  checksum: bc6f6aa7f9e9c573255db1a7465e3f1f4e3eaeffc579a317489643e1c7ae6b22c819aa3e309380988ff4497d771daf1abf0aa0a92afa347b7011cd525e7388d4
+  languageName: node
+  linkType: hard
+
 "discontinuous-range@npm:1.0.0":
   version: 1.0.0
   resolution: "discontinuous-range@npm:1.0.0"
@@ -7800,7 +7807,7 @@ __metadata:
     classnames: ^2.2.4
     commander: ^13.0.0
     cross-env: ^7.0.0
-    diff: ^7.0.0
+    diff: ^8.0.1
     dompurify: ^3.0.0
     enzyme: ^3.8.0
     enzyme-adapter-preact-pure: ^4.0.1
