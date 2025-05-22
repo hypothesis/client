@@ -10,6 +10,7 @@ import changed from 'gulp-changed';
 
 import { serveDev } from './dev-server/serve-dev.js';
 import { servePackage } from './dev-server/serve-package.js';
+import { renderBootTemplate } from './scripts/render-boot-template.js';
 import annotatorTailwindConfig from './tailwind-annotator.config.js';
 import sidebarTailwindConfig from './tailwind-sidebar.config.js';
 import tailwindConfig from './tailwind.config.js';
@@ -98,8 +99,12 @@ gulp.task(
 const manifestSourceFiles = 'build/{scripts,styles}/*.{css,js,map}';
 
 gulp.task('build-boot-script', async () => {
+  // Generate the manifest containing cache-busted asset URLs
   await generateManifest({ pattern: manifestSourceFiles });
+  // Generate the boot script template
   await buildJS('./rollup-boot.config.js');
+  // Replace variables in the template with real URLs
+  renderBootTemplate('build/boot-template.js', 'build/boot.js');
 });
 
 gulp.task('watch-boot-script', () => {
