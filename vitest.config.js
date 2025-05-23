@@ -1,6 +1,8 @@
 import { SummaryReporter } from '@hypothesis/frontend-testing/vitest';
 import { defineConfig } from 'vitest/config';
 
+import { excludeFromCoverage } from './rollup-tests.config.js';
+
 export default defineConfig({
   test: {
     globals: true,
@@ -29,12 +31,7 @@ export default defineConfig({
       reportsDirectory: './coverage',
       reporter: ['json', 'html'],
       include: ['src/**/*.{ts,tsx}'],
-      exclude: [
-        '**/node_modules/**',
-        '**/test/**/*.js',
-        '**/test-util/**',
-        'src/**/index.{ts,tsx}',
-      ],
+      exclude: excludeFromCoverage,
     },
   },
 });
