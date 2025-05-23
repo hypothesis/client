@@ -39,18 +39,25 @@ describe('AnnotationThumbnail', () => {
   });
 
   [
+    // No alt text
     {
-      textInImage: undefined,
       expectedAlt: 'Thumbnail',
     },
+    // Text extracted from image
     {
       textInImage: 'Foo bar',
       expectedAlt: 'Thumbnail. Contains text: Foo bar',
     },
-  ].forEach(({ textInImage, expectedAlt }) => {
+    // Explicitly provided description
+    {
+      description: 'Foo bar',
+      textInImage: 'Some text',
+      expectedAlt: 'Thumbnail. Foo bar',
+    },
+  ].forEach(({ textInImage, description, expectedAlt }) => {
     it('sets alt text for thumbnail', () => {
       fakeThumbnailService.get.returns(fakeThumbnail);
-      const wrapper = createComponent({ textInImage });
+      const wrapper = createComponent({ description, textInImage });
       const image = wrapper.find('canvas');
       assert.equal(image.prop('aria-label'), expectedAlt);
     });

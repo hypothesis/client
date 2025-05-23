@@ -24,6 +24,15 @@ describe('AnnotationsService', () => {
     fakeStore.isLoggedIn.returns(loggedIn);
   }
 
+  // The minimal data needed for a `create` call.
+  const emptyAnnotationData = {
+    target: [
+      {
+        source: 'https://example.com',
+      },
+    ],
+  };
+
   beforeEach(() => {
     fakeAnnotationActivity = {
       reportActivity: sinon.stub(),
@@ -116,7 +125,7 @@ describe('AnnotationsService', () => {
     it('extends the provided annotation object with defaults', () => {
       fakeStore.focusedGroupId.returns('mygroup');
 
-      svc.create({}, now);
+      svc.create(emptyAnnotationData, now);
 
       const annotation = getLastAddedAnnotation();
 
@@ -141,7 +150,7 @@ describe('AnnotationsService', () => {
         lms: { assignment_id: '1234' },
       };
 
-      svc.create({}, now);
+      svc.create(emptyAnnotationData, now);
 
       const annotation = getLastAddedAnnotation();
       assert.deepEqual(annotation.metadata, fakeSettings.annotationMetadata);
@@ -152,7 +161,7 @@ describe('AnnotationsService', () => {
         fakeStore.getDefault.returns('private');
         fakeDefaultPermissions.returns('private-permissions');
 
-        svc.create({}, now);
+        svc.create(emptyAnnotationData, now);
         const annotation = getLastAddedAnnotation();
 
         assert.calledOnce(fakeDefaultPermissions);
@@ -169,7 +178,7 @@ describe('AnnotationsService', () => {
         fakeStore.getDefault.returns('shared');
         fakeDefaultPermissions.returns('default permissions');
 
-        svc.create({}, now);
+        svc.create(emptyAnnotationData, now);
         const annotation = getLastAddedAnnotation();
 
         assert.calledOnce(fakeDefaultPermissions);
@@ -187,7 +196,7 @@ describe('AnnotationsService', () => {
         fakePrivatePermissions.returns('private permissions');
         fakeDefaultPermissions.returns('default permissions');
 
-        svc.create({}, now);
+        svc.create(emptyAnnotationData, now);
         const annotation = getLastAddedAnnotation();
 
         assert.calledOnce(fakePrivatePermissions);
@@ -483,7 +492,7 @@ describe('AnnotationsService', () => {
       );
     });
 
-    it('calls the relevant API service with an object that has any draft changes integrated', () => {
+    it('calls the relevant API service with an object that has any draft changes integrated', async () => {
       fakeMetadata.isSaved.returns(false);
       fakePrivatePermissions.returns({ read: ['foo'] });
       const annotation = fixtures.defaultAnnotation();
@@ -494,20 +503,25 @@ describe('AnnotationsService', () => {
         tags: ['one', 'two'],
         text: 'my text',
         isPrivate: true,
+        description: 'Image description',
         annotation: fixtures.defaultAnnotation(),
       });
 
-      return svc.save(fixtures.defaultAnnotation()).then(() => {
-        const annotationWithChanges =
-          fakeApi.annotation.create.getCall(0).args[1];
-        assert.equal(annotationWithChanges.text, 'my text');
-        assert.sameMembers(annotationWithChanges.tags, ['one', 'two']);
-        // Permissions converted to "private"
-        assert.include(annotationWithChanges.permissions.read, 'foo');
-        assert.notInclude(annotationWithChanges.permissions.read, [
-          'group:__world__',
-        ]);
-      });
+      await svc.save(fixtures.defaultAnnotation());
+
+      const annotationWithChanges =
+        fakeApi.annotation.create.getCall(0).args[1];
+      assert.equal(annotationWithChanges.text, 'my text');
+      assert.sameMembers(annotationWithChanges.tags, ['one', 'two']);
+      // Permissions converted to "private"
+      assert.include(annotationWithChanges.permissions.read, 'foo');
+      assert.notInclude(annotationWithChanges.permissions.read, [
+        'group:__world__',
+      ]);
+      assert.equal(
+        annotationWithChanges.target[0].description,
+        'Image description',
+      );
     });
 
     [

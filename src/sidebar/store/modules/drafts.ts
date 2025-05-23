@@ -19,6 +19,9 @@ type DraftChanges = {
   isPrivate: boolean;
   tags: string[];
   text: string;
+
+  /** Description of what was selected, for image annotations. */
+  description?: string;
 };
 
 /**
@@ -32,12 +35,14 @@ export class Draft {
   isPrivate: boolean;
   tags: string[];
   text: string;
+  description?: string;
 
   constructor(annotation: AnnotationID, changes: DraftChanges) {
     this.annotation = { id: annotation.id, $tag: annotation.$tag };
     this.isPrivate = changes.isPrivate;
     this.tags = changes.tags;
     this.text = changes.text;
+    this.description = changes.description;
   }
   /**
    * Returns true if this draft matches a given annotation.
@@ -55,7 +60,7 @@ export class Draft {
    * any user input.
    */
   isEmpty() {
-    return !this.text && this.tags.length === 0;
+    return !this.text && this.tags.length === 0 && !this.description;
   }
 }
 

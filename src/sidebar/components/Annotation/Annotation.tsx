@@ -7,6 +7,7 @@ import {
   annotationRole,
   isOrphan,
   isSaved,
+  description,
   quote,
   shape,
 } from '../../helpers/annotation-metadata';
@@ -78,6 +79,8 @@ function Annotation({
   const store = useSidebarStore();
 
   const annotationQuote = quote(annotation);
+  const targetDescription = description(annotation);
+
   const draft = store.getDraft(annotation);
   const userid = store.profile().userid;
 
@@ -128,6 +131,7 @@ function Annotation({
         <AnnotationThumbnail
           tag={annotation.$tag}
           textInImage={targetShape.text}
+          description={targetDescription}
         />
       )}
       {annotationQuote && (

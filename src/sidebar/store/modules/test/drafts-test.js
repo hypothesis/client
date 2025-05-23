@@ -44,19 +44,31 @@ describe('store/modules/drafts', () => {
         annotation: {
           ...fixtures.annotation,
         },
+        description: undefined,
         ...fixtures.draftWithText,
       });
     });
+
     describe('#isEmpty', () => {
       it('returns false if draft has tags or text', () => {
         const draft = new Draft(fixtures.annotation, fixtures.draftWithText);
         assert.isFalse(draft.isEmpty());
       });
+
+      it('returns false if draft has a description', () => {
+        const draft = new Draft(fixtures.annotation, {
+          ...fixtures.emptyDraft,
+          description: 'foo',
+        });
+        assert.isFalse(draft.isEmpty());
+      });
+
       it('returns true if draft has no tags or text', () => {
         const draft = new Draft(fixtures.annotation, fixtures.emptyDraft);
         assert.isTrue(draft.isEmpty());
       });
     });
+
     describe('#match', () => {
       it('matches an annotation with the same tag or id', () => {
         const draft = new Draft(fixtures.annotation, fixtures.draftWithText);

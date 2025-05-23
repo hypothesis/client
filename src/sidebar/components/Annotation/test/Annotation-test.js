@@ -147,6 +147,7 @@ describe('Annotation', () => {
 
     it('renders a thumbnail if annotation has a shape selector', () => {
       const annotation = fixtures.defaultAnnotation();
+      annotation.target[0].description = 'This is a thing';
       annotation.target[0].selector = [
         {
           type: 'ShapeSelector',
@@ -164,6 +165,7 @@ describe('Annotation', () => {
       const thumbnail = wrapper.find('AnnotationThumbnail');
       assert.isTrue(thumbnail.exists());
       assert.equal(thumbnail.prop('tag'), annotation.$tag);
+      assert.equal(thumbnail.prop('description'), 'This is a thing');
       assert.equal(thumbnail.prop('textInImage'), 'Some text');
     });
   });

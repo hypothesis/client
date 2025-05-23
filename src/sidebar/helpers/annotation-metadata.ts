@@ -394,6 +394,11 @@ export function quote(annotation: APIAnnotationData): string | null {
   return quoteSel ? quoteSel.exact : null;
 }
 
+/** Return the description of the annotation's selection. */
+export function description(annotation: APIAnnotationData): string | undefined {
+  return annotation.target[0]?.description;
+}
+
 /**
  * Return the shape of an annotation's target, if there is one.
  *
