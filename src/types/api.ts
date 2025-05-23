@@ -239,6 +239,8 @@ export type Target = {
   source: string;
   /** Region of the document */
   selector?: Selector[];
+  /** Text description of the selection, for when the selection itself is not text. */
+  description?: string;
 };
 
 export type UserInfo = {

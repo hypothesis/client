@@ -1,3 +1,4 @@
+import { Input } from '@hypothesis/frontend-shared';
 import {
   useCallback,
   useEffect,
@@ -14,6 +15,7 @@ import {
   annotationRole,
   isReply,
   isSaved,
+  shape,
 } from '../../helpers/annotation-metadata';
 import type { UserItem } from '../../helpers/mention-suggestions';
 import { combineUsersForMentions } from '../../helpers/mention-suggestions';
@@ -65,6 +67,11 @@ function AnnotationEditor({
   const group = store.getGroup(annotation.group);
   const isReplyAnno = useMemo(() => isReply(annotation), [annotation]);
 
+  const showDescription = useMemo(
+    () => shape(annotation) && store.isFeatureEnabled('image_descriptions'),
+    [annotation, store],
+  );
+
   const shouldShowLicense =
     !draft.isPrivate && group && group.type !== 'private';
 
@@ -74,13 +81,21 @@ function AnnotationEditor({
 
   const tags = draft.tags;
   const text = draft.text;
-  const isEmpty = !text && !tags.length;
+  const description = draft.description;
+  const isEmpty = !text && !tags.length && !description;
 
   // Warn user if they try to close the tab while there is an open, non-empty
   // draft.
   //
   // WARNING: This does not work in all browsers. See hook docs for details.
   useUnsavedChanges(!isEmpty);
+
+  const onEditDescription = useCallback(
+    (description: string) => {
+      store.createDraft(draft.annotation, { ...draft, description });
+    },
+    [draft, store],
+  );
 
   const onEditTags = useCallback(
     (tags: string[]) => {
@@ -271,6 +286,17 @@ function AnnotationEditor({
       className="space-y-4"
       onKeyDown={onKeyDown}
     >
+      {showDescription && (
+        <Input
+          data-testid="description"
+          placeholder="Describe selected area..."
+          aria-label="Describe selected area"
+          value={description}
+          onInput={e => onEditDescription((e.target as HTMLInputElement).value)}
+          // Maximum length for `target.description` field supported by the API.
+          maxlength={250}
+        />
+      )}
       <MarkdownEditor
         textStyle={textStyle}
         label={isReplyAnno ? 'Enter reply' : 'Enter comment'}

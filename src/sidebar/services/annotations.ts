@@ -90,6 +90,13 @@ export class AnnotationsService {
       ? privatePermissions(annotation.user)
       : sharedPermissions(annotation.user, annotation.group);
 
+    const target = annotation.target;
+    if (target[0] && target[0].description !== draft.description) {
+      const newTarget = structuredClone(target);
+      newTarget[0].description = draft.description;
+      changes.target = newTarget;
+    }
+
     // Integrate changes from draft into object to be persisted
     return { ...annotation, ...changes };
   }
@@ -175,6 +182,7 @@ export class AnnotationsService {
         tags: annotation.tags,
         text: annotation.text,
         isPrivate: !metadata.isPublic(annotation),
+        description: annotation.target[0]?.description,
       });
     }
 

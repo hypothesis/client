@@ -98,6 +98,7 @@ function AnnotationActionBar({
       tags: annotation.tags,
       text: annotation.text,
       isPrivate: isPrivate(annotation.permissions),
+      description: annotation.target[0]?.description,
     });
   };
 

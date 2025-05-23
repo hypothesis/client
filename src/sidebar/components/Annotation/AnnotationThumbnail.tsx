@@ -58,9 +58,13 @@ export type AnnotationThumbnailProps = {
    * This is used when generating alt text for the thumbnail.
    */
   textInImage?: string;
+
+  /** Description of the thumbnail. */
+  description?: string;
 };
 
 function AnnotationThumbnail({
+  description,
   textInImage,
   tag,
   thumbnailService,
@@ -85,7 +89,9 @@ function AnnotationThumbnail({
   }, [error, devicePixelRatio, tag, thumbnail, thumbnailService]);
 
   let altText;
-  if (textInImage) {
+  if (description) {
+    altText = `Thumbnail. ${description}`;
+  } else if (textInImage) {
     altText = `Thumbnail. Contains text: ${textInImage}`;
   } else {
     altText = 'Thumbnail';

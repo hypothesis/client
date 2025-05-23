@@ -2,6 +2,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import * as annotationMetadata from '../annotation-metadata';
 import {
   cfi,
+  description,
   documentMetadata,
   domainAndTitle,
   isSaved,
@@ -749,6 +750,22 @@ describe('sidebar/helpers/annotation-metadata', () => {
         const annShape = shape(annotation);
         assert.deepEqual(annShape, expected);
       });
+    });
+  });
+
+  describe('description', () => {
+    it('returns target description', () => {
+      const annotation = { target: [] };
+      assert.isUndefined(description(annotation));
+
+      const annotation2 = {
+        target: [
+          {
+            description: 'Two roads diverge in a wood',
+          },
+        ],
+      };
+      assert.equal(description(annotation2), 'Two roads diverge in a wood');
     });
   });
 

@@ -187,6 +187,38 @@ describe('AnnotationEditor', () => {
     });
   });
 
+  describe('editing target descriptions', () => {
+    const getDescription = wrapper =>
+      wrapper.find('input[data-testid="description"]');
+
+    beforeEach(() => {
+      fakeStore.isFeatureEnabled.withArgs('image_descriptions').returns(true);
+    });
+
+    it('does not show description input if annotation has no shape selector', () => {
+      const wrapper = createComponent();
+      assert.isFalse(getDescription(wrapper).exists());
+    });
+
+    it('updates draft when description is edited', () => {
+      const annotation = Object.assign(fixtures.defaultAnnotation(), {
+        target: [
+          {
+            selector: [{ type: 'ShapeSelector' }],
+          },
+        ],
+      });
+      const wrapper = createComponent({ annotation });
+      const input = wrapper.find('input[data-testid="description"]');
+      input.getDOMNode().value = 'new-description';
+      input.simulate('input');
+
+      const draftCall = fakeStore.createDraft.getCall(0);
+
+      assert.deepEqual(draftCall.args[1].description, 'new-description');
+    });
+  });
+
   describe('saving the annotation', () => {
     it('saves the annotation when save callback invoked', async () => {
       const annotation = fixtures.defaultAnnotation();

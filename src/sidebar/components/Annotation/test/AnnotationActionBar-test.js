@@ -114,6 +114,8 @@ describe('AnnotationActionBar', () => {
     });
 
     it('creates a new draft when `Edit` button clicked', () => {
+      fakeAnnotation.target[0].description = 'Image description';
+
       allowOnly('update');
       const button = getButton(createComponent(), 'EditIcon');
 
@@ -125,6 +127,7 @@ describe('AnnotationActionBar', () => {
       assert.include(call.args[1], {
         isPrivate: false,
         text: fakeAnnotation.text,
+        description: 'Image description',
       });
       assert.isArray(call.args[1].tags);
     });
