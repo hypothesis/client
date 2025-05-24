@@ -1,14 +1,16 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
 
-import type { Service, SidebarSettings } from '../../types/config';
-import { serviceConfig } from '../config/service-config';
-import {
-  isThirdPartyUser,
-  username as getUsername,
-} from '../helpers/account-id';
+// Service, serviceConfig, isThirdPartyUser, getUsername are no longer needed
+// import type { Service, SidebarSettings } from '../../types/config';
+// import { serviceConfig } from '../config/service-config';
+// import {
+//   isThirdPartyUser,
+//   username as getUsername,
+// } from '../helpers/account-id';
+import type { SidebarSettings } from '../../types/config'; // Keep SidebarSettings if settings.dashboard is used
 import { withServices } from '../service-context';
-import type { FrameSyncService } from '../services/frame-sync';
+import type { FrameSyncService } from '../services/frame-sync'; // Keep if onSelectNotebook or onSelectProfile is used
 import { useSidebarStore } from '../store';
 import Menu from './Menu';
 import MenuItem from './MenuItem';
@@ -16,44 +18,34 @@ import MenuSection from './MenuSection';
 import OpenDashboardMenuItem from './OpenDashboardMenuItem';
 
 export type UserMenuProps = {
-  onLogout: () => void;
+  // onLogout prop removed
 
   // Injected
-  frameSync: FrameSyncService;
-  settings: SidebarSettings;
+  frameSync: FrameSyncService; // Keep if onSelectNotebook is used
+  settings: SidebarSettings; // Keep if settings.dashboard is used
 };
 
 /**
- * A menu with user and account links.
+ * A menu for the "Default_User".
  *
- * This menu will contain different items depending on service configuration,
- * context and whether the user is first- or third-party.
+ * This menu is simplified for a single-user context, removing account-specific
+ * actions and external links.
  */
-function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
+function UserMenu({ frameSync, settings }: UserMenuProps) {
   const store = useSidebarStore();
-  const defaultAuthority = store.defaultAuthority();
-  const profile = store.profile();
+  const profile = store.profile(); // This will be the "Default_User" profile
 
-  const isThirdParty = isThirdPartyUser(profile.userid, defaultAuthority);
-  const service = serviceConfig(settings);
-  const username = getUsername(profile.userid);
-  const displayName = profile.user_info?.display_name ?? username;
+  // displayName will be "Default User" from the static profile
+  const displayName = profile.user_info?.display_name || 'User';
   const [isOpen, setOpen] = useState(false);
 
-  const serviceSupports = (feature: keyof Service) =>
-    service && !!service[feature];
+  // isThirdParty, service, username, serviceSupports, isSelectableProfile,
+  // logoutAvailable, logoutDisabled, onProfileSelected, profileHref are removed.
 
-  const isSelectableProfile =
-    !isThirdParty || serviceSupports('onProfileRequestProvided');
-
-  // Is logging out generally possible for the current user?
-  const logoutAvailable =
-    !isThirdParty || serviceSupports('onLogoutRequestProvided');
-
-  // Is logging out possible right now?
-  const logoutDisabled = store.importsPending() > 0;
-
-  const isProfileEnabled = store.isFeatureEnabled('client_user_profile');
+  // isProfileEnabled can be kept if 'client_user_profile' feature flag might be used
+  // by "Default_User" for a local-only profile view (currently out of scope).
+  // For now, assuming this feature flag will be false or the item removed.
+  // const isProfileEnabled = store.isFeatureEnabled('client_user_profile');
 
   const onSelectNotebook = () => {
     const groupId = store.focusedGroupId();
@@ -61,26 +53,19 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
       frameSync.notifyHost('openNotebook', groupId);
     }
   };
-  const onSelectProfile = () => frameSync.notifyHost('openProfile');
+  // const onSelectProfile = () => frameSync.notifyHost('openProfile'); // Removed
 
-  // Access to the Notebook:
-  // type the key 'n' when user menu is focused/open
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'n') {
       onSelectNotebook();
       setOpen(false);
-    } else if (isProfileEnabled && event.key === 'p') {
-      onSelectProfile();
-      setOpen(false);
     }
+    // "Your profile" (p key) shortcut removed
+    // else if (isProfileEnabled && event.key === 'p') {
+    //   onSelectProfile();
+    //   setOpen(false);
+    // }
   };
-
-  const onProfileSelected = () =>
-    isThirdParty && frameSync.notifyHost('profileRequested');
-  const profileHref =
-    isSelectableProfile && !isThirdParty
-      ? store.getLink('user', { user: username })
-      : undefined;
 
   const menuLabel = (
     <span className="p-1">
@@ -88,32 +73,23 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
     </span>
   );
   return (
-    // Allow keyboard shortcut 'n' to open Notebook
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
     <div data-testid="user-menu" onKeyDown={onKeyDown}>
       <Menu
         label={menuLabel}
-        title={displayName}
+        title={displayName} // This will be "Default User"
         align="right"
         open={isOpen}
         onOpenChanged={setOpen}
       >
         <MenuSection>
-          <MenuItem
-            label={displayName}
-            isDisabled={!isSelectableProfile}
-            href={profileHref}
-            onClick={isSelectableProfile ? onProfileSelected : undefined}
-          />
-          {!isThirdParty && (
-            <MenuItem
-              label="Account settings"
-              href={store.getLink('account.settings')}
-            />
-          )}
-          {isProfileEnabled && (
-            <MenuItem label="Your profile" onClick={() => onSelectProfile()} />
-          )}
+          {/* Display name item - no longer a link to external profile */}
+          <MenuItem label={displayName} isDisabled={true} />
+
+          {/* "Account settings" MenuItem removed */}
+          {/* "Your profile" MenuItem removed (as it implied external interaction) */}
+          {/* If a local profile view is desired later, isProfileEnabled could control it */}
+
           <MenuItem label="Open notebook" onClick={() => onSelectNotebook()} />
         </MenuSection>
         {settings.dashboard?.showEntryPoint && (
@@ -121,18 +97,11 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
             <OpenDashboardMenuItem isMenuOpen={isOpen} />
           </MenuSection>
         )}
-        {logoutAvailable && (
-          <MenuSection>
-            <MenuItem
-              isDisabled={logoutDisabled}
-              label="Log out"
-              onClick={onLogout}
-            />
-          </MenuSection>
-        )}
+        {/* Logout section removed */}
       </Menu>
     </div>
   );
 }
 
+// frameSync might not be needed if onSelectNotebook is also removed later
 export default withServices(UserMenu, ['frameSync', 'settings']);

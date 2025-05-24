@@ -8,7 +8,7 @@ import type { LoadAnnotationsService } from '../services/load-annotations';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
 import LoggedOutMessage from './LoggedOutMessage';
-import LoginPromptPanel from './LoginPromptPanel';
+// LoginPromptPanel removed
 import PendingUpdatesNotification from './PendingUpdatesNotification';
 import SidebarContentError from './SidebarContentError';
 import SidebarTabs from './SidebarTabs';
@@ -16,7 +16,7 @@ import FilterControls from './search/FilterControls';
 
 export type SidebarViewProps = {
   onLogin: () => void;
-  onSignUp: () => void;
+  // onSignUp prop removed
 
   // injected
   frameSync: FrameSyncService;
@@ -30,7 +30,7 @@ export type SidebarViewProps = {
 function SidebarView({
   frameSync,
   onLogin,
-  onSignUp,
+  // onSignUp prop removed from destructuring
   loadAnnotationsService,
   streamer,
 }: SidebarViewProps) {
@@ -144,7 +144,7 @@ function SidebarView({
         <PendingUpdatesNotification />
       </div>
       {showFilterControls && <FilterControls withCardContainer />}
-      <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
+      {/* LoginPromptPanel removed */}
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError
           errorType="annotation"

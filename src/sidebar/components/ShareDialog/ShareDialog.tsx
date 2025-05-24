@@ -8,10 +8,12 @@ import TabHeader from '../tabs/TabHeader';
 import TabPanel from '../tabs/TabPanel';
 import ExportAnnotations from './ExportAnnotations';
 import ImportAnnotations from './ImportAnnotations';
-import ShareAnnotations from './ShareAnnotations';
+// ShareAnnotations import removed
 
 export type ShareDialogProps = {
   /** If true, the share tab will be rendered. Defaults to false */
+  // This prop might become less relevant if the "Share" tab is always removed.
+  // For now, its presence doesn't harm, but the tab itself will be gone.
   shareTab?: boolean;
 };
 
@@ -24,34 +26,25 @@ export default function ShareDialog({ shareTab }: ShareDialogProps) {
   const store = useSidebarStore();
   const focusedGroup = store.focusedGroup();
   const groupName = (focusedGroup && focusedGroup.name) || '...';
-  const panelTitle = `Share Annotations in ${groupName}`;
+  const panelTitle = `Manage Annotations in ${groupName}`; // Adjusted title
 
-  // Determine initial selected tab, based on the first tab that will be displayed
-  const initialTab = shareTab ? 'share' : 'export';
-  const [selectedTab, setSelectedTab] = useState<'share' | 'export' | 'import'>(
+  // Determine initial selected tab. Since "Share" is removed, "export" is the first.
+  const initialTab = 'export';
+  const [selectedTab, setSelectedTab] = useState<'export' | 'import'>( // 'share' type removed
     initialTab,
   );
-  const isFirstTabSelected = selectedTab === initialTab;
+  // isFirstTabSelected logic might need re-evaluation if 'export' is always first.
+  // For now, if selectedTab is 'export', it's the first.
+  const isFirstTabSelected = selectedTab === 'export';
 
   return (
     <SidebarPanel
       title={panelTitle}
-      panelName="shareGroupAnnotations"
+      panelName="shareGroupAnnotations" // This panelName might be too specific now
       variant="custom"
     >
-      <TabHeader closeTitle="Close share panel">
-        {shareTab && (
-          <Tab
-            id="share-panel-tab"
-            aria-controls="share-panel"
-            variant="tab"
-            selected={selectedTab === 'share'}
-            onClick={() => setSelectedTab('share')}
-            textContent="Share"
-          >
-            Share
-          </Tab>
-        )}
+      <TabHeader closeTitle="Close panel">
+        {/* Share Tab removed */}
         <Tab
           id="export-panel-tab"
           aria-controls="export-panel"
@@ -74,14 +67,7 @@ export default function ShareDialog({ shareTab }: ShareDialogProps) {
         </Tab>
       </TabHeader>
       <Card classes={classnames({ 'rounded-tl-none': isFirstTabSelected })}>
-        <TabPanel
-          id="share-panel"
-          active={selectedTab === 'share'}
-          aria-labelledby="share-panel-tab"
-          title={panelTitle}
-        >
-          <ShareAnnotations />
-        </TabPanel>
+        {/* ShareAnnotations TabPanel removed */}
         <TabPanel
           id="export-panel"
           active={selectedTab === 'export'}

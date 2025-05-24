@@ -1,95 +1,89 @@
 import { createSelector } from 'reselect';
 
 import type { Profile } from '../../../types/api';
-import type { SidebarSettings } from '../../../types/config';
-import { createStoreModule, makeAction } from '../create-store';
+// SidebarSettings is no longer needed as defaultAuthority is static
+// import type { SidebarSettings } from '../../../types/config';
+import { createStoreModule /*, makeAction */ } from '../create-store'; // makeAction no longer needed
 
 export type State = {
   /**
-   * The app's default authority (user identity provider), from settings,
-   * e.g. `hypothes.is` or `localhost`
-   *
-   * FIXME: This is an empty string when `authDomain` is missing
-   * because other app logic has long assumed its string-y presence:
-   * behavior when it's missing is undefined. This setting should be
-   * enforced similarly to how `apiUrl` is enforced.
+   * The app's default authority. Static in this version.
    */
   defaultAuthority: string;
 
   /**
-   * Feature flags to enable, in addition to those that are enabled in the
-   * user's profile.
-   *
-   * This is used in the LMS app for example to enable features based on the
-   * LMS app installation in use, rather than the active H user account.
+   * Feature flags from external sources (e.g., LMS app).
+   * Profile features are now part of the static defaultProfile.
    */
-  features: string[];
+  features: string[]; // Kept for compatibility if external features are still used
 
   /**
-   * Profile object fetched from the `/api/profile` endpoint.
+   * Static profile for "Default_User".
    */
   profile: Profile;
 };
 
 /**
- * A dummy profile returned by the `profile` selector before the real profile
- * is fetched.
+ * The static profile for "Default_User".
  */
-const initialProfile: Profile = {
-  /** A map of features that are enabled for the current user. */
-  features: {},
-  /** A map of preference names and values. */
-  preferences: {},
-  /**
-   * The authenticated user ID or null if the user is not logged in.
-   */
-  userid: null,
+const defaultUserProfile: Profile = {
+  userid: 'Default_User',
+  user_info: {
+    display_name: 'Default User',
+    // Other user_info fields can be added here if needed, e.g.,
+    // authority: 'default.local', // Or whatever is appropriate
+  },
+  /** A map of features that are enabled for the "Default_User". */
+  features: {
+    // Example: pre-define features for Default_User if necessary
+    // "some_feature_flag": true,
+  },
+  /** A map of preference names and values for "Default_User". */
+  preferences: {
+    // Example: pre-define preferences
+    // "show_sidebar_tutorial": false,
+  },
+  // Other Profile fields can be added here if they have sensible defaults
+  // groups: [], // Example if 'groups' is part of Profile
 };
 
-function initialState(settings: SidebarSettings): State {
+function initialState(/* settings: SidebarSettings */): State {
+  // Settings are no longer used to initialize session state
   return {
-    defaultAuthority: settings?.authDomain ?? '',
-    features: settings.features ?? [],
-    profile: initialProfile,
+    defaultAuthority: 'default.local', // Static default authority
+    features: [] /* settings.features ?? [] */, // External features, if any, could still come from settings if needed
+    profile: defaultUserProfile,
   };
 }
 
+// Reducers are now empty as the profile is static and not updated via actions.
 const reducers = {
-  UPDATE_PROFILE(state: State, action: { profile: Profile }) {
-    return {
-      profile: { ...action.profile },
-    };
-  },
+  // UPDATE_PROFILE reducer is removed.
 };
 
-/**
- * Update the profile information for the current user.
- */
-function updateProfile(profile: Profile) {
-  return makeAction(reducers, 'UPDATE_PROFILE', { profile });
-}
+// updateProfile action creator is removed.
 
 function defaultAuthority(state: State) {
   return state.defaultAuthority;
 }
 
 /**
- * Return true if a user is logged in and false otherwise.
+ * Return true as the "Default_User" is always considered logged in.
  */
-function isLoggedIn(state: State) {
-  return state.profile.userid !== null;
+function isLoggedIn(_state: State) {
+  return true;
 }
 
 /**
  * Return the effective set of feature flags. This combines feature flags from
- * the profile with those from other sources.
+ * the static profile with those from other external sources (e.g., LMS settings).
  */
 const features = createSelector(
-  (state: State) => state.profile,
-  (state: State) => state.features,
-  (profile: Profile, features: string[]): Record<string, boolean> => {
+  (state: State) => state.profile, // Uses the static defaultUserProfile
+  (state: State) => state.features, // External features
+  (profile: Profile, externalFeatures: string[]): Record<string, boolean> => {
     const combinedFeatures = { ...profile.features };
-    for (const feat of features) {
+    for (const feat of externalFeatures) {
       combinedFeatures[feat] = true;
     }
     return combinedFeatures;
@@ -98,33 +92,20 @@ const features = createSelector(
 
 /**
  * Return true if a given feature flag is enabled for the current user.
- *
- * @param feature - The name of the feature flag. This matches the name of the
- *   feature flag as declared in the Hypothesis service.
  */
 function isFeatureEnabled(state: State, feature: string) {
   return Boolean(features(state)[feature]);
 }
 
 /**
- * Return true if the user's profile has been fetched. This can be used to
- * distinguish the dummy profile returned by `profile()` on startup from a
- * logged-out user profile returned by the server.
+ * Return true as the profile is statically set and considered "fetched".
  */
-function hasFetchedProfile(state: State) {
-  return state.profile !== initialProfile;
+function hasFetchedProfile(_state: State) {
+  return true;
 }
 
 /**
- * Return the user's profile.
- *
- * Returns the current user's profile fetched from the `/api/profile` endpoint.
- *
- * If the profile has not yet been fetched yet, a dummy logged-out profile is
- * returned. This allows code to skip a null check.
- *
- * NOTE: To check the set of enabled features, use the {@link features} selector
- * instead, since it combines features from the profile and other sources.
+ * Return the static "Default_User" profile.
  */
 function profile(state: State) {
   return state.profile;
@@ -134,9 +115,8 @@ export const sessionModule = createStoreModule(initialState, {
   namespace: 'session',
   reducers,
 
-  actionCreators: {
-    updateProfile,
-  },
+  // updateProfile actionCreator is removed
+  actionCreators: {},
 
   selectors: {
     defaultAuthority,

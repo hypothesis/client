@@ -1,16 +1,14 @@
 import { createSelector } from 'reselect';
 
-import type { Group, GroupMember } from '../../../types/api';
+import type { Group } from '../../../types/api'; // GroupMember removed
 import { createStoreModule, makeAction } from '../create-store';
-import { sessionModule } from './session';
-import type { State as SessionState } from './session';
+// sessionModule and SessionState are no longer needed for getMyGroups simplification
+// import { sessionModule } from './session';
+// import type { State as SessionState } from './session';
 
 type GroupID = Group['id'];
 
-export type FocusedGroupMembers =
-  | { status: 'not-loaded' }
-  | { status: 'loading' }
-  | { status: 'loaded'; members: GroupMember[] };
+// FocusedGroupMembers type removed
 
 export type State = {
   /**
@@ -24,17 +22,14 @@ export type State = {
   /** ID of currently selected group. */
   focusedGroupId: string | null;
 
-  /** Members of currently selected group */
-  focusedGroupMembers: FocusedGroupMembers;
+  // focusedGroupMembers property removed
 };
 
 const initialState: State = {
   filteredGroupIds: null,
   groups: [],
   focusedGroupId: null,
-  focusedGroupMembers: {
-    status: 'not-loaded' as const,
-  },
+  // focusedGroupMembers initialization removed
 };
 
 const reducers = {
@@ -74,16 +69,8 @@ const reducers = {
       return {};
     }
 
-    const prevFocusedGroup = state.focusedGroupId;
-    if (prevFocusedGroup === action.id) {
-      return { focusedGroupId: action.id };
-    }
-
-    // Reset focused group members if focused group changed
-    return {
-      focusedGroupId: action.id,
-      focusedGroupMembers: { status: 'not-loaded' as const },
-    };
+    // No longer need to reset focusedGroupMembers
+    return { focusedGroupId: action.id };
   },
 
   LOAD_GROUPS(state: State, action: { groups: Group[] }) {
@@ -105,27 +92,18 @@ const reducers = {
     return {
       focusedGroupId,
       groups: action.groups,
+      // focusedGroupMembers is no longer part of the state to reset here
     };
   },
 
-  LOAD_FOCUSED_GROUP_MEMBERS(
-    state: State,
-    action: { focusedGroupMembers: FocusedGroupMembers },
-  ) {
-    if (!state.focusedGroupId) {
-      throw new Error('A group needs to be focused before loading its members');
-    }
-
-    const { focusedGroupMembers } = action;
-    return { focusedGroupMembers };
-  },
+  // LOAD_FOCUSED_GROUP_MEMBERS reducer removed
 
   CLEAR_GROUPS() {
     return {
       filteredGroupIds: null,
       focusedGroupId: null,
       groups: [],
-      focusedGroupMembers: { status: 'not-loaded' as const },
+      // focusedGroupMembers reset removed
     };
   },
 };
@@ -155,37 +133,10 @@ function loadGroups(groups: Group[]) {
   return makeAction(reducers, 'LOAD_GROUPS', { groups });
 }
 
-/**
- * Indicate lading members for focused group has started.
- */
-function startLoadingFocusedGroupMembers() {
-  return makeAction(reducers, 'LOAD_FOCUSED_GROUP_MEMBERS', {
-    focusedGroupMembers: { status: 'loading' },
-  });
-}
+// startLoadingFocusedGroupMembers action creator removed
+// loadFocusedGroupMembers action creator removed
 
-/**
- * Update members for focused group.
- */
-function loadFocusedGroupMembers(members: GroupMember[] | null) {
-  return makeAction(reducers, 'LOAD_FOCUSED_GROUP_MEMBERS', {
-    focusedGroupMembers:
-      members === null
-        ? { status: 'not-loaded' }
-        : {
-            status: 'loaded',
-            members,
-          },
-  });
-}
-
-/**
- * Return list of members for focused group.
- * Null is returned if members are being loaded or a group is not focused.
- */
-function getFocusedGroupMembers(state: State): FocusedGroupMembers {
-  return state.focusedGroupMembers;
-}
+// getFocusedGroupMembers selector removed
 
 /**
  * Return the currently focused group.
@@ -232,61 +183,31 @@ function getGroup(state: State, id: string): Group | undefined {
   return state.groups.find(g => g.id === id);
 }
 
-/**
- * Return groups the user isn't a member of that are scoped to the URI.
- */
-const getFeaturedGroups = createSelector(
-  (state: State) => filteredGroups(state),
-  groups => groups.filter(group => !group.isMember && group.isScopedToUri),
-);
-
-/**
- * Return groups that are scoped to the uri. This is used to return the groups
- * that show up in the old groups menu. This should be removed once the new groups
- * menu is permanent.
- */
-const getInScopeGroups = createSelector(
-  (state: State) => filteredGroups(state),
-  groups => groups.filter(g => g.isScopedToUri),
-);
+// getFeaturedGroups selector removed
+// getInScopeGroups selector removed (assuming it's part of "Featured" or not relevant)
 
 // Selectors that receive root state.
 
 type RootState = {
   groups: State;
-  session: SessionState;
+  // session: SessionState; // No longer needed for getMyGroups
 };
 
 /**
- * Return groups the logged-in user is a member of.
+ * Return all filtered groups. In a single-user context ("Default_User"),
+ * all groups are considered "my groups".
  */
 const getMyGroups = createSelector(
   (rootState: RootState) => filteredGroups(rootState.groups),
-  (rootState: RootState) =>
-    sessionModule.selectors.isLoggedIn(rootState.session),
-  (groups, loggedIn) => {
-    // If logged out, the Public group still has isMember set to true so only
-    // return groups with membership in logged in state.
-    if (loggedIn) {
-      return groups.filter(g => g.isMember);
-    }
-    return [];
+  groups => {
+    // "Default_User" is always logged in and owns all predefined groups.
+    // The `isMember` flag on the Group itself should be true for predefined groups.
+    return groups.filter(g => g.isMember);
+    // Alternatively, if all groups are always the user's: return groups;
   },
 );
 
-/**
- * Return groups that don't show up in Featured and My Groups.
- */
-const getCurrentlyViewingGroups = createSelector(
-  (rootState: RootState) => filteredGroups(rootState.groups),
-  (rootState: RootState) => getMyGroups(rootState),
-  (rootState: RootState) => getFeaturedGroups(rootState.groups),
-  (allGroups, myGroups, featuredGroups) => {
-    return allGroups.filter(
-      g => !myGroups.includes(g) && !featuredGroups.includes(g),
-    );
-  },
-);
+// getCurrentlyViewingGroups selector removed
 
 export const groupsModule = createStoreModule(initialState, {
   namespace: 'groups',
@@ -295,8 +216,8 @@ export const groupsModule = createStoreModule(initialState, {
     filterGroups,
     focusGroup,
     loadGroups,
-    startLoadingFocusedGroupMembers,
-    loadFocusedGroupMembers,
+    // startLoadingFocusedGroupMembers removed
+    // loadFocusedGroupMembers removed
     clearGroups,
   },
   selectors: {
@@ -305,13 +226,13 @@ export const groupsModule = createStoreModule(initialState, {
     filteredGroupIds,
     focusedGroup,
     focusedGroupId,
-    getFocusedGroupMembers,
-    getFeaturedGroups,
+    // getFocusedGroupMembers removed
+    // getFeaturedGroups removed
     getGroup,
-    getInScopeGroups,
+    // getInScopeGroups removed
   },
   rootSelectors: {
-    getCurrentlyViewingGroups,
+    // getCurrentlyViewingGroups removed
     getMyGroups,
   },
 });
