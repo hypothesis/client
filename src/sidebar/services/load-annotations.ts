@@ -1,11 +1,12 @@
 import type { Annotation } from '../../types/api';
 import { isReply } from '../helpers/annotation-metadata';
-import { SearchClient } from '../search-client';
-import type { SortBy, SortOrder } from '../search-client';
+// import { SearchClient } from '../search-client'; // No longer used
+import type { SortBy, SortOrder } from '../search-client'; // Import for sorting
 import type { SidebarStore } from '../store';
-import type { APIService } from './api';
-import type { StreamFilter } from './stream-filter';
-import type { StreamerService } from './streamer';
+// import type { APIService } from './api'; // No longer used for loading
+// import type { StreamFilter } from './stream-filter'; // No longer used
+// import type { StreamerService } from './streamer'; // No longer used
+import type { LocalStorageService } from './local-storage';
 
 export type LoadAnnotationOptions = {
   groupId: string;
@@ -14,22 +15,20 @@ export type LoadAnnotationOptions = {
    * If number of annotations in search results exceeds this value, do not load
    * annotations (see: `SearchClient`)
    */
-  maxResults?: number;
+  maxResults?: number; // This may become irrelevant with local storage, but kept for signature compatibility
 
   /**
-   * `sortBy` and `sortOrder` control in what order annotations are loaded. To
-   * minimize visible content changing as annotations load, `sortBy` and
-   * `sortOrder` should be chosen to correlate with the expected presentation
-   * order of annotations/threads in the current view.
+   * `sortBy` and `sortOrder` control in what order annotations are loaded.
+   * This will need to be implemented client-side if still desired.
    */
   sortBy?: SortBy;
   sortOrder?: SortOrder;
 
   /**
-   * Optional error handler for SearchClient. Default error handling logs errors
+   * Optional error handler. Default error handling logs errors
    * to console.
    */
-  onError?: (error: Error) => void;
+  onError?: (error: Error) => void; // Kept for compatibility, may be used for local storage errors
 
   /**
    * Set the websocket stream to filter by either URIs or groupIds.
@@ -48,25 +47,30 @@ export type LoadAnnotationOptions = {
  * @inject
  */
 export class LoadAnnotationsService {
-  private _api: APIService;
+  // private _api: APIService; // API service no longer directly used for loading
   private _store: SidebarStore;
-  private _streamer: StreamerService;
-  private _streamFilter: StreamFilter;
-  private _searchClient: SearchClient | null;
+  // private _streamer: StreamerService; // Streamer no longer used here
+  // private _streamFilter: StreamFilter; // StreamFilter no longer used here
+  // private _searchClient: SearchClient | null; // SearchClient no longer used
+  private _localStorage: LocalStorageService;
 
   constructor(
-    api: APIService,
+    // api: APIService, // API service no longer directly used for loading
     store: SidebarStore,
-    streamer: StreamerService,
-    streamFilter: StreamFilter,
+    // streamer: StreamerService, // Streamer no longer used here
+    // streamFilter: StreamFilter, // StreamFilter no longer used here
+    localStorage: LocalStorageService,
   ) {
-    this._api = api;
+    // this._api = api;
     this._store = store;
-    this._streamer = streamer;
-    this._streamFilter = streamFilter;
-
-    this._searchClient = null;
+    // this._streamer = streamer;
+    // this._streamFilter = streamFilter;
+    this._localStorage = localStorage;
+    // this._searchClient = null;
   }
+
+  // Define the key consistently
+  private ANNOTATIONS_STORAGE_KEY = 'hypothesis.annotations';
 
   /**
    * Load annotations from Hypothesis.
@@ -78,99 +82,100 @@ export class LoadAnnotationsService {
     groupId,
     uris,
     onError,
-    maxResults,
-    sortBy,
-    sortOrder,
-    streamFilterBy = 'uri',
+    sortBy = 'updated', // Default sort to 'updated' as per common use-cases
+    sortOrder = 'desc', // Default sort order to 'desc'
   }: LoadAnnotationOptions) {
     this._store.removeAnnotations(this._store.savedAnnotations());
+    this._store.annotationFetchStarted();
 
-    // Cancel previously running search client.
-    //
-    // This will emit the "end" event for the existing client and trigger cleanup
-    // associated with that client (eg. resetting the count of in-flight
-    // annotation fetches).
-    if (this._searchClient) {
-      this._searchClient.cancel();
-    }
+    try {
+      let annotationsToLoad: Annotation[] =
+        this._localStorage.getObject(this.ANNOTATIONS_STORAGE_KEY) || [];
 
-    // Set the filter for the websocket stream
-    switch (streamFilterBy) {
-      case 'group':
-        this._streamFilter
-          .resetFilter()
-          .addClause('/group', 'equals', groupId, true);
-        this._streamer.setConfig('filter', {
-          filter: this._streamFilter.getFilter(),
-        });
-        break;
-      case 'uri':
-      default:
-        if (uris && uris.length > 0) {
-          this._streamFilter.resetFilter().addClause('/uri', 'one_of', uris);
-          this._streamer.setConfig('filter', {
-            filter: this._streamFilter.getFilter(),
-          });
-        }
-        break;
-    }
-
-    const searchOptions = {
-      incremental: true,
-      separateReplies: false,
-      maxResults,
-
-      // Annotations are fetched in order of creation by default. This is expected
-      // to roughly correspond to the order in which threads end up being sorted
-      // because:
-      //
-      // 1. The default thread sort order in the sidebar is by document location
-      // 2. When users annotate a document, they will tend to annotate content in
-      //    document order. Annotations near the top of the document will
-      //    tend to have earlier creation dates.
-      //
-      // If the backend would allow us to sort on document location, we could do even better.
-
-      sortBy,
-      sortOrder,
-    };
-
-    this._searchClient = new SearchClient(this._api.search, searchOptions);
-
-    this._searchClient.on('resultCount', (count: number) => {
-      this._store.setAnnotationResultCount(count);
-    });
-
-    this._searchClient.on('results', (results: Annotation[]) => {
-      if (results.length) {
-        this._store.addAnnotations(results);
-      }
-    });
-
-    this._searchClient.on('error', (error: Error) => {
-      if (typeof onError === 'function') {
-        onError(error);
-      } else {
-        console.error(error);
-      }
-    });
-
-    this._searchClient.on('end', () => {
-      // Remove client as it's no longer active.
-      this._searchClient = null;
-
+      // Apply URI filtering
       if (uris && uris.length > 0) {
+        annotationsToLoad = annotationsToLoad.filter(
+          ann => ann.uri && uris.includes(ann.uri),
+        );
+      }
+
+      // Apply Group filtering
+      if (groupId) {
+        annotationsToLoad = annotationsToLoad.filter(
+          ann => ann.group === groupId,
+        );
+      }
+
+      // Apply Sorting
+      // Ensure sortBy and sortOrder have valid values, even if not passed in options
+      // by relying on defaults.
+      annotationsToLoad.sort((a, b) => {
+        let valA: number | string;
+        let valB: number | string;
+
+        switch (sortBy) {
+          case 'created':
+            valA = new Date(a.created || 0).getTime();
+            valB = new Date(b.created || 0).getTime();
+            break;
+          case 'updated':
+            valA = new Date(a.updated || 0).getTime();
+            valB = new Date(b.updated || 0).getTime();
+            break;
+          // Add other sortBy cases here if needed, e.g., for text or user
+          // For now, focusing on date fields as they are most common for sorting.
+          default:
+            // Default to 'updated' if sortBy is an unexpected value
+            valA = new Date(a.updated || 0).getTime();
+            valB = new Date(b.updated || 0).getTime();
+            break;
+        }
+
+        if (typeof valA === 'string' && typeof valB === 'string') {
+          // String comparison
+          return sortOrder === 'asc'
+            ? valA.localeCompare(valB)
+            : valB.localeCompare(valA);
+        } else {
+          // Numeric comparison (timestamps)
+          return sortOrder === 'asc'
+            ? (valA as number) - (valB as number)
+            : (valB as number) - (valA as number);
+        }
+      });
+
+      this._store.addAnnotations(annotationsToLoad);
+      this._store.setAnnotationResultCount(annotationsToLoad.length);
+
+      // Update frame annotation fetch status
+      const relevantUris = new Set(annotationsToLoad.map(ann => ann.uri));
+      if (uris && uris.length > 0) {
+        // If specific URIs were requested, only update status for those
+        uris.forEach(uri => {
+          if (relevantUris.has(uri)) { // Check if any loaded annotations match this URI
+            this._store.updateFrameAnnotationFetchStatus(uri, true);
+          }
+        });
+      } else {
+        // If no specific URIs were requested (e.g., loading all for a group),
+        // update status for all frames that have loaded annotations.
         this._store.frames().forEach(frame => {
-          if (uris.indexOf(frame.uri) >= 0) {
+          if (relevantUris.has(frame.uri)) {
             this._store.updateFrameAnnotationFetchStatus(frame.uri, true);
           }
         });
       }
+    } catch (e) {
+      if (onError) {
+        onError(e as Error);
+      } else {
+        console.error('Error loading annotations from local storage:', e);
+      }
+      // Ensure result count is 0 on error
+      this._store.setAnnotationResultCount(0);
+    } finally {
       this._store.annotationFetchFinished();
-    });
-
-    this._store.annotationFetchStarted();
-    this._searchClient.get({ group: groupId, uri: uris });
+    }
   }
 
   /**
@@ -179,49 +184,55 @@ export class LoadAnnotationsService {
    * @param id - Annotation ID. This may be an annotation or a reply.
    * @return Top-level annotation in the thread, followed by any replies.
    */
-  async loadThread(id: string) {
-    let annotation;
-    let replySearchResult;
-
-    // Clear out any annotations already in the store before fetching new ones
+  async loadThread(id: string): Promise<Annotation[]> {
     this._store.clearAnnotations();
+    this._store.annotationFetchStarted();
+
+    let threadAnnotations: Annotation[] = [];
 
     try {
-      this._store.annotationFetchStarted();
-      // 1. Fetch the annotation indicated by `id` — the target annotation
-      annotation = await this._api.annotation.get({ id });
+      const allAnnotations: Annotation[] =
+        this._localStorage.getObject(this.ANNOTATIONS_STORAGE_KEY) || [];
 
-      // 2. If annotation is not the top-level annotation in its thread,
-      //    fetch the top-level annotation
-      if (isReply(annotation)) {
-        annotation = await this._api.annotation.get({
-          id: annotation.references![0],
-        });
+      if (allAnnotations.length === 0) {
+        console.warn(
+          `Attempted to load thread for ID: ${id}, but no annotations found in local storage.`,
+        );
+        return [];
       }
 
-      // 3. Fetch all of the annotations in the thread, based on the
-      //    top-level annotation
-      replySearchResult = await this._api.search({ references: annotation.id });
+      let targetAnnotation = allAnnotations.find(ann => ann.id === id);
+
+      if (!targetAnnotation) {
+        console.warn(
+          `Annotation with ID: ${id} not found in local storage for thread loading.`,
+        );
+        return [];
+      }
+
+      let topLevelAnnotation = targetAnnotation;
+      if (isReply(targetAnnotation) && targetAnnotation.references?.length) {
+        const parentId = targetAnnotation.references[0];
+        topLevelAnnotation =
+          allAnnotations.find(ann => ann.id === parentId) || targetAnnotation;
+      }
+
+      // The thread includes the top-level annotation and all its replies
+      threadAnnotations = allAnnotations.filter(
+        ann =>
+          ann.id === topLevelAnnotation.id ||
+          (ann.references && ann.references.includes(topLevelAnnotation.id!)),
+      );
+
+      this._store.addAnnotations(threadAnnotations);
+    } catch (e) {
+      console.error('Error loading thread from local storage:', e);
+      // `threadAnnotations` will be empty if an error occurs.
     } finally {
       this._store.annotationFetchFinished();
     }
-    const threadAnnotations = [annotation, ...replySearchResult.rows];
 
-    this._store.addAnnotations(threadAnnotations);
-
-    // If we've been successful in retrieving a thread, with a top-level annotation,
-    // configure the connection to the real-time update service to send us
-    // updates to any of the annotations in the thread.
-    if (!isReply(annotation)) {
-      const id = annotation.id!;
-      this._streamFilter
-        .addClause('/references', 'one_of', id, true)
-        .addClause('/id', 'equals', id, true);
-      this._streamer.setConfig('filter', {
-        filter: this._streamFilter.getFilter(),
-      });
-      this._streamer.connect();
-    }
+    // Real-time update logic (streamFilter, streamer) is removed as per requirements.
 
     return threadAnnotations;
   }

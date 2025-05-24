@@ -23,6 +23,7 @@ import { APIService } from './services/api';
 import { APIRoutesService } from './services/api-routes';
 import { AuthService } from './services/auth';
 import { AutosaveService } from './services/autosave';
+import { DraftPersistenceService } from './services/draft-persistence';
 import { DashboardService } from './services/dashboard';
 import { FrameSyncService } from './services/frame-sync';
 import { GroupsService } from './services/groups';
@@ -102,10 +103,12 @@ function initServices(
   autosaveService: AutosaveService,
   persistedDefaults: PersistedDefaultsService,
   serviceURL: ServiceURLService,
+  draftPersistenceService: DraftPersistenceService,
 ) {
   autosaveService.init();
   persistedDefaults.init();
   serviceURL.init();
+  draftPersistenceService.init();
 }
 
 /**
@@ -149,6 +152,7 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
     .register('auth', AuthService)
     .register('autosaveService', AutosaveService)
     .register('dashboard', DashboardService)
+    .register('draftPersistenceService', DraftPersistenceService)
     .register('frameSync', FrameSyncService)
     .register('groups', GroupsService)
     .register('importAnnotationsService', ImportAnnotationsService)

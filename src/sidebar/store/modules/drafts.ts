@@ -72,9 +72,51 @@ const initialState: State = {
   drafts: [],
 };
 
+const LOAD_DRAFTS_FROM_STORAGE = 'LOAD_DRAFTS_FROM_STORAGE';
+
 const reducers = {
   DISCARD_ALL_DRAFTS() {
     return { drafts: [] };
+  },
+
+  // Action to load drafts from storage.
+  // The payload is expected to be an array of objects that look like Drafts.
+  [LOAD_DRAFTS_FROM_STORAGE](
+    state: State,
+    action: { payload: Partial<Draft>[] },
+  ) {
+    if (!action.payload || !Array.isArray(action.payload)) {
+      return state;
+    }
+    const loadedDrafts = action.payload
+      .map(plainDraft => {
+        // Ensure the plainDraft has the necessary structure.
+        // The Draft constructor expects `annotation` and `changes` (which includes isPrivate, tags, text, description).
+        // If plainDraft directly matches DraftChanges and has an annotation property, it can be used.
+        if (
+          plainDraft.annotation &&
+          typeof plainDraft.isPrivate === 'boolean' &&
+          Array.isArray(plainDraft.tags) &&
+          typeof plainDraft.text === 'string'
+        ) {
+          // Re-construct Draft instances to ensure they have methods.
+          // The second argument to Draft constructor is DraftChanges.
+          // plainDraft itself contains these properties.
+          return new Draft(plainDraft.annotation, {
+            isPrivate: plainDraft.isPrivate,
+            tags: plainDraft.tags,
+            text: plainDraft.text,
+            description: plainDraft.description,
+          });
+        }
+        return null; // Or handle error, log warning
+      })
+      .filter((draft): draft is Draft => draft !== null); // Filter out any nulls from malformed data
+
+    // Merge with existing drafts if necessary, or replace.
+    // For simplicity, this replaces existing drafts if any were loaded.
+    // Consider a merging strategy if drafts could be created before storage loads.
+    return { drafts: loadedDrafts.length > 0 ? loadedDrafts : state.drafts };
   },
 
   REMOVE_DRAFT(state: State, action: { annotation: AnnotationID }) {
@@ -92,6 +134,17 @@ const reducers = {
     drafts.push(action.draft); // push ok since it's a copy
     return { drafts };
   },
+};
+
+// Action creator for loading drafts from storage
+// This is not strictly needed if DraftPersistenceService dispatches plain objects
+// with type and payload, but can be useful for consistency or if specific
+// payload processing is needed before the reducer.
+function loadDraftsFromStorage(persistedDrafts: Partial<Draft>[]) {
+  return {
+    type: LOAD_DRAFTS_FROM_STORAGE,
+    payload: persistedDrafts,
+  };
 };
 
 /**
@@ -194,6 +247,12 @@ export const draftsModule = createStoreModule(initialState, {
     deleteNewAndEmptyDrafts,
     discardAllDrafts,
     removeDraft,
+    loadDraftsFromStorage, // Add the new action creator
+  },
+
+  // Expose action type for DraftPersistenceService
+  actionTypes: {
+    LOAD_DRAFTS_FROM_STORAGE,
   },
 
   selectors: {

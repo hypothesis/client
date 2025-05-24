@@ -18,6 +18,7 @@ import {
 import type { SidebarStore } from '../store';
 import type { AnnotationActivityService } from './annotation-activity';
 import type { APIService } from './api';
+import type { LocalStorageService } from './local-storage';
 
 export type MentionsOptions =
   | {
@@ -42,17 +43,20 @@ export class AnnotationsService {
   private _api: APIService;
   private _settings: SidebarSettings;
   private _store: SidebarStore;
+  private _localStorage: LocalStorageService;
 
   constructor(
     annotationActivity: AnnotationActivityService,
     api: APIService,
     settings: SidebarSettings,
     store: SidebarStore,
+    localStorage: LocalStorageService,
   ) {
     this._activity = annotationActivity;
     this._api = api;
     this._settings = settings;
     this._store = store;
+    this._localStorage = localStorage;
   }
 
   /**
@@ -229,10 +233,44 @@ export class AnnotationsService {
   }
 
   /**
-   * Delete an annotation via the API and update the store.
+   * Delete an annotation from local storage and update the store.
    */
   async delete(annotation: SavedAnnotation) {
-    await this._api.annotation.delete({ id: annotation.id });
+    // Key for storing annotations in local storage
+    const ANNOTATIONS_STORAGE_KEY = 'hypothesis.annotations';
+
+    const allAnnotations: Annotation[] =
+      this._localStorage.getObject(ANNOTATIONS_STORAGE_KEY) || [];
+
+    if (allAnnotations.length === 0) {
+      console.warn(
+        `Attempted to delete annotation ID: ${annotation.id}, but no annotations found in local storage.`,
+      );
+      // Still proceed to remove from store and report activity as it might be in memory
+    }
+
+    // Filter out the annotation to be deleted.
+    // Primarily use `id`. If `id` is not present on `ann` (which shouldn't happen for SavedAnnotation from local storage),
+    // or if `id` on `annotation` is somehow null/undefined, this will skip.
+    // Given that `save` generates a local `id`, this should be reliable.
+    const updatedAnnotations = allAnnotations.filter(ann => {
+      if (annotation.id) {
+        return ann.id !== annotation.id;
+      }
+      // Fallback or safety net, though `id` should be the primary mechanism
+      // For a SavedAnnotation, `id` should always be present.
+      // If we were dealing with non-saved annotations, $tag might be more relevant.
+      return ann.$tag !== annotation.$tag;
+    });
+
+    if (updatedAnnotations.length < allAnnotations.length) {
+      this._localStorage.setObject(ANNOTATIONS_STORAGE_KEY, updatedAnnotations);
+    } else {
+      console.warn(
+        `Annotation ID: ${annotation.id} (or $tag: ${annotation.$tag}) not found in local storage for deletion.`,
+      );
+    }
+
     this._activity.reportActivity('delete', annotation);
     this._store.removeAnnotations([annotation]);
   }
@@ -271,7 +309,6 @@ export class AnnotationsService {
     annotation: Annotation,
     mentionsOptions: MentionsOptions = { mentionMode: 'username' },
   ) {
-    let saved: Promise<Annotation>;
     let eventType: AnnotationEventType;
 
     const annotationWithChanges = this._applyDraftChanges(
@@ -279,32 +316,61 @@ export class AnnotationsService {
       mentionsOptions,
     );
 
-    if (!metadata.isSaved(annotation)) {
-      saved = this._api.annotation.create({}, annotationWithChanges);
-      eventType = 'create';
-    } else {
-      saved = this._api.annotation.update(
-        { id: annotation.id },
-        annotationWithChanges,
-      );
-      eventType = 'update';
-    }
+    // Key for storing annotations in local storage
+    const ANNOTATIONS_STORAGE_KEY = 'hypothesis.annotations';
 
-    let savedAnnotation: Annotation;
     this._store.annotationSaveStarted(annotation);
+
+    let savedAnnotation = annotationWithChanges;
+
     try {
-      savedAnnotation = await saved;
+      const allAnnotations: Annotation[] =
+        this._localStorage.getObject(ANNOTATIONS_STORAGE_KEY) || [];
+
+      if (!metadata.isSaved(annotation)) {
+        // New annotation. Add to the list.
+        // Ensure it has a unique $tag if not already present (annotationFromData should handle this).
+        // For local storage, we might not have a server 'id' yet.
+        // We'll use $tag for identification within local storage if 'id' is missing.
+        savedAnnotation.id = generateHexString(10); // Generate a local ID
+        allAnnotations.push(savedAnnotation);
+        eventType = 'create';
+      } else {
+        // Existing annotation. Find and update.
+        // Prioritize 'id' for matching if available (though for purely local, $tag might be more consistent)
+        const existingIndex = allAnnotations.findIndex(
+          ann =>
+            (ann.id && ann.id === annotation.id) || ann.$tag === annotation.$tag,
+        );
+        if (existingIndex !== -1) {
+          allAnnotations[existingIndex] = savedAnnotation;
+        } else {
+          // If not found by id or $tag (e.g. if it was saved with an ID but now only $tag matches),
+          // or simply not found, add it as a new one.
+          // This case might need refinement based on how IDs are handled locally vs. server.
+          allAnnotations.push(savedAnnotation);
+        }
+        eventType = 'update';
+      }
+
+      this._localStorage.setObject(ANNOTATIONS_STORAGE_KEY, allAnnotations);
       this._activity.reportActivity(eventType, savedAnnotation);
     } finally {
       this._store.annotationSaveFinished(annotation);
     }
 
     // Copy local/internal fields from the original annotation to the saved
-    // version.
+    // version. This is important for fields like $tag.
     for (const [key, value] of Object.entries(annotation)) {
       if (key.startsWith('$')) {
-        const fields: Record<string, any> = savedAnnotation;
-        fields[key] = value;
+        (savedAnnotation as Record<string, any>)[key] = value;
+      }
+    }
+    // Ensure the savedAnnotation that goes to the store also has these fields if they were added/modified
+    // in annotationWithChanges but not in the original `annotation`'s $ fields.
+    for (const [key, value] of Object.entries(annotationWithChanges)) {
+      if (key.startsWith('$')) {
+        (savedAnnotation as Record<string, any>)[key] = value;
       }
     }
 
