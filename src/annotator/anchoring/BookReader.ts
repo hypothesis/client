@@ -75,12 +75,12 @@ export async function describe(
 
   const pageContainer: HTMLElement = textLayer.closest('.BRpagecontainer')!;
   const pageIndex = parseFloat(pageContainer.dataset.index!);
-  const pageLabel = pageContainer.dataset.label!;
+  const pageNum = pageContainer.dataset.pageNum!;
 
   const pageSelector: PageSelector = {
     type: 'PageSelector',
     index: pageIndex,
-    label: pageLabel || `n${pageIndex}`,
+    label: pageNum || `n${pageIndex}`,
   };
 
   return [quote, pageSelector];
@@ -153,7 +153,7 @@ async function pollUntilTruthy<T>(
   fn: () => T,
   { timeout = 1000 },
 ): Promise<T | undefined> {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const start = Date.now();
     const interval = setInterval(() => {
       const val = fn();

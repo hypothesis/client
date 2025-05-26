@@ -1,6 +1,6 @@
 import debounce from 'lodash.debounce';
-import { TinyEmitter } from 'tiny-emitter';
 
+import { EventEmitter } from '../../shared/event-emitter';
 import type { BookReader } from '../../types/BookReader';
 import type {
   Anchor,
@@ -8,9 +8,10 @@ import type {
   AnnotationTool,
   Annotator,
   Integration,
+  IntegrationEvents,
   SidebarLayout,
 } from '../../types/annotator';
-import { PageSelector, Selector } from '../../types/api';
+import type { PageSelector, Selector } from '../../types/api';
 import { anchor, canDescribe, describe } from '../anchoring/BookReader';
 import { TextRange } from '../anchoring/text-range';
 
@@ -30,7 +31,10 @@ export function isBookReader() {
 /**
  * Integration that works with PDF.js
  */
-export class BookReaderIntegration extends TinyEmitter implements Integration {
+export class BookReaderIntegration
+  extends EventEmitter<IntegrationEvents>
+  implements Integration
+{
   private _annotator: Annotator;
   private _br: BookReader;
   private _debouncedUpdate: () => void;
@@ -118,7 +122,7 @@ export class BookReaderIntegration extends TinyEmitter implements Integration {
   }
 
   // This method (re-)anchors annotations when pages are rendered and destroyed.
-  _update = async () => {
+  _update = () => {
     const refreshAnnotations: AnnotationData[] = [];
 
     // For pages that are no longer visible, we want to
@@ -132,22 +136,24 @@ export class BookReaderIntegration extends TinyEmitter implements Integration {
         continue;
       }
 
-      const placeholder = anchor.highlights[0].closest(
-        '.BRannotationPlaceholder',
-      );
       // If it's a placeholder and its page is now visible, we want to re-anchor
+      const placeholder = anchor.highlights[0].closest(
+        '.BRhypothesisPlaceholder',
+      );
       if (placeholder) {
         const pageSelector = anchor.target.selector?.find(
           s => s.type === 'PageSelector',
         ) as PageSelector;
         if (!pageSelector) {
-          throw new Error('No page selector found');
+          // Legacy annotation without a page selector; skip?
+          console.warn('No page selector found');
+          continue;
         }
 
-        const pageContainer = this._br.refs.$br.find(
+        const pageContainer = this.contentContainer().querySelector(
           `.BRpagecontainer[data-index="${pageSelector.index}"]`,
         );
-        if (pageContainer.length) {
+        if (pageContainer) {
           delete anchor.region;
           placeholder.remove();
           anchor.highlights.splice(0, anchor.highlights.length);
@@ -159,7 +165,8 @@ export class BookReaderIntegration extends TinyEmitter implements Integration {
         }
       }
 
-      // Now it's not a placeholder; if it's page has been removed, then we need to re-anchor (potentially creating a placeholder)
+      // Ok, not a placeholder; if its page has been removed, then we need to
+      // re-anchor (potentially creating a placeholder)
       const notInDom = anchor.highlights.some(
         highlight => !document.body.contains(highlight),
       );
@@ -181,7 +188,7 @@ export class BookReaderIntegration extends TinyEmitter implements Integration {
    * Return the scrollable element which contains the document content.
    */
   contentContainer(): HTMLElement {
-    return this._br.refs.$br.find('.BRcontainer')?.[0] as HTMLElement;
+    return this._br.refs.$br[0] as HTMLElement;
   }
 
   sideBySideActive() {
@@ -209,7 +216,7 @@ export class BookReaderIntegration extends TinyEmitter implements Integration {
       throw new Error('No page selector found');
     }
 
-    if (this._br.activeMode.name == 'thumb') {
+    if (this._br.activeMode.name === 'thumb') {
       this._br.switchMode('2up', { suppressFragmentChange: true });
       await delay(50);
     }

@@ -1,8 +1,6 @@
 /**
- * BookReader doesn't quite have types, so create a stub here
- *
- * Note that the definitions here are not complete, they only include properties
- * that the client uses.
+ * Stub BookReader types. Note that the definitions here are not complete, they
+ * only include properties that the client uses.
  */
 
 export type BookReader = {
@@ -28,7 +26,7 @@ export type BookReader = {
     options?: { suppressFragmentChange: boolean },
   ): void;
 
-  _plugins: {
+  plugins: {
     textSelection:
       | undefined
       | {
@@ -40,5 +38,4 @@ export type BookReader = {
 type JQuery<T> = {
   [index: number]: T;
   length: number;
-  find: (selector: string) => JQuery<T>;
 };
