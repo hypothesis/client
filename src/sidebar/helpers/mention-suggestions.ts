@@ -114,7 +114,9 @@ export function usersMatchingMention(
           ? `${u.username} ${displayName}`
           : displayName;
 
-      return contentToMatch.match(new RegExp(mentionToMatch, 'i'));
+      return contentToMatch
+        .toLowerCase()
+        .includes(mentionToMatch.toLowerCase());
     })
     .slice(0, maxUsers);
 }
