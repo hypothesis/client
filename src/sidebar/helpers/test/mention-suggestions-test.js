@@ -454,6 +454,23 @@ describe('usersMatchingMention', () => {
         },
       ],
     },
+
+    // Matching even if the mention candidate includes an invalid RegExp
+    {
+      usersForMentions: {
+        status: 'loaded',
+        users: [
+          {
+            userid: 'acct:one@example.com',
+            username: 'one',
+            displayName: 'johndoe',
+          },
+        ],
+      },
+      mention: '\\',
+      options: { mentionMode: 'username' },
+      expectedSuggestions: [],
+    },
   ].forEach(({ usersForMentions, mention, options, expectedSuggestions }) => {
     it('suggests expected users for mention', () => {
       assert.deepEqual(
