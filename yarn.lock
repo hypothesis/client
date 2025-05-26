@@ -5609,6 +5609,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "commander@npm:14.0.0"
+  checksum: 6e9bdaf2e8e4f512855ffc10579eeae2e84c4a7697a91b1a5f62aab3c9849182207855268dd7c3952ae7a2334312a7138f58e929e4b428aef5bf8af862685c9b
+  languageName: node
+  linkType: hard
+
 "commander@npm:^2.19.0, commander@npm:^2.20.0":
   version: 2.20.3
   resolution: "commander@npm:2.20.3"
@@ -7741,7 +7748,7 @@ __metadata:
     chai: ^5.0.0
     chance: ^1.0.13
     classnames: ^2.2.4
-    commander: ^13.0.0
+    commander: ^14.0.0
     cross-env: ^7.0.0
     dompurify: ^3.0.0
     enzyme: ^3.8.0
