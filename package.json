@@ -50,7 +50,7 @@
     "chai": "^5.0.0",
     "chance": "^1.0.13",
     "classnames": "^2.2.4",
-    "commander": "^13.0.0",
+    "commander": "^14.0.0",
     "cross-env": "^7.0.0",
     "dompurify": "^3.0.0",
     "enzyme": "^3.8.0",
