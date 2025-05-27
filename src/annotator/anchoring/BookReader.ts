@@ -1,8 +1,4 @@
-import type {
-  PageSelector,
-  Selector,
-  TextQuoteSelector,
-} from '../../types/api';
+import type { PageSelector, Selector } from '../../types/api';
 import { anchor as htmlAnchor } from './html';
 import { TextRange } from './text-range';
 import { TextQuoteAnchor } from './types';
@@ -96,27 +92,21 @@ export async function anchor(
   root: HTMLElement,
   selectors: Selector[],
 ): Promise<Range> {
-  const quote = selectors.find(s => s.type === 'TextQuoteSelector') as
-    | TextQuoteSelector
-    | undefined;
-
-  // The quote selector is required in order to check that text position
-  // selector results are still valid.
+  const quote = selectors.find(s => s.type === 'TextQuoteSelector');
   if (!quote) {
+    // The quote selector is required in order to check that text position
+    // selector results are still valid.
     throw new Error('No quote selector found');
   }
 
-  const pageSelector = selectors.find(s => s.type === 'PageSelector') as
-    | PageSelector
-    | undefined;
-
+  const pageSelector = selectors.find(s => s.type === 'PageSelector');
   if (!pageSelector) {
     throw new Error('No page selector found');
   }
 
   // This will behave very similarly to the HTML; the only
   // difference is the page might not be rendered yet, but for
-  // not let's assume it is.
+  // now let's assume it is.
 
   const pageIndex = pageSelector.index;
   const pageContainer = root.querySelector(
@@ -127,7 +117,7 @@ export async function anchor(
     console.warn('Page not found:', pageIndex);
     // It's off-screen ; create a placeholder
     const placeholder = document.createElement('div');
-    placeholder.classList.add('BRannotationPlaceholder');
+    placeholder.classList.add('BRhypothesisPlaceholder');
     placeholder.style.display = 'none';
     placeholder.textContent = quote.exact;
     root.appendChild(placeholder);
@@ -151,7 +141,7 @@ export async function anchor(
  */
 async function pollUntilTruthy<T>(
   fn: () => T,
-  { timeout = 1000 },
+  { timeout = 1000, step = 100 } = {},
 ): Promise<T | undefined> {
   return new Promise(resolve => {
     const start = Date.now();
@@ -164,6 +154,6 @@ async function pollUntilTruthy<T>(
         clearInterval(interval);
         resolve(undefined);
       }
-    }, 100);
+    }, step);
   });
 }

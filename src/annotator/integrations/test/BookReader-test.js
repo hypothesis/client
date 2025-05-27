@@ -49,7 +49,6 @@ describe('annotator/integrations/BookReader', () => {
       fakeAnnotator = {
         anchor: sinon.stub(),
         anchors: [],
-        anchoring: null,
       };
 
       window.br = {
@@ -134,6 +133,9 @@ describe('annotator/integrations/BookReader', () => {
   });
 });
 
+/**
+ * @param {HTMLDivElement} brRoot
+ */
 function createFakePage(brRoot) {
   const fakePage = document.createElement('div');
   fakePage.classList.add('BRpagecontainer');
@@ -142,6 +144,12 @@ function createFakePage(brRoot) {
   return fakePage;
 }
 
+/**
+ * @param {HTMLDivElement} brRoot
+ * @param {import('../../../types/annotator').Anchor} fakeAnchor
+ * @param {import('../../../types/annotator').Annotator} fakeAnnotator
+ * @returns {[HTMLDivElement, import('../../../types/annotator').Anchor]}
+ */
 function createPlaceholderHighlight(brRoot, fakeAnchor, fakeAnnotator) {
   const placeholderHighlight = document.createElement('div');
   placeholderHighlight.classList.add('BRhypothesisPlaceholder');
@@ -154,6 +162,12 @@ function createPlaceholderHighlight(brRoot, fakeAnchor, fakeAnnotator) {
   return [placeholderHighlight, anchor];
 }
 
+/**
+ * @param {HTMLDivElement} brRoot
+ * @param {import('../../../types/annotator').Anchor} fakeAnchor
+ * @param {import('../../../types/annotator').Annotator} fakeAnnotator
+ * @returns {[HTMLDivElement, import('../../../types/annotator').Anchor]}
+ */
 function createNonPlaceholderHighlight(brRoot, fakeAnchor, fakeAnnotator) {
   const highlight = document.createElement('div');
   const innerText = document.createElement('div');
