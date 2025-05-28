@@ -1,4 +1,4 @@
-import { PortRPC, installPortCloseWorkaroundForSafari } from '../port-rpc';
+import { PortRPC } from '../port-rpc';
 
 describe('PortRPC', () => {
   let port1;
@@ -321,96 +321,5 @@ describe('PortRPC', () => {
     await waitForMessage(port2, 'close');
 
     assert.calledOnce(closeHandler);
-  });
-
-  /** Transfer a MessagePort to another frame and return the transferred port. */
-  async function transferPort(port, targetWindow) {
-    const transferredPort = new Promise(resolve => {
-      targetWindow.addEventListener('message', e => {
-        if (e.ports[0]) {
-          resolve(e.ports[0]);
-        }
-      });
-    });
-    targetWindow.postMessage({}, '*', [port]);
-    return transferredPort;
-  }
-
-  describe('Safari <= 15 workaround', () => {
-    const safariUserAgent =
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Safari/605.1.15';
-
-    let removeWorkaround;
-    let childFrame;
-
-    beforeEach(() => {
-      childFrame = document.createElement('iframe');
-      document.body.append(childFrame);
-
-      removeWorkaround = installPortCloseWorkaroundForSafari(safariUserAgent);
-    });
-
-    afterEach(() => {
-      removeWorkaround();
-      childFrame.remove();
-    });
-
-    it('transfers port to parent frame and sends "close" event from there when window is unloaded', async () => {
-      const { port1, port2 } = new MessageChannel();
-      const transferredPort = await transferPort(
-        port1,
-        childFrame.contentWindow,
-      );
-
-      const sender = new PortRPC({
-        userAgent: safariUserAgent,
-        currentWindow: childFrame.contentWindow,
-        forceUnloadListener: true,
-      });
-      const receiver = new PortRPC();
-      const closeHandler = sinon.stub();
-
-      receiver.on('close', closeHandler);
-      receiver.connect(port2);
-      sender.connect(transferredPort);
-      await waitForMessageDelivery();
-
-      assert.notCalled(closeHandler);
-
-      // Emulate the Safari bug by disabling `postMessage` on the sending port
-      // in the original frame. When the port is transferred to the "parent"
-      // frame, it will reconstituted as a new MessagePort instance.
-      transferredPort.postMessage = () => {};
-
-      // Unload the child frame. The "unload" handler will transfer the port to
-      // the parent frame and the "close" event will be sent from there.
-      childFrame.remove();
-
-      await waitForMessage(port2, 'close');
-
-      assert.called(closeHandler);
-    });
-  });
-
-  [
-    // Chrome 100
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4867.0 Safari/537.36',
-
-    // Firefox 96
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:96.0) Gecko/20100101 Firefox/96.0',
-
-    // Safari >= 16
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15',
-
-    // WebKit user agent, but with major version of Safari missing.
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Safari/605.1.15',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_2) AppleWebKit/605.1.15 (KHTML, like Gecko)',
-  ].forEach(userAgent => {
-    it('does not use workaround in unaffected browsers', () => {
-      sinon.stub(window, 'addEventListener');
-      const removeWorkaround = installPortCloseWorkaroundForSafari(userAgent);
-      removeWorkaround();
-      assert.notCalled(window.addEventListener);
-    });
   });
 });

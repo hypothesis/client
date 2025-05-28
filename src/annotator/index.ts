@@ -1,10 +1,7 @@
 // Enable debug checks for Preact. Removed in prod builds by Rollup config.
 import 'preact/debug';
 
-import {
-  PortProvider,
-  installPortCloseWorkaroundForSafari,
-} from '../shared/messaging';
+import { PortProvider } from '../shared/messaging';
 import type { Destroyable, Events } from '../types/annotator';
 import type { NotebookConfig } from './components/NotebookModal';
 import type { ProfileConfig } from './components/ProfileModal';
@@ -93,10 +90,6 @@ function init() {
       );
       return;
     }
-
-    // Ensure port "close" notifications from eg. guest frames are delivered properly.
-    const removeWorkaround = installPortCloseWorkaroundForSafari();
-    destroyables.push({ destroy: removeWorkaround });
 
     const sidebarConfig = getConfig('sidebar') as SidebarConfig;
 
