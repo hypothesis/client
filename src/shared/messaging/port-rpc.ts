@@ -80,78 +80,6 @@ function sendCall(
 }
 
 /**
- * Install a message listener that ensures proper delivery of "close" notifications
- * from {@link PortRPC}s in Safari <= 15.
- *
- * This must be called in the _parent_ frame of the frame that owns the port.
- * In Hypothesis this means for example that the workaround would be installed
- * in the host frame to ensure delivery of "close" notifications from "guest"
- * frames.
- *
- * @param [userAgent] - Test seam
- * @return Callback that removes the listener
- */
-export function installPortCloseWorkaroundForSafari(
-  /* istanbul ignore next */
-  userAgent = navigator.userAgent,
-): () => void {
-  if (!shouldUseSafariWorkaround(userAgent)) {
-    return () => {};
-  }
-
-  const handler = (event: MessageEvent) => {
-    if (event.data?.type === 'hypothesisPortClosed' && event.ports[0]) {
-      const port = event.ports[0];
-      sendCall(port, 'close');
-      port.close();
-    }
-  };
-
-  window.addEventListener('message', handler);
-  return () => window.removeEventListener('message', handler);
-}
-
-/**
- * Test whether this browser needs the workaround for https://bugs.webkit.org/show_bug.cgi?id=231167.
- */
-function shouldUseSafariWorkaround(userAgent: string) {
-  // Test whether this is a WebKit-based browser.
-  const webkitVersionMatch = userAgent.match(/\bAppleWebKit\/([0-9]+)\b/);
-  if (!webkitVersionMatch) {
-    return false;
-  }
-  const webkitVersion = parseInt(webkitVersionMatch[1]);
-
-  // Chrome's user agent contains the token "AppleWebKit/537.36", where the
-  // version number is frozen. This corresponds to a version of Safari from 2013,
-  // which is older than all supported Safari versions.
-  if (webkitVersion <= 537) {
-    return false;
-  }
-
-  // The bug was fixed in Safari 16, which according to
-  // https://github.com/mdn/browser-compat-data/blob/main/browsers/safari.json
-  // corresponds to WebKit 614.* and later. However, the WebKit version was
-  // frozen before then, so we instead need to check the `Version` token.
-  // This identifies the _browser_, not the engine.
-  const versionMatch = userAgent.match(/\bVersion\/([0-9]+)\b/);
-  if (!versionMatch) {
-    // If no version info, we guess that the browser is a new version of
-    // WebKit which is not affected.
-    return false;
-  }
-
-  const version = parseInt(versionMatch[1]);
-
-  // The bug was fixed in Safari 16.
-  if (version >= 16) {
-    return false;
-  }
-
-  return true;
-}
-
-/**
  * Callback type used for RPC method handlers and result callbacks.
  */
 type Callback = (...args: unknown[]) => void;
@@ -219,11 +147,9 @@ export class PortRPC<Handlers extends HandlerMap, Calls extends CallMap>
   private _receivedCloseEvent: boolean;
 
   constructor({
-    userAgent = navigator.userAgent,
     currentWindow = window,
     forceUnloadListener = false,
   }: {
-    userAgent?: string;
     currentWindow?: Window;
 
     // Test seam. Force the use of a Window "unload" listener even if the
@@ -252,23 +178,9 @@ export class PortRPC<Handlers extends HandlerMap, Calls extends CallMap>
         }
 
         if (this._port) {
-          // Send "close" notification directly. This works in Chrome, Firefox and
-          // Safari >= 16.
+          // Send "close" notification. This works in Chrome, Firefox and Safari
+          // >= 16.
           sendCall(this._port, 'close');
-
-          // To work around a bug in Safari <= 15 which prevents sending messages
-          // while a window is unloading, try transferring the port to the parent frame
-          // and re-sending the "close" event from there.
-          if (
-            currentWindow !== currentWindow.parent &&
-            shouldUseSafariWorkaround(userAgent)
-          ) {
-            currentWindow.parent.postMessage(
-              { type: 'hypothesisPortClosed' },
-              '*',
-              [this._port],
-            );
-          }
         }
       });
     }
