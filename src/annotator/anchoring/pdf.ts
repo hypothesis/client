@@ -330,13 +330,19 @@ async function anchorByPosition(
       start,
       end,
       isNotSpace,
+      // Apply normalization since the extracted text and text layer may have
+      // different normalization, depending on the PDF.js version.
+      { normalize: true },
     );
 
     const textLayerQuote = stripSpaces(
       textLayerStr.slice(textLayerStart, textLayerEnd),
     );
     const pageTextQuote = stripSpaces(pageText.slice(start, end));
-    if (textLayerQuote !== pageTextQuote) {
+
+    // Compare NFKD normalized-strings here to match how `translateOffsets`
+    // works.
+    if (textLayerQuote.normalize('NFKD') !== pageTextQuote.normalize('NFKD')) {
       warnOnce(
         'Text layer text does not match page text. Highlights will be mis-aligned.',
       );
@@ -446,6 +452,9 @@ async function anchorQuote(
           expectedOffsetInPage,
           expectedOffsetInPage,
           isNotSpace,
+          // We don't need to normalize here since both input strings are
+          // derived from the same input.
+          { normalize: false },
         );
       } else {
         strippedHint = 0; // Prefer matches closer to start of page.
