@@ -45,12 +45,16 @@ type NormalizeResult = {
   /**
    * Offsets which map from positions in {@link output} to positions in
    * {@link input}.
+   *
+   * This will be undefined if the input and output strings are identical.
    */
   reverseOffsets?: number[];
 
   /**
    * Offsets which map from positions in {@link input} to positions in
    * {@link output}.
+   *
+   * This will be undefined if the input and output strings are identical.
    */
   offsets?: number[];
 };
@@ -69,7 +73,14 @@ function normalizeWithOffsets(
   input: string,
   opts: NormalizeOptions,
 ): NormalizeResult {
-  let output = '';
+  // Generate the normalized output string in one step. This is more efficient
+  // that incrementally appending to the output string. Plus we can bail early
+  // if no normalization is required.
+  const output = input.normalize('NFKD');
+  if (output === input) {
+    return { input, output };
+  }
+
   const reverseOffsets = [];
   const offsets = [];
   let inOffset = 0;
@@ -93,8 +104,6 @@ function normalizeWithOffsets(
       }
       inOffset += ch.length;
     }
-
-    output += decomposed;
   }
 
   // Add offset for end of string.
