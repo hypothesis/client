@@ -1,44 +1,5 @@
-import type { ClientAnnotationData } from './shared';
-
-/**
- * Type definitions for objects returned from the Hypothesis API.
- *
- * The canonical reference is the API documentation at
- * https://h.readthedocs.io/en/latest/api-reference/
- */
-
-/**
- * Metadata specifying how to call an API route.
- */
-export type RouteMetadata = {
-  /** HTTP method */
-  method: string;
-  /** URL template */
-  url: string;
-  /** Description of API route */
-  desc: string;
-};
-
-/** A nested map of API route name to route metadata. */
-export type RouteMap = { [key: string]: RouteMap | RouteMetadata };
-
-/**
- * Structure of the API index response (`/api`).
- */
-export type IndexResponse = {
-  links: RouteMap;
-};
-
-/**
- * Structure of the Hypothesis links response (`/api/links`).
- *
- * This is a map of link name (eg. "account.settings") to URL. The URL may
- * include ":"-prefixed placeholders/variables.
- */
-export type LinksResponse = Record<string, string>;
-
 /** A date and time in ISO format (eg. "2024-12-09T07:17:52+00:00") */
-export type ISODateTime = string;
+type ISODateTime = string;
 
 /**
  * Selector which indicates the time range within a video or audio file that
@@ -275,7 +236,7 @@ export type ModerationStatus = 'PENDING' | 'APPROVED' | 'DENIED' | 'SPAM';
  * Represents an annotation as returned by the h API.
  * API docs: https://h.readthedocs.io/en/latest/api-reference/#tag/annotations
  */
-export type APIAnnotationData = {
+export type Annotation = {
   /**
    * The server-assigned ID for the annotation. This is only set once the
    * annotation has been saved to the backend.
@@ -346,132 +307,29 @@ export type APIAnnotationData = {
 };
 
 /**
- * Augmented annotation including what's returned by `h` API + client-internal
- * properties
+ * Values for `type` field when creating or updating groups.
  */
-export type Annotation = ClientAnnotationData & APIAnnotationData;
-
-/**
- * An annotation which has been saved to the backend and assigned an ID.
- */
-export type SavedAnnotation = Annotation & { id: string };
-
-export type Profile = {
-  userid: string | null;
-  preferences: {
-    show_sidebar_tutorial?: boolean;
-  };
-  features: Record<string, boolean>;
-  user_info?: UserInfo;
-};
-
 export type GroupType = 'private' | 'restricted' | 'open';
 
-export type Organization = {
-  name: string;
-  logo: string;
-  id: string;
-  default?: boolean;
-};
-
-export type GroupScopes = {
-  enforced: boolean;
-  uri_patterns: string[];
-};
-
 export type Group = {
-  /** The "pubid" of the group, unique per authority. */
-  id: string;
-  /** Fully-qualified ID with authority. */
-  groupid?: string;
-  type: GroupType;
-  /**
-   * Note: This field is nullable in the API, but we assign a default organization in the client.
-   */
-  organization: Organization;
-  scopes: GroupScopes | null;
-  links: {
-    html?: string;
-  };
-
-  // Properties not present on API objects, but added in the client.
-  logo: string;
-  isMember: boolean;
-  isScopedToUri: boolean;
+  pubid: string;
   name: string;
-  canLeave: boolean;
+  description: string;
+  link: string;
+  type: GroupType;
+  num_annotations: number;
+  pre_moderated: boolean;
 };
 
-/**
- * All Groups have an `id`, which is a server-assigned identifier. This is the
- * primary field used to identify a Group.
- *
- * In some cases, specifically LMS, it is necessary for an outside service to
- * be able to specify its own identifier. This gets stored in the `groupid`
- * field of a Group. Only some Groups have a `groupid`.
- *
- * Application logic operates on `id`s, but we may receive `groupid`s in some
- * cases from outside sevices, e.g. the `changeFocusModeUser` RPC method.
- */
-export type GroupIdentifier = NonNullable<Group['id'] | Group['groupid']>;
+export type SavedAnnotation = Annotation & { id: string };
 
-/**
- * Generic type for endpoints that return paginated lists of items.
- */
-export type PaginatedResponse<Item> = {
-  meta: {
-    page: {
-      total: number;
-    };
+export type Draft = {
+  annotation: {
+    id?: string;
   };
-  data: Item[];
-};
 
-export type GroupMember = {
-  authority: string;
-  userid: string;
-  username: string;
-  display_name: string | null;
-  roles: string[];
-  actions: string[];
-  created: string;
-  updated: string;
-};
-
-/**
- * Response to a GET /api/groups/{id}/members api call
- */
-export type GroupMembers = PaginatedResponse<GroupMember>;
-
-/**
- * Query parameters for an `/api/search` API call.
- *
- * This type currently includes params that we've actually used.
- *
- * See https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
- * for the complete list and usage of each.
- */
-export type SearchQuery = {
-  limit?: number;
-  uri?: string[];
-  group?: string;
-  order?: string;
-  references?: string;
-  search_after?: string;
-  sort?: string;
-  /** Undocument param that causes replies to be returned in a separate `replies` field. */
-  _separate_replies?: boolean;
-};
-
-/**
- * Response to an `/api/search` API call.
- *
- * See https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
- */
-export type SearchResponse = {
-  total: number;
-  rows: Annotation[];
-
-  /** Undocumented property that is populated if `_separate_replies` query param was specified. */
-  replies?: Annotation[];
+  isPrivate: boolean;
+  tags: string[];
+  text: string;
+  description?: string;
 };

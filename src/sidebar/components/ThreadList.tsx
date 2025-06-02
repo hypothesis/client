@@ -1,15 +1,21 @@
+import { AnnotationCard } from '@hypothesis/annotations-ui-lib';
 import { ListenerCollection } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 
 import type { Annotation, EPUBContentSelector } from '../../types/api';
+import { isThirdPartyUser, username } from '../helpers/account-id';
 import type { Thread } from '../helpers/build-thread';
 import { mostRelevantAnnotation } from '../helpers/highlighted-annotations';
+import { combineUsersForMentions } from '../helpers/mention-suggestions';
+import type { MentionMode } from '../helpers/mentions';
 import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
 } from '../helpers/visible-threads';
+import { withServices } from '../service-context';
+import type { TagsService } from '../services/tags';
 import { useSidebarStore } from '../store';
 import { getElementHeightWithMargins } from '../util/dom';
 import ThreadCard from './ThreadCard';
@@ -32,6 +38,9 @@ function roundScrollPosition(pos: number) {
 
 export type ThreadListProps = {
   threads: Thread[];
+
+  // injected
+  tags: TagsService;
 };
 
 /**
@@ -90,7 +99,7 @@ function headingMap(threads: Thread[]): Map<string, string> {
  * user-defined content may include rich media such as images, audio clips,
  * embedded YouTube videos, rendered math and more.
  */
-export default function ThreadList({ threads }: ThreadListProps) {
+function ThreadList({ threads, tags: tagsService }: ThreadListProps) {
   // Client height of the scroll container.
   const [scrollContainerHeight, setScrollContainerHeight] = useState(0);
 
@@ -296,6 +305,43 @@ export default function ThreadList({ threads }: ThreadListProps) {
     });
   }, [visibleThreads]);
 
+  const defaultAuthority = store.defaultAuthority();
+  const profile = store.profile();
+  const mentionMode = useMemo(
+    (): MentionMode =>
+      isThirdPartyUser(profile.userid, defaultAuthority)
+        ? 'display-name'
+        : 'username',
+    [defaultAuthority, profile.userid],
+  );
+
+  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
+  const annotationAuthorName = (annotation: Annotation) => {
+    const displayName = annotation.user_info?.display_name;
+    return displayNamesEnabled && displayName
+      ? displayName
+      : username(annotation.user);
+  };
+
+  const usersWhoAnnotated = store.usersWhoAnnotated();
+  const usersWhoWereMentioned = store.usersWhoWereMentioned();
+  const focusedGroupMembers = store.getFocusedGroupMembers();
+  const usersForMentions = useMemo(
+    () =>
+      combineUsersForMentions({
+        usersWhoAnnotated,
+        usersWhoWereMentioned,
+        focusedGroupMembers,
+        mentionMode,
+      }),
+    [
+      focusedGroupMembers,
+      mentionMode,
+      usersWhoAnnotated,
+      usersWhoWereMentioned,
+    ],
+  );
+
   return (
     <div>
       <div style={{ height: offscreenUpperHeight }} />
@@ -318,10 +364,49 @@ export default function ThreadList({ threads }: ThreadListProps) {
               {headings.get(child)}
             </h3>
           )}
-          <ThreadCard thread={child} />
+          {child.annotation && (
+            <AnnotationCard
+              annotation={child.annotation}
+              context={{
+                features: {
+                  atMentions: store.isFeatureEnabled('at_mentions'),
+                  groupModeration: store.isFeatureEnabled('group_moderation'),
+                  imageDescriptions:
+                    store.isFeatureEnabled('image_descriptions'),
+                },
+                group: store.getGroup(child.annotation.group) ?? null,
+                isHighlighted: store.isAnnotationHighlighted(child.annotation),
+                isHovered: store.isAnnotationHovered(child.annotation.$tag),
+                isOrphan: false, // TODO
+                isSaving: store.isSavingAnnotation(child.annotation),
+                mentionMode,
+                usersForMentions,
+                flaggingEnabled: true, // TODO
+                sharingEnabled: true, // TODO
+                tagSuggestions: tagsService.filter(''), // TODO Does this resolve all tags?
+                authorName: annotationAuthorName(child.annotation),
+                events: {
+                  onSave: console.log,
+                  // onStartEdit: () =>
+                  //   store.annotationSaveStarted(child.annotation!),
+                  // onCancel
+                  // onReply
+                  // onFlag
+                  // onDelete
+                  // onAddTag
+                  // onRemoveTag
+                  // onSetPrivate
+                  // onCopyShareLink
+                },
+              }}
+            />
+          )}
+          {/*<ThreadCard thread={child} />*/}
         </div>
       ))}
       <div style={{ height: offscreenLowerHeight }} />
     </div>
   );
 }
+
+export default withServices(ThreadList, ['tags']);
