@@ -12,6 +12,7 @@ import type { UserItem } from '../helpers/mention-suggestions';
 import { wrapDisplayNameMentions, wrapMentions } from '../helpers/mentions';
 import {
   defaultPermissions,
+  isPrivate,
   privatePermissions,
   sharedPermissions,
 } from '../helpers/permissions';
@@ -181,7 +182,7 @@ export class AnnotationsService {
       this._store.createDraft(annotation, {
         tags: annotation.tags,
         text: annotation.text,
-        isPrivate: !metadata.isPublic(annotation),
+        isPrivate: isPrivate(annotation.permissions),
         description: annotation.target[0]?.description,
       });
     }
@@ -252,7 +253,7 @@ export class AnnotationsService {
   reply(annotation: SavedAnnotation, userid: string) {
     const replyAnnotation = {
       group: annotation.group,
-      permissions: metadata.isPublic(annotation)
+      permissions: !isPrivate(annotation.permissions)
         ? sharedPermissions(userid, annotation.group)
         : privatePermissions(userid),
       references: (annotation.references || []).concat(annotation.id),

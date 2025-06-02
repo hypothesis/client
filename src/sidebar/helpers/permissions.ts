@@ -81,9 +81,7 @@ export function defaultPermissions(
  * group.
  */
 export function isShared(perms: Permissions): boolean {
-  return perms.read.some(principal => {
-    return principal.indexOf('group:') === 0;
-  });
+  return perms.read.some(principal => principal.startsWith('group:'));
 }
 
 /**

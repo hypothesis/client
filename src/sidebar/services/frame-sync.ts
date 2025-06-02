@@ -23,11 +23,12 @@ import type {
   SidebarToGuestCalls,
   GuestToSidebarCalls,
 } from '../../types/port-rpc-calls';
-import { isReply, isPublic } from '../helpers/annotation-metadata';
+import { isReply } from '../helpers/annotation-metadata';
 import {
   annotationMatchesSegment,
   segmentMatchesFocusFilters,
 } from '../helpers/annotation-segment';
+import { isPrivate } from '../helpers/permissions';
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
 import { watch } from '../util/watch';
@@ -239,7 +240,7 @@ export class FrameSyncService {
           return;
         }
 
-        if (isPublic(annot)) {
+        if (!isPrivate(annot.permissions)) {
           ++publicAnns;
         }
 

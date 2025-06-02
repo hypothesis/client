@@ -311,12 +311,14 @@ describe('FrameSyncService', () => {
       const mainFrameAnn = {
         id: 'abc',
         uri: 'https://example.com',
+        permissions: { read: [] },
       };
 
       // Annotation whose URI exactly matches the iframe.
       const iframeAnn = {
         id: 'def',
         uri: 'https://example.com/iframe',
+        permissions: { read: [] },
       };
 
       // Annotation whose URI doesn't match either frame exactly.
@@ -326,6 +328,7 @@ describe('FrameSyncService', () => {
       const unknownFrameAnn = {
         id: 'ghi',
         uri: 'https://example.org',
+        permissions: { read: [] },
       };
 
       // Connect two guests, one representing the main frame and one representing
@@ -365,6 +368,7 @@ describe('FrameSyncService', () => {
       const annotation = {
         id: 'abc',
         uri: 'urn:book-id:1234',
+        permissions: { read: [] },
       };
 
       // Connect a single guest which is not the main/host frame. This simulates
@@ -403,6 +407,7 @@ describe('FrameSyncService', () => {
             ],
           },
         ],
+        permissions: { read: [] },
       };
 
       const chapter2ann = {
@@ -418,6 +423,7 @@ describe('FrameSyncService', () => {
             ],
           },
         ],
+        permissions: { read: [] },
       };
 
       let clock;
@@ -552,7 +558,7 @@ describe('FrameSyncService', () => {
       emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
 
       const annot = annotationFixtures.defaultAnnotation();
-      delete annot.permissions;
+      annot.permissions.read = [];
 
       fakeStore.setState({
         annotations: [annot],
