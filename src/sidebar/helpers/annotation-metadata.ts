@@ -148,26 +148,6 @@ export function isNew(annotation: APIAnnotationData): boolean {
 }
 
 /**
- * Return `true` if the given annotation is public, `false` otherwise.
- */
-export function isPublic(annotation: Annotation): boolean {
-  let isPublic = false;
-
-  if (!annotation.permissions) {
-    return isPublic;
-  }
-
-  annotation.permissions.read.forEach(perm => {
-    const readPermArr = perm.split(':');
-    if (readPermArr.length === 2 && readPermArr[0] === 'group') {
-      isPublic = true;
-    }
-  });
-
-  return isPublic;
-}
-
-/**
  * Return `true` if `annotation` has a selector.
  *
  * An annotation which has a selector refers to a specific part of a document,

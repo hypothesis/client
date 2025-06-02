@@ -557,34 +557,6 @@ describe('sidebar/helpers/annotation-metadata', () => {
     });
   });
 
-  describe('isPublic', () => {
-    it('returns true if an annotation is shared within a group', () => {
-      assert.isTrue(annotationMetadata.isPublic(fixtures.publicAnnotation()));
-    });
-
-    [
-      {
-        read: ['acct:someemail@localhost'],
-      },
-      {
-        read: ['something invalid'],
-      },
-    ].forEach(testCase => {
-      it('returns false if an annotation is not publicly readable', () => {
-        const annotation = Object.assign(fixtures.defaultAnnotation(), {
-          permissions: testCase,
-        });
-        assert.isFalse(annotationMetadata.isPublic(annotation));
-      });
-    });
-
-    it('returns false if an annotation is missing permissions', () => {
-      const annot = fixtures.defaultAnnotation();
-      delete annot.permissions;
-      assert.isFalse(annotationMetadata.isPublic(annot));
-    });
-  });
-
   describe('isOrphan', () => {
     it('returns true if an annotation failed to anchor', () => {
       const annotation = Object.assign(fixtures.defaultAnnotation(), {

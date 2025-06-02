@@ -13,6 +13,7 @@ describe('AnnotationsService', () => {
   let fakeDefaultPermissions;
   let fakePrivatePermissions;
   let fakeSharedPermissions;
+  let fakeIsPrivate;
 
   let svc;
 
@@ -55,8 +56,9 @@ describe('AnnotationsService', () => {
       isHighlight: sinon.stub(),
       isSaved: sinon.stub(),
       isPageNote: sinon.stub(),
-      isPublic: sinon.stub(),
     };
+
+    fakeIsPrivate = sinon.stub();
 
     fakeSettings = {};
 
@@ -90,6 +92,7 @@ describe('AnnotationsService', () => {
         defaultPermissions: fakeDefaultPermissions,
         privatePermissions: fakePrivatePermissions,
         sharedPermissions: fakeSharedPermissions,
+        isPrivate: fakeIsPrivate,
       },
     });
 
@@ -415,7 +418,7 @@ describe('AnnotationsService', () => {
     });
 
     it('uses public permissions if annotation is public', () => {
-      fakeMetadata.isPublic.returns(true);
+      fakeIsPrivate.returns(false);
       fakeSharedPermissions.returns('public');
 
       const annotation = filledAnnotation();
@@ -427,7 +430,7 @@ describe('AnnotationsService', () => {
     });
 
     it('uses private permissions if annotation is private', () => {
-      fakeMetadata.isPublic.returns(false);
+      fakeIsPrivate.returns(true);
       fakePrivatePermissions.returns('private');
 
       const annotation = filledAnnotation();
