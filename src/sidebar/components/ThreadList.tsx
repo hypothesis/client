@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 
 import type { Annotation, EPUBContentSelector } from '../../types/api';
 import { isThirdPartyUser, username } from '../helpers/account-id';
+import { annotationRole, isReply } from '../helpers/annotation-metadata';
 import type { Thread } from '../helpers/build-thread';
 import { mostRelevantAnnotation } from '../helpers/highlighted-annotations';
 import { combineUsersForMentions } from '../helpers/mention-suggestions';
@@ -15,7 +16,10 @@ import {
   THREAD_DIMENSION_DEFAULTS,
 } from '../helpers/visible-threads';
 import { withServices } from '../service-context';
+import type { AnnotationsService } from '../services/annotations';
+import type { GroupsService } from '../services/groups';
 import type { TagsService } from '../services/tags';
+import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import { getElementHeightWithMargins } from '../util/dom';
 import ThreadCard from './ThreadCard';
@@ -40,7 +44,10 @@ export type ThreadListProps = {
   threads: Thread[];
 
   // injected
+  annotationsService: AnnotationsService;
+  groups: GroupsService;
   tags: TagsService;
+  toastMessenger: ToastMessengerService;
 };
 
 /**
@@ -99,7 +106,13 @@ function headingMap(threads: Thread[]): Map<string, string> {
  * user-defined content may include rich media such as images, audio clips,
  * embedded YouTube videos, rendered math and more.
  */
-function ThreadList({ threads, tags: tagsService }: ThreadListProps) {
+function ThreadList({
+  threads,
+  annotationsService,
+  groups: groupsService,
+  tags: tagsService,
+  toastMessenger,
+}: ThreadListProps) {
   // Client height of the scroll container.
   const [scrollContainerHeight, setScrollContainerHeight] = useState(0);
 
@@ -323,6 +336,7 @@ function ThreadList({ threads, tags: tagsService }: ThreadListProps) {
       : username(annotation.user);
   };
 
+  const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const usersWhoAnnotated = store.usersWhoAnnotated();
   const usersWhoWereMentioned = store.usersWhoWereMentioned();
   const focusedGroupMembers = store.getFocusedGroupMembers();
@@ -341,6 +355,13 @@ function ThreadList({ threads, tags: tagsService }: ThreadListProps) {
       usersWhoWereMentioned,
     ],
   );
+
+  useEffect(() => {
+    // Load members for focused group only if not yet loaded
+    if (mentionsEnabled && focusedGroupMembers.status === 'not-loaded') {
+      groupsService.loadFocusedGroupMembers();
+    }
+  }, [focusedGroupMembers, groupsService, mentionsEnabled]);
 
   return (
     <div>
@@ -369,7 +390,7 @@ function ThreadList({ threads, tags: tagsService }: ThreadListProps) {
               annotation={child.annotation}
               context={{
                 features: {
-                  atMentions: store.isFeatureEnabled('at_mentions'),
+                  atMentions: mentionsEnabled,
                   groupModeration: store.isFeatureEnabled('group_moderation'),
                   imageDescriptions:
                     store.isFeatureEnabled('image_descriptions'),
@@ -386,16 +407,39 @@ function ThreadList({ threads, tags: tagsService }: ThreadListProps) {
                 tagSuggestions: tagsService.filter(''), // TODO Does this resolve all tags?
                 authorName: annotationAuthorName(child.annotation),
                 events: {
-                  onSave: console.log,
-                  // onStartEdit: () =>
-                  //   store.annotationSaveStarted(child.annotation!),
-                  // onCancel
+                  onSave: async annotation => {
+                    const successMessage = `${annotationRole(annotation)} ${
+                      annotation.id !== undefined ? 'updated' : 'saved'
+                    }`;
+                    try {
+                      await annotationsService.save(annotation);
+                      toastMessenger.success(successMessage, {
+                        visuallyHidden: true,
+                      });
+                    } catch {
+                      toastMessenger.error('Saving annotation failed');
+                    }
+                  },
+                  onCancel: () => {
+                    if (child.annotation && !child.annotation.id) {
+                      store.removeAnnotations([child.annotation]);
+                    }
+                  },
+                  // onStartEdit
                   // onReply
                   // onFlag
                   // onDelete
-                  // onAddTag
-                  // onRemoveTag
-                  // onSetPrivate
+                  onTagsChange: tags => {
+                    tagsService.store(tags);
+                  },
+                  onSetPrivate: isPrivate => {
+                    if (child.annotation && !isReply(child.annotation)) {
+                      store.setDefault(
+                        'annotationPrivacy',
+                        isPrivate ? 'private' : 'shared',
+                      );
+                    }
+                  },
                   // onCopyShareLink
                 },
               }}
@@ -409,4 +453,9 @@ function ThreadList({ threads, tags: tagsService }: ThreadListProps) {
   );
 }
 
-export default withServices(ThreadList, ['tags']);
+export default withServices(ThreadList, [
+  'annotationsService',
+  'groups',
+  'tags',
+  'toastMessenger',
+]);

@@ -44,9 +44,8 @@ export type AnnotationContextType = {
     onFlag?: () => void;
     onDelete?: () => void;
 
-    onAddTag?: (newTag: string) => void;
-    onRemoveTag?: (tag: string) => boolean;
-    onSetPrivate?: (isPrivate: boolean) => boolean;
+    onTagsChange?: (tagList: string[]) => void;
+    onSetPrivate?: (isPrivate: boolean) => void;
 
     onCopyShareLink?: (options: { successfullyCopied: boolean }) => void;
   };

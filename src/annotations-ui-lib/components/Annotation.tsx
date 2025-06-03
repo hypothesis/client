@@ -62,7 +62,6 @@ export default function Annotation({ annotation }: AnnotationProps) {
     () => setDraft(draftFromAnnotation(annotation)),
     [annotation],
   );
-  const resetDraft = useCallback(() => setDraft(null), []);
 
   const isEditing = !!draft && !isSaving && !!events?.onSave;
   const showActions = !isSaving && !isEditing && isSaved(annotation);

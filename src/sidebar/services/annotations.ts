@@ -270,24 +270,21 @@ export class AnnotationsService {
    */
   async save(
     annotation: Annotation,
-    mentionsOptions: MentionsOptions = { mentionMode: 'username' },
+    mentionsOptions?: MentionsOptions = { mentionMode: 'username' },
   ) {
     let saved: Promise<Annotation>;
     let eventType: AnnotationEventType;
 
-    const annotationWithChanges = this._applyDraftChanges(
-      annotation,
-      mentionsOptions,
-    );
+    // const annotationWithChanges = this._applyDraftChanges(
+    //   annotation,
+    //   mentionsOptions,
+    // );
 
     if (!metadata.isSaved(annotation)) {
-      saved = this._api.annotation.create({}, annotationWithChanges);
+      saved = this._api.annotation.create({}, annotation);
       eventType = 'create';
     } else {
-      saved = this._api.annotation.update(
-        { id: annotation.id },
-        annotationWithChanges,
-      );
+      saved = this._api.annotation.update({ id: annotation.id }, annotation);
       eventType = 'update';
     }
 

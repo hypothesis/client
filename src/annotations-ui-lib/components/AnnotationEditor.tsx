@@ -19,7 +19,7 @@ export type AnnotationEditorProps = {
   annotation: Annotation;
   /** The annotation's draft */
   draft: Draft;
-  onChangeDraft: (draft: Draft) => void;
+  onChangeDraft: (draft: Draft | null) => void;
 };
 
 export default function AnnotationEditor({
@@ -81,7 +81,7 @@ export default function AnnotationEditor({
       }
       const tagList = [...tags, newTag];
       // Notify consumers about the new tag
-      events?.onAddTag?.(newTag);
+      events?.onTagsChange?.(tagList);
       onEditTags(tagList);
       return true;
     },
@@ -192,6 +192,8 @@ export default function AnnotationEditor({
     //      Here we do the merging with the draft before calling `onSave`.
     //      The only exception are mentions
     events?.onSave?.({ ...annotation, ...changes });
+    displayNameToUserMap.current = new Map();
+    onChangeDraft(null);
   }, [
     pendingTag,
     annotation,
@@ -202,13 +204,15 @@ export default function AnnotationEditor({
     features.atMentions,
     mentionMode,
     events,
+    onChangeDraft,
     onAddTag,
   ]);
 
   const onCancel = useCallback(() => {
     displayNameToUserMap.current = new Map();
+    onChangeDraft(null);
     events?.onCancel?.();
-  }, [events]);
+  }, [events, onChangeDraft]);
 
   // Allow saving of annotation by pressing CMD/CTRL-Enter
   const onKeyDown = useCallback(
