@@ -1,15 +1,13 @@
 import { generateHexString } from '../../shared/random';
 import type { AnnotationData } from '../../types/annotator';
 import type {
-  APIAnnotationData,
   Annotation,
+  APIAnnotationData,
   SavedAnnotation,
 } from '../../types/api';
 import type { AnnotationEventType, SidebarSettings } from '../../types/config';
-import { parseAccountID } from '../helpers/account-id';
 import * as metadata from '../helpers/annotation-metadata';
 import type { UserItem } from '../helpers/mention-suggestions';
-import { wrapDisplayNameMentions, wrapMentions } from '../helpers/mentions';
 import {
   defaultPermissions,
   isPrivate,
@@ -57,52 +55,6 @@ export class AnnotationsService {
   }
 
   /**
-   * Apply changes for the given `annotation` from its draft in the store (if
-   * any) and return a new object with those changes integrated.
-   */
-  private _applyDraftChanges(
-    annotation: Annotation,
-    mentionsOptions: MentionsOptions,
-  ): Annotation {
-    const changes: Partial<Annotation> = {};
-    const draft = this._store.getDraft(annotation);
-    const authority =
-      parseAccountID(this._store.profile().userid)?.provider ??
-      this._store.defaultAuthority();
-    const mentionsEnabled = this._store.isFeatureEnabled('at_mentions');
-
-    if (!draft) {
-      return { ...annotation };
-    }
-
-    if (!mentionsEnabled) {
-      changes.text = draft.text;
-    } else if (mentionsOptions.mentionMode === 'username') {
-      changes.text = wrapMentions(draft.text, authority);
-    } else {
-      changes.text = wrapDisplayNameMentions(
-        draft.text,
-        mentionsOptions.usersMap,
-      );
-    }
-
-    changes.tags = draft.tags;
-    changes.permissions = draft.isPrivate
-      ? privatePermissions(annotation.user)
-      : sharedPermissions(annotation.user, annotation.group);
-
-    const target = annotation.target;
-    if (target[0] && target[0].description !== draft.description) {
-      const newTarget = structuredClone(target);
-      newTarget[0].description = draft.description;
-      changes.target = newTarget;
-    }
-
-    // Integrate changes from draft into object to be persisted
-    return { ...annotation, ...changes };
-  }
-
-  /**
    * Create a new {@link Annotation} object from a set of field values.
    *
    * All fields not set in `annotationData` will be populated with default
@@ -147,6 +99,7 @@ export class AnnotationsService {
         hidden: false,
         links: {},
         document: { title: '' },
+        moderation_status: 'APPROVED',
       },
       annotationData,
     );
@@ -305,9 +258,6 @@ export class AnnotationsService {
         fields[key] = value;
       }
     }
-
-    // Clear out any pending changes (draft)
-    this._store.removeDraft(annotation);
 
     // Add (or, in effect, update) the annotation to the store's collection
     this._store.addAnnotations([savedAnnotation]);

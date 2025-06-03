@@ -1,16 +1,23 @@
-import { AnnotationCard } from '@hypothesis/annotations-ui-lib';
-import { ListenerCollection } from '@hypothesis/frontend-shared';
+import {
+  AnnotationCard,
+  annotationRole,
+  isReply,
+} from '@hypothesis/annotations-ui-lib';
+import type {
+  Annotation,
+  EPUBContentSelector,
+  MentionMode,
+} from '@hypothesis/annotations-ui-lib';
+import { confirm, ListenerCollection } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 
-import type { Annotation, EPUBContentSelector } from '../../types/api';
 import { isThirdPartyUser, username } from '../helpers/account-id';
-import { annotationRole, isReply } from '../helpers/annotation-metadata';
 import type { Thread } from '../helpers/build-thread';
 import { mostRelevantAnnotation } from '../helpers/highlighted-annotations';
 import { combineUsersForMentions } from '../helpers/mention-suggestions';
-import type { MentionMode } from '../helpers/mentions';
+import { permits } from '../helpers/permissions';
 import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
@@ -363,6 +370,14 @@ function ThreadList({
     }
   }, [focusedGroupMembers, groupsService, mentionsEnabled]);
 
+  // Is the current user allowed to take the given `action` on this annotation?
+  const userIsAuthorizedTo = (
+    action: 'update' | 'delete',
+    annotation: Annotation,
+  ) => {
+    return permits(annotation.permissions, action, profile.userid);
+  };
+
   return (
     <div>
       <div style={{ height: offscreenUpperHeight }} />
@@ -425,13 +440,31 @@ function ThreadList({
                       store.removeAnnotations([child.annotation]);
                     }
                   },
-                  // onStartEdit
-                  // onReply
-                  // onFlag
-                  // onDelete
-                  onTagsChange: tags => {
-                    tagsService.store(tags);
-                  },
+                  onStartEdit: userIsAuthorizedTo('update', child.annotation)
+                    ? console.log
+                    : undefined,
+                  onDelete: userIsAuthorizedTo('delete', child.annotation)
+                    ? async () => {
+                        const annType = annotationRole(child.annotation!);
+                        if (
+                          await confirm({
+                            title: `Delete ${annType.toLowerCase()}?`,
+                            message: `Are you sure you want to delete this ${annType.toLowerCase()}?`,
+                            confirmAction: 'Delete',
+                          })
+                        ) {
+                          try {
+                            await annotationsService.delete(child.annotation!);
+                            toastMessenger.success(`${annType} deleted`, {
+                              visuallyHidden: true,
+                            });
+                          } catch (err) {
+                            toastMessenger.error(err.message);
+                          }
+                        }
+                      }
+                    : undefined,
+                  onTagsChange: tags => tagsService.store(tags),
                   onSetPrivate: isPrivate => {
                     if (child.annotation && !isReply(child.annotation)) {
                       store.setDefault(
@@ -440,6 +473,8 @@ function ThreadList({
                       );
                     }
                   },
+                  // onReply
+                  // onFlag
                   // onCopyShareLink
                 },
               }}

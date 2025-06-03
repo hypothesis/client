@@ -134,7 +134,9 @@ export function isReply(annotation: APIAnnotationData): boolean {
  * Return true if the given annotation has been saved to the backend and assigned
  * an ID.
  */
-export function isSaved(annotation: Annotation): annotation is SavedAnnotation {
+export function isSaved(
+  annotation: APIAnnotationData,
+): annotation is SavedAnnotation {
   return !!annotation.id;
 }
 
