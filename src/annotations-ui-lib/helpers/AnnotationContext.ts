@@ -13,7 +13,6 @@ export type AnnotationContextType = {
     imageDescriptions: boolean;
   };
 
-  flaggingEnabled?: boolean;
   sharingEnabled?: boolean;
 
   mentionMode: MentionMode;
@@ -23,7 +22,13 @@ export type AnnotationContextType = {
   tagSuggestions: string[];
 
   group: Group | null;
-  authorName: string;
+  showGroupInHeader: boolean;
+  author: {
+    name: string;
+    link?: string;
+  };
+  showEditAction: boolean;
+
   isHighlighted: boolean;
   isOrphan: boolean;
   isHovered: boolean;
@@ -39,8 +44,8 @@ export type AnnotationContextType = {
     /** Invoked when cancelling the annotation edition */
     onCancel?: () => void;
 
-    onStartEdit?: () => void;
     onReply?: () => void;
+    /** Flagging this annotation is disabled if not provided */
     onFlag?: () => void;
     onDelete?: () => void;
 

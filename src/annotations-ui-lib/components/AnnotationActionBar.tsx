@@ -14,7 +14,7 @@ import AnnotationShareControl from './AnnotationShareControl';
 
 export type AnnotationActionBarProps = {
   annotation: Annotation;
-  onStartEdit: () => void;
+  onEdit: () => void;
 };
 
 /**
@@ -25,15 +25,16 @@ export type AnnotationActionBarProps = {
  */
 export default function AnnotationActionBar({
   annotation,
-  onStartEdit,
+  onEdit,
 }: AnnotationActionBarProps) {
-  const { events, flaggingEnabled, sharingEnabled } = useAnnotationContext();
+  const { events, sharingEnabled, showEditAction } = useAnnotationContext();
   const shareLink = sharingEnabled && annotationSharingLink(annotation);
+  const flaggingEnabled = !!events?.onFlag;
 
   return (
     <div className="flex text-[16px]" data-testid="annotation-action-bar">
-      {events?.onSave && (
-        <IconButton icon={EditIcon} title="Edit" onClick={onStartEdit} />
+      {showEditAction && (
+        <IconButton icon={EditIcon} title="Edit" onClick={onEdit} />
       )}
       {events?.onDelete && (
         <IconButton

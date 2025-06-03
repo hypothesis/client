@@ -13,7 +13,10 @@ import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 
+import { SidebarSettings } from '../../types/config';
+import { serviceConfig } from '../config/service-config';
 import { isThirdPartyUser, username } from '../helpers/account-id';
+import { annotationAuthorLink } from '../helpers/annotation-user';
 import type { Thread } from '../helpers/build-thread';
 import { mostRelevantAnnotation } from '../helpers/highlighted-annotations';
 import { combineUsersForMentions } from '../helpers/mention-suggestions';
@@ -29,7 +32,6 @@ import type { TagsService } from '../services/tags';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import { getElementHeightWithMargins } from '../util/dom';
-import ThreadCard from './ThreadCard';
 
 // The precision of the `scrollPosition` value in pixels; values will be rounded
 // down to the nearest multiple of this scale value
@@ -53,6 +55,7 @@ export type ThreadListProps = {
   // injected
   annotationsService: AnnotationsService;
   groups: GroupsService;
+  settings: SidebarSettings;
   tags: TagsService;
   toastMessenger: ToastMessengerService;
 };
@@ -73,6 +76,14 @@ function getSegmentSelector(ann: Annotation): EPUBContentSelector | undefined {
   return target.selector?.find(s => s.type === 'EPUBContentSelector') as
     | EPUBContentSelector
     | undefined;
+}
+
+function flaggingEnabled(settings: SidebarSettings) {
+  const service = serviceConfig(settings);
+  if (service?.allowFlagging === false) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -117,6 +128,7 @@ function ThreadList({
   threads,
   annotationsService,
   groups: groupsService,
+  settings,
   tags: tagsService,
   toastMessenger,
 }: ThreadListProps) {
@@ -336,11 +348,22 @@ function ThreadList({
   );
 
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
-  const annotationAuthorName = (annotation: Annotation) => {
+  const annotationAuthor = (annotation: Annotation) => {
     const displayName = annotation.user_info?.display_name;
-    return displayNamesEnabled && displayName
-      ? displayName
-      : username(annotation.user);
+    const name =
+      displayNamesEnabled && displayName
+        ? displayName
+        : username(annotation.user);
+
+    const userURL = store.getLink('user', { user: annotation.user });
+    const link = annotationAuthorLink(
+      annotation,
+      settings,
+      defaultAuthority,
+      userURL,
+    );
+
+    return { name, link };
   };
 
   const mentionsEnabled = store.isFeatureEnabled('at_mentions');
@@ -378,6 +401,11 @@ function ThreadList({
     return permits(annotation.permissions, action, profile.userid);
   };
 
+  const annotationFlaggingEnabled = (annotation: Annotation) =>
+    flaggingEnabled(settings) &&
+    !!profile.userid &&
+    profile.userid !== annotation.user;
+
   return (
     <div>
       <div style={{ height: offscreenUpperHeight }} />
@@ -411,16 +439,17 @@ function ThreadList({
                     store.isFeatureEnabled('image_descriptions'),
                 },
                 group: store.getGroup(child.annotation.group) ?? null,
+                showGroupInHeader: store.route() !== 'sidebar',
+                showEditAction: userIsAuthorizedTo('update', child.annotation),
+                author: annotationAuthor(child.annotation),
                 isHighlighted: store.isAnnotationHighlighted(child.annotation),
                 isHovered: store.isAnnotationHovered(child.annotation.$tag),
                 isOrphan: false, // TODO
                 isSaving: store.isSavingAnnotation(child.annotation),
                 mentionMode,
                 usersForMentions,
-                flaggingEnabled: true, // TODO
                 sharingEnabled: true, // TODO
-                tagSuggestions: tagsService.filter(''), // TODO Does this resolve all tags?
-                authorName: annotationAuthorName(child.annotation),
+                tagSuggestions: tagsService.filter(''),
                 events: {
                   onSave: async annotation => {
                     const successMessage = `${annotationRole(annotation)} ${
@@ -440,9 +469,6 @@ function ThreadList({
                       store.removeAnnotations([child.annotation]);
                     }
                   },
-                  onStartEdit: userIsAuthorizedTo('update', child.annotation)
-                    ? console.log
-                    : undefined,
                   onDelete: userIsAuthorizedTo('delete', child.annotation)
                     ? async () => {
                         const annType = annotationRole(child.annotation!);
@@ -474,7 +500,15 @@ function ThreadList({
                     }
                   },
                   // onReply
-                  // onFlag
+                  onFlag: annotationFlaggingEnabled(child.annotation)
+                    ? () => {
+                        annotationsService
+                          .flag(child.annotation!)
+                          .catch(() =>
+                            toastMessenger.error('Flagging annotation failed'),
+                          );
+                      }
+                    : undefined,
                   // onCopyShareLink
                 },
               }}
@@ -491,6 +525,7 @@ function ThreadList({
 export default withServices(ThreadList, [
   'annotationsService',
   'groups',
+  'settings',
   'tags',
   'toastMessenger',
 ]);

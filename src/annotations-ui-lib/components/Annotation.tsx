@@ -55,7 +55,7 @@ function draftFromAnnotation(annotation: Annotation): Draft {
 }
 
 export default function Annotation({ annotation }: AnnotationProps) {
-  const { authorName, isHighlighted, isOrphan, isHovered, isSaving, events } =
+  const { author, isHighlighted, isOrphan, isHovered, isSaving, events } =
     useAnnotationContext();
   const [draft, setDraft] = useState<Draft | null>(null);
   const initDraft = useCallback(
@@ -77,7 +77,7 @@ export default function Annotation({ annotation }: AnnotationProps) {
   return (
     <div
       className="flex flex-col gap-y-4"
-      aria-label={`${annotationDescription} by ${authorName}${state}`}
+      aria-label={`${annotationDescription} by ${author.name}${state}`}
     >
       <AnnotationHeader annotation={annotation} />
       {targetShape &&
@@ -105,10 +105,7 @@ export default function Annotation({ annotation }: AnnotationProps) {
         {isSaving && <SavingMessage />}
         {showActions && (
           <CardActions classes="grow">
-            <AnnotationActionBar
-              annotation={annotation}
-              onStartEdit={initDraft}
-            />
+            <AnnotationActionBar annotation={annotation} onEdit={initDraft} />
           </CardActions>
         )}
       </footer>

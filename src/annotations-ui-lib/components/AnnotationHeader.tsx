@@ -15,7 +15,7 @@ export type AnnotationHeaderProps = {
 export default function AnnotationHeader({
   annotation,
 }: AnnotationHeaderProps) {
-  const { group, authorName } = useAnnotationContext();
+  const { group, showGroupInHeader, author } = useAnnotationContext();
   const annotationURL = annotation.links?.html || '';
 
   const showEditedTimestamp = useMemo(
@@ -26,7 +26,7 @@ export default function AnnotationHeader({
   return (
     <header>
       <div className="flex gap-x-1 items-center flex-wrap-reverse">
-        <AnnotationUser displayName={authorName} />
+        <AnnotationUser authorLink={author.link} displayName={author.name} />
 
         <div className="flex justify-end grow">
           <AnnotationTimestamps
@@ -42,7 +42,7 @@ export default function AnnotationHeader({
         className="flex gap-x-1 items-baseline flex-wrap-reverse"
         data-testid="extended-header-info"
       >
-        {group && <AnnotationGroupInfo group={group} />}
+        {group && showGroupInHeader && <AnnotationGroupInfo group={group} />}
         {isHighlight(annotation) && (
           <HighlightIcon
             title="This is a highlight."
