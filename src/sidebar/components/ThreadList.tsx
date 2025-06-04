@@ -27,6 +27,7 @@ import {
 } from '../helpers/visible-threads';
 import { withServices } from '../service-context';
 import type { AnnotationsService } from '../services/annotations';
+import type { APIService } from '../services/api';
 import type { FrameSyncService } from '../services/frame-sync';
 import type { GroupsService } from '../services/groups';
 import type { TagsService } from '../services/tags';
@@ -55,6 +56,7 @@ export type ThreadListProps = {
 
   // injected
   annotationsService: AnnotationsService;
+  api: APIService;
   frameSync: FrameSyncService;
   groups: GroupsService;
   settings: SidebarSettings;
@@ -129,6 +131,7 @@ function headingMap(threads: Thread[]): Map<string, string> {
 function ThreadList({
   threads,
   annotationsService,
+  api,
   frameSync,
   groups: groupsService,
   settings,
@@ -531,6 +534,24 @@ function ThreadList({
                       toastMessenger.error('Unable to copy link');
                     }
                   },
+                  onHideFlagged: () => {
+                    const id = child.annotation!.id!;
+                    api.annotation
+                      .hide({ id })
+                      .then(() => store.hideAnnotation(id))
+                      .catch(() =>
+                        toastMessenger.error('Failed to hide annotation'),
+                      );
+                  },
+                  onUnhideFlagged: () => {
+                    const id = child.annotation!.id!;
+                    api.annotation
+                      .unhide({ id })
+                      .then(() => store.unhideAnnotation(id))
+                      .catch(() =>
+                        toastMessenger.error('Failed to unhide annotation'),
+                      );
+                  },
                   // onReply
                 },
               }}
@@ -546,6 +567,7 @@ function ThreadList({
 
 export default withServices(ThreadList, [
   'annotationsService',
+  'api',
   'frameSync',
   'groups',
   'settings',

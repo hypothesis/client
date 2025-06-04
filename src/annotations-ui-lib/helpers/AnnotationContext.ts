@@ -56,6 +56,9 @@ export type AnnotationContextType = {
 
     onClick?: () => void;
     onHover?: (direction: 'in' | 'out') => void;
+
+    onHideFlagged?: () => void;
+    onUnhideFlagged?: () => void;
   };
 };
 

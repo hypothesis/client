@@ -5,6 +5,7 @@ import type { AnnotationContextType } from '../helpers/AnnotationContext';
 import { AnnotationContext } from '../helpers/AnnotationContext';
 import type { Annotation as AnnotationType } from '../helpers/types';
 import Annotation from './Annotation';
+import ModerationBanner from './ModerationBanner';
 
 const isFromButtonOrLink = (target: Element) =>
   !!target.closest('button') || !!target.closest('a');
@@ -54,6 +55,7 @@ export default function AnnotationCard({
               'grow max-w-full min-w-0',
             )}
           >
+            <ModerationBanner annotation={annotation} />
             <Annotation annotation={annotation} />
           </div>
         </CardContent>

@@ -77,6 +77,17 @@ export function annotationRole(annotation: Annotation): string {
 }
 
 /**
+ * Return the number of times the annotation has been flagged
+ * by other users. If moderation metadata is not present, returns `null`.
+ */
+export function flagCount(annotation: Annotation): number | null {
+  if (!annotation.moderation) {
+    return null;
+  }
+  return annotation.moderation.flagCount;
+}
+
+/**
  * Return the text quote that an annotation refers to.
  */
 export function quote(annotation: Annotation): string | null {
