@@ -150,13 +150,7 @@ export default function AnnotationShareControl({
             <h2 className="text-brand text-md font-medium">
               Share this annotation
             </h2>
-            <div
-              className={classnames(
-                // Slightly larger font size for touch devices to correspond with
-                // larger button and input sizes
-                'flex w-full text-xs touch:text-base',
-              )}
-            >
+            <div className="flex w-full text-base">
               <InputGroup>
                 <Input
                   aria-label="Use this URL to share this annotation"
