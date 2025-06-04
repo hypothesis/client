@@ -107,7 +107,7 @@
 
     // Valid processed mention with link
     a[data-hyp-mention-type='link'] {
-      @apply text-brand font-bold underline;
+      @apply text-brand font-bold underline focus-visible-ring;
     }
 
     // Valid processed mention without link
