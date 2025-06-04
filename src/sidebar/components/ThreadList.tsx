@@ -524,8 +524,14 @@ function ThreadList({
                       direction === 'in' ? child.annotation! : null,
                     );
                   },
+                  onCopyShareLink: ({ successfullyCopied }) => {
+                    if (successfullyCopied) {
+                      toastMessenger.success('Copied share link to clipboard');
+                    } else {
+                      toastMessenger.error('Unable to copy link');
+                    }
+                  },
                   // onReply
-                  // onCopyShareLink
                 },
               }}
             />
