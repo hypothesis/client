@@ -53,6 +53,9 @@ export type AnnotationContextType = {
     onSetPrivate?: (isPrivate: boolean) => void;
 
     onCopyShareLink?: (options: { successfullyCopied: boolean }) => void;
+
+    onClick?: () => void;
+    onHover?: (direction: 'in' | 'out') => void;
   };
 };
 

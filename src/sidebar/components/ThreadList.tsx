@@ -13,7 +13,7 @@ import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 
-import { SidebarSettings } from '../../types/config';
+import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import { isThirdPartyUser, username } from '../helpers/account-id';
 import { annotationAuthorLink } from '../helpers/annotation-user';
@@ -27,6 +27,7 @@ import {
 } from '../helpers/visible-threads';
 import { withServices } from '../service-context';
 import type { AnnotationsService } from '../services/annotations';
+import type { FrameSyncService } from '../services/frame-sync';
 import type { GroupsService } from '../services/groups';
 import type { TagsService } from '../services/tags';
 import type { ToastMessengerService } from '../services/toast-messenger';
@@ -54,6 +55,7 @@ export type ThreadListProps = {
 
   // injected
   annotationsService: AnnotationsService;
+  frameSync: FrameSyncService;
   groups: GroupsService;
   settings: SidebarSettings;
   tags: TagsService;
@@ -127,6 +129,7 @@ function headingMap(threads: Thread[]): Map<string, string> {
 function ThreadList({
   threads,
   annotationsService,
+  frameSync,
   groups: groupsService,
   settings,
   tags: tagsService,
@@ -406,6 +409,12 @@ function ThreadList({
     !!profile.userid &&
     profile.userid !== annotation.user;
 
+  const setAnnotationHovered = useMemo(
+    () =>
+      debounce((ann: Annotation | null) => frameSync.hoverAnnotation(ann), 10),
+    [frameSync],
+  );
+
   return (
     <div>
       <div style={{ height: offscreenUpperHeight }} />
@@ -499,7 +508,6 @@ function ThreadList({
                       );
                     }
                   },
-                  // onReply
                   onFlag: annotationFlaggingEnabled(child.annotation)
                     ? () => {
                         annotationsService
@@ -509,6 +517,14 @@ function ThreadList({
                           );
                       }
                     : undefined,
+                  onClick: () =>
+                    frameSync.scrollToAnnotation(child.annotation!),
+                  onHover: direction => {
+                    setAnnotationHovered(
+                      direction === 'in' ? child.annotation! : null,
+                    );
+                  },
+                  // onReply
                   // onCopyShareLink
                 },
               }}
@@ -524,6 +540,7 @@ function ThreadList({
 
 export default withServices(ThreadList, [
   'annotationsService',
+  'frameSync',
   'groups',
   'settings',
   'tags',
