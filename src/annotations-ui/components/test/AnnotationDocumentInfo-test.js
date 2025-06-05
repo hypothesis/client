@@ -1,7 +1,7 @@
 import { checkAccessibility } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
 
-import { AnnotationDocumentInfo } from '../AnnotationDocumentInfo';
+import AnnotationDocumentInfo from '../AnnotationDocumentInfo';
 
 describe('AnnotationDocumentInfo', () => {
   const createAnnotationDocumentInfo = props => {

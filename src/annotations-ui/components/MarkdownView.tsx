@@ -9,8 +9,8 @@ import {
   useState,
 } from 'preact/hooks';
 
-import { MentionPopoverContent } from '../components/MentionPopoverContent';
-import { StyledText } from '../components/StyledText';
+import MentionPopoverContent from '../components/MentionPopoverContent';
+import StyledText from '../components/StyledText';
 import { processAndReplaceMentionElements } from '../helpers';
 import type {
   InvalidMentionContent,
@@ -77,7 +77,7 @@ type PopoverContent = Mention | InvalidMentionContent | null;
  * A component which renders markdown as HTML, replaces recognized links with
  * embedded video/audio and processes mention tags.
  */
-export function MarkdownView(props: MarkdownViewProps) {
+export default function MarkdownView(props: MarkdownViewProps) {
   /* istanbul ignore next - Unpack here to ignore default values for test seams */
   const {
     markdown,

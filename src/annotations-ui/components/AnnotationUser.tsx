@@ -9,7 +9,7 @@ type AnnotationUserProps = {
  * Display information about an annotation's user. Link to the user's
  * activity if `authorLink` is present.
  */
-export function AnnotationUser({
+export default function AnnotationUser({
   authorLink,
   displayName,
 }: AnnotationUserProps) {
