@@ -10,10 +10,8 @@ export type AnnotationDocumentInfoProps = {
 /**
  * Render some metadata about an annotation's document and link to it
  * if a link is available.
- *
- * @param {AnnotationDocumentInfoProps} props
  */
-export default function AnnotationDocumentInfo({
+export function AnnotationDocumentInfo({
   domain,
   link,
   title,
