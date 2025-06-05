@@ -1,4 +1,3 @@
-import { Input } from '@hypothesis/frontend-shared';
 import {
   useCallback,
   useEffect,
@@ -33,6 +32,7 @@ import TagEditor from '../TagEditor';
 import { useUnsavedChanges } from '../hooks/unsaved-changes';
 import AnnotationLicense from './AnnotationLicense';
 import AnnotationPublishControl from './AnnotationPublishControl';
+import AnnotationThumbnailDescription from './AnnotationThumbnailDescription';
 
 type AnnotationEditorProps = {
   /** The annotation under edit */
@@ -287,14 +287,9 @@ function AnnotationEditor({
       onKeyDown={onKeyDown}
     >
       {showDescription && (
-        <Input
-          data-testid="description"
-          placeholder="Describe selected area..."
-          aria-label="Describe selected area"
-          value={description}
-          onInput={e => onEditDescription((e.target as HTMLInputElement).value)}
-          // Maximum length for `target.description` field supported by the API.
-          maxlength={250}
+        <AnnotationThumbnailDescription
+          description={description ?? ''}
+          onEdit={onEditDescription}
         />
       )}
       <MarkdownEditor
