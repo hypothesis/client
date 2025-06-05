@@ -22,7 +22,7 @@ export type AnnotationTimestampProps = {
  * timestamp will be linked to that URL (the single-annotation view
  * for this annotation).
  */
-export function AnnotationTimestamps({
+export default function AnnotationTimestamps({
   annotationCreated,
   annotationUpdated,
   annotationURL,

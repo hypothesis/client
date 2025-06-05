@@ -15,7 +15,7 @@ export type MentionPopoverContentProps = {
 /**
  * Information to display in a Popover when hovering over a processed mention.
  */
-export function MentionPopoverContent({
+export default function MentionPopoverContent({
   content,
   mentionMode,
 }: MentionPopoverContentProps) {

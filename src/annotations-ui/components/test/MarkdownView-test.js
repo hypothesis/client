@@ -6,7 +6,7 @@ import {
 } from '@hypothesis/frontend-testing';
 import sinon from 'sinon';
 
-import { MarkdownView, $imports } from '../MarkdownView';
+import MarkdownView, { $imports } from '../MarkdownView';
 
 describe('MarkdownView', () => {
   let fakeRenderMathAndMarkdown;

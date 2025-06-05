@@ -11,7 +11,9 @@ export type AnnotationGroupInfoProps = {
 /**
  * Render information about what group an annotation is in.
  */
-export function AnnotationGroupInfo({ group }: AnnotationGroupInfoProps) {
+export default function AnnotationGroupInfo({
+  group,
+}: AnnotationGroupInfoProps) {
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links
   const linkToGroup = group?.links.html;

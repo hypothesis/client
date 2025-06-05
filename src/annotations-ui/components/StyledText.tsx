@@ -9,7 +9,7 @@ export type StyledTextProps = JSX.HTMLAttributes<HTMLDivElement> & {
 /**
  * Render children as styled text: basic prose styling for HTML
  */
-export function StyledText({
+export default function StyledText({
   children,
   classes,
   ...restProps
