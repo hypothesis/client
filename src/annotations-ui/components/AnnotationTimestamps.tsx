@@ -21,10 +21,8 @@ export type AnnotationTimestampProps = {
  * was last edited. If the `annotation` has an HTML link, the created-date
  * timestamp will be linked to that URL (the single-annotation view
  * for this annotation).
- *
- * @param {AnnotationTimestampsProps} props
  */
-export default function AnnotationTimestamps({
+export function AnnotationTimestamps({
   annotationCreated,
   annotationUpdated,
   annotationURL,

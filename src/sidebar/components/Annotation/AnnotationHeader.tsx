@@ -1,4 +1,8 @@
-import { AnnotationDocumentInfo } from '@hypothesis/annotations-ui';
+import {
+  AnnotationDocumentInfo,
+  AnnotationGroupInfo,
+  AnnotationTimestamps,
+} from '@hypothesis/annotations-ui';
 import {
   LinkButton,
   HighlightIcon,
@@ -22,8 +26,6 @@ import {
 import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
-import AnnotationGroupInfo from './AnnotationGroupInfo';
-import AnnotationTimestamps from './AnnotationTimestamps';
 import AnnotationUser from './AnnotationUser';
 
 export type AnnotationHeaderProps = {

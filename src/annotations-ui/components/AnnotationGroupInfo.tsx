@@ -1,7 +1,7 @@
 import { Link, GlobeIcon, GroupsIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import type { Group } from '../../../types/api';
+import type { Group } from '../helpers/groups';
 
 export type AnnotationGroupInfoProps = {
   /** Group to which the annotation belongs */
@@ -10,10 +10,8 @@ export type AnnotationGroupInfoProps = {
 
 /**
  * Render information about what group an annotation is in.
- *
- * @param {AnnotationGroupInfoProps} props
  */
-function AnnotationGroupInfo({ group }: AnnotationGroupInfoProps) {
+export function AnnotationGroupInfo({ group }: AnnotationGroupInfoProps) {
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links
   const linkToGroup = group?.links.html;
@@ -45,5 +43,3 @@ function AnnotationGroupInfo({ group }: AnnotationGroupInfoProps) {
     </>
   );
 }
-
-export default AnnotationGroupInfo;

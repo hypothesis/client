@@ -2,7 +2,7 @@ import { checkAccessibility } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
 import { act } from 'preact/test-utils';
 
-import AnnotationTimestamps, { $imports } from '../AnnotationTimestamps';
+import { AnnotationTimestamps, $imports } from '../AnnotationTimestamps';
 
 describe('AnnotationTimestamps', () => {
   let clock;

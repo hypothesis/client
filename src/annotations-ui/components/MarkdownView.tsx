@@ -9,7 +9,8 @@ import {
   useState,
 } from 'preact/hooks';
 
-import { MentionPopoverContent, StyledText } from '../components';
+import { MentionPopoverContent } from '../components/MentionPopoverContent';
+import { StyledText } from '../components/StyledText';
 import { processAndReplaceMentionElements } from '../helpers';
 import type {
   InvalidMentionContent,
