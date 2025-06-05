@@ -9,6 +9,7 @@ import {
   documentMetadata,
   isReply,
   pageLabel,
+  description,
   quote,
 } from '../helpers/annotation-metadata';
 import { annotationDisplayName } from '../helpers/annotation-user';
@@ -90,12 +91,17 @@ export class AnnotationsExporter {
     const annotationsAsText = annotations.map((annotation, index) => {
       const page = pageLabel(annotation);
       const annotationQuote = quote(annotation);
+      const annotationDescription = description(annotation);
+
       const lines = [
         `Created at: ${formatSortableDateTime(new Date(annotation.created))}`,
         `Author: ${extractUsername(annotation)}`,
         page ? `Page: ${page}` : undefined,
         `Type: ${annotationRole(annotation)}`,
         annotationQuote ? `Quote: "${annotationQuote}"` : undefined,
+        annotationDescription
+          ? `Description: ${annotationDescription}`
+          : undefined,
         `Comment: ${annotation.text}`,
         annotation.tags.length > 0
           ? `Tags: ${annotation.tags.join(', ')}`
@@ -141,7 +147,7 @@ export class AnnotationsExporter {
         uri,
         groupName,
         annotationRole(annotation),
-        quote(annotation) ?? '',
+        quote(annotation) ?? description(annotation) ?? '',
         annotation.text,
         annotation.tags.join(','),
       ]
@@ -155,7 +161,7 @@ export class AnnotationsExporter {
       'URL',
       'Group',
       'Type',
-      'Quote',
+      'Quote/description',
       'Comment',
       'Tags',
     ].join(separator);
@@ -236,6 +242,7 @@ export class AnnotationsExporter {
             {annotations.map((annotation, index) => {
               const page = pageLabel(annotation);
               const annotationQuote = quote(annotation);
+              const annotationDescription = description(annotation);
               const renderedComment = renderMathAndMarkdown(annotation.text);
 
               // When the result of rendering the text's markdown is just a
@@ -283,6 +290,12 @@ export class AnnotationsExporter {
                               {annotationQuote}
                             </blockquote>
                           </td>
+                        </tr>
+                      )}
+                      {annotationDescription && (
+                        <tr>
+                          <td>Description:</td>
+                          <td>{annotationDescription}</td>
                         </tr>
                       )}
                       <tr>
