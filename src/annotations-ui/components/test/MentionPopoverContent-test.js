@@ -1,7 +1,7 @@
 import { formatDateTime } from '@hypothesis/frontend-shared';
 import { checkAccessibility, mount } from '@hypothesis/frontend-testing';
 
-import MentionPopoverContent from '../MentionPopoverContent';
+import { MentionPopoverContent } from '../MentionPopoverContent';
 
 describe('MentionPopoverContent', () => {
   function createComponent(content, mentionMode = 'username') {

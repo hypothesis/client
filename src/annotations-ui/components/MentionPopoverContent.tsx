@@ -1,13 +1,13 @@
 import { formatDateTime, InfoIcon, Link } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import type { Mention } from '../../../types/api';
 import type {
   InvalidMentionContent,
+  Mention,
   MentionMode,
-} from '../../helpers/mentions';
+} from '../helpers/mentions';
 
-export type MentionPopoverContent = {
+export type MentionPopoverContentProps = {
   content: Mention | InvalidMentionContent;
   mentionMode: MentionMode;
 };
@@ -15,10 +15,10 @@ export type MentionPopoverContent = {
 /**
  * Information to display in a Popover when hovering over a processed mention.
  */
-export default function MentionPopoverContent({
+export function MentionPopoverContent({
   content,
   mentionMode,
-}: MentionPopoverContent) {
+}: MentionPopoverContentProps) {
   const isUsernameMode = mentionMode === 'username';
 
   return (
