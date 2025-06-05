@@ -4,7 +4,7 @@ import {
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
 
-import AnnotationGroupInfo, { $imports } from '../AnnotationGroupInfo';
+import { AnnotationGroupInfo, $imports } from '../AnnotationGroupInfo';
 
 describe('AnnotationGroupInfo', () => {
   let fakeGroup;
