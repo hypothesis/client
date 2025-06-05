@@ -9,7 +9,10 @@ type AnnotationUserProps = {
  * Display information about an annotation's user. Link to the user's
  * activity if `authorLink` is present.
  */
-function AnnotationUser({ authorLink, displayName }: AnnotationUserProps) {
+export function AnnotationUser({
+  authorLink,
+  displayName,
+}: AnnotationUserProps) {
   const user = <h3 className="text-color-text font-bold">{displayName}</h3>;
 
   if (authorLink) {
@@ -22,5 +25,3 @@ function AnnotationUser({ authorLink, displayName }: AnnotationUserProps) {
 
   return <div>{user}</div>;
 }
-
-export default AnnotationUser;
