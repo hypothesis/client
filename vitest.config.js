@@ -1,4 +1,6 @@
 import { SummaryReporter } from '@hypothesis/frontend-testing/vitest';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 import { excludeFromCoverage } from './rollup-tests.config.js';
@@ -32,6 +34,13 @@ export default defineConfig({
       reporter: ['json', 'html'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: excludeFromCoverage,
+    },
+
+    alias: {
+      '@hypothesis/annotations-ui': path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        'src/annotations-ui',
+      ),
     },
   },
 });
