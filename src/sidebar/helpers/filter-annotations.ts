@@ -6,7 +6,12 @@ import {
 import type { Annotation } from '../../types/api';
 import { pageLabelInRange } from '../util/page-range';
 import * as unicodeUtils from '../util/unicode';
-import { cfi as getCFI, quote, pageLabel } from './annotation-metadata';
+import {
+  cfi as getCFI,
+  description,
+  quote,
+  pageLabel,
+} from './annotation-metadata';
 import type { Facet } from './query-parser';
 
 type Filter = {
@@ -111,7 +116,12 @@ function stringFieldMatcher(
  * Map of field name (from a parsed query) to matcher for that field.
  */
 const fieldMatchers: Record<string, Matcher | Matcher<number>> = {
-  quote: stringFieldMatcher(ann => [quote(ann) ?? '']),
+  quote: stringFieldMatcher(ann => {
+    // The quote field matches "the textual version of what was annotated". This
+    // can mean the text (for text annotations) or a text representation of the
+    // selection.
+    return [quote(ann) ?? description(ann) ?? ''];
+  }),
 
   cfi: {
     fieldValues: ann => [getCFI(ann)?.trim() ?? ''],

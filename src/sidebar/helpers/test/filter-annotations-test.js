@@ -310,6 +310,43 @@ describe('sidebar/helpers/filter-annotations', () => {
     });
   });
 
+  describe('"quote" field', () => {
+    const emptyAnnotation = { id: 42, target: [{}] };
+
+    it('matches target text quote', () => {
+      const annotation = {
+        id: 1,
+        target: [
+          {
+            selector: [
+              {
+                type: 'TextQuoteSelector',
+                exact: 'foobar',
+              },
+            ],
+          },
+        ],
+      };
+      const filters = { quote: { terms: ['foo'], operator: 'or' } };
+      const result = filterAnnotations([annotation, emptyAnnotation], filters);
+      assert.deepEqual(result, [annotation]);
+    });
+
+    it('matches target description', () => {
+      const annotation = {
+        id: 1,
+        target: [
+          {
+            description: 'a widget',
+          },
+        ],
+      };
+      const filters = { quote: { terms: ['widget'], operator: 'or' } };
+      const result = filterAnnotations([annotation, emptyAnnotation], filters);
+      assert.deepEqual(result, [annotation]);
+    });
+  });
+
   it('ignores filters with no terms in the query', () => {
     const annotation = {
       id: 1,
