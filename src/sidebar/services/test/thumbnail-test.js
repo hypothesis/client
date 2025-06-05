@@ -22,7 +22,7 @@ describe('ThumbnailService', () => {
     it('returns thumbnail if cached', async () => {
       const svc = createService();
       await svc.fetch('ann123');
-      assert.instanceOf(svc.get('ann123'), ImageBitmap);
+      assert.ok(svc.get('ann123'));
     });
 
     it('moves thumbnail to back of least-recently-used list', async () => {

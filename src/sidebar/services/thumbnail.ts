@@ -1,14 +1,39 @@
 import type { RenderToBitmapOptions } from '../../types/annotator';
 import type { FrameSyncService } from './frame-sync';
 
+async function bitmapToImageURL(bitmap: ImageBitmap): Promise<string> {
+  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
+  const blob = await canvas.convertToBlob();
+  return URL.createObjectURL(blob);
+}
+
+export type Thumbnail = {
+  /** Thumbnail image width in pixels. */
+  width: number;
+
+  /** Thumbnail image height in pixels. */
+  height: number;
+
+  /**
+   * URL for thumbnail image.
+   *
+   * This URL is created from a blob via {@link URL.createObjectURL} and will be
+   * revoked via {@link URL.revokeObjectURL} when expired from {@link
+   * ThumbnailService}'s cache.
+   */
+  url: string;
+};
+
 /**
  * Service for managing thumbnails for annotated sections of a document.
  *
  * @inject
  */
 export class ThumbnailService {
-  /** Map of annotation tag to thumbnail image. */
-  #cache = new Map<string, ImageBitmap>();
+  /** Map of annotation tag to thumbnail. */
+  #cache = new Map<string, Thumbnail>();
 
   /** Max thumbnails to keep in cache. */
   #cacheSize = 30;
@@ -34,6 +59,10 @@ export class ThumbnailService {
     // Keys are visited in insertion order, so the least recently used entry
     // will be visited first.
     for (const tag of this.#cache.keys()) {
+      const entry = this.#cache.get(tag);
+      if (entry) {
+        URL.revokeObjectURL(entry.url);
+      }
       this.#cache.delete(tag);
       if (this.#cache.size <= this.cacheSize) {
         break;
@@ -53,20 +82,22 @@ export class ThumbnailService {
   async fetch(
     tag: string,
     options: RenderToBitmapOptions = {},
-  ): Promise<ImageBitmap> {
+  ): Promise<Thumbnail> {
     const entry = this.get(tag);
     if (entry) {
       return entry;
     }
 
     const bitmap = await this.#frameSync.requestThumbnail(tag, options);
-    this.#cache.set(tag, bitmap);
+    const url = await bitmapToImageURL(bitmap);
+    const thumbnail = { url, width: bitmap.width, height: bitmap.height };
+    this.#cache.set(tag, thumbnail);
 
     if (this.#cache.size > this.cacheSize) {
       this.#pruneCache();
     }
 
-    return bitmap;
+    return thumbnail;
   }
 
   /**
@@ -76,18 +107,18 @@ export class ThumbnailService {
    * {@link ThumbnailService.fetch} must be called to generate and cache a new
    * thumbnail.
    */
-  get(tag: string): ImageBitmap | null {
-    const bitmap = this.#cache.get(tag);
-    if (!bitmap) {
+  get(tag: string): Thumbnail | null {
+    const thumbnail = this.#cache.get(tag);
+    if (!thumbnail) {
       return null;
     }
 
     // Move this entry to the back of the cache's key list, so it becomes
     // the most recently used.
     this.#cache.delete(tag);
-    this.#cache.set(tag, bitmap);
+    this.#cache.set(tag, thumbnail);
 
-    return bitmap;
+    return thumbnail;
   }
 
   /**

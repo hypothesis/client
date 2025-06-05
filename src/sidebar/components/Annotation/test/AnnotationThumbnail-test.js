@@ -17,8 +17,7 @@ describe('AnnotationThumbnail', () => {
   };
 
   beforeEach(async () => {
-    const imageData = new ImageData(32, 32);
-    fakeThumbnail = await createImageBitmap(imageData);
+    fakeThumbnail = { url: 'blob:1234', width: 256, height: 256 };
     fakeThumbnailService = {
       get: sinon.stub().returns(null),
       fetch: sinon.stub().resolves(fakeThumbnail),
@@ -27,7 +26,7 @@ describe('AnnotationThumbnail', () => {
 
   it('renders a placeholder if thumbnail is not available', () => {
     const wrapper = createComponent();
-    assert.isFalse(wrapper.exists('BitmapImage'));
+    assert.isFalse(wrapper.exists('img'));
     assert.isTrue(wrapper.exists('[data-testid="placeholder"]'));
   });
 
@@ -35,7 +34,7 @@ describe('AnnotationThumbnail', () => {
     fakeThumbnailService.get.returns(fakeThumbnail);
     const wrapper = createComponent();
     assert.isFalse(wrapper.exists('[data-testid="placeholder"]'));
-    assert.isTrue(wrapper.exists('BitmapImage'));
+    assert.isTrue(wrapper.exists('img'));
   });
 
   [
@@ -58,16 +57,16 @@ describe('AnnotationThumbnail', () => {
     it('sets alt text for thumbnail', () => {
       fakeThumbnailService.get.returns(fakeThumbnail);
       const wrapper = createComponent({ description, textInImage });
-      const image = wrapper.find('canvas');
-      assert.equal(image.prop('aria-label'), expectedAlt);
+      const image = wrapper.find('img');
+      assert.equal(image.prop('alt'), expectedAlt);
     });
   });
 
   it('requests thumbnail and then renders it if not cached', async () => {
     const wrapper = createComponent();
     assert.calledOnce(fakeThumbnailService.fetch);
-    const thumbnail = await waitForElement(wrapper, 'BitmapImage');
-    assert.equal(thumbnail.prop('bitmap'), fakeThumbnail);
+    const thumbnail = await waitForElement(wrapper, 'img');
+    assert.equal(thumbnail.prop('src'), fakeThumbnail.url);
   });
 
   it('renders error indicator if thumbnail rendering failed', async () => {
