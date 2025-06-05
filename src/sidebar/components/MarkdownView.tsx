@@ -1,3 +1,4 @@
+import { StyledText } from '@hypothesis/annotations-ui';
 import { Popover } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import {
@@ -14,7 +15,6 @@ import type { InvalidMentionContent, MentionMode } from '../helpers/mentions';
 import { processAndReplaceMentionElements } from '../helpers/mentions';
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
-import StyledText from './StyledText';
 import MentionPopoverContent from './mentions/MentionPopoverContent';
 
 /** Return true if the point (x, y) lies within `rect`. */

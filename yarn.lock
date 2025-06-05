@@ -3121,6 +3121,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollup/plugin-alias@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@rollup/plugin-alias@npm:5.1.1"
+  peerDependencies:
+    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+  peerDependenciesMeta:
+    rollup:
+      optional: true
+  checksum: 742ccb82170542a8229444bc3961f4c9b0a9eff890662e77ad201a7e04a91d67fa6f68d85c997032aa1845f8b991cf1f9a3329c77b4b067be80dad3c25abfb6b
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-babel@npm:^6.0.0":
   version: 6.0.4
   resolution: "@rollup/plugin-babel@npm:6.0.4"
@@ -7858,6 +7870,7 @@ __metadata:
     "@hypothesis/frontend-testing": ^1.7.1
     "@npmcli/arborist": ^9.0.0
     "@octokit/rest": ^22.0.0
+    "@rollup/plugin-alias": ^5.1.1
     "@rollup/plugin-babel": ^6.0.0
     "@rollup/plugin-commonjs": ^28.0.0
     "@rollup/plugin-json": ^6.0.0
