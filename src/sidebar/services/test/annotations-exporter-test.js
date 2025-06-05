@@ -14,6 +14,14 @@ describe('AnnotationsExporter', () => {
   let exporter;
   const groupName = 'My group';
 
+  const shapeSelector = {
+    type: 'ShapeSelector',
+    shape: {
+      type: 'point',
+      x: 0,
+      y: 1,
+    },
+  };
   const pageSelector = page => ({
     type: 'PageSelector',
     label: `${page}`,
@@ -95,6 +103,15 @@ describe('AnnotationsExporter', () => {
         },
         {
           ...baseAnnotation,
+          target: [
+            {
+              description: 'An image',
+              selector: [shapeSelector],
+            },
+          ],
+        },
+        {
+          ...baseAnnotation,
           ...newReply(),
           target: targetWithSelectors(pageSelector(23)),
         },
@@ -118,7 +135,7 @@ http://example.com
 Group: ${groupName}
 Total users: 2
 Users: bill, jane
-Total annotations: 5
+Total annotations: 6
 Total replies: 1
 
 Annotation 1:
@@ -147,12 +164,20 @@ Tags: foo, bar
 Annotation 4:
 Created at: ${formattedNow}
 Author: bill
+Type: Annotation
+Description: An image
+Comment: Annotation text
+Tags: tag_1, tag_2
+
+Annotation 5:
+Created at: ${formattedNow}
+Author: bill
 Page: 23
 Type: Reply
 Comment: Annotation text
 Tags: tag_1, tag_2
 
-Annotation 5:
+Annotation 6:
 Created at: ${formattedNow}
 Author: bill
 Page: iii
@@ -208,18 +233,20 @@ Tags: tag_1, tag_2`,
       {
         separator: ',',
         buildExpectedContent:
-          date => `Created at,Author,Page,URL,Group,Type,Quote,Comment,Tags
+          date => `Created at,Author,Page,URL,Group,Type,Quote/description,Comment,Tags
 ${date},jane,,http://example.com,My group,Annotation,includes \t tabs,Annotation text,"foo,bar"
 ${date},bill,23,http://example.com,My group,Reply,"includes ""double quotes"", and commas",Annotation text,"tag_1,tag_2"
-${date},bill,iii,http://example.com,My group,Highlight,,Annotation text,`,
+${date},bill,iii,http://example.com,My group,Highlight,,Annotation text,
+${date},bill,,http://example.com,My group,Annotation,an image,Annotation text,`,
       },
       {
         separator: '\t',
         buildExpectedContent:
-          date => `Created at\tAuthor\tPage\tURL\tGroup\tType\tQuote\tComment\tTags
+          date => `Created at\tAuthor\tPage\tURL\tGroup\tType\tQuote/description\tComment\tTags
 ${date}\tjane\t\thttp://example.com\tMy group\tAnnotation\t"includes \t tabs"\tAnnotation text\tfoo,bar
 ${date}\tbill\t23\thttp://example.com\tMy group\tReply\t"includes ""double quotes"", and commas"\tAnnotation text\ttag_1,tag_2
-${date}\tbill\tiii\thttp://example.com\tMy group\tHighlight\t\tAnnotation text\t`,
+${date}\tbill\tiii\thttp://example.com\tMy group\tHighlight\t\tAnnotation text\t
+${date}\tbill\t\thttp://example.com\tMy group\tAnnotation\tan image\tAnnotation text\t`,
       },
     ].forEach(({ separator, buildExpectedContent }) => {
       it('generates CSV content with expected annotations and separator', () => {
@@ -243,6 +270,16 @@ ${date}\tbill\tiii\thttp://example.com\tMy group\tHighlight\t\tAnnotation text\t
             ...newHighlight(),
             tags: [],
             target: targetWithSelectors(pageSelector('iii')),
+          },
+          {
+            ...baseAnnotation,
+            tags: [],
+            target: [
+              {
+                description: 'an image',
+                selector: [shapeSelector],
+              },
+            ],
           },
         ];
 
@@ -272,7 +309,7 @@ ${date}\tbill\tiii\thttp://example.com\tMy group\tHighlight\t\tAnnotation text\t
 
       assert.equal(
         result,
-        `Created at,Author,Page,URL,Group,Type,Quote,Comment,Tags
+        `Created at,Author,Page,URL,Group,Type,Quote/description,Comment,Tags
 ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation text,"tag_1,tag_2"`,
       );
     });
@@ -313,6 +350,16 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
           ...newReply(),
           tags: [],
           target: targetWithSelectors(pageSelector('iii')),
+        },
+        {
+          ...baseAnnotation,
+          tags: [],
+          target: [
+            {
+              description: 'an image',
+              selector: [shapeSelector],
+            },
+          ],
         },
       ];
 
@@ -364,7 +411,7 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
           </tr>
           <tr>
             <td>Total annotations:</td>
-            <td>3</td>
+            <td>4</td>
           </tr>
           <tr>
             <td>Total replies:</td>
@@ -478,6 +525,35 @@ ${formattedNow},John Doe,,http://example.com,My group,Annotation,,Annotation tex
             <tr>
               <td>Type:</td>
               <td>Reply</td>
+            </tr>
+            <tr>
+              <td>Comment:</td>
+              <td>Annotation text</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+      <article>
+        <h2>Annotation 4:</h2>
+        <table>
+          <tbody style="vertical-align:top;">
+            <tr>
+              <td>Created at:</td>
+              <td>
+                <time datetime="${isoDate}">${formattedNow}</time>
+              </td>
+            </tr>
+            <tr>
+              <td>Author:</td>
+              <td>bill</td>
+            </tr>
+            <tr>
+              <td>Type:</td>
+              <td>Annotation</td>
+            </tr>
+            <tr>
+              <td>Description:</td>
+              <td>an image</td>
             </tr>
             <tr>
               <td>Comment:</td>
