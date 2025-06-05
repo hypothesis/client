@@ -1,3 +1,4 @@
+import { MarkdownView } from '@hypothesis/annotations-ui';
 import {
   Button,
   IconButton,
@@ -51,7 +52,6 @@ import {
 } from '../markdown-commands';
 import type { EditorState } from '../markdown-commands';
 import { getCaretCoordinates } from '../util/textarea-caret-position';
-import MarkdownView from './MarkdownView';
 import MentionSuggestionsPopover from './MentionSuggestionsPopover';
 
 /**

@@ -1,8 +1,3 @@
-import {
-  MentionPopoverContent,
-  StyledText,
-  renderMathAndMarkdown,
-} from '@hypothesis/annotations-ui';
 import { Popover } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import {
@@ -14,10 +9,15 @@ import {
   useState,
 } from 'preact/hooks';
 
-import type { Mention } from '../../types/api';
-import type { InvalidMentionContent, MentionMode } from '../helpers/mentions';
-import { processAndReplaceMentionElements } from '../helpers/mentions';
-import { replaceLinksWithEmbeds } from '../media-embedder';
+import { MentionPopoverContent, StyledText } from '../components';
+import { processAndReplaceMentionElements } from '../helpers';
+import type {
+  InvalidMentionContent,
+  MentionMode,
+  Mention,
+} from '../helpers/mentions';
+import { renderMathAndMarkdown } from '../utils';
+import { replaceLinksWithEmbeds } from '../utils/media-embedder';
 
 /** Return true if the point (x, y) lies within `rect`. */
 function rectContainsPoint(rect: DOMRect, x: number, y: number): boolean {
@@ -76,7 +76,7 @@ type PopoverContent = Mention | InvalidMentionContent | null;
  * A component which renders markdown as HTML, replaces recognized links with
  * embedded video/audio and processes mention tags.
  */
-export default function MarkdownView(props: MarkdownViewProps) {
+export function MarkdownView(props: MarkdownViewProps) {
   /* istanbul ignore next - Unpack here to ignore default values for test seams */
   const {
     markdown,

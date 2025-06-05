@@ -1,3 +1,4 @@
+import { MarkdownView } from '@hypothesis/annotations-ui';
 import { Button, CollapseIcon, ExpandIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo, useState } from 'preact/hooks';
@@ -11,7 +12,6 @@ import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
 import Excerpt from '../Excerpt';
-import MarkdownView from '../MarkdownView';
 import TagList from '../TagList';
 import TagListItem from '../TagListItem';
 

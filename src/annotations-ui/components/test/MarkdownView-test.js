@@ -6,7 +6,7 @@ import {
 } from '@hypothesis/frontend-testing';
 import sinon from 'sinon';
 
-import MarkdownView, { $imports } from '../MarkdownView';
+import { MarkdownView, $imports } from '../MarkdownView';
 
 describe('MarkdownView', () => {
   let fakeRenderMathAndMarkdown;
@@ -39,13 +39,13 @@ describe('MarkdownView', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../render-markdown': {
+      '../utils': {
         renderMathAndMarkdown: fakeRenderMathAndMarkdown,
       },
-      '../media-embedder': {
+      '../utils/media-embedder': {
         replaceLinksWithEmbeds: fakeReplaceLinksWithEmbeds,
       },
-      '../helpers/mentions': {
+      '../helpers': {
         processAndReplaceMentionElements: fakeProcessAndReplaceMentionElements,
       },
     });
