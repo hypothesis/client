@@ -1,10 +1,10 @@
+import { StyledText } from '@hypothesis/annotations-ui';
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../../types/config';
 import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
 import Excerpt from '../Excerpt';
-import StyledText from '../StyledText';
 
 type AnnotationQuoteProps = {
   quote: string;

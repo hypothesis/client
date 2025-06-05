@@ -21,7 +21,12 @@
     // Prevent automatic inclusion of global variables defined in `@types/<name>` packages.
     // This prevents eg. Node globals from `@types/node` being included when writing
     // code for the browser.
-    "types": []
+    "types": [],
+
+    "paths": {
+      "@hypothesis/annotations-ui/*": ["annotations-ui/*"],
+      "@hypothesis/annotations-ui": ["annotations-ui"]
+    }
   },
   "include": ["**/*.js", "**/*.ts", "**/*.tsx", "types/*.d.ts"],
   "exclude": [
