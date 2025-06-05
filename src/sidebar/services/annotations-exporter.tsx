@@ -1,3 +1,4 @@
+import { renderMathAndMarkdown } from '@hypothesis/annotations-ui';
 import renderToString from 'preact-render-to-string/jsx';
 
 import type { CSVSeparator } from '../../shared/csv';
@@ -15,7 +16,6 @@ import {
 import { annotationDisplayName } from '../helpers/annotation-user';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
-import { renderMathAndMarkdown } from '../render-markdown';
 import { formatSortableDateTime } from '../util/time';
 
 export type JSONExportContent = {

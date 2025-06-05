@@ -1,4 +1,8 @@
-import { MentionPopoverContent, StyledText } from '@hypothesis/annotations-ui';
+import {
+  MentionPopoverContent,
+  StyledText,
+  renderMathAndMarkdown,
+} from '@hypothesis/annotations-ui';
 import { Popover } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import {
@@ -14,7 +18,6 @@ import type { Mention } from '../../types/api';
 import type { InvalidMentionContent, MentionMode } from '../helpers/mentions';
 import { processAndReplaceMentionElements } from '../helpers/mentions';
 import { replaceLinksWithEmbeds } from '../media-embedder';
-import { renderMathAndMarkdown } from '../render-markdown';
 
 /** Return true if the point (x, y) lies within `rect`. */
 function rectContainsPoint(rect: DOMRect, x: number, y: number): boolean {
