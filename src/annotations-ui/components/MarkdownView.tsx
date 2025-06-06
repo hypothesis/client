@@ -9,13 +9,16 @@ import {
   useState,
 } from 'preact/hooks';
 
-import type { Mention } from '../../types/api';
-import type { InvalidMentionContent, MentionMode } from '../helpers/mentions';
-import { processAndReplaceMentionElements } from '../helpers/mentions';
-import { replaceLinksWithEmbeds } from '../media-embedder';
-import { renderMathAndMarkdown } from '../render-markdown';
-import StyledText from './StyledText';
-import MentionPopoverContent from './mentions/MentionPopoverContent';
+import MentionPopoverContent from '../components/MentionPopoverContent';
+import StyledText from '../components/StyledText';
+import { processAndReplaceMentionElements } from '../helpers';
+import type {
+  InvalidMentionContent,
+  MentionMode,
+  Mention,
+} from '../helpers/mentions';
+import { renderMathAndMarkdown } from '../utils';
+import { replaceLinksWithEmbeds } from '../utils/media-embedder';
 
 /** Return true if the point (x, y) lies within `rect`. */
 function rectContainsPoint(rect: DOMRect, x: number, y: number): boolean {

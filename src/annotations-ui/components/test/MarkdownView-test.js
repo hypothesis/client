@@ -39,13 +39,13 @@ describe('MarkdownView', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../render-markdown': {
+      '../utils': {
         renderMathAndMarkdown: fakeRenderMathAndMarkdown,
       },
-      '../media-embedder': {
+      '../utils/media-embedder': {
         replaceLinksWithEmbeds: fakeReplaceLinksWithEmbeds,
       },
-      '../helpers/mentions': {
+      '../helpers': {
         processAndReplaceMentionElements: fakeProcessAndReplaceMentionElements,
       },
     });

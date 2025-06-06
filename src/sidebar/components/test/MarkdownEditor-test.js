@@ -39,7 +39,7 @@ describe('MarkdownEditor', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../markdown-commands': fakeMarkdownCommands,
-      './MarkdownView': MarkdownView,
+      '@hypothesis/annotation-ui': { MarkdownView },
       '../../shared/user-agent': {
         isMacOS: fakeIsMacOS,
       },
