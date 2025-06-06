@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { IconButton, InfoIcon, Popover } from '@hypothesis/frontend-shared';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { withServices } from '../../service-context';
 import type { ThumbnailService, Thumbnail } from '../../services/thumbnail';
@@ -30,6 +31,8 @@ function AnnotationThumbnail({
     thumbnailService.get(tag),
   );
   const [error, setError] = useState<string>();
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const descriptionButtonRef = useRef();
 
   const devicePixelRatio = useMemo(() => window.devicePixelRatio, []);
   const maxWidth = 196;
@@ -52,22 +55,53 @@ function AnnotationThumbnail({
     altText = 'Thumbnail';
   }
 
+  const scaledWidth = thumbnail ? thumbnail.width / devicePixelRatio : 0;
+  const scaledHeight = thumbnail ? thumbnail.height / devicePixelRatio : 0;
+
   return (
     <div
-      className="flex flex-row justify-center"
+      className="flex flex-row justify-center relative"
       data-testid="thumbnail-container"
     >
       {thumbnail && (
         <img
           src={thumbnail.url}
           alt={altText}
-          title={altText}
           className="border rounded-md"
           style={{
-            width: `${thumbnail.width / devicePixelRatio}px`,
-            height: `${thumbnail.height / devicePixelRatio}px`,
+            width: `${scaledWidth}px`,
+            height: `${scaledHeight}px`,
           }}
         />
+      )}
+      {thumbnail && description && (
+        <>
+          <IconButton
+            classes="absolute top-0 text-[white] text-[16px]"
+            variant="custom"
+            icon={InfoIcon}
+            title="Image description"
+            onClick={() => setPopoverOpen(true)}
+            expanded={popoverOpen}
+            elementRef={descriptionButtonRef}
+            style={{
+              // Position info button towards top-right corner of thumbnail.
+              left: `calc(50% + ${scaledWidth}px / 2 - 32px)`,
+              // Add a drop shadow to make the white icon visible on thumbnails
+              // that have a light background.
+              filter: 'drop-shadow(grey 1px 1px 1px)',
+            }}
+          />
+          <Popover
+            open={popoverOpen}
+            align="right"
+            anchorElementRef={descriptionButtonRef}
+            onClose={() => setPopoverOpen(false)}
+            classes="p-2"
+          >
+            {description}
+          </Popover>
+        </>
       )}
       {!thumbnail && !error && (
         // TODO - Adjust size here so it matches the thumbnail after it has
