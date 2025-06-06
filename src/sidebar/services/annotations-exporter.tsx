@@ -1,4 +1,4 @@
-import { renderMathAndMarkdown } from '@hypothesis/annotations-ui';
+import { renderMathAndMarkdown } from '@hypothesis/annotation-ui';
 import renderToString from 'preact-render-to-string/jsx';
 
 import type { CSVSeparator } from '../../shared/csv';

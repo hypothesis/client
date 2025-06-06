@@ -1,4 +1,4 @@
-import { StyledText } from '@hypothesis/annotations-ui';
+import { StyledText } from '@hypothesis/annotation-ui';
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../../types/config';
