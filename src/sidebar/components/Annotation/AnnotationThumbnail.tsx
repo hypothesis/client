@@ -77,7 +77,7 @@ function AnnotationThumbnail({
       {thumbnail && description && (
         <>
           <IconButton
-            classes="absolute top-0 text-[white] text-[16px]"
+            classes="absolute text-[white] text-[16px]"
             variant="custom"
             icon={InfoIcon}
             title="Image description"
@@ -86,7 +86,14 @@ function AnnotationThumbnail({
             elementRef={descriptionButtonRef}
             style={{
               // Position info button towards top-right corner of thumbnail.
-              left: `calc(50% + ${scaledWidth}px / 2 - 32px)`,
+              //
+              // Conceptually we center the button on the top-right corner of
+              // the thumbnail, then offset it by 16px to bring it inside the
+              // thumbnail. The button size changes on touch displays, but the
+              // icon size is fixed.
+              left: `calc(50% + ${scaledWidth}px / 2 - 16px)`,
+              top: '16px',
+              transform: 'translateX(-50%) translateY(-50%)',
               // Add a drop shadow to make the white icon visible on thumbnails
               // that have a light background.
               filter: 'drop-shadow(grey 1px 1px 1px)',
