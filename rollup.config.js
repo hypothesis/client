@@ -80,7 +80,7 @@ function bundleConfig({ name, entry, format = 'es' }) {
       alias({
         entries: [
           {
-            find: '@hypothesis/annotations-ui',
+            find: '@hypothesis/annotation-ui',
             replacement: path.resolve(
               path.dirname(fileURLToPath(import.meta.url)),
               'src/annotations-ui',

@@ -3,7 +3,7 @@ import {
   AnnotationGroupInfo,
   AnnotationTimestamps,
   AnnotationUser,
-} from '@hypothesis/annotations-ui';
+} from '@hypothesis/annotation-ui';
 import {
   LinkButton,
   HighlightIcon,

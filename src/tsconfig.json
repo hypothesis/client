@@ -24,8 +24,8 @@
     "types": [],
 
     "paths": {
-      "@hypothesis/annotations-ui/*": ["./annotations-ui/*"],
-      "@hypothesis/annotations-ui": ["./annotations-ui"]
+      "@hypothesis/annotation-ui/*": ["./annotations-ui/*"],
+      "@hypothesis/annotation-ui": ["./annotations-ui"]
     }
   },
   "include": ["**/*.js", "**/*.ts", "**/*.tsx", "types/*.d.ts"],

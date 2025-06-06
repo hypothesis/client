@@ -1,4 +1,4 @@
-import { MarkdownView } from '@hypothesis/annotations-ui';
+import { MarkdownView } from '@hypothesis/annotation-ui';
 import { Button, CollapseIcon, ExpandIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo, useState } from 'preact/hooks';

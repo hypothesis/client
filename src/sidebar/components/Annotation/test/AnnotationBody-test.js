@@ -63,7 +63,7 @@ describe('AnnotationBody', () => {
       '../../helpers/account-id': { isThirdPartyUser: fakeIsThirdPartyUser },
       '../../helpers/theme': { applyTheme: fakeApplyTheme },
       '../../store': { useSidebarStore: () => fakeStore },
-      '@hypothesis/annotations-ui': { MarkdownView: () => null },
+      '@hypothesis/annotation-ui': { MarkdownView: () => null },
     });
   });
 

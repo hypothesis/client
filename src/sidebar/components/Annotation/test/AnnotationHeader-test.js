@@ -91,7 +91,7 @@ describe('AnnotationHeader', () => {
       '../../helpers/permissions': {
         isPrivate: fakeIsPrivate,
       },
-      '@hypothesis/annotations-ui': { AnnotationTimestamps: () => null },
+      '@hypothesis/annotation-ui': { AnnotationTimestamps: () => null },
     });
   });
 
