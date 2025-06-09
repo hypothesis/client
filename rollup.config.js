@@ -83,7 +83,7 @@ function bundleConfig({ name, entry, format = 'es' }) {
             find: '@hypothesis/annotation-ui',
             replacement: path.resolve(
               path.dirname(fileURLToPath(import.meta.url)),
-              'src/annotations-ui',
+              'src/annotation-ui',
             ),
           },
         ],
