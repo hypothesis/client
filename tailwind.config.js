@@ -9,6 +9,7 @@ export default {
     './src/sidebar/components/**/*.{js,ts,tsx}',
     './src/annotator/components/**/*.{js,ts,tsx}',
     './dev-server/ui-playground/components/**/*.{js,ts,tsx}',
+    './node_modules/@hypothesis/annotation-ui/lib/**/*.{js,ts,tsx}',
     './node_modules/@hypothesis/frontend-shared/lib/**/*.{js,ts,tsx}',
     // This module references `sidebar-frame` and related classes
     './src/annotator/sidebar.{js,ts,tsx}',
