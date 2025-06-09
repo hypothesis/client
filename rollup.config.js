@@ -1,4 +1,3 @@
-import alias from '@rollup/plugin-alias';
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
@@ -6,8 +5,6 @@ import replace from '@rollup/plugin-replace';
 import terser from '@rollup/plugin-terser';
 import virtual from '@rollup/plugin-virtual';
 import { readFileSync } from 'fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { string } from 'rollup-plugin-string';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -39,13 +36,6 @@ if (isProd) {
     }),
   );
 }
-
-// Absolute path to the annotation-ui directory, to alias the
-// `@hypothesis/annotation-ui` import
-export const annotationUiPath = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'src/annotation-ui',
-);
 
 function bundleConfig({ name, entry, format = 'es' }) {
   return {
@@ -84,14 +74,6 @@ function bundleConfig({ name, entry, format = 'es' }) {
     context: 'void(0)',
 
     plugins: [
-      alias({
-        entries: [
-          {
-            find: '@hypothesis/annotation-ui',
-            replacement: annotationUiPath,
-          },
-        ],
-      }),
       replace({
         preventAssignment: true,
         values: {

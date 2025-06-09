@@ -2,7 +2,6 @@ import { SummaryReporter } from '@hypothesis/frontend-testing/vitest';
 import { defineConfig } from 'vitest/config';
 
 import { excludeFromCoverage } from './rollup-tests.config.js';
-import { annotationUiPath } from './rollup.config.js';
 
 export default defineConfig({
   test: {
@@ -33,10 +32,6 @@ export default defineConfig({
       reporter: ['json', 'html'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: excludeFromCoverage,
-    },
-
-    alias: {
-      '@hypothesis/annotation-ui': annotationUiPath,
     },
   },
 });
