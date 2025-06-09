@@ -39,7 +39,7 @@ export default defineConfig({
     alias: {
       '@hypothesis/annotation-ui': path.resolve(
         path.dirname(fileURLToPath(import.meta.url)),
-        'src/annotations-ui',
+        'src/annotation-ui',
       ),
     },
   },
