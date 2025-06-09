@@ -1,9 +1,8 @@
 import { SummaryReporter } from '@hypothesis/frontend-testing/vitest';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 import { excludeFromCoverage } from './rollup-tests.config.js';
+import { annotationUiPath } from './rollup.config.js';
 
 export default defineConfig({
   test: {
@@ -37,10 +36,7 @@ export default defineConfig({
     },
 
     alias: {
-      '@hypothesis/annotation-ui': path.resolve(
-        path.dirname(fileURLToPath(import.meta.url)),
-        'src/annotation-ui',
-      ),
+      '@hypothesis/annotation-ui': annotationUiPath,
     },
   },
 });

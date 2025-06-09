@@ -40,6 +40,13 @@ if (isProd) {
   );
 }
 
+// Absolute path to the annotation-ui directory, to alias the
+// `@hypothesis/annotation-ui` import
+export const annotationUiPath = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  'src/annotation-ui',
+);
+
 function bundleConfig({ name, entry, format = 'es' }) {
   return {
     input: {
@@ -81,10 +88,7 @@ function bundleConfig({ name, entry, format = 'es' }) {
         entries: [
           {
             find: '@hypothesis/annotation-ui',
-            replacement: path.resolve(
-              path.dirname(fileURLToPath(import.meta.url)),
-              'src/annotation-ui',
-            ),
+            replacement: annotationUiPath,
           },
         ],
       }),
