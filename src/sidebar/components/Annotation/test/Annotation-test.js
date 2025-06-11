@@ -167,6 +167,30 @@ describe('Annotation', () => {
       assert.equal(thumbnail.prop('tag'), annotation.$tag);
       assert.equal(thumbnail.prop('description'), 'This is a thing');
       assert.equal(thumbnail.prop('textInImage'), 'Some text');
+      assert.equal(thumbnail.prop('showDescription'), true);
+    });
+
+    it('hides thumbnail description when editing', () => {
+      setEditingMode(true);
+      const annotation = fixtures.defaultAnnotation();
+      annotation.target[0].description = 'This is a thing';
+      annotation.target[0].selector = [
+        {
+          type: 'ShapeSelector',
+          shape: {
+            type: 'rect',
+            left: 0,
+            top: 10,
+            right: 10,
+            bottom: 0,
+          },
+          text: 'Some text',
+        },
+      ];
+      const wrapper = createComponent({ annotation });
+      const thumbnail = wrapper.find('AnnotationThumbnail');
+      assert.isTrue(thumbnail.exists());
+      assert.isFalse(thumbnail.prop('showDescription'));
     });
   });
 

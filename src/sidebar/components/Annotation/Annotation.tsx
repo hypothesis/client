@@ -132,6 +132,8 @@ function Annotation({
           tag={annotation.$tag}
           textInImage={targetShape.text}
           description={targetDescription}
+          // Don't show the description when it is also visible in an input field.
+          showDescription={!isEditing}
         />
       )}
       {annotationQuote && (
