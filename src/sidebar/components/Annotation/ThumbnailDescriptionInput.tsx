@@ -8,15 +8,15 @@ import {
 import classnames from 'classnames';
 import { useState, useRef } from 'preact/hooks';
 
-export type AnnotationThumbnailDescriptionProps = {
+export type ThumbnailDescriptionInputProps = {
   description: string;
   onEdit: (description: string) => void;
 };
 
-export default function AnnotationThumbnailDescription({
+export default function ThumbnailDescriptionInput({
   description,
   onEdit,
-}: AnnotationThumbnailDescriptionProps) {
+}: ThumbnailDescriptionInputProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const iconRef = useRef<HTMLButtonElement | null>(null);
 

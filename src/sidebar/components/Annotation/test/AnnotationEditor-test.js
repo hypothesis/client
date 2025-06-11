@@ -188,8 +188,7 @@ describe('AnnotationEditor', () => {
   });
 
   describe('editing target descriptions', () => {
-    const getDescription = wrapper =>
-      wrapper.find('AnnotationThumbnailDescription');
+    const getDescription = wrapper => wrapper.find('ThumbnailDescriptionInput');
 
     beforeEach(() => {
       fakeStore.isFeatureEnabled.withArgs('image_descriptions').returns(true);
@@ -209,7 +208,7 @@ describe('AnnotationEditor', () => {
         ],
       });
       const wrapper = createComponent({ annotation });
-      wrapper.find('AnnotationThumbnailDescription').prop('onEdit')(
+      wrapper.find('ThumbnailDescriptionInput').prop('onEdit')(
         'new-description',
       );
 

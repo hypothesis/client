@@ -32,7 +32,7 @@ import TagEditor from '../TagEditor';
 import { useUnsavedChanges } from '../hooks/unsaved-changes';
 import AnnotationLicense from './AnnotationLicense';
 import AnnotationPublishControl from './AnnotationPublishControl';
-import AnnotationThumbnailDescription from './AnnotationThumbnailDescription';
+import ThumbnailDescriptionInput from './ThumbnailDescriptionInput';
 
 type AnnotationEditorProps = {
   /** The annotation under edit */
@@ -287,7 +287,7 @@ function AnnotationEditor({
       onKeyDown={onKeyDown}
     >
       {showDescription && (
-        <AnnotationThumbnailDescription
+        <ThumbnailDescriptionInput
           description={description ?? ''}
           onEdit={onEditDescription}
         />
