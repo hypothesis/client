@@ -1,11 +1,11 @@
 import { mount } from '@hypothesis/frontend-testing';
 
-import AnnotationThumbnailDescription from '../AnnotationThumbnailDescription';
+import ThumbnailDescriptionInput from '../ThumbnailDescriptionInput';
 
-describe('AnnotationThumbnailDescription', () => {
+describe('ThumbnailDescriptionInput', () => {
   it('displays current description', () => {
     const wrapper = mount(
-      <AnnotationThumbnailDescription description="foo bar" />,
+      <ThumbnailDescriptionInput description="foo bar" />,
       // Needed for popover to work
       { connected: true },
     );
@@ -15,7 +15,7 @@ describe('AnnotationThumbnailDescription', () => {
   it('invokes `onEdit` when description is changed', () => {
     const onEdit = sinon.stub();
     const wrapper = mount(
-      <AnnotationThumbnailDescription description="foo bar" onEdit={onEdit} />,
+      <ThumbnailDescriptionInput description="foo bar" onEdit={onEdit} />,
       { connected: true },
     );
     const input = wrapper.find('input');
@@ -27,10 +27,9 @@ describe('AnnotationThumbnailDescription', () => {
   });
 
   it('displays alt-text info popover when info button is clicked', () => {
-    const wrapper = mount(
-      <AnnotationThumbnailDescription description="foo bar" />,
-      { connected: true },
-    );
+    const wrapper = mount(<ThumbnailDescriptionInput description="foo bar" />, {
+      connected: true,
+    });
     assert.isFalse(wrapper.find('Popover').prop('open'));
 
     wrapper.find('button').simulate('click');
