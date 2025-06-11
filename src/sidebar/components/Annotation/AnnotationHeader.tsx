@@ -14,7 +14,6 @@ import { useMemo } from 'preact/hooks';
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
 import {
-  domainAndTitle,
   isHighlight,
   isReply,
   hasBeenEdited,
@@ -80,24 +79,8 @@ function AnnotationHeader({
     return hasBeenEdited(annotation) && !isCollapsedReply;
   }, [annotation, isCollapsedReply]);
 
-  // Pull together some document metadata related to this annotation
-  const documentInfo = domainAndTitle(annotation);
-  // There are some cases at present in which linking directly to an
-  // annotation's document is not immediately feasible—e.g in an LMS context
-  // where the original document might not be available outside of an
-  // assignment (e.g. Canvas files), and/or wouldn't be able to present
-  // any associated annotations.
-  // For the present, disable links to annotation documents for all third-party
-  // annotations until we have a more nuanced way of making linking determinations.
-  // The absence of a link to a single-annotation view is a signal that this
-  // is a third-party annotation.
-  // Also, of course, verify that there is a URL to the document (titleLink)
-  const documentLink =
-    annotationURL && documentInfo.titleLink ? documentInfo.titleLink : '';
-  // Show document information on non-sidebar routes, assuming there is a title
-  // to show, at the least
-  const showDocumentInfo =
-    store.route() !== 'sidebar' && documentInfo.titleText;
+  // Show document information on non-sidebar routes only
+  const showDocumentInfo = store.route() !== 'sidebar';
 
   const onReplyCountClick = () =>
     // If an annotation has replies it must have been saved and therefore have
@@ -158,20 +141,15 @@ function AnnotationHeader({
               className="w-[10px] h-[10px] text-color-text-light"
             />
           )}
-          {(showDocumentInfo || pageNumber) && (
-            <span className="flex">
-              {showDocumentInfo && (
-                <AnnotationDocumentInfo
-                  domain={documentInfo.domain}
-                  link={documentLink}
-                  title={documentInfo.titleText}
-                />
-              )}
-              {pageNumber && (
-                <span className="text-grey-6" data-testid="page-number">
-                  {showDocumentInfo && ', '}p. {pageNumber}
-                </span>
-              )}
+          {showDocumentInfo && (
+            <div className="flex">
+              <AnnotationDocumentInfo annotation={annotation} />
+              {pageNumber && <span className="text-grey-6">, </span>}
+            </div>
+          )}
+          {pageNumber && (
+            <span className="text-grey-6" data-testid="page-number">
+              p. {pageNumber}
             </span>
           )}
         </div>

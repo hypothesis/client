@@ -1,4 +1,7 @@
-import { renderMathAndMarkdown } from '@hypothesis/annotation-ui';
+import {
+  documentMetadata,
+  renderMathAndMarkdown,
+} from '@hypothesis/annotation-ui';
 import renderToString from 'preact-render-to-string/jsx';
 
 import type { CSVSeparator } from '../../shared/csv';
@@ -7,7 +10,6 @@ import { trimAndDedent } from '../../shared/trim-and-dedent';
 import type { APIAnnotationData, Profile } from '../../types/api';
 import {
   annotationRole,
-  documentMetadata,
   isReply,
   pageLabel,
   description,
