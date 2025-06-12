@@ -1,10 +1,9 @@
-import { usePopoverShouldClose } from '@hypothesis/frontend-shared';
 import {
-  Card,
+  CopyIcon,
   IconButton,
   Input,
   InputGroup,
-  CopyIcon,
+  Popover,
   ShareIcon,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
@@ -18,7 +17,6 @@ import { withServices } from '../../service-context';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import { copyPlainText } from '../../util/copy-to-clipboard';
-import MenuArrow from '../MenuArrow';
 
 export type AnnotationShareControlProps = {
   /** The annotation in question */
@@ -60,8 +58,6 @@ function AnnotationShareControl({
 
   const toggleSharePanel = () => setOpen(!isOpen);
   const closePanel = () => setOpen(false);
-
-  usePopoverShouldClose(shareRef, closePanel, { enabled: isOpen });
 
   useEffect(() => {
     if (wasOpen.current !== isOpen) {
@@ -114,72 +110,61 @@ function AnnotationShareControl({
   );
 
   return (
-    // Make the container div focusable by setting a non-null `tabIndex`.
-    // This prevents clicks on non-focusable contents from "leaking out" and
-    // focusing a focusable ancester. If something outside of the panel gains
-    // focus, `usePopoverShouldClose`'s focus listener will close the panel.
-    // "Catch focus" here to prevent this.
-    // See https://github.com/hypothesis/client/issues/5196
-    <div className="relative" ref={shareRef} tabIndex={-1}>
+    <div className="relative" ref={shareRef}>
       <IconButton
         icon={ShareIcon}
         title="Share"
         onClick={toggleSharePanel}
         expanded={isOpen}
       />
-      {isOpen && (
-        <div
-          // Position this Card above its IconButton. Account for larger
-          // IconButtons in touch interfaces
-          className="absolute bottom-8 right-0 touch:bottom-touch-minimum"
-        >
-          <Card
-            classes={classnames(
-              // Prefer width 96 (24rem) but ensure that component isn't wider
-              // than 85vw
-              'w-96 max-w-[85vw]',
-              'space-y-2 p-2',
+      <Popover
+        open={isOpen}
+        onClose={closePanel}
+        anchorElementRef={shareRef}
+        align="right"
+        placement="above"
+        arrow
+        classes={classnames({
+          // Set explicit width for browsers not supporting native popover API
+          'w-max':
+            // eslint-disable-next-line no-prototype-builtins
+            !HTMLElement.prototype.hasOwnProperty('popover'),
+        })}
+      >
+        <div className="p-2 flex flex-col gap-y-2">
+          <h2 className="text-brand text-md font-medium">
+            Share this annotation
+          </h2>
+          <div className="flex w-full text-base">
+            <InputGroup>
+              <Input
+                aria-label="Use this URL to share this annotation"
+                type="text"
+                value={shareUri}
+                readOnly
+                elementRef={inputRef}
+              />
+              <IconButton
+                icon={CopyIcon}
+                title="Copy share link to clipboard"
+                onClick={copyShareLink}
+                variant="dark"
+              />
+            </InputGroup>
+          </div>
+          <div className="text-base font-normal" data-testid="share-details">
+            {inContextAvailable ? (
+              <>{annotationSharingInfo}</>
+            ) : (
+              <>
+                This annotation cannot be shared in its original context because
+                it was made on a document that is not available on the web. This
+                link shares the annotation by itself.
+              </>
             )}
-            width="custom"
-          >
-            <h2 className="text-brand text-md font-medium">
-              Share this annotation
-            </h2>
-            <div className="flex w-full text-base">
-              <InputGroup>
-                <Input
-                  aria-label="Use this URL to share this annotation"
-                  type="text"
-                  value={shareUri}
-                  readOnly
-                  elementRef={inputRef}
-                />
-                <IconButton
-                  icon={CopyIcon}
-                  title="Copy share link to clipboard"
-                  onClick={copyShareLink}
-                  variant="dark"
-                />
-              </InputGroup>
-            </div>
-            <div className="text-base font-normal" data-testid="share-details">
-              {inContextAvailable ? (
-                <>{annotationSharingInfo}</>
-              ) : (
-                <>
-                  This annotation cannot be shared in its original context
-                  because it was made on a document that is not available on the
-                  web. This link shares the annotation by itself.
-                </>
-              )}
-            </div>
-            <MenuArrow
-              direction="down"
-              classes="bottom-[-8px] right-2 touch:right-[9px]"
-            />
-          </Card>
+          </div>
         </div>
-      )}
+      </Popover>
     </div>
   );
 }
