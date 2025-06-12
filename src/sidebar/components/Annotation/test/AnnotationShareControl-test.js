@@ -80,9 +80,6 @@ describe('AnnotationShareControl', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '@hypothesis/frontend-shared': {
-        usePopoverShouldClose: sinon.stub(),
-      },
       '../../helpers/annotation-sharing': {
         isShareableURI: fakeIsShareableURI,
       },
@@ -119,7 +116,7 @@ describe('AnnotationShareControl', () => {
     });
     wrapper.update();
 
-    assert.isTrue(wrapper.find('Card').exists());
+    assert.isTrue(wrapper.find('Popover').prop('open'));
   });
 
   it('renders the share URI in a readonly input field', () => {
