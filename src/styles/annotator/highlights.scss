@@ -8,7 +8,6 @@
   --hypothesis-highlight-thirdColor: transparent;
 
   --hypothesis-highlight-focused-color: rgba(156, 230, 255, 0.5);
-  --hypothesis-highlight-text-color: inherit;
 
   --hypothesis-color-cyan: #cffafe;
 
@@ -52,8 +51,6 @@
 
   // Clustered highlight styling configuration
   // These values are updated by the `highlight-clusters` module
-  --hypothesis-cluster-text-color: #333333;
-
   --hypothesis-other-content-color: var(--hypothesis-color-yellow);
   --hypothesis-other-content-secondColor: var(--hypothesis-color-yellow);
   --hypothesis-other-content-thirdColor: var(--hypothesis-color-yellow);
@@ -72,7 +69,6 @@
 .hypothesis-highlight,
 .hypothesis-svg-highlight {
   --highlight-color: var(--hypothesis-highlight-color);
-  --highlight-text-color: var(--hypothesis-highlight-text-color);
   --highlight-color-focused: var(--hypothesis-highlight-focused-color);
 
   & .hypothesis-highlight {
@@ -140,10 +136,6 @@
     --highlight-color-focused: var(--hypothesis-color-cyan);
   }
 
-  .hypothesis-highlight {
-    --highlight-text-color: var(--hypothesis-cluster-text-color);
-  }
-
   @include clusterHighlightStyles('user-highlights');
   @include clusterHighlightStyles('user-annotations');
   @include clusterHighlightStyles('other-content');
@@ -181,7 +173,11 @@
 }
 
 .hypothesis-highlights-always-on .hypothesis-highlight {
-  color: var(--highlight-text-color);
+  // Set the background for highlights. The highlight colors currently work
+  // well for pages with light backgrounds, but can impair readability if the
+  // page has dark background / light text. We could override the color as well,
+  // but this causes problems for web pages which rely on text colors to
+  // distinguish links or other semantically important elements.
   background-color: var(--highlight-color);
 
   cursor: pointer;
