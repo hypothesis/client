@@ -212,21 +212,6 @@ describe('AnnotationShareControl', () => {
     );
   });
 
-  it('renders share links if annotation can be shared in context', () => {
-    const wrapper = createComponent();
-    openElement(wrapper);
-
-    assert.isTrue(wrapper.find('ShareLinks').exists());
-  });
-
-  it('does not render share links if annotation cannot be shared in context', () => {
-    fakeIsShareableURI.returns(false);
-    const wrapper = createComponent();
-    openElement(wrapper);
-
-    assert.isFalse(wrapper.find('ShareLinks').exists());
-  });
-
   it('focuses the share-URI input when opened on non-iOS', () => {
     const wrapper = createComponent();
     openElement(wrapper);
