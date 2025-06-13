@@ -12,7 +12,6 @@ import { withServices } from '../../service-context';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import { copyPlainText } from '../../util/copy-to-clipboard';
-import ShareLinks from '../ShareLinks';
 import LoadingSpinner from './LoadingSpinner';
 
 export type ShareAnnotationsProps = {
@@ -98,9 +97,6 @@ function ShareAnnotations({ toastMessenger }: ShareAnnotationsProps) {
               <em>Only Me</em>) annotations are only visible to you.
             </span>
           </p>
-          <div className="text-[24px]">
-            <ShareLinks shareURI={shareURI} />
-          </div>
         </>
       ) : (
         <p data-testid="no-sharing">

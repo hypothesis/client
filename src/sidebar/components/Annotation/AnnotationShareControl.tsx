@@ -19,7 +19,6 @@ import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import { copyPlainText } from '../../util/copy-to-clipboard';
 import MenuArrow from '../MenuArrow';
-import ShareLinks from '../ShareLinks';
 
 export type AnnotationShareControlProps = {
   /** The annotation in question */
@@ -81,17 +80,6 @@ function AnnotationShareControl({
     // not yet been unloaded, e.g. on logout if a private group was focused
     return null;
   }
-
-  // NB: Sharing links (social media/email) are not currently shown for `html`
-  // links. There are two reasons for this:
-  // - Lack of vertical real estate available. The explanatory text about `html`
-  //   links takes up several lines. Adding the sharing links below this runs
-  //   the risk of interfering with the top bar or other elements outside of the
-  //   annotation's card. This may be rectified with a design tweak, perhaps.
-  // - Possible confusion about what the sharing link does. The difference
-  //   between an `incontext` and `html` link likely isn't clear to users. This
-  //   bears further discussion.
-  const showShareLinks = inContextAvailable;
 
   const copyShareLink = async () => {
     try {
@@ -185,7 +173,6 @@ function AnnotationShareControl({
                 </>
               )}
             </div>
-            {showShareLinks && <ShareLinks shareURI={shareUri} />}
             <MenuArrow
               direction="down"
               classes="bottom-[-8px] right-2 touch:right-[9px]"
