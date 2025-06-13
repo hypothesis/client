@@ -119,7 +119,7 @@ describe('AnnotationShareControl', () => {
     });
     wrapper.update();
 
-    assert.isTrue(wrapper.find('Card').exists());
+    assert.isTrue(wrapper.find('Popover').prop('open'));
   });
 
   it('renders the share URI in a readonly input field', () => {
