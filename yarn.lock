@@ -2683,8 +2683,8 @@ __metadata:
   linkType: hard
 
 "@npmcli/arborist@npm:^9.0.0":
-  version: 9.1.1
-  resolution: "@npmcli/arborist@npm:9.1.1"
+  version: 9.1.2
+  resolution: "@npmcli/arborist@npm:9.1.2"
   dependencies:
     "@isaacs/string-locale-compare": ^1.1.0
     "@npmcli/fs": ^4.0.0
@@ -2722,7 +2722,7 @@ __metadata:
     walk-up-path: ^4.0.0
   bin:
     arborist: bin/index.js
-  checksum: 798ccb2353a0a76157f66722be8bdcb0a92a513c0567c85aeaa4e2e7bf2e4cb591274f9156599429f0ae05c9e472bfbf9888582eb39f2bdd77d9a70d9bfcec85
+  checksum: 31d53664c4457a4cf2d9fc272d69f8b621b90e2a448853d0d9342eb136080cda0686625909fdc148b1b6a424f0c0d989eb75d11906d97692c00a2e5bfd82bdc8
   languageName: node
   linkType: hard
 
