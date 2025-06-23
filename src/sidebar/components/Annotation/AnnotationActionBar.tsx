@@ -12,10 +12,6 @@ import type { SavedAnnotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
 import { serviceConfig } from '../../config/service-config';
 import { annotationRole } from '../../helpers/annotation-metadata';
-import {
-  sharingEnabled,
-  annotationSharingLink,
-} from '../../helpers/annotation-sharing';
 import { isPrivate, permits } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
@@ -72,9 +68,6 @@ function AnnotationActionBar({
     !!userProfile.userid &&
     userProfile.userid !== annotation.user;
 
-  const shareLink =
-    sharingEnabled(settings) && annotationSharingLink(annotation);
-
   const onDelete = async () => {
     const annType = annotationRole(annotation);
     if (
@@ -125,9 +118,7 @@ function AnnotationActionBar({
         <IconButton icon={TrashIcon} title="Delete" onClick={onDelete} />
       )}
       <IconButton icon={ReplyIcon} title="Reply" onClick={onReplyClick} />
-      {shareLink && (
-        <AnnotationShareControl annotation={annotation} shareUri={shareLink} />
-      )}
+      <AnnotationShareControl annotation={annotation} />
       {showFlagAction && !annotation.flagged && (
         <IconButton
           icon={FlagIcon}
