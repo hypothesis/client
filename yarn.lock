@@ -2453,16 +2453,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hypothesis/annotation-ui@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "@hypothesis/annotation-ui@npm:0.2.0"
+"@hypothesis/annotation-ui@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@hypothesis/annotation-ui@npm:0.3.0"
   peerDependencies:
     "@hypothesis/frontend-shared": ^9.4.0
     dompurify: ^3.0.0
     escape-html: ^1.0.3
     katex: ^0.16.0
     showdown: ^2.0.0
-  checksum: b7418856c4af72c813a5d3a6ae0c4155b010c3b320606ed75369574222914a209de9f0ff6d1d2ff03cde9c79ad70348f49f3303c49a35637ac18eaa1a23e6b97
+  checksum: aa2bf243e0867905094984c3ec57c2261755180f7f94cf63a7202a21f25196191045cada4d0d82306561264d676642f39eecb14f73eae6be4e423a55a921da1f
   languageName: node
   linkType: hard
 
@@ -7933,7 +7933,7 @@ __metadata:
     "@babel/preset-env": ^7.1.6
     "@babel/preset-react": ^7.0.0
     "@babel/preset-typescript": ^7.16.7
-    "@hypothesis/annotation-ui": ^0.2.0
+    "@hypothesis/annotation-ui": ^0.3.0
     "@hypothesis/frontend-build": ^4.0.0
     "@hypothesis/frontend-shared": ^9.5.1
     "@hypothesis/frontend-testing": ^1.7.1
