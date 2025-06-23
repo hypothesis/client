@@ -65,7 +65,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "express": "^5.0.1",
     "fancy-log": "^2.0.0",
-    "fetch-mock": "11",
+    "fetch-mock": "12",
     "globals": "^16.0.0",
     "gulp": "^5.0.0",
     "gulp-changed": "^5.0.1",
