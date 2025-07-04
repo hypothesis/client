@@ -1,4 +1,5 @@
 import type { Annotator, Integration } from '../../types/annotator';
+import { BookReaderIntegration, isBookReader } from './BookReader';
 import { HTMLIntegration } from './html';
 import { PDFIntegration, isPDF } from './pdf';
 import {
@@ -16,6 +17,10 @@ export function createIntegration(annotator: Annotator): Integration {
       annotator: annotator,
       features: annotator.features,
     });
+  }
+
+  if (isBookReader()) {
+    return new BookReaderIntegration(annotator);
   }
 
   const vsFrameRole = vitalSourceFrameRole();
