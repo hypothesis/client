@@ -166,9 +166,12 @@ export class PDFMetadata {
     // is preferred if available.
     //
     // This logic is similar to how PDF.js sets `document.title`.
+
+    const dcTitle = metadata?.get('dc:title');
+
     let title;
-    if (metadata?.has('dc:title') && metadata.get('dc:title') !== 'Untitled') {
-      title = metadata.get('dc:title');
+    if (dcTitle && dcTitle !== 'Untitled') {
+      title = dcTitle;
     } else if (documentInfo?.Title) {
       title = documentInfo.Title;
     } else if (contentDispositionFilename) {
