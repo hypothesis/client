@@ -1,3 +1,6 @@
+import type { SidebarSettings } from '../../types/config';
+import { serviceConfig } from '../config/service-config';
+
 /**
  * Generate a URI for sharing: a bouncer link built to share annotations in
  * a specific group (groupID) on a specific document (documentURI). If the
@@ -22,4 +25,16 @@ export function pageSharingLink(
  */
 export function isShareableURI(uri: string): boolean {
   return /^http(s?):/i.test(uri);
+}
+
+/**
+ * Return true if annotation sharing is globally enabled in the client's
+ * configuration.
+ *
+ * Sharing is enabled by default but can be disabled when a third party
+ * authority is being used.
+ */
+export function sharingEnabled(settings: SidebarSettings): boolean {
+  const service = serviceConfig(settings);
+  return service?.enableShareLinks !== false;
 }

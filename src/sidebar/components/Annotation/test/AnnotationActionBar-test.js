@@ -21,6 +21,7 @@ describe('AnnotationActionBar', () => {
   let fakePermits;
   let fakeSettings;
   // Fake dependencies
+  let fakeSharingEnabled;
   let fakeStore;
 
   function createComponent(props = {}) {
@@ -76,6 +77,8 @@ describe('AnnotationActionBar', () => {
     fakePermits = sinon.stub().returns(true);
     fakeSettings = {};
 
+    fakeSharingEnabled = sinon.stub().returns(true);
+
     fakeStore = {
       createDraft: sinon.stub(),
       isLoggedIn: sinon.stub(),
@@ -88,6 +91,9 @@ describe('AnnotationActionBar', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '@hypothesis/frontend-shared': { confirm: fakeConfirm },
+      '../../helpers/annotation-sharing': {
+        sharingEnabled: fakeSharingEnabled,
+      },
       '../../helpers/permissions': { permits: fakePermits },
       '../../store': { useSidebarStore: () => fakeStore },
     });
@@ -240,12 +246,17 @@ describe('AnnotationActionBar', () => {
   });
 
   describe('share action button', () => {
-    it('forwards annotation to AnnotationShareControl', () => {
+    it('shows share action button if annotation is shareable', () => {
       const wrapper = createComponent();
-      assert.equal(
-        wrapper.find('AnnotationShareControl').prop('annotation'),
-        fakeAnnotation,
-      );
+
+      assert.isTrue(wrapper.find('AnnotationShareControl').exists());
+    });
+
+    it('does not show share action button if sharing is not enabled', () => {
+      fakeSharingEnabled.returns(false);
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('AnnotationShareControl').exists());
     });
   });
 

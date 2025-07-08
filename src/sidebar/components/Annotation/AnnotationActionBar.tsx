@@ -12,6 +12,7 @@ import type { SavedAnnotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
 import { serviceConfig } from '../../config/service-config';
 import { annotationRole } from '../../helpers/annotation-metadata';
+import { sharingEnabled } from '../../helpers/annotation-sharing';
 import { isPrivate, permits } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
@@ -109,6 +110,8 @@ function AnnotationActionBar({
     onReply();
   };
 
+  const showShareAction = sharingEnabled(settings);
+
   return (
     <div className="flex text-[16px]" data-testid="annotation-action-bar">
       {showEditAction && (
@@ -118,7 +121,7 @@ function AnnotationActionBar({
         <IconButton icon={TrashIcon} title="Delete" onClick={onDelete} />
       )}
       <IconButton icon={ReplyIcon} title="Reply" onClick={onReplyClick} />
-      <AnnotationShareControl annotation={annotation} />
+      {showShareAction && <AnnotationShareControl annotation={annotation} />}
       {showFlagAction && !annotation.flagged && (
         <IconButton
           icon={FlagIcon}
