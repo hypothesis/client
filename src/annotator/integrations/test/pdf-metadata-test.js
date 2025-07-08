@@ -19,10 +19,6 @@ class FakeMetadata {
   get(key) {
     return this._metadata[key];
   }
-
-  has(key) {
-    return Object.hasOwn(this._metadata, key);
-  }
 }
 
 /**

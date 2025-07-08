@@ -18,8 +18,7 @@
  * See `Metadata` class from `display/metadata.js` in PDF.js.
  */
 export type Metadata = {
-  get(name: string): string;
-  has(name: string): boolean;
+  get(name: string): string | null;
 };
 
 /**
