@@ -44,8 +44,8 @@ type AnnotationEditorProps = {
   annotationsService: AnnotationsService;
   groups: GroupsService;
   settings: SidebarSettings;
-  toastMessenger: ToastMessengerService;
   tags: TagsService;
+  toastMessenger: ToastMessengerService;
 };
 
 /**
@@ -53,8 +53,8 @@ type AnnotationEditorProps = {
  */
 function AnnotationEditor({
   annotation,
-  draft,
   annotationsService,
+  draft,
   groups: groupsService,
   settings,
   tags: tagsService,
