@@ -4,7 +4,11 @@ import { isShared } from '../helpers/permissions';
 import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 
 /**
- * Send messages to configured ancestor frame on annotation activity
+ * Service for sending messages to the embedder frame.
+ *
+ * This is primarily used in the Hypothesis LMS app, where the client sends
+ * the LMS frontend notifications about annotation activity happening in the
+ * client.
  */
 // @inject
 export class AnnotationActivityService {
@@ -43,12 +47,28 @@ export class AnnotationActivityService {
     };
 
     if (this._reportConfig.events.includes(eventType)) {
-      postMessageJsonRpc.notify(
-        this._rpc.targetFrame,
-        this._rpc.origin,
-        this._reportConfig.method,
-        [eventType, data],
-      );
+      this.notify(this._reportConfig.method, [eventType, data]);
     }
+  }
+
+  /**
+   * Notify the embedder frame that the client has, or does not have,
+   * unsaved changes to annotations.
+   */
+  notifyUnsavedChanges(unsaved: boolean) {
+    this.notify('reportUnsavedChanges', [{ unsaved }]);
+  }
+
+  /** Send a JSON-RPC message to the embedder frame. */
+  private notify(method: string, args: unknown[]) {
+    if (!this._rpc) {
+      return;
+    }
+    postMessageJsonRpc.notify(
+      this._rpc.targetFrame,
+      this._rpc.origin,
+      method,
+      args,
+    );
   }
 }

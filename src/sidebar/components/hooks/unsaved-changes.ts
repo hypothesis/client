@@ -1,5 +1,8 @@
 import { useEffect } from 'preact/hooks';
 
+import { useService } from '../../service-context';
+import type { AnnotationActivityService } from '../../services/annotation-activity';
+
 /** Count of components with unsaved changes. */
 let unsavedCount = 0;
 
@@ -36,6 +39,9 @@ export function useUnsavedChanges(
   /* istanbul ignore next - test seam */
   window_ = window,
 ) {
+  const annotationActivity = useService(
+    'annotationActivity',
+  ) as AnnotationActivityService;
   useEffect(() => {
     if (!hasUnsavedChanges) {
       return () => {};
@@ -43,13 +49,19 @@ export function useUnsavedChanges(
 
     unsavedCount += 1;
     if (unsavedCount === 1) {
+      // Notify embedder frame (eg. LMS app) about unsaved changes. This works
+      // around an issue in desktop Safari. See https://github.com/hypothesis/support/issues/59#issuecomment-3068704178.
+      annotationActivity.notifyUnsavedChanges(true);
       window_.addEventListener('beforeunload', preventUnload);
     }
     return () => {
       unsavedCount -= 1;
       if (unsavedCount === 0) {
+        // Notify embedder frame (eg. LMS app) about unsaved changes. This works
+        // around an issue in desktop Safari. See https://github.com/hypothesis/support/issues/59#issuecomment-3068704178.
+        annotationActivity.notifyUnsavedChanges(false);
         window_.removeEventListener('beforeunload', preventUnload);
       }
     };
-  }, [hasUnsavedChanges, window_]);
+  }, [annotationActivity, hasUnsavedChanges, window_]);
 }
