@@ -156,4 +156,29 @@ describe('AnnotationActivityService', () => {
       });
     });
   });
+
+  describe('#notifyUnsavedChanges', () => {
+    [true, false].forEach(unsaved => {
+      it('sends reportUnsavedChanges notification with unsaved state', () => {
+        const svc = new AnnotationActivityService(fakeSettings);
+
+        svc.notifyUnsavedChanges(unsaved);
+
+        assert.calledOnce(fakePostMessageJsonRpc.notify);
+        assert.calledWith(
+          fakePostMessageJsonRpc.notify,
+          window,
+          'https://www.example.com',
+          'reportUnsavedChanges',
+          [{ unsaved }],
+        );
+      });
+    });
+
+    it('does not send notification if RPC is not configured', () => {
+      const svc = new AnnotationActivityService({});
+      svc.notifyUnsavedChanges(true);
+      assert.notCalled(fakePostMessageJsonRpc.notify);
+    });
+  });
 });

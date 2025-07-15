@@ -21,6 +21,7 @@ import { combineUsersForMentions } from '../../helpers/mention-suggestions';
 import type { MentionMode } from '../../helpers/mentions';
 import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
+import type { AnnotationActivityService } from '../../services/annotation-activity';
 import type { AnnotationsService } from '../../services/annotations';
 import type { GroupsService } from '../../services/groups';
 import type { TagsService } from '../../services/tags';
@@ -44,8 +45,8 @@ type AnnotationEditorProps = {
   annotationsService: AnnotationsService;
   groups: GroupsService;
   settings: SidebarSettings;
-  toastMessenger: ToastMessengerService;
   tags: TagsService;
+  toastMessenger: ToastMessengerService;
 };
 
 /**
@@ -53,8 +54,8 @@ type AnnotationEditorProps = {
  */
 function AnnotationEditor({
   annotation,
-  draft,
   annotationsService,
+  draft,
   groups: groupsService,
   settings,
   tags: tagsService,
