@@ -3,6 +3,7 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import ThreadCard, { $imports } from '../ThreadCard';
 
@@ -33,6 +34,7 @@ describe('ThreadCard', () => {
       isAnnotationHovered: sinon.stub().returns(false),
       route: sinon.stub(),
       isAnnotationHighlighted: sinon.stub().returns(false),
+      profile: sinon.stub().returns({ userid: '123' }),
     };
 
     fakeThread = {
@@ -145,6 +147,25 @@ describe('ThreadCard', () => {
         wrapper.find('Card').prop('classes').includes('border-brand'),
         isHighlighted,
       );
+    });
+
+    [
+      { author: '456', moderationStatus: 'DENIED', shouldBeDenied: false },
+      { author: '123', moderationStatus: 'DENIED', shouldBeDenied: true },
+      { author: '456', moderationStatus: 'APPROVED', shouldBeDenied: false },
+      { author: '123', moderationStatus: 'APPROVED', shouldBeDenied: false },
+    ].forEach(({ author, moderationStatus, shouldBeDenied }) => {
+      it('marks thread as declined when moderation status is DENIED and is not highlighted', () => {
+        fakeStore.isAnnotationHighlighted.returns(isHighlighted);
+        fakeThread.annotation.user = author;
+        fakeThread.annotation.moderation_status = moderationStatus;
+
+        const wrapper = createComponent();
+        assert.equal(
+          wrapper.find('Card').prop('classes').includes('border-red'),
+          !isHighlighted && shouldBeDenied,
+        );
+      });
     });
   });
 

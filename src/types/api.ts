@@ -1,3 +1,5 @@
+import type { ModerationStatus } from '@hypothesis/annotation-ui';
+
 import type { ClientAnnotationData } from './shared';
 
 /**
@@ -312,6 +314,8 @@ export type APIAnnotationData = {
   moderation?: {
     flagCount: number;
   };
+
+  moderation_status?: ModerationStatus;
 
   links: {
     /**
