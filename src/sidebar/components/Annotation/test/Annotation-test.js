@@ -299,6 +299,71 @@ describe('Annotation', () => {
     });
   });
 
+  [
+    {
+      author: 'acct:foo@bar.com',
+      showActions: true,
+      moderationStatus: 'PENDING',
+      shouldRenderBadge: true,
+    },
+    {
+      author: 'acct:foo@bar.com',
+      showActions: true,
+      moderationStatus: undefined,
+      shouldRenderBadge: false,
+    },
+    {
+      author: 'acct:foo@bar.com',
+      showActions: false,
+      moderationStatus: 'PENDING',
+      shouldRenderBadge: false,
+    },
+    {
+      author: 'acct:foo@bar.com',
+      showActions: false,
+      moderationStatus: undefined,
+      shouldRenderBadge: false,
+    },
+    {
+      author: 'acct:bar@bar.com',
+      showActions: true,
+      moderationStatus: 'PENDING',
+      shouldRenderBadge: false,
+    },
+    {
+      author: 'acct:bar@bar.com',
+      showActions: true,
+      moderationStatus: undefined,
+      shouldRenderBadge: false,
+    },
+    {
+      author: 'acct:bar@bar.com',
+      showActions: false,
+      moderationStatus: 'PENDING',
+      shouldRenderBadge: false,
+    },
+    {
+      author: 'acct:bar@bar.com',
+      showActions: false,
+      moderationStatus: undefined,
+      shouldRenderBadge: false,
+    },
+  ].forEach(({ author, showActions, moderationStatus, shouldRenderBadge }) => {
+    it('renders ModerationStatusBadge when current user is the annotation author', () => {
+      fakeStore.isSavingAnnotation.returns(!showActions);
+
+      const wrapper = createComponent({
+        annotation: {
+          ...fixtures.defaultAnnotation(),
+          user: author,
+          moderation_status: moderationStatus,
+        },
+      });
+
+      assert.equal(wrapper.exists('ModerationStatusBadge'), shouldRenderBadge);
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

@@ -15,6 +15,7 @@ import { annotationDisplayName } from '../../helpers/annotation-user';
 import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
 import { useSidebarStore } from '../../store';
+import ModerationStatusBadge from '../moderation/ModerationStatusBadge';
 import AnnotationActionBar from './AnnotationActionBar';
 import AnnotationBody from './AnnotationBody';
 import AnnotationEditor from './AnnotationEditor';
@@ -95,6 +96,10 @@ function Annotation({
   const defaultAuthority = store.defaultAuthority();
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
 
+  // We want to show moderation controls only if current user is the author.
+  const moderationStatus =
+    annotation.user === userid ? annotation?.moderation_status : undefined;
+
   const onReply = () => {
     if (isSaved(annotation) && userid) {
       annotationsService.reply(annotation, userid);
@@ -151,14 +156,22 @@ function Annotation({
       {isEditing && <AnnotationEditor annotation={annotation} draft={draft} />}
 
       {!isCollapsedReply && (
-        <footer className="flex items-center">
-          {onToggleReplies && (
-            <AnnotationReplyToggle
-              onToggleReplies={onToggleReplies}
-              replyCount={replyCount}
-              threadIsCollapsed={threadIsCollapsed}
-            />
-          )}
+        <footer className="flex items-start">
+          <div className="flex flex-col items-start gap-y-1">
+            {showActions && moderationStatus && (
+              <ModerationStatusBadge
+                status={moderationStatus}
+                classes="mt-0.5"
+              />
+            )}
+            {onToggleReplies && (
+              <AnnotationReplyToggle
+                onToggleReplies={onToggleReplies}
+                replyCount={replyCount}
+                threadIsCollapsed={threadIsCollapsed}
+              />
+            )}
+          </div>
           {isSaving && <SavingMessage />}
           {showActions && (
             <CardActions classes="grow">
