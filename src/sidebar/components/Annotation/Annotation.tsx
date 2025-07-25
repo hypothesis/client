@@ -15,6 +15,7 @@ import { annotationDisplayName } from '../../helpers/annotation-user';
 import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
 import { useSidebarStore } from '../../store';
+import ModerationStatusBadge from '../moderation/ModerationStatusBadge';
 import AnnotationActionBar from './AnnotationActionBar';
 import AnnotationBody from './AnnotationBody';
 import AnnotationEditor from './AnnotationEditor';
@@ -95,6 +96,14 @@ function Annotation({
   const defaultAuthority = store.defaultAuthority();
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
 
+  const focusedGroup = store.focusedGroup();
+  const moderationStatus =
+    // We want to show moderation controls only for groups where pre-moderation
+    // is enabled, and only if the annotation user is the author.
+    focusedGroup?.pre_moderated && annotation.user === userid
+      ? annotation?.moderation_status
+      : undefined;
+
   const onReply = () => {
     if (isSaved(annotation) && userid) {
       annotationsService.reply(annotation, userid);
@@ -152,6 +161,9 @@ function Annotation({
 
       {!isCollapsedReply && (
         <footer className="flex items-center">
+          {moderationStatus && (
+            <ModerationStatusBadge status={moderationStatus} />
+          )}
           {onToggleReplies && (
             <AnnotationReplyToggle
               onToggleReplies={onToggleReplies}

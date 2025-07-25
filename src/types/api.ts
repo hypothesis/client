@@ -269,6 +269,8 @@ export type Mention = {
   original_userid: string;
 };
 
+export type ModerationStatus = 'PENDING' | 'APPROVED' | 'DENIED' | 'SPAM';
+
 /**
  * Represents an annotation as returned by the h API.
  * API docs: https://h.readthedocs.io/en/latest/api-reference/#tag/annotations
@@ -312,6 +314,8 @@ export type APIAnnotationData = {
   moderation?: {
     flagCount: number;
   };
+
+  moderation_status?: ModerationStatus;
 
   links: {
     /**
@@ -389,6 +393,7 @@ export type Group = {
   links: {
     html?: string;
   };
+  pre_moderated: boolean;
 
   // Properties not present on API objects, but added in the client.
   logo: string;

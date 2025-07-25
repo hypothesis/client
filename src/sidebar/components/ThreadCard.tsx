@@ -39,6 +39,13 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
     [frameSync],
   );
 
+  const focusedGroup = store.focusedGroup();
+  const currentUserId = store.profile().userid;
+  const annotationIsDeclined =
+    focusedGroup?.pre_moderated &&
+    thread.annotation?.moderation_status === 'DENIED' &&
+    thread.annotation.user === currentUserId;
+
   /**
    * Is the target's event an <a> or <button> element, or does it have
    * either as an ancestor?
@@ -69,7 +76,10 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
       active={isHovered}
       classes={classnames(
         'cursor-pointer focus-visible-ring theme-clean:border-none',
-        { 'border-brand': isHighlighted },
+        {
+          'border-brand': isHighlighted,
+          'border-red': !isHighlighted && annotationIsDeclined,
+        },
       )}
       data-testid="thread-card"
       elementRef={cardRef}
