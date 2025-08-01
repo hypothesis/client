@@ -343,6 +343,9 @@ export type APIAnnotationData = {
    * This prop will be present only if `at_mentions` is enabled.
    */
   mentions?: Mention[];
+
+  /** The list of actions current user can perform over this annotation */
+  actions?: Array<'moderate' | string>;
 };
 
 /**
@@ -393,6 +396,7 @@ export type Group = {
   links: {
     html?: string;
   };
+  pre_moderated: boolean;
 
   // Properties not present on API objects, but added in the client.
   logo: string;
