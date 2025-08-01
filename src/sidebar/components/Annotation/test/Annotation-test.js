@@ -66,6 +66,7 @@ describe('Annotation', () => {
       profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
       setExpanded: sinon.stub(),
       isAnnotationHighlighted: sinon.stub().returns(false),
+      focusedGroup: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -299,68 +300,15 @@ describe('Annotation', () => {
     });
   });
 
-  [
-    {
-      author: 'acct:foo@bar.com',
-      showActions: true,
-      moderationStatus: 'PENDING',
-      shouldRenderBadge: true,
-    },
-    {
-      author: 'acct:foo@bar.com',
-      showActions: true,
-      moderationStatus: undefined,
-      shouldRenderBadge: false,
-    },
-    {
-      author: 'acct:foo@bar.com',
-      showActions: false,
-      moderationStatus: 'PENDING',
-      shouldRenderBadge: false,
-    },
-    {
-      author: 'acct:foo@bar.com',
-      showActions: false,
-      moderationStatus: undefined,
-      shouldRenderBadge: false,
-    },
-    {
-      author: 'acct:bar@bar.com',
-      showActions: true,
-      moderationStatus: 'PENDING',
-      shouldRenderBadge: false,
-    },
-    {
-      author: 'acct:bar@bar.com',
-      showActions: true,
-      moderationStatus: undefined,
-      shouldRenderBadge: false,
-    },
-    {
-      author: 'acct:bar@bar.com',
-      showActions: false,
-      moderationStatus: 'PENDING',
-      shouldRenderBadge: false,
-    },
-    {
-      author: 'acct:bar@bar.com',
-      showActions: false,
-      moderationStatus: undefined,
-      shouldRenderBadge: false,
-    },
-  ].forEach(({ author, showActions, moderationStatus, shouldRenderBadge }) => {
-    it('renders ModerationStatusBadge when current user is the annotation author', () => {
+  [true, false].forEach(showActions => {
+    it('renders ModerationControl when actions are shown', () => {
       fakeStore.isSavingAnnotation.returns(!showActions);
 
       const wrapper = createComponent({
-        annotation: {
-          ...fixtures.defaultAnnotation(),
-          user: author,
-          moderation_status: moderationStatus,
-        },
+        annotation: fixtures.defaultAnnotation(),
       });
 
-      assert.equal(wrapper.exists('ModerationStatusBadge'), shouldRenderBadge);
+      assert.equal(wrapper.exists('ModerationControl'), showActions);
     });
   });
 
