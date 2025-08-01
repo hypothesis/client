@@ -220,14 +220,16 @@ export class OAuthClient {
     authURL.searchParams.set('response_type', 'code');
     authURL.searchParams.set('state', state);
 
+    // The sizes are chosen to be sufficient for our own login and sign-up UI,
+    // as well as the social login flows (Google etc.) that the user may be
+    // redirected through.
+    //
     // In Chrome & Firefox the sizes passed to `window.open` are used for the
     // viewport size. In Safari the size is used for the window size including
     // title bar etc. There is enough vertical space at the bottom to allow for
-    // this.
-    //
-    // See https://bugs.webkit.org/show_bug.cgi?id=143678
+    // this. See https://bugs.webkit.org/show_bug.cgi?id=143678.
     const width = 475;
-    const height = 430;
+    const height = 630;
     const left = $window.screen.width / 2 - width / 2;
     const top = $window.screen.height / 2 - height / 2;
 
