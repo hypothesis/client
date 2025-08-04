@@ -119,6 +119,11 @@ describe('APIService', () => {
     return api.annotation.unhide({ id: 'an-id' });
   });
 
+  it('moderates an annotation', () => {
+    expectCall('patch', 'annotations/an-id/moderation');
+    return api.annotation.moderate({ id: 'an-id' }, 'DENIED');
+  });
+
   it('removes current user from a group', () => {
     expectCall('delete', 'groups/an-id/members/me', 204);
     return api.group.member.delete({ pubid: 'an-id', userid: 'me' });

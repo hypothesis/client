@@ -479,3 +479,17 @@ export type SearchResponse = {
   /** Undocumented property that is populated if `_separate_replies` query param was specified. */
   replies?: Annotation[];
 };
+
+/**
+ * Body of request to moderate an annotation via `/api/annotation/{id}/moderation`
+ */
+export type AnnotationModeration = {
+  moderation_status: ModerationStatus;
+
+  /**
+   * The annotation's current updated time, used to know if the annotation has
+   * changed since it was first loaded, which would cause a conflict error to be
+   * returned by the backend.
+   */
+  annotation_updated: ISODateTime;
+};

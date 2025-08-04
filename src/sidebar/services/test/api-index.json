@@ -90,6 +90,11 @@
         "url": "https://example.com/api/annotations/:id",
         "method": "DELETE",
         "desc": "Delete an annotation"
+      },
+      "moderate": {
+        "url": "https://example.com/api/annotations/:id/moderation",
+        "method": "PATCH",
+        "desc": "Moderate an annotation"
       }
     },
     "analytics": {
