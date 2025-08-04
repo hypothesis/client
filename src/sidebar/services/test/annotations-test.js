@@ -44,6 +44,7 @@ describe('AnnotationsService', () => {
         delete: sinon.stub().resolves(),
         flag: sinon.stub().resolves(),
         update: sinon.stub().resolves(fixtures.defaultAnnotation()),
+        moderate: sinon.stub().resolves(fixtures.defaultAnnotation()),
       },
     };
 
@@ -661,6 +662,31 @@ describe('AnnotationsService', () => {
           assert.notCalled(fakeStore.addAnnotations);
         });
       });
+    });
+  });
+
+  describe('moderate', () => {
+    it('calls the `moderate` API service', async () => {
+      const annotation = fixtures.defaultAnnotation();
+      await svc.moderate(annotation, 'APPROVED');
+
+      assert.calledWith(
+        fakeApi.annotation.moderate,
+        { id: annotation.id },
+        {
+          moderation_status: 'APPROVED',
+          annotation_updated: annotation.updated,
+        },
+      );
+    });
+
+    it('updates annotation in store', async () => {
+      const annotation = fixtures.defaultAnnotation();
+      await svc.moderate(annotation, 'APPROVED');
+
+      const savedAnnotation =
+        await fakeApi.annotation.moderate.lastCall.returnValue;
+      assert.calledWith(fakeStore.addAnnotations, [savedAnnotation]);
     });
   });
 });

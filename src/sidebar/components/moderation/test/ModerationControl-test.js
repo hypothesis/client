@@ -1,10 +1,23 @@
 import { mockImportedComponents, mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import { defaultAnnotation } from '../../../test/annotation-fixtures';
+import { FetchError } from '../../../util/fetch';
 import ModerationControl, { $imports } from '../ModerationControl';
 
 describe('ModerationControl', () => {
+  let fakeAnnotationsService;
+  let fakeToastMessenger;
+
   beforeEach(() => {
+    fakeAnnotationsService = {
+      moderate: sinon.stub().resolves(undefined),
+    };
+    fakeToastMessenger = {
+      notice: sinon.stub(),
+      error: sinon.stub(),
+    };
+
     $imports.$mock(mockImportedComponents());
   });
 
@@ -13,6 +26,8 @@ describe('ModerationControl', () => {
       <ModerationControl
         annotation={annotation}
         groupIsPreModerated={groupIsPreModerated}
+        annotationsService={fakeAnnotationsService}
+        toastMessenger={fakeToastMessenger}
       />,
     );
   }
@@ -47,5 +62,62 @@ describe('ModerationControl', () => {
 
     assert.isTrue(wrapper.exists('ModerationStatusBadge'));
     assert.isFalse(wrapper.exists('ModerationStatusSelect'));
+  });
+
+  it('calls annotations service when ModerationStatusSelect value is changed', () => {
+    const annotation = {
+      ...defaultAnnotation(),
+      actions: ['moderate'],
+    };
+    const wrapper = createComponent({ annotation });
+    const getSelect = () => wrapper.find('ModerationStatusSelect');
+
+    assert.isFalse(getSelect().prop('disabled'));
+    getSelect().props().onChange('APPROVED');
+    wrapper.update();
+
+    assert.isTrue(getSelect().prop('disabled'));
+    assert.calledWith(fakeAnnotationsService.moderate, annotation, 'APPROVED');
+  });
+
+  context('when saving annotations fails', () => {
+    it('shows a notice toast message when a conflict error occurs', async () => {
+      fakeAnnotationsService.moderate.rejects(
+        new FetchError('', new Response('', { status: 409 })),
+      );
+
+      const wrapper = createComponent({
+        annotation: {
+          ...defaultAnnotation(),
+          actions: ['moderate'],
+        },
+      });
+      await wrapper.find('ModerationStatusSelect').props().onChange('APPROVED');
+
+      assert.calledWith(
+        fakeToastMessenger.notice,
+        'The annotation has been updated since this page was loaded',
+        { autoDismiss: false },
+      );
+      assert.notCalled(fakeToastMessenger.error);
+    });
+
+    it('shows an error toast message when an unknown error occurs', async () => {
+      fakeAnnotationsService.moderate.rejects(new Error(''));
+
+      const wrapper = createComponent({
+        annotation: {
+          ...defaultAnnotation(),
+          actions: ['moderate'],
+        },
+      });
+      await wrapper.find('ModerationStatusSelect').props().onChange('APPROVED');
+
+      assert.calledWith(
+        fakeToastMessenger.error,
+        'An error occurred updating the moderation status',
+      );
+      assert.notCalled(fakeToastMessenger.notice);
+    });
   });
 });

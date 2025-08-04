@@ -5,6 +5,7 @@ import type {
   RouteMetadata,
   Profile,
   GroupMembers,
+  AnnotationModeration,
 } from '../../types/api';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import type { SidebarStore } from '../store';
@@ -214,6 +215,7 @@ export class APIService {
     flag: APICall<IDParam>;
     hide: APICall<IDParam>;
     unhide: APICall<IDParam>;
+    moderate: APICall<IDParam, AnnotationModeration, Annotation>;
   };
   group: {
     member: {
@@ -291,6 +293,11 @@ export class APIService {
       flag: apiCall('annotation.flag') as APICall<IDParam>,
       hide: apiCall('annotation.hide') as APICall<IDParam>,
       unhide: apiCall('annotation.unhide') as APICall<IDParam>,
+      moderate: apiCall('annotation.moderate') as APICall<
+        IDParam,
+        AnnotationModeration,
+        Annotation
+      >,
     };
     this.group = {
       member: {

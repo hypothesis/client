@@ -1,3 +1,5 @@
+import type { ModerationStatus } from '@hypothesis/annotation-ui';
+
 import { generateHexString } from '../../shared/random';
 import type { AnnotationData } from '../../types/annotator';
 import type {
@@ -314,6 +316,25 @@ export class AnnotationsService {
 
     // Add (or, in effect, update) the annotation to the store's collection
     this._store.addAnnotations([savedAnnotation]);
+    return savedAnnotation;
+  }
+
+  /**
+   * Change an annotation's moderation status, then update the annotation in
+   * the store
+   */
+  async moderate(
+    annotation: SavedAnnotation,
+    newStatus: ModerationStatus,
+  ): Promise<Annotation> {
+    const savedAnnotation = await this._api.annotation.moderate(
+      { id: annotation.id },
+      { moderation_status: newStatus, annotation_updated: annotation.updated },
+    );
+
+    // Add (or, in effect, update) the annotation to the store's collection
+    this._store.addAnnotations([savedAnnotation]);
+
     return savedAnnotation;
   }
 }
