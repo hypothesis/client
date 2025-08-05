@@ -12,6 +12,7 @@ describe('ModerationControl', () => {
   beforeEach(() => {
     fakeAnnotationsService = {
       moderate: sinon.stub().resolves(undefined),
+      loadAnnotation: sinon.stub().resolves(defaultAnnotation()),
     };
     fakeToastMessenger = {
       notice: sinon.stub(),
@@ -86,20 +87,41 @@ describe('ModerationControl', () => {
         new FetchError('', new Response('', { status: 409 })),
       );
 
-      const wrapper = createComponent({
-        annotation: {
-          ...defaultAnnotation(),
-          actions: ['moderate'],
-        },
-      });
+      const annotation = {
+        ...defaultAnnotation(),
+        actions: ['moderate'],
+      };
+      const wrapper = createComponent({ annotation });
       await wrapper.find('ModerationStatusSelect').props().onChange('APPROVED');
 
+      assert.calledWith(fakeAnnotationsService.loadAnnotation, annotation.id);
       assert.calledWith(
         fakeToastMessenger.notice,
-        'The annotation has been updated since this page was loaded',
+        'The annotation has been updated since this page was loaded. Review this new version and try again.',
         { autoDismiss: false },
       );
       assert.notCalled(fakeToastMessenger.error);
+    });
+
+    it('shows an error toast message when a conflict error occurs but the annotation could not be loaded', async () => {
+      fakeAnnotationsService.moderate.rejects(
+        new FetchError('', new Response('', { status: 409 })),
+      );
+      fakeAnnotationsService.loadAnnotation.rejects(new Error(''));
+
+      const annotation = {
+        ...defaultAnnotation(),
+        actions: ['moderate'],
+      };
+      const wrapper = createComponent({ annotation });
+      await wrapper.find('ModerationStatusSelect').props().onChange('APPROVED');
+
+      assert.calledWith(fakeAnnotationsService.loadAnnotation, annotation.id);
+      assert.calledWith(
+        fakeToastMessenger.error,
+        'The annotation has been updated since this page was loaded',
+      );
+      assert.notCalled(fakeToastMessenger.notice);
     });
 
     it('shows an error toast message when an unknown error occurs', async () => {
@@ -113,6 +135,7 @@ describe('ModerationControl', () => {
       });
       await wrapper.find('ModerationStatusSelect').props().onChange('APPROVED');
 
+      assert.notCalled(fakeAnnotationsService.loadAnnotation);
       assert.calledWith(
         fakeToastMessenger.error,
         'An error occurred updating the moderation status',

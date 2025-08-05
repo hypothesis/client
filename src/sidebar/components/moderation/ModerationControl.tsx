@@ -30,30 +30,47 @@ function ModerationControl({
   const canModerate = annotation.actions?.includes('moderate');
   const moderationStatus = annotation?.moderation_status ?? 'APPROVED';
   const [changingStatus, setChangingStatus] = useState(false);
+  const handleChangeStatusError = useCallback(
+    async (e: unknown) => {
+      const isConflictError =
+        e instanceof FetchError && e.response?.status === 409;
+      let messageType: 'notice' | 'error' = isConflictError
+        ? 'notice'
+        : 'error';
+      let message = isConflictError
+        ? 'The annotation has been updated since this page was loaded. Review this new version and try again.'
+        : 'An error occurred updating the moderation status';
+
+      // If a conflict has occurred, try to reload the annotation before
+      // reporting back to the user
+      if (isConflictError) {
+        await annotationsService.loadAnnotation(annotation.id).catch(() => {
+          messageType = 'error';
+          message =
+            'The annotation has been updated since this page was loaded';
+        });
+      }
+
+      if (messageType === 'notice') {
+        toastMessenger.notice(message, { autoDismiss: false });
+      } else {
+        toastMessenger.error(message);
+      }
+    },
+    [annotation, annotationsService, toastMessenger],
+  );
   const changeModerationStatus = useCallback(
     async (newStatus: ModerationStatus) => {
       setChangingStatus(true);
       try {
         await annotationsService.moderate(annotation, newStatus);
       } catch (e) {
-        const isConflictError =
-          e instanceof FetchError && e.response?.status === 409;
-
-        if (isConflictError) {
-          toastMessenger.notice(
-            'The annotation has been updated since this page was loaded',
-            { autoDismiss: false },
-          );
-        } else {
-          toastMessenger.error(
-            'An error occurred updating the moderation status',
-          );
-        }
+        await handleChangeStatusError(e);
       } finally {
         setChangingStatus(false);
       }
     },
-    [annotation, annotationsService, toastMessenger],
+    [annotation, annotationsService, handleChangeStatusError],
   );
 
   // We don't want to show any moderation control for approved annotations in

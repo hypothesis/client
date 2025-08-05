@@ -40,6 +40,7 @@ describe('AnnotationsService', () => {
     };
     fakeApi = {
       annotation: {
+        read: sinon.stub().resolves(fixtures.defaultAnnotation()),
         create: sinon.stub().resolves(fixtures.defaultAnnotation()),
         delete: sinon.stub().resolves(),
         flag: sinon.stub().resolves(),
@@ -686,6 +687,24 @@ describe('AnnotationsService', () => {
 
       const savedAnnotation =
         await fakeApi.annotation.moderate.lastCall.returnValue;
+      assert.calledWith(fakeStore.addAnnotations, [savedAnnotation]);
+    });
+  });
+
+  describe('loadAnnotation', () => {
+    it('calls the `read` API service', async () => {
+      const annotation = fixtures.defaultAnnotation();
+      await svc.loadAnnotation(annotation.id);
+
+      assert.calledWith(fakeApi.annotation.read, { id: annotation.id });
+    });
+
+    it('updates annotation in store', async () => {
+      const annotation = fixtures.defaultAnnotation();
+      await svc.loadAnnotation(annotation.id);
+
+      const savedAnnotation =
+        await fakeApi.annotation.read.lastCall.returnValue;
       assert.calledWith(fakeStore.addAnnotations, [savedAnnotation]);
     });
   });

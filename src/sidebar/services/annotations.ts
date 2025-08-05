@@ -337,4 +337,16 @@ export class AnnotationsService {
 
     return savedAnnotation;
   }
+
+  /**
+   * Fetch an annotation from the API and add or update it in the store
+   */
+  async loadAnnotation(id: string): Promise<Annotation> {
+    const annotation = await this._api.annotation.read({ id });
+
+    // Add or update the annotation in the store's collection
+    this._store.addAnnotations([annotation]);
+
+    return annotation;
+  }
 }
