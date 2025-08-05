@@ -208,6 +208,7 @@ export class APIService {
 
   search: APICall<Record<string, unknown>, void, AnnotationSearchResult>;
   annotation: {
+    read: APICall<IDParam, void, Annotation>;
     create: APICall<Record<string, unknown>, Partial<Annotation>, Annotation>;
     delete: APICall<IDParam>;
     get: APICall<IDParam, void, Annotation>;
@@ -278,6 +279,7 @@ export class APIService {
       AnnotationSearchResult
     >;
     this.annotation = {
+      read: apiCall('annotation.read') as APICall<IDParam, void, Annotation>,
       create: apiCall('annotation.create') as APICall<
         Record<string, unknown>,
         Partial<Annotation>,

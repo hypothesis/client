@@ -85,6 +85,11 @@ describe('APIService', () => {
     fetchMock.restore();
   });
 
+  it('reads an annotation', () => {
+    expectCall('get', 'annotations/an-id');
+    return api.annotation.read({ id: 'an-id' });
+  });
+
   it('saves a new annotation', () => {
     // nb. The Hypothesis API returns 200 here not 201 as one might expect.
     expectCall('post', 'annotations', 200, { id: 'new-id' });
