@@ -668,7 +668,10 @@ describe('AnnotationsService', () => {
 
   describe('moderate', () => {
     it('calls the `moderate` API service', async () => {
-      const annotation = fixtures.defaultAnnotation();
+      const annotation = {
+        ...fixtures.defaultAnnotation(),
+        moderation_status: 'PENDING',
+      };
       await svc.moderate(annotation, 'APPROVED');
 
       assert.calledWith(
@@ -676,6 +679,7 @@ describe('AnnotationsService', () => {
         { id: annotation.id },
         {
           moderation_status: 'APPROVED',
+          current_moderation_status: annotation.moderation_status,
           annotation_updated: annotation.updated,
         },
       );

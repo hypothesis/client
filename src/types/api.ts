@@ -487,9 +487,16 @@ export type AnnotationModeration = {
   moderation_status: ModerationStatus;
 
   /**
-   * The annotation's current updated time, used to know if the annotation has
-   * changed since it was first loaded, which would cause a conflict error to be
-   * returned by the backend.
+   * The annotation's current moderation status, used to check if the annotation
+   * has been moderated since it was loaded. If it has, the server will return a
+   * 409 Conflict response.
+   */
+  current_moderation_status?: ModerationStatus;
+
+  /**
+   * The annotation's current updated time, used to check if the annotation has
+   * changed since it was loaded. If it has, the server will return a 409
+   * Conflict response.
    */
   annotation_updated: ISODateTime;
 };
