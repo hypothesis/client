@@ -329,7 +329,11 @@ export class AnnotationsService {
   ): Promise<Annotation> {
     const savedAnnotation = await this._api.annotation.moderate(
       { id: annotation.id },
-      { moderation_status: newStatus, annotation_updated: annotation.updated },
+      {
+        moderation_status: newStatus,
+        current_moderation_status: annotation.moderation_status,
+        annotation_updated: annotation.updated,
+      },
     );
 
     // Add (or, in effect, update) the annotation to the store's collection
