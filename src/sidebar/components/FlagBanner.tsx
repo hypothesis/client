@@ -8,7 +8,7 @@ import type { APIService } from '../services/api';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 
-export type ModerationBannerProps = {
+export type FlagBannerProps = {
   annotation: Annotation;
 
   // injected
@@ -20,11 +20,7 @@ export type ModerationBannerProps = {
  * Banner allows moderators to hide/unhide the flagged annotation from other
  * users.
  */
-function ModerationBanner({
-  annotation,
-  api,
-  toastMessenger,
-}: ModerationBannerProps) {
+function FlagBanner({ annotation, api, toastMessenger }: FlagBannerProps) {
   const store = useSidebarStore();
   const flagCount = annotationMetadata.flagCount(annotation);
 
@@ -64,6 +60,7 @@ function ModerationBanner({
   if (!isHiddenOrFlagged) {
     return null;
   }
+
   return (
     <div
       className={classnames(
@@ -127,4 +124,4 @@ function ModerationBanner({
   );
 }
 
-export default withServices(ModerationBanner, ['api', 'toastMessenger']);
+export default withServices(FlagBanner, ['api', 'toastMessenger']);

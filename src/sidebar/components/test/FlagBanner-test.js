@@ -6,17 +6,17 @@ import {
 import { mount } from '@hypothesis/frontend-testing';
 
 import * as fixtures from '../../test/annotation-fixtures';
-import ModerationBanner, { $imports } from '../ModerationBanner';
+import FlagBanner, { $imports } from '../FlagBanner';
 
 const moderatedAnnotation = fixtures.moderatedAnnotation;
 
-describe('ModerationBanner', () => {
+describe('FlagBanner', () => {
   let fakeApi;
   let fakeToastMessenger;
 
   function createComponent(props) {
     return mount(
-      <ModerationBanner
+      <FlagBanner
         api={fakeApi}
         toastMessenger={fakeToastMessenger}
         {...props}

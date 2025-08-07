@@ -149,7 +149,7 @@ describe('Thread', () => {
       // is an `annotation` object
       const wrapper = createComponent();
 
-      assert.isTrue(wrapper.exists('ModerationBanner'));
+      assert.isTrue(wrapper.exists('FlagBanner'));
     });
 
     it('renders the annotation', () => {
