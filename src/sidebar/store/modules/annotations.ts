@@ -202,16 +202,6 @@ const reducers = {
     return { hovered: toTrueMap(action.tags) };
   },
 
-  HIDE_ANNOTATION(state: State, action: { id: string }): Partial<State> {
-    const anns = state.annotations.map(ann => {
-      if (ann.id !== action.id) {
-        return ann;
-      }
-      return { ...ann, hidden: true };
-    });
-    return { annotations: anns };
-  },
-
   HIGHLIGHT_ANNOTATIONS(
     state: State,
     action: Pick<State, 'highlighted'>,
@@ -229,16 +219,6 @@ const reducers = {
     return {
       annotations: [...action.remainingAnnotations],
     };
-  },
-
-  UNHIDE_ANNOTATION(state: State, action: { id: string }): Partial<State> {
-    const anns = state.annotations.map(ann => {
-      if (ann.id !== action.id) {
-        return ann;
-      }
-      return Object.assign({}, ann, { hidden: false });
-    });
-    return { annotations: anns };
   },
 
   UPDATE_ANCHOR_STATUS(
@@ -373,16 +353,6 @@ function hoverAnnotations(tags: string[]) {
 }
 
 /**
- * Update the local hidden state of an annotation.
- *
- * This updates an annotation to reflect the fact that it has been hidden from
- * non-moderators.
- */
-function hideAnnotation(id: string) {
-  return makeAction(reducers, 'HIDE_ANNOTATION', { id });
-}
-
-/**
  * Highlight annotations with the given `ids`.
  *
  * This is used to add a visual indicator to specific annotation cards, like a
@@ -416,16 +386,6 @@ export function removeAnnotations(annotations: AnnotationStub[]) {
       }),
     );
   };
-}
-
-/**
- * Update the local hidden state of an annotation.
- *
- * This updates an annotation to reflect the fact that it has been made visible
- * to non-moderators.
- */
-function unhideAnnotation(id: string) {
-  return makeAction(reducers, 'UNHIDE_ANNOTATION', { id });
 }
 
 /**
@@ -633,10 +593,8 @@ export const annotationsModule = createStoreModule(initialState, {
     addAnnotations,
     clearAnnotations,
     hoverAnnotations,
-    hideAnnotation,
     highlightAnnotations,
     removeAnnotations,
-    unhideAnnotation,
     updateAnchorStatus,
     updateFlagStatus,
   },

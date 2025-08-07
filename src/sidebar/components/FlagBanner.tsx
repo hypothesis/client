@@ -1,63 +1,21 @@
-import { Button, FlagIcon, HideIcon } from '@hypothesis/frontend-shared';
+import { FlagIcon, HideIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { Annotation } from '../../types/api';
 import * as annotationMetadata from '../helpers/annotation-metadata';
-import { withServices } from '../service-context';
-import type { APIService } from '../services/api';
-import type { ToastMessengerService } from '../services/toast-messenger';
-import { useSidebarStore } from '../store';
 
 export type FlagBannerProps = {
   annotation: Annotation;
-
-  // injected
-  api: APIService;
-  toastMessenger: ToastMessengerService;
 };
 
 /**
- * Banner allows moderators to hide/unhide the flagged annotation from other
- * users.
+ * Banner allows moderators to know if an annotation is flagged
  */
-function FlagBanner({ annotation, api, toastMessenger }: FlagBannerProps) {
-  const store = useSidebarStore();
+export default function FlagBanner({ annotation }: FlagBannerProps) {
   const flagCount = annotationMetadata.flagCount(annotation);
+  const isFlagged = !!flagCount;
 
-  const isHiddenOrFlagged =
-    flagCount !== null && (flagCount > 0 || annotation.hidden);
-
-  /**
-   * Hide an annotation from non-moderator users.
-   */
-  const hideAnnotation = () => {
-    const id = annotation.id!;
-    api.annotation
-      .hide({ id })
-      .then(() => {
-        store.hideAnnotation(id);
-      })
-      .catch(() => {
-        toastMessenger.error('Failed to hide annotation');
-      });
-  };
-
-  /**
-   * Un-hide an annotation from non-moderator users.
-   */
-  const unhideAnnotation = () => {
-    const id = annotation.id!;
-    api.annotation
-      .unhide({ id })
-      .then(() => {
-        store.unhideAnnotation(id);
-      })
-      .catch(() => {
-        toastMessenger.error('Failed to unhide annotation');
-      });
-  };
-
-  if (!isHiddenOrFlagged) {
+  if (!isFlagged) {
     return null;
   }
 
@@ -100,28 +58,6 @@ function FlagBanner({ annotation, api, toastMessenger }: FlagBannerProps) {
         )}
         {annotation.hidden && <span>Hidden from users</span>}
       </div>
-      <div className="self-center pr-2">
-        <Button
-          classes={classnames(
-            'px-1.5 py-1',
-            'bg-slate-1 text-grey-7 bg-grey-2',
-            'enabled:hover:text-grey-9 enabled:hover:bg-grey-3 disabled:text-grey-5',
-            'aria-pressed:bg-grey-3 aria-expanded:bg-grey-3',
-          )}
-          onClick={annotation.hidden ? unhideAnnotation : hideAnnotation}
-          title={
-            annotation.hidden
-              ? 'Make this annotation visible to everyone'
-              : 'Hide this annotation from non-moderators'
-          }
-          size="custom"
-          variant="custom"
-        >
-          {annotation.hidden ? 'Unhide' : 'Hide'}
-        </Button>
-      </div>
     </div>
   );
 }
-
-export default withServices(FlagBanner, ['api', 'toastMessenger']);

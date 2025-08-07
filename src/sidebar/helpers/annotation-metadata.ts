@@ -66,13 +66,6 @@ export function isWaitingToAnchor(annotation: Annotation): boolean {
 }
 
 /**
- * Has this annotation hidden by moderators?
- */
-export function isHidden(annotation: Annotation): boolean {
-  return !!annotation.hidden;
-}
-
-/**
  * Is this annotation a highlight?
  *
  * Highlights are generally identifiable by having no text content AND no tags,
@@ -240,10 +233,7 @@ function distanceFromTopOfView(selector: ShapeSelector): number | undefined {
  * by other users. If moderation metadata is not present, returns `null`.
  */
 export function flagCount(annotation: Annotation): number | null {
-  if (!annotation.moderation) {
-    return null;
-  }
-  return annotation.moderation.flagCount;
+  return annotation.moderation?.flagCount ?? null;
 }
 
 /**
