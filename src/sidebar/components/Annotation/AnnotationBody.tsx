@@ -6,7 +6,6 @@ import { useMemo, useState } from 'preact/hooks';
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
 import { isThirdPartyUser } from '../../helpers/account-id';
-import { isHidden } from '../../helpers/annotation-metadata';
 import type { MentionMode } from '../../helpers/mentions';
 import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
@@ -106,9 +105,6 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
         >
           <MarkdownView
             markdown={text}
-            classes={classnames({
-              'p-redacted-text': isHidden(annotation),
-            })}
             style={textStyle}
             mentions={annotation.mentions}
             mentionsEnabled={mentionsEnabled}

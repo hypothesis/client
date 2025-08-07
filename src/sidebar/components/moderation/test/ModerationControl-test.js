@@ -56,6 +56,21 @@ describe('ModerationControl', () => {
     assert.isFalse(wrapper.exists('ModerationStatusBadge'));
   });
 
+  it('renders ModerationStatusSelect for APPROVED annotations in non-pre-moderated groups, if annotation is flagged', () => {
+    const wrapper = createComponent({
+      annotation: {
+        ...defaultAnnotation(),
+        actions: ['moderate'],
+        moderation_status: 'APPROVED',
+        moderation: { flagCount: 10 },
+      },
+      groupIsPreModerated: false,
+    });
+
+    assert.isTrue(wrapper.exists('ModerationStatusSelect'));
+    assert.isFalse(wrapper.exists('ModerationStatusBadge'));
+  });
+
   it('renders ModerationStatusBadge when annotation cannot be moderated', () => {
     const wrapper = createComponent({
       annotation: defaultAnnotation(),

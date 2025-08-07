@@ -3,6 +3,7 @@ import { ModerationStatusSelect } from '@hypothesis/annotation-ui';
 import { useCallback, useState } from 'preact/hooks';
 
 import type { SavedAnnotation } from '../../../types/api';
+import { flagCount } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
 import type { ToastMessengerService } from '../../services/toast-messenger';
@@ -73,10 +74,18 @@ function ModerationControl({
     [annotation, annotationsService, handleChangeStatusError],
   );
 
+  const isAnnotationFlagged = !!flagCount(annotation);
+
   // We don't want to show any moderation control for approved annotations in
   // non-pre-moderated groups, to avoid cluttering the UI, since most,
   // annotations will have `APPROVED` status.
-  if (!groupIsPreModerated && moderationStatus === 'APPROVED') {
+  // Flagged annotations should always show the control to allow
+  // hiding/unhiding on the spot.
+  if (
+    !groupIsPreModerated &&
+    moderationStatus === 'APPROVED' &&
+    !isAnnotationFlagged
+  ) {
     return null;
   }
 

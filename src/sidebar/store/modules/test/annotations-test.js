@@ -417,32 +417,6 @@ describe('sidebar/store/modules/annotations', () => {
     });
   });
 
-  describe('#hideAnnotation', () => {
-    it('sets the `hidden` state to `true`', () => {
-      const store = createTestStore();
-      const ann = fixtures.moderatedAnnotation({ hidden: false });
-
-      store.addAnnotations([ann]);
-      store.hideAnnotation(ann.id);
-
-      const storeAnn = store.findAnnotationByID(ann.id);
-      assert.equal(storeAnn.hidden, true);
-    });
-  });
-
-  describe('#unhideAnnotation', () => {
-    it('sets the `hidden` state to `false`', () => {
-      const store = createTestStore();
-      const ann = fixtures.moderatedAnnotation({ hidden: true });
-
-      store.addAnnotations([ann]);
-      store.unhideAnnotation(ann.id);
-
-      const storeAnn = store.findAnnotationByID(ann.id);
-      assert.equal(storeAnn.hidden, false);
-    });
-  });
-
   describe('#removeAnnotations', () => {
     it('removes the annotation', () => {
       const store = createTestStore();
