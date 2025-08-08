@@ -529,9 +529,11 @@ describe('AuthService', () => {
       fakeSettings.services = [];
     });
 
-    it('calls OAuthClient#authorize', async () => {
-      await auth.login();
-      assert.calledWith(fakeClient.authorize, fakeWindow);
+    ['login', 'signup'].forEach(action => {
+      it('calls OAuthClient#authorize', async () => {
+        await auth.login({ action });
+        assert.calledWith(fakeClient.authorize, fakeWindow);
+      });
     });
 
     it('resolves when auth completes successfully', () => {

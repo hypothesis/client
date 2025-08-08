@@ -197,36 +197,39 @@ describe('sidebar/util/oauth-client', () => {
       });
     });
 
-    function authorize() {
-      return client.authorize(fakeWindow);
+    function authorize(action) {
+      return client.authorize(fakeWindow, action);
     }
 
-    it('opens a popup window at the authorization URL', async () => {
-      const authorized = authorize();
+    ['login', 'signup'].forEach(action => {
+      it('opens a popup window at the authorization URL', async () => {
+        const authorized = authorize(action);
 
-      const params = new URLSearchParams({
-        client_id: config.clientId,
-        origin: 'https://client.hypothes.is',
-        response_mode: 'web_message',
-        response_type: 'code',
-        state: 'notrandom',
+        const params = new URLSearchParams({
+          client_id: config.clientId,
+          origin: 'https://client.hypothes.is',
+          response_mode: 'web_message',
+          response_type: 'code',
+          state: 'notrandom',
+          action,
+        });
+        const expectedAuthURL = `${config.authorizationEndpoint}?${params}`;
+
+        assert.calledWith(
+          fakeWindow.open,
+          expectedAuthURL,
+          'Log in to Hypothesis',
+          'left=274.5,top=69,width=475,height=630',
+        );
+
+        fakeWindow.sendMessage({
+          type: 'authorization_response',
+          code: 'expected-code',
+          state: 'notrandom',
+        });
+
+        await authorized;
       });
-      const expectedAuthURL = `${config.authorizationEndpoint}?${params}`;
-
-      assert.calledWith(
-        fakeWindow.open,
-        expectedAuthURL,
-        'Log in to Hypothesis',
-        'left=274.5,top=69,width=475,height=630',
-      );
-
-      fakeWindow.sendMessage({
-        type: 'authorization_response',
-        code: 'expected-code',
-        state: 'notrandom',
-      });
-
-      await authorized;
     });
 
     it('rejects if popup cannot be opened', async () => {
