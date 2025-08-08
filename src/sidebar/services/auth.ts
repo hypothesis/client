@@ -23,6 +23,17 @@ const isTokenInfo = (token: unknown): token is TokenInfo =>
   'expiresAt' in token &&
   typeof token.expiresAt === 'number';
 
+export type LoginOptions = {
+  /**
+   * A hint passed to the server for whether the user clicked a "Sign up" or
+   * "Log in" action.
+   *
+   * This is used to determine which form to show in the authorization popup if
+   * the user is not logged in.
+   */
+  action?: 'login' | 'signup';
+};
+
 export type Events = {
   oauthTokensChanged(): void;
 };
@@ -298,7 +309,7 @@ export class AuthService extends EventEmitter<Events> {
    * Store the resulting authorization code to exchange for an access token in
    * the next API call ( {@see getAccessToken} )
    */
-  async login() {
+  async login({ action = 'login' }: LoginOptions = {}) {
     // Any async steps before the call to `client.authorize` must complete
     // in less than ~1 second, otherwise the browser's popup blocker may block
     // the popup.
@@ -307,7 +318,7 @@ export class AuthService extends EventEmitter<Events> {
     // This should already have happened by the time this function is called
     // however, so it will just be returning a cached value.
     const client = await this._oauthClient();
-    const authCode = await client.authorize(this._window);
+    const authCode = await client.authorize(this._window, action);
 
     // Save the auth code. It will be exchanged for an access token when the
     // next API request is made.

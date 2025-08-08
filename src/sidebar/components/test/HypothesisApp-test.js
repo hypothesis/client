@@ -56,7 +56,9 @@ describe('HypothesisApp', () => {
       getLink: sinon.stub(),
     };
 
-    fakeAuth = {};
+    fakeAuth = {
+      login: sinon.stub().resolves(),
+    };
 
     fakeSession = {
       load: sinon.stub().returns(Promise.resolve({ userid: null })),
@@ -155,16 +157,50 @@ describe('HypothesisApp', () => {
     });
   });
 
+  // Add tests for common behaviors shared between "Log in" and "Sign up" actions.
+  function addCommonLoginTests(action) {
+    const clickButton = wrapper =>
+      wrapper
+        .find('TopBar')
+        .prop(action === 'login' ? 'onLogin' : 'onSignUp')();
+
+    it('clears groups', async () => {
+      const wrapper = createComponent();
+      await clickButton(wrapper);
+      assert.called(fakeStore.clearGroups);
+    });
+
+    it('initiates the OAuth login flow', async () => {
+      const wrapper = createComponent();
+      await clickButton(wrapper);
+      assert.calledWith(fakeAuth.login, { action });
+    });
+
+    it('reloads the session when login completes', async () => {
+      const wrapper = createComponent();
+      await clickButton(wrapper);
+      assert.called(fakeSession.reload);
+    });
+
+    it('closes the login prompt panel', async () => {
+      const wrapper = createComponent();
+      await clickButton(wrapper);
+      assert.called(fakeStore.closeSidebarPanel);
+    });
+
+    it('reports an error if login fails', async () => {
+      fakeAuth.login.returns(Promise.reject(new Error('Login failed')));
+
+      const wrapper = createComponent();
+      await clickButton(wrapper);
+      assert.called(fakeToastMessenger.error);
+    });
+  }
+
   describe('"Sign up" action', () => {
     const clickSignUp = wrapper => wrapper.find('TopBar').props().onSignUp();
 
-    beforeEach(() => {
-      sinon.stub(window, 'open');
-    });
-
-    afterEach(() => {
-      window.open.restore();
-    });
+    addCommonLoginTests('signup');
 
     context('when using a third-party service', () => {
       beforeEach(() => {
@@ -177,21 +213,10 @@ describe('HypothesisApp', () => {
         assert.calledWith(fakeFrameSync.notifyHost, 'signupRequested');
       });
 
-      it('does not open a URL directly', () => {
+      it('does not log in', () => {
         const wrapper = createComponent();
         clickSignUp(wrapper);
-        assert.notCalled(window.open);
-      });
-    });
-
-    context('when not using a third-party service', () => {
-      it('opens the signup URL in a new tab', () => {
-        fakeStore.getLink
-          .withArgs('signup')
-          .returns('https://ann.service/signup');
-        const wrapper = createComponent();
-        clickSignUp(wrapper);
-        assert.calledWith(window.open, 'https://ann.service/signup');
+        assert.notCalled(fakeAuth.login);
       });
     });
   });
@@ -199,41 +224,7 @@ describe('HypothesisApp', () => {
   describe('"Log in" action', () => {
     const clickLogIn = wrapper => wrapper.find('TopBar').props().onLogin();
 
-    beforeEach(() => {
-      fakeAuth.login = sinon.stub().returns(Promise.resolve());
-    });
-
-    it('clears groups', async () => {
-      const wrapper = createComponent();
-      await clickLogIn(wrapper);
-      assert.called(fakeStore.clearGroups);
-    });
-
-    it('initiates the OAuth login flow', async () => {
-      const wrapper = createComponent();
-      await clickLogIn(wrapper);
-      assert.called(fakeAuth.login);
-    });
-
-    it('reloads the session when login completes', async () => {
-      const wrapper = createComponent();
-      await clickLogIn(wrapper);
-      assert.called(fakeSession.reload);
-    });
-
-    it('closes the login prompt panel', async () => {
-      const wrapper = createComponent();
-      await clickLogIn(wrapper);
-      assert.called(fakeStore.closeSidebarPanel);
-    });
-
-    it('reports an error if login fails', async () => {
-      fakeAuth.login.returns(Promise.reject(new Error('Login failed')));
-
-      const wrapper = createComponent();
-      await clickLogIn(wrapper);
-      assert.called(fakeToastMessenger.error);
-    });
+    addCommonLoginTests('login');
 
     it('sends "loginRequested" event to host page if using a third-party service', async () => {
       // If the client is using a third-party annotation service then clicking

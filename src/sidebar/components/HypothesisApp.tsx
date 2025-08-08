@@ -66,15 +66,9 @@ function HypothesisApp({
 
   const isThirdParty = isThirdPartyService(settings);
 
-  const login = async () => {
-    if (serviceConfig(settings)) {
-      // Let the host page handle the login request
-      frameSync.notifyHost('loginRequested');
-      return;
-    }
-
+  const loginOrSignUp = async (action: 'login' | 'signup') => {
     try {
-      await auth.login();
+      await auth.login({ action });
 
       store.closeSidebarPanel('loginPrompt');
       store.clearGroups();
@@ -84,13 +78,22 @@ function HypothesisApp({
     }
   };
 
-  const signUp = () => {
+  const login = async () => {
+    if (serviceConfig(settings)) {
+      // Let the host page handle the login request
+      frameSync.notifyHost('loginRequested');
+      return;
+    }
+    await loginOrSignUp('login');
+  };
+
+  const signUp = async () => {
     if (serviceConfig(settings)) {
       // Let the host page handle the signup request
       frameSync.notifyHost('signupRequested');
       return;
     }
-    window.open(store.getLink('signup'));
+    await loginOrSignUp('signup');
   };
 
   const promptToLogout = async () => {

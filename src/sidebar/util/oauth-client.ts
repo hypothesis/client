@@ -179,7 +179,10 @@ export class OAuthClient {
    * @param $window - Window which will receive the auth response.
    * @return - Authorization code which can be passed to {@link exchangeAuthCode}.
    */
-  authorize($window: Window): Promise<string> {
+  authorize(
+    $window: Window,
+    action: 'login' | 'signup' = 'login',
+  ): Promise<string> {
     // Random state string used to check that auth messages came from the popup
     // window that we opened.
     //
@@ -219,6 +222,7 @@ export class OAuthClient {
     authURL.searchParams.set('response_mode', 'web_message');
     authURL.searchParams.set('response_type', 'code');
     authURL.searchParams.set('state', state);
+    authURL.searchParams.set('action', action);
 
     // The sizes are chosen to be sufficient for our own login and sign-up UI,
     // as well as the social login flows (Google etc.) that the user may be
