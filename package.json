@@ -13,7 +13,7 @@
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.16.7",
-    "@hypothesis/annotation-ui": "^0.5.0",
+    "@hypothesis/annotation-ui": "^0.6.0",
     "@hypothesis/frontend-build": "^4.0.0",
     "@hypothesis/frontend-shared": "^9.6.1",
     "@hypothesis/frontend-testing": "^1.7.1",
