@@ -1,9 +1,8 @@
-import { StyledText } from '@hypothesis/annotation-ui';
+import { Excerpt, StyledText } from '@hypothesis/annotation-ui';
 import { useEffect, useMemo, useState, useId } from 'preact/hooks';
 
 import { withServices } from '../../service-context';
 import type { ThumbnailService, Thumbnail } from '../../services/thumbnail';
-import Excerpt from '../Excerpt';
 
 export type AnnotationThumbnailProps = {
   tag: string;
