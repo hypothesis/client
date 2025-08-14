@@ -24,8 +24,8 @@ describe('InlineControlExcerpt', () => {
     const wrapper = mount(<InlineControlExcerpt settings={{}} />);
     const excerpt = wrapper.find('Excerpt');
 
-    assert.isTrue(excerpt.prop('inlineControls'));
-    assert.isDefined(excerpt.prop('inlineControlsLinkStyle'));
+    assert.isTrue(excerpt.prop('inlineControl'));
+    assert.isDefined(excerpt.prop('inlineControlStyle'));
     assert.calledWith(fakeApplyTheme, ['selectionFontFamily'], {});
   });
 });
