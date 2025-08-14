@@ -1,8 +1,9 @@
-import { Excerpt, StyledText } from '@hypothesis/annotation-ui';
+import { StyledText } from '@hypothesis/annotation-ui';
 import { useEffect, useMemo, useState, useId } from 'preact/hooks';
 
 import { withServices } from '../../service-context';
 import type { ThumbnailService, Thumbnail } from '../../services/thumbnail';
+import InlineControlExcerpt from '../InlineControlExcerpt';
 
 export type AnnotationThumbnailProps = {
   tag: string;
@@ -94,10 +95,9 @@ function AnnotationThumbnail({
       </div>
 
       {thumbnail && altText && showDescription && (
-        <Excerpt
+        <InlineControlExcerpt
           // Two lines of text
           collapsedHeight={35}
-          inlineControls={true}
         >
           <StyledText
             // Hide this text from screen readers because it duplicates the thumbnail's
@@ -106,7 +106,7 @@ function AnnotationThumbnail({
           >
             <blockquote id={altId}>{altText}</blockquote>
           </StyledText>
-        </Excerpt>
+        </InlineControlExcerpt>
       )}
     </>
   );
