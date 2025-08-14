@@ -78,7 +78,7 @@ describe('AnnotationThumbnail', () => {
     fakeThumbnailService.get.returns(fakeThumbnail);
     const wrapper = createComponent({ description, showDescription: true });
 
-    const excerpt = wrapper.find('Excerpt');
+    const excerpt = wrapper.find('InlineControlExcerpt');
     assert.isTrue(excerpt.exists());
     assert.include(excerpt.text(), description);
   });
@@ -88,7 +88,7 @@ describe('AnnotationThumbnail', () => {
     fakeThumbnailService.get.returns(fakeThumbnail);
     const wrapper = createComponent({ description, showDescription: false });
 
-    const excerpt = wrapper.find('Excerpt');
+    const excerpt = wrapper.find('InlineControlExcerpt');
     assert.isFalse(excerpt.exists());
   });
 
@@ -96,7 +96,7 @@ describe('AnnotationThumbnail', () => {
     fakeThumbnailService.get.returns(fakeThumbnail);
     const wrapper = createComponent({ showDescription: true });
 
-    const excerpt = wrapper.find('Excerpt');
+    const excerpt = wrapper.find('InlineControlExcerpt');
     assert.isFalse(excerpt.exists());
   });
 

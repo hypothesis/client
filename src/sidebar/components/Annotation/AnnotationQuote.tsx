@@ -1,9 +1,10 @@
-import { Excerpt, StyledText } from '@hypothesis/annotation-ui';
+import { StyledText } from '@hypothesis/annotation-ui';
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../../types/config';
 import { applyTheme } from '../../helpers/theme';
 import { withServices } from '../../service-context';
+import InlineControlExcerpt from '../InlineControlExcerpt';
 
 type AnnotationQuoteProps = {
   quote: string;
@@ -22,7 +23,7 @@ function AnnotationQuote({
   settings,
 }: AnnotationQuoteProps) {
   return (
-    <Excerpt collapsedHeight={35} inlineControls={true} overflowThreshold={20}>
+    <InlineControlExcerpt collapsedHeight={35} overflowThreshold={20}>
       <StyledText classes={classnames({ 'p-redacted-text': isOrphan })}>
         <blockquote
           className={classnames('hover:border-l-blue-quote', {
@@ -33,7 +34,7 @@ function AnnotationQuote({
           {quote}
         </blockquote>
       </StyledText>
-    </Excerpt>
+    </InlineControlExcerpt>
   );
 }
 
