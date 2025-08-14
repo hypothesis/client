@@ -6,7 +6,7 @@ import { withServices } from '../service-context';
 
 export type InlineControlExcerptProps = Omit<
   ExcerptProps,
-  'inlineControls' | 'inlineControlsLinkStyle'
+  'inlineControl' | 'inlineControlStyle'
 > & {
   // Injected
   settings: object;
@@ -23,8 +23,8 @@ function InlineControlExcerpt({
   return (
     <Excerpt
       {...props}
-      inlineControls
-      inlineControlsLinkStyle={applyTheme(['selectionFontFamily'], settings)}
+      inlineControl
+      inlineControlStyle={applyTheme(['selectionFontFamily'], settings)}
     />
   );
 }
