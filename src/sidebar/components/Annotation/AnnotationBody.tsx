@@ -95,9 +95,9 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
     <div className="space-y-4">
       {showExcerpt && (
         <Excerpt
-          collapse={collapsed}
+          inlineControl={false}
+          collapsed={collapsed}
           collapsedHeight={400}
-          inlineControls={false}
           onCollapsibleChanged={setCollapsible}
           onToggleCollapsed={setCollapsed}
           overflowThreshold={20}
