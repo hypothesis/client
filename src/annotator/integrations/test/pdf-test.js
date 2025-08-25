@@ -366,7 +366,7 @@ describe('annotator/integrations/pdf', () => {
       assert.isNotNull(banner);
       assert.include(
         banner.shadowRoot.textContent,
-        'This PDF does not contain selectable text',
+        'Text annotation tools are unavailable because this PDF does not contain selectable text',
       );
     });
 

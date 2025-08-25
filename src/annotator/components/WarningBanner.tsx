@@ -3,7 +3,8 @@ import classnames from 'classnames';
 
 /**
  * A banner shown at the top of the PDF viewer if the PDF cannot be annotated
- * by Hypothesis.
+ * via text annotations due to lack of selectable text.
+ * Other types of annotations (like image annotations) may still work.
  */
 export default function WarningBanner() {
   return (
@@ -18,15 +19,18 @@ export default function WarningBanner() {
           <CautionIcon className="text-annotator-xl" />
         </div>
         <div>
-          <strong>This PDF does not contain selectable text:</strong>{' '}
+          <strong>
+            Text annotation tools are unavailable because this PDF does not
+            contain selectable text.
+          </strong>{' '}
           <Link
             target="_blank"
             href="https://web.hypothes.is/help/how-to-ocr-optimize-pdfs/"
             underline="always"
           >
-            Learn how to fix this
-          </Link>{' '}
-          in order to annotate with Hypothesis.
+            Learn more here
+          </Link>
+          .
         </div>
       </div>
     </div>
