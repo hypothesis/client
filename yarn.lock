@@ -5803,7 +5803,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai@npm:^5.0.0, chai@npm:^5.2.0":
+"chai@npm:^5.2.0":
   version: 5.3.1
   resolution: "chai@npm:5.3.1"
   dependencies:
@@ -5813,6 +5813,13 @@ __metadata:
     loupe: ^3.1.0
     pathval: ^2.0.0
   checksum: e68804fbf0936f338519ea4bbfded3f3cd00e6b24a847efe4c50b8fcb63a9d0e9a08a77ae409de59718dca44810d00d6a0e7f9db57afb39e2853a82ac6afa0e2
+  languageName: node
+  linkType: hard
+
+"chai@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "chai@npm:6.0.1"
+  checksum: 70fb4f9bfdd6f7720c99e0a6dadeeb650ffc15e0c02326577ad0e39d12313c61b8231e5b7b2c96a8c946a46435c0b2fa0f126b92b044e0eb28c2e00b98f1b713
   languageName: node
   linkType: hard
 
@@ -8174,7 +8181,7 @@ __metadata:
     babel-plugin-inject-args: ^1.0.0
     babel-plugin-istanbul: ^7.0.0
     babel-plugin-mockable-imports: ^2.0.1
-    chai: ^5.0.0
+    chai: ^6.0.1
     chance: ^1.0.13
     classnames: ^2.2.4
     commander: ^14.0.0
