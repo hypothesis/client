@@ -328,16 +328,27 @@ describe('Adder', () => {
       wrapper.unmount();
     });
 
-    it('returns a z-index greater than any highlights', () => {
-      const fakeHighlight = document.createElement('hypothesis-highlight');
-      fakeHighlight.style.zIndex = '20';
+    [
+      {
+        zIndex: '20',
+        adderZIndex: 21,
+      },
+      {
+        zIndex: 'auto',
+        adderZIndex: 1,
+      },
+    ].forEach(({ zIndex, adderZIndex }) => {
+      it('returns a z-index greater than any highlights', () => {
+        const fakeHighlight = document.createElement('hypothesis-highlight');
+        fakeHighlight.style.zIndex = zIndex;
 
-      try {
-        document.body.append(fakeHighlight);
-        assert.equal(getAdderZIndex(0, 0), 21);
-      } finally {
-        fakeHighlight.remove();
-      }
+        try {
+          document.body.append(fakeHighlight);
+          assert.equal(getAdderZIndex(0, 0), adderZIndex);
+        } finally {
+          fakeHighlight.remove();
+        }
+      });
     });
   });
 

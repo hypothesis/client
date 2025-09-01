@@ -280,7 +280,12 @@ export class Adder implements Destroyable {
       ...document.elementsFromPoint(left + adderWidth, top + adderHeight),
     ]);
 
-    const elementZIndex = (el: Element) => +getComputedStyle(el).zIndex;
+    const elementZIndex = (el: Element) => {
+      // The `zIndex` property value is a string whose value can either be an
+      // integer or "auto".
+      const zIndex = parseInt(getComputedStyle(el).zIndex);
+      return Number.isInteger(zIndex) ? zIndex : 0;
+    };
 
     const zIndexes = [...elements].map(elementZIndex).filter(Number.isInteger);
 
