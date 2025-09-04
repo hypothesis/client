@@ -1,4 +1,8 @@
-import { CardActions, Spinner } from '@hypothesis/frontend-shared';
+import {
+  CardActions,
+  formatDateTime,
+  Spinner,
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
@@ -107,7 +111,10 @@ function Annotation({
       annotationDisplayName(annotation, defaultAuthority, displayNamesEnabled),
     [annotation, defaultAuthority, displayNamesEnabled],
   );
-
+  const formattedDate = useMemo(
+    () => formatDateTime(annotation.created),
+    [annotation.created],
+  );
   const annotationDescription = isSaved(annotation)
     ? annotationRole(annotation)
     : `New ${annotationRole(annotation).toLowerCase()}`;
@@ -120,7 +127,7 @@ function Annotation({
   return (
     <article
       className="space-y-4"
-      aria-label={`${annotationDescription} by ${authorName}${state}`}
+      aria-label={`${annotationDescription} by ${authorName} on ${formattedDate}${state}`}
     >
       <AnnotationHeader
         annotation={annotation}
