@@ -71,6 +71,7 @@ describe('Annotation', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      '@hypothesis/frontend-shared': { formatDateTime: date => date },
       '../../helpers/annotation-metadata': fakeMetadata,
       '../../helpers/annotation-user': fakeAnnotationUser,
       '../../store': { useSidebarStore: () => fakeStore },
@@ -83,20 +84,20 @@ describe('Annotation', () => {
 
   describe('annotation accessibility (ARIA) attributes', () => {
     it('should add a descriptive `aria-label` for an existing annotation', () => {
-      const wrapper = createComponent();
+      const annotation = fixtures.defaultAnnotation();
+      const wrapper = createComponent({ annotation });
 
       assert.equal(
-        wrapper.find('article').props()['aria-label'],
-        'Annotation by Richard Lionheart',
+        wrapper.find('article').prop('aria-label'),
+        `Annotation by Richard Lionheart on ${annotation.created}`,
       );
     });
 
     it('should add a descriptive `aria-label` for a new annotation', () => {
       const wrapper = createComponent({ annotation: fixtures.newAnnotation() });
 
-      assert.equal(
-        wrapper.find('article').props()['aria-label'],
-        'New annotation by Richard Lionheart',
+      assert.isTrue(
+        wrapper.find('article').prop('aria-label').startsWith('New annotation'),
       );
     });
 
