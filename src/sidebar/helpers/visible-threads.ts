@@ -11,10 +11,13 @@ export const THREAD_DIMENSION_DEFAULTS = {
   marginBelow: 800,
 };
 
-type VisibleThreads = {
+export type VisibleThreads = {
   visibleThreads: Thread[];
   offscreenUpperHeight: number;
   offscreenLowerHeight: number;
+
+  /** Number of offscreen threads above the first visible one */
+  offscreenThreadsAbove: number;
 };
 
 /**
@@ -42,6 +45,7 @@ export function calculateVisibleThreads(
   // Estimated height, in px, of the thread cards above and below the viewport
   let offscreenUpperHeight = 0;
   let offscreenLowerHeight = 0;
+  let offscreenThreadsAbove = 0;
 
   threads.forEach(thread => {
     const threadHeight = threadHeights.get(thread.id) || defaultHeight;
@@ -53,6 +57,7 @@ export function calculateVisibleThreads(
 
     if (threadIsAboveViewport) {
       offscreenUpperHeight += threadHeight;
+      offscreenThreadsAbove += 1;
     } else if (threadIsVisible) {
       visibleThreads.push(thread);
     } else {
@@ -66,5 +71,6 @@ export function calculateVisibleThreads(
     visibleThreads,
     offscreenUpperHeight,
     offscreenLowerHeight,
+    offscreenThreadsAbove,
   };
 }
