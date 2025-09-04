@@ -82,6 +82,7 @@ describe('ThreadList', () => {
         visibleThreads: fakeTopThread.children,
         offscreenUpperHeight: 400,
         offscreenLowerHeight: 600,
+        offscreenThreadsAbove: 0,
       })),
       THREAD_DIMENSION_DEFAULTS: {
         defaultHeight: 200,
@@ -363,6 +364,19 @@ describe('ThreadList', () => {
     const wrapper = createComponent();
     const cards = wrapper.find('ThreadCard');
     assert.equal(cards.length, fakeTopThread.children.length);
+  });
+
+  it('calculates aria list attributes', () => {
+    const wrapper = createComponent();
+    const items = wrapper.find('[role="listitem"]');
+
+    assert.lengthOf(items, 4);
+    items.forEach((item, index) => {
+      // All items should have `aria-setsize` with the total amount of threads
+      // (visible and hidden)
+      assert.equal('4', item.prop('aria-setsize'));
+      assert.equal(`${index + 1}`, item.prop('aria-posinset'));
+    });
   });
 
   describe('chapter headings', () => {
