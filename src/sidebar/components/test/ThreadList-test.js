@@ -82,6 +82,7 @@ describe('ThreadList', () => {
         visibleThreads: fakeTopThread.children,
         offscreenUpperHeight: 400,
         offscreenLowerHeight: 600,
+        hiddenThreadsAbove: 0,
       })),
       THREAD_DIMENSION_DEFAULTS: {
         defaultHeight: 200,
@@ -226,16 +227,16 @@ describe('ThreadList', () => {
   });
 
   /**
-   * Get the blank spacer `<div>` that reserves space for non-rendered threads
+   * Get the blank spacer listitem that reserves space for non-rendered threads
    * above the viewport.
    */
-  const getUpperSpacer = wrapper => wrapper.find('div > div').first();
+  const getUpperSpacer = wrapper => wrapper.find('[role="listitem"]').first();
 
   /**
-   * Get the blank spacer `<div>` that reserves space for non-rendered threads
+   * Get the blank spacer listitem that reserves space for non-rendered threads
    * below the viewport.
    */
-  const getLowerSpacer = wrapper => wrapper.find('div > div').last();
+  const getLowerSpacer = wrapper => wrapper.find('[role="listitem"]').last();
 
   it('renders dimensional elements above and below visible threads', () => {
     const wrapper = createComponent();
@@ -363,6 +364,21 @@ describe('ThreadList', () => {
     const wrapper = createComponent();
     const cards = wrapper.find('ThreadCard');
     assert.equal(cards.length, fakeTopThread.children.length);
+  });
+
+  it('calculates aria list attributes', () => {
+    const wrapper = createComponent();
+    const items = wrapper
+      .find('[role="listitem"]')
+      .filterWhere(node => !node.prop('aria-hidden'));
+
+    assert.lengthOf(items, 4);
+    items.forEach((item, index) => {
+      // All items should have `aria-setsize` with the total amount of threads
+      // (visible and hidden)
+      assert.equal('4', item.prop('aria-setsize'));
+      assert.equal(`${index + 1}`, item.prop('aria-posinset'));
+    });
   });
 
   describe('chapter headings', () => {

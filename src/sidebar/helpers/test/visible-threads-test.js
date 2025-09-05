@@ -61,6 +61,8 @@ describe('sidebar/helpers/visible-threads', () => {
       // (4 additional threads): thus, the first 5 threads should be considered
       // "visible."
       assert.deepEqual(visibleIds, ['t1', 't2', 't3', 't4', 't5']);
+      assert.equal(calculated.hiddenThreadsAbove, 0);
+      assert.equal(calculated.hiddenThreadsBelow, 5);
       // The space offscreen below should be the remaining 5 threads at their
       // estimated 200px heights:
       assert.equal(calculated.offscreenLowerHeight, 1000);
@@ -90,8 +92,10 @@ describe('sidebar/helpers/visible-threads', () => {
       ]);
       // That first thread's space...
       assert.equal(calculated.offscreenUpperHeight, 200);
+      assert.equal(calculated.hiddenThreadsAbove, 1);
       // The rest are rendered within viewport + lower margin, so:
       assert.equal(calculated.offscreenLowerHeight, 0);
+      assert.equal(calculated.hiddenThreadsBelow, 0);
     });
 
     describe('calculating visible threads without margins', () => {
@@ -119,6 +123,8 @@ describe('sidebar/helpers/visible-threads', () => {
             't9',
             't10',
           ],
+          expectedHiddenThreadsAbove: 0,
+          expectedHiddenThreadsBelow: 0,
           offscreenUpperHeight: 0,
           offscreenLowerHeight: 0,
         },
@@ -126,6 +132,8 @@ describe('sidebar/helpers/visible-threads', () => {
           scrollPos: 0,
           windowHeight: 100,
           expectedVisibleThreadIds: ['t1'],
+          expectedHiddenThreadsAbove: 0,
+          expectedHiddenThreadsBelow: 9,
           offscreenUpperHeight: 0,
           offscreenLowerHeight: 900,
         },
@@ -133,6 +141,8 @@ describe('sidebar/helpers/visible-threads', () => {
           scrollPos: 101,
           windowHeight: 199,
           expectedVisibleThreadIds: ['t2', 't3'],
+          expectedHiddenThreadsAbove: 1,
+          expectedHiddenThreadsBelow: 7,
           offscreenUpperHeight: 100,
           offscreenLowerHeight: 700,
         },
@@ -155,6 +165,14 @@ describe('sidebar/helpers/visible-threads', () => {
           assert.equal(
             calculated.offscreenLowerHeight,
             testCase.offscreenLowerHeight,
+          );
+          assert.equal(
+            calculated.hiddenThreadsAbove,
+            testCase.expectedHiddenThreadsAbove,
+          );
+          assert.equal(
+            calculated.hiddenThreadsBelow,
+            testCase.expectedHiddenThreadsBelow,
           );
         });
       });

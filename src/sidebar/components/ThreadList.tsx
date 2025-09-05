@@ -139,17 +139,21 @@ export default function ThreadList({ threads }: ThreadListProps) {
 
   const topLevelThreads = threads;
 
-  const { offscreenLowerHeight, offscreenUpperHeight, visibleThreads } =
-    useMemo(
-      () =>
-        calculateVisibleThreads(
-          topLevelThreads,
-          threadHeights,
-          scrollPosition,
-          scrollContainerHeight,
-        ),
-      [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight],
-    );
+  const {
+    offscreenLowerHeight,
+    offscreenUpperHeight,
+    visibleThreads,
+    hiddenThreadsAbove,
+  } = useMemo(
+    () =>
+      calculateVisibleThreads(
+        topLevelThreads,
+        threadHeights,
+        scrollPosition,
+        scrollContainerHeight,
+      ),
+    [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight],
+  );
 
   // Compute the heading to display above each thread. Headings are only shown
   // in some document types (eg. VitalSource books).
@@ -297,10 +301,20 @@ export default function ThreadList({ threads }: ThreadListProps) {
   }, [visibleThreads]);
 
   return (
-    <div>
-      <div style={{ height: offscreenUpperHeight }} />
-      {visibleThreads.map(child => (
+    // We use role="list"/role="listitem" rather than unstyled ul/li because
+    // some screen readers do not treat them as lists if they don't explicitly
+    // have bullets
+    <div role="list">
+      <div
+        style={{ height: offscreenUpperHeight }}
+        role="listitem"
+        aria-hidden
+      />
+      {visibleThreads.map((child, index) => (
         <div
+          role="listitem"
+          aria-setsize={threads.length}
+          aria-posinset={hiddenThreadsAbove + index + 1}
           className={classnames(
             // The goal is to space out each annotation card vertically. Typically
             // this is better handled by applying vertical spacing to the parent
@@ -321,7 +335,11 @@ export default function ThreadList({ threads }: ThreadListProps) {
           <ThreadCard thread={child} />
         </div>
       ))}
-      <div style={{ height: offscreenLowerHeight }} />
+      <div
+        style={{ height: offscreenLowerHeight }}
+        role="listitem"
+        aria-hidden
+      />
     </div>
   );
 }
