@@ -34,11 +34,7 @@ export default function ShareDialog({ shareTab }: ShareDialogProps) {
   const isFirstTabSelected = selectedTab === initialTab;
 
   return (
-    <SidebarPanel
-      title={panelTitle}
-      panelName="shareGroupAnnotations"
-      variant="custom"
-    >
+    <SidebarPanel description={panelTitle} panelName="shareGroupAnnotations">
       <TabHeader closeTitle="Close share panel">
         {shareTab && (
           <Tab

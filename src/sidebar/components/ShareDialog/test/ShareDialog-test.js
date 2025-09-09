@@ -41,21 +41,21 @@ describe('ShareDialog', () => {
   });
 
   describe('panel dialog title', () => {
-    it("sets sidebar panel dialog title to include group's name", () => {
+    it("sets sidebar panel dialog description to include group's name", () => {
       const wrapper = createComponent();
 
       assert.equal(
-        wrapper.find('SidebarPanel').prop('title'),
+        wrapper.find('SidebarPanel').prop('description'),
         'Share Annotations in Test Private Group',
       );
     });
 
-    it('sets a temporary title if focused group not available', () => {
+    it('sets a temporary description if focused group not available', () => {
       fakeStore.focusedGroup = sinon.stub().returns({});
 
       const wrapper = createComponent();
       assert.equal(
-        wrapper.find('SidebarPanel').prop('title'),
+        wrapper.find('SidebarPanel').prop('description'),
         'Share Annotations in ...',
       );
     });

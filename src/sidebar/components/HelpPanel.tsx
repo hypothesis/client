@@ -109,10 +109,9 @@ function HelpPanel({ session }: HelpPanelProps) {
 
   return (
     <SidebarPanel
-      title="Help"
+      description="Help"
       panelName="help"
       onActiveChanged={onActiveChanged}
-      variant="custom"
     >
       <TabHeader closeTitle="Close help panel">
         <Tab

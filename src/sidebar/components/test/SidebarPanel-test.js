@@ -1,9 +1,10 @@
-import { Dialog } from '@hypothesis/frontend-shared';
+import { CloseButton } from '@hypothesis/frontend-shared';
 import {
   checkAccessibility,
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import SidebarPanel, { $imports } from '../SidebarPanel';
 
@@ -12,7 +13,11 @@ describe('SidebarPanel', () => {
   let fakeScrollIntoView;
 
   const createSidebarPanel = props =>
-    mount(<SidebarPanel panelName="testpanel" title="Test Panel" {...props} />);
+    mount(
+      <SidebarPanel panelName="testpanel" description="Test Panel" {...props}>
+        <CloseButton />
+      </SidebarPanel>,
+    );
 
   beforeEach(() => {
     fakeScrollIntoView = sinon.stub();
@@ -33,36 +38,68 @@ describe('SidebarPanel', () => {
     $imports.$restore();
   });
 
-  it('renders a panel with provided title and icon', () => {
-    const wrapper = createSidebarPanel({
-      title: 'My Panel',
-      icon: 'restricted',
-    });
+  it('renders a panel with provided description', () => {
+    const wrapper = createSidebarPanel({ description: 'My Panel' });
+    const panel = wrapper.find('section');
 
-    const dialog = wrapper.find(Dialog);
-
-    assert.equal(dialog.props().icon, 'restricted');
-    assert.equal(dialog.props().title, 'My Panel');
+    assert.equal(panel.prop('aria-label'), 'My Panel');
   });
 
-  it('provides an `onClose` handler that closes the panel', () => {
+  it('exposes a close handler via CloseableContext, that closes the panel', () => {
     const wrapper = createSidebarPanel({ panelName: 'flibberty' });
 
-    wrapper.find(Dialog).props().onClose();
+    // The CloseButton will use the handler exposed by the panel's CloseableContext
+    wrapper.find(CloseButton).find('button').simulate('click');
 
     assert.calledWith(fakeStore.toggleSidebarPanel, 'flibberty', false);
   });
 
-  it('shows content if active', () => {
-    fakeStore.isSidebarPanelOpen.returns(true);
-    const wrapper = createSidebarPanel();
-    assert.equal(wrapper.find('Slider').prop('direction'), 'in');
+  [true, false].forEach(isOpen => {
+    it('mounts content if active', () => {
+      fakeStore.isSidebarPanelOpen.returns(isOpen);
+      const wrapper = createSidebarPanel();
+      assert.equal(wrapper.exists(CloseButton), isOpen);
+    });
   });
 
-  it('hides content if not active', () => {
-    fakeStore.isSidebarPanelOpen.returns(false);
-    const wrapper = createSidebarPanel();
-    assert.isFalse(wrapper.find(Dialog).exists());
+  context('when initialFocus is provided', () => {
+    [
+      {
+        disabled: false,
+        direction: 'in',
+        shouldFocus: true,
+      },
+      {
+        disabled: true,
+        direction: 'in',
+        shouldFocus: false,
+      },
+      {
+        disabled: false,
+        direction: 'out',
+        shouldFocus: false,
+      },
+      {
+        disabled: true,
+        direction: 'out',
+        shouldFocus: false,
+      },
+    ].forEach(({ disabled, direction, shouldFocus }) => {
+      it('focuses element when opened, if it is not disabled', () => {
+        const fakeFocus = sinon.stub();
+        const elementToFocus = {
+          focus: fakeFocus,
+          disabled,
+        };
+        const wrapper = createSidebarPanel({
+          initialFocus: { current: elementToFocus },
+        });
+
+        wrapper.find('Slider').props().onTransitionEnd(direction);
+
+        assert.equal(fakeFocus.called, shouldFocus);
+      });
+    });
   });
 
   context('when panel state changes', () => {
@@ -75,34 +112,25 @@ describe('SidebarPanel', () => {
       return wrapper;
     };
 
+    [true, false].forEach(initiallyOpen => {
+      it('fires `onActiveChanged` callback when state changes, if provided', () => {
+        const fakeCallback = sinon.stub();
+        const wrapper = wrapperWithInitialState(initiallyOpen, {
+          onActiveChanged: fakeCallback,
+        });
+        // force re-render
+        wrapper.setProps({});
+
+        assert.calledWith(fakeCallback, !initiallyOpen);
+      });
+    });
+
     it('scrolls panel into view when opened after being closed', () => {
       const wrapper = wrapperWithInitialState(false, {});
       // force re-render
       wrapper.setProps({});
 
       assert.calledOnce(fakeScrollIntoView);
-    });
-
-    it('fires `onActiveChanged` callback if provided when opened', () => {
-      const fakeCallback = sinon.stub();
-      const wrapper = wrapperWithInitialState(false, {
-        onActiveChanged: fakeCallback,
-      });
-      // force re-render
-      wrapper.setProps({});
-
-      assert.calledWith(fakeCallback, true);
-    });
-
-    it('fires `onActiveChanged` callback if provided when closed', () => {
-      const fakeCallback = sinon.stub();
-      const wrapper = wrapperWithInitialState(true, {
-        onActiveChanged: fakeCallback,
-      });
-      // force re-render
-      wrapper.setProps({});
-
-      assert.calledWith(fakeCallback, false);
     });
 
     it('does not scroll panel if already opened', () => {

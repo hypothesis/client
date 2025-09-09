@@ -1,6 +1,10 @@
 import {
   Button,
+  Card,
   CardActions,
+  CardContent,
+  CardHeader,
+  CardTitle,
   RestrictedIcon,
 } from '@hypothesis/frontend-shared';
 
@@ -25,20 +29,24 @@ export default function LoginPromptPanel({
     return null;
   }
   return (
-    <SidebarPanel
-      icon={RestrictedIcon}
-      title="Login needed"
-      panelName="loginPrompt"
-    >
-      <p>Please log in to create annotations or highlights.</p>
-      <CardActions>
-        <Button title="Sign up" onClick={onSignUp}>
-          Sign up
-        </Button>
-        <Button title="Log in" variant="primary" onClick={onLogin}>
-          Log in
-        </Button>
-      </CardActions>
+    <SidebarPanel description="Login needed" panelName="loginPrompt">
+      <Card>
+        <CardHeader>
+          <RestrictedIcon className="w-em h-em" />
+          <CardTitle>Login needed</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please log in to create annotations or highlights.</p>
+          <CardActions>
+            <Button title="Sign up" onClick={onSignUp}>
+              Sign up
+            </Button>
+            <Button title="Log in" variant="primary" onClick={onLogin}>
+              Log in
+            </Button>
+          </CardActions>
+        </CardContent>
+      </Card>
     </SidebarPanel>
   );
 }

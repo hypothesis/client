@@ -19,8 +19,7 @@ export default function SearchPanel() {
   return (
     <SidebarPanel
       panelName="searchAnnotations"
-      variant="custom"
-      title="Search"
+      description="Search"
       initialFocus={inputRef}
       onActiveChanged={active => {
         if (!active) {
