@@ -166,11 +166,18 @@ export default function Menu({
     position: containerPositioned ? 'relative' : 'static',
   };
 
+  // The button and the container need to set the minimum and maximum widths so
+  // that potential nested truncated elements behave as expected.
+  // We could get rid of the relative container by migrating to frontend-shared's
+  // `Popover` once all browsers we support can use the native Popover API, in
+  // which case we could set these classes in the button only.
+  const truncateWrapperClasses = 'max-w-full min-w-0';
+
   return (
     // See https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/no-static-element-interactions.md#case-the-event-handler-is-only-being-used-to-capture-bubbled-events
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
     <div
-      className="relative"
+      className={classnames('relative', truncateWrapperClasses)}
       data-testid="menu-container"
       ref={menuRef}
       // Add inline styles for positioning
@@ -189,6 +196,7 @@ export default function Menu({
         className={classnames(
           'focus-visible-ring rounded transition-colors',
           'flex items-center justify-center gap-x-1',
+          truncateWrapperClasses,
           {
             'text-grey-7 hover:text-grey-9': !isOpen,
             'text-brand': isOpen,
