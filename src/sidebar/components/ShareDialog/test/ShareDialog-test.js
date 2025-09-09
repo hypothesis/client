@@ -4,6 +4,7 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import ShareDialog from '../ShareDialog';
 import { $imports } from '../ShareDialog';
@@ -40,22 +41,22 @@ describe('ShareDialog', () => {
     $imports.$restore();
   });
 
-  describe('panel dialog title', () => {
-    it("sets sidebar panel dialog title to include group's name", () => {
+  describe('share tab title', () => {
+    it("includes group's name", () => {
       const wrapper = createComponent();
 
       assert.equal(
-        wrapper.find('SidebarPanel').prop('title'),
+        wrapper.find('TabPanel[data-testid="share-panel"]').prop('title'),
         'Share Annotations in Test Private Group',
       );
     });
 
-    it('sets a temporary title if focused group not available', () => {
+    it('sets a temporary label if focused group not available', () => {
       fakeStore.focusedGroup = sinon.stub().returns({});
 
       const wrapper = createComponent();
       assert.equal(
-        wrapper.find('SidebarPanel').prop('title'),
+        wrapper.find('TabPanel[data-testid="share-panel"]').prop('title'),
         'Share Annotations in ...',
       );
     });

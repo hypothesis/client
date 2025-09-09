@@ -34,11 +34,7 @@ export default function ShareDialog({ shareTab }: ShareDialogProps) {
   const isFirstTabSelected = selectedTab === initialTab;
 
   return (
-    <SidebarPanel
-      title={panelTitle}
-      panelName="shareGroupAnnotations"
-      variant="custom"
-    >
+    <SidebarPanel label="Share panel" panelName="shareGroupAnnotations">
       <TabHeader closeTitle="Close share panel">
         {shareTab && (
           <Tab
@@ -76,6 +72,7 @@ export default function ShareDialog({ shareTab }: ShareDialogProps) {
       <Card classes={classnames({ 'rounded-tl-none': isFirstTabSelected })}>
         <TabPanel
           id="share-panel"
+          data-testid="share-panel"
           active={selectedTab === 'share'}
           aria-labelledby="share-panel-tab"
           title={panelTitle}
