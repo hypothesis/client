@@ -101,7 +101,7 @@ function GroupList({ settings }: GroupListProps) {
               alt={altName}
             />
           )}
-          {focusedGroup.name}
+          <span className="truncate">{focusedGroup.name}</span>
         </span>
       </span>
     );
