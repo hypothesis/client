@@ -108,12 +108,7 @@ function HelpPanel({ session }: HelpPanelProps) {
   );
 
   return (
-    <SidebarPanel
-      title="Help"
-      panelName="help"
-      onActiveChanged={onActiveChanged}
-      variant="custom"
-    >
+    <SidebarPanel panelName="help" onActiveChanged={onActiveChanged}>
       <TabHeader closeTitle="Close help panel">
         <Tab
           id={tutorialTabId}

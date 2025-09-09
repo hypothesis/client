@@ -12,7 +12,7 @@ describe('SidebarPanel', () => {
   let fakeScrollIntoView;
 
   const createSidebarPanel = props =>
-    mount(<SidebarPanel panelName="testpanel" title="Test Panel" {...props} />);
+    mount(<SidebarPanel panelName="testpanel" {...props} />);
 
   beforeEach(() => {
     fakeScrollIntoView = sinon.stub();

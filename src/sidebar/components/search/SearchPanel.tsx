@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@hypothesis/frontend-shared';
-import { useRef } from 'preact/hooks';
+import { useLayoutEffect, useRef } from 'preact/hooks';
 
 import { useSidebarStore } from '../../store';
 import SidebarPanel from '../SidebarPanel';
@@ -19,8 +19,6 @@ export default function SearchPanel() {
   return (
     <SidebarPanel
       panelName="searchAnnotations"
-      variant="custom"
-      title="Search"
       initialFocus={inputRef}
       onActiveChanged={active => {
         if (!active) {
