@@ -92,7 +92,7 @@ function GroupList({ settings }: GroupListProps) {
         )}
         <span
           className={classnames(
-            'text-md text-color-text font-bold',
+            'text-md text-color-text font-bold truncate',
             // Add some vertical padding so that the dropdown has some space
             'py-1',
           )}
