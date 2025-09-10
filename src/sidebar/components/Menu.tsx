@@ -1,17 +1,11 @@
-import { usePopoverShouldClose } from '@hypothesis/frontend-shared';
+import { Popover } from '@hypothesis/frontend-shared';
 import { MenuExpandIcon } from '@hypothesis/frontend-shared';
+import CloseableContext from '@hypothesis/frontend-shared/lib/components/CloseableContext';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
-
-/**
- * Flag indicating whether the next click event on the menu's toggle button
- * should be ignored, because the action it would trigger has already been
- * triggered by a preceding "mousedown" event.
- */
-let ignoreNextClick = false;
 
 export type MenuProps = {
   /**
@@ -27,12 +21,6 @@ export type MenuProps = {
 
   /** Menu content, typically `MenuSection` and `MenuItem` components  */
   children: ComponentChildren;
-
-  /**
-   * Whether the menu elements should be positioned relative to the Menu
-   * container. When `false`, the consumer is responsible for positioning.
-   */
-  containerPositioned?: boolean;
 
   /** Additional CSS classes to apply to the Menu */
   contentClass?: string;
@@ -88,7 +76,6 @@ const noop = () => {};
 export default function Menu({
   align = 'left',
   children,
-  containerPositioned = true,
   contentClass,
   defaultOpen = false,
   disabled = false,
@@ -114,75 +101,12 @@ export default function Menu({
     }
   }, [isOpen, onOpenChanged]);
 
-  /**
-   * Toggle menu when user presses toggle button. The menu is shown on mouse
-   * press for a more responsive/native feel but also handles a click event for
-   * activation via other input methods.
-   */
-  const toggleMenu = (event: Event) => {
-    // If the menu was opened on press, don't close it again on the subsequent
-    // mouse up ("click") event.
-    if (event.type === 'mousedown') {
-      ignoreNextClick = true;
-    } else if (event.type === 'click' && ignoreNextClick) {
-      // Ignore "click" event triggered from the mouse up action.
-      ignoreNextClick = false;
-      event.stopPropagation();
-      event.preventDefault();
-      return;
-    }
-
-    setOpen(!isOpen);
-  };
+  const toggleMenu = () => setOpen(!isOpen);
   const closeMenu = useCallback(() => setOpen(false), [setOpen]);
-
-  // Set up an effect which adds document-level event handlers when the menu
-  // is open and removes them when the menu is closed or removed.
-  //
-  // These handlers close the menu when the user taps or clicks outside the
-  // menu or presses Escape.
-  const menuRef = useRef<HTMLDivElement | null>(null);
-
-  // Menu element should close via `closeMenu` whenever it's open and there
-  // are user interactions outside of it (e.g. clicks) in the document
-  usePopoverShouldClose(menuRef, closeMenu, { enabled: isOpen });
-
-  const stopPropagation = (e: Event) => e.stopPropagation();
-
-  // It should also close if the user presses a key which activates menu items.
-  const handleMenuKeyDown = (event: KeyboardEvent) => {
-    const key = event.key;
-    if (key === 'Enter' || key === ' ') {
-      // The browser will not open the link if the link element is removed
-      // from within the keypress event that triggers it. Add a little
-      // delay to work around that.
-      setTimeout(() => {
-        closeMenu();
-      });
-    }
-  };
-
-  const containerStyle = {
-    position: containerPositioned ? 'relative' : 'static',
-  };
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   return (
-    // See https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/no-static-element-interactions.md#case-the-event-handler-is-only-being-used-to-capture-bubbled-events
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
-    <div
-      className="relative"
-      data-testid="menu-container"
-      ref={menuRef}
-      // Add inline styles for positioning
-      style={containerStyle}
-      // Don't close the menu if the mouse is released over one of the menu
-      // elements outside the content area (eg. the arrow at the top of the
-      // content).
-      onClick={stopPropagation}
-      // Don't close the menu if the user presses the mouse down on menu elements
-      // except for the toggle button.
-      onMouseDown={stopPropagation}
-    >
+    <>
       <button
         aria-expanded={isOpen ? 'true' : 'false'}
         aria-haspopup={true}
@@ -196,10 +120,10 @@ export default function Menu({
         )}
         data-testid="menu-toggle-button"
         disabled={disabled}
-        onMouseDown={toggleMenu}
         onClick={toggleMenu}
         aria-label={title}
         title={title}
+        ref={buttonRef}
       >
         <span
           // wrapper is needed to serve as the flex layout for the label and indicator content.
@@ -217,30 +141,20 @@ export default function Menu({
           )}
         </span>
       </button>
-      {isOpen && (
-        <div
-          className={classnames(
-            'focus-visible-ring',
-            // Position menu content near bottom of menu label/toggle control
-            'absolute top-[calc(100%+3px)] z-1',
-            'border shadow-intense rounded-lg overflow-hidden bg-white text-md',
-            {
-              'left-0': align === 'left',
-              'right-0': align === 'right',
-            },
-            contentClass,
-          )}
-          data-testid="menu-content"
-          role="menu"
-          tabIndex={-1}
-          onClick={closeMenu}
-          onKeyDown={handleMenuKeyDown}
-        >
-          <MenuKeyboardNavigation visible={true}>
-            {children}
-          </MenuKeyboardNavigation>
-        </div>
-      )}
-    </div>
+      <Popover
+        open={isOpen}
+        onClose={closeMenu}
+        anchorElementRef={buttonRef}
+        align={align}
+        classes={classnames(
+          '!max-h-full text-md !shadow-intense !rounded-lg',
+          contentClass,
+        )}
+      >
+        <CloseableContext.Provider value={{ onClose: closeMenu }}>
+          <MenuKeyboardNavigation visible>{children}</MenuKeyboardNavigation>
+        </CloseableContext.Provider>
+      </Popover>
+    </>
   );
 }

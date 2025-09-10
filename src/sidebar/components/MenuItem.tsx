@@ -3,10 +3,11 @@ import {
   MenuExpandIcon,
   Slider,
 } from '@hypothesis/frontend-shared';
+import CloseableContext from '@hypothesis/frontend-shared/lib/components/CloseableContext';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 import type { ComponentChildren, Ref } from 'preact';
-import { useEffect, useRef } from 'preact/hooks';
+import { useCallback, useContext, useEffect, useRef } from 'preact/hooks';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
 
@@ -186,6 +187,16 @@ export default function MenuItem({
     });
   };
 
+  const closeParentMenu = useContext(CloseableContext);
+  // When the item is clicked, close parent menu too
+  const handleClick = useCallback(
+    (e: Event) => {
+      onClick?.(e);
+      closeParentMenu?.onClose?.();
+    },
+    [closeParentMenu, onClick],
+  );
+
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
       case 'ArrowRight':
@@ -199,7 +210,7 @@ export default function MenuItem({
       case ' ':
         if (onClick) {
           // Let event propagate so the menu closes
-          onClick(event);
+          handleClick(event);
         }
     }
   };
@@ -296,6 +307,7 @@ export default function MenuItem({
         rel="noopener noreferrer"
         role="menuitem"
         onKeyDown={onKeyDown}
+        onClick={closeParentMenu?.onClose}
       >
         {menuItemContent}
       </a>
@@ -310,7 +322,7 @@ export default function MenuItem({
         data-testid="menu-item"
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        onClick={onClick}
+        onClick={handleClick}
         role={isRadioButtonType ? 'menuitemradio' : 'menuitem'}
         aria-checked={isRadioButtonType ? isSelected : undefined}
         aria-haspopup={hasSubmenuVisible}
