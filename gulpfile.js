@@ -11,44 +11,36 @@ import changed from 'gulp-changed';
 import { serveDev } from './dev-server/serve-dev.js';
 import { servePackage } from './dev-server/serve-package.js';
 import { renderBootTemplate } from './scripts/render-boot-template.js';
-import annotatorTailwindConfig from './tailwind-annotator.config.js';
-import sidebarTailwindConfig from './tailwind-sidebar.config.js';
-import tailwindConfig from './tailwind.config.js';
 
 gulp.task('build-js', () => buildJS('./rollup.config.js'));
 gulp.task('watch-js', () => watchJS('./rollup.config.js'));
 
 gulp.task('build-annotator-tailwind-css', () =>
-  buildCSS(['./src/styles/annotator/annotator.scss'], {
-    tailwindConfig: annotatorTailwindConfig,
+  buildCSS(['./src/styles/annotator/annotator.css'], {
+    autoprefixer: false,
+    tailwind: true,
   }),
 );
 
 gulp.task('build-sidebar-tailwind-css', () =>
   buildCSS(
     [
-      // sidebar styles (with tailwind)
-      './src/styles/sidebar/sidebar.scss',
-      // TODO: After tailwind migration complete, should this
-      // be managed with its own tailwind config?
-      './src/styles/ui-playground/ui-playground.scss',
+      './src/styles/sidebar/sidebar.css',
+      './src/styles/ui-playground/ui-playground.css',
     ],
-    { tailwindConfig: sidebarTailwindConfig },
+    { autoprefixer: false, tailwind: true },
   ),
 );
 
+// Style bundles that don't use Tailwind.
 gulp.task('build-standalone-css', () =>
   buildCSS(
     [
-      // styles processed by tailwind, used by annotator
       './src/styles/annotator/highlights.scss',
-      // other styles used by annotator (standalone)
-      './src/styles/annotator/pdfjs-overrides.scss',
-
-      // Vendor
+      './src/styles/annotator/pdfjs-overrides.css',
       './node_modules/katex/dist/katex.min.css',
     ],
-    { tailwindConfig },
+    { autoprefixer: false },
   ),
 );
 
@@ -68,6 +60,7 @@ gulp.task(
       [
         'node_modules/katex/dist/katex.min.css',
         'src/styles/**/*.scss',
+        'src/styles/**/*.css',
         'src/**/*.tsx',
         'dev-server/ui-playground/**/*.tsx',
       ],
