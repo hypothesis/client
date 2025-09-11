@@ -39,7 +39,7 @@ function NativeDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="relative w-full h-full backdrop:bg-black/50"
+      className="relative m-5 w-full h-full backdrop:bg-black/50"
       data-testid={testId}
       aria-label={label}
     >
