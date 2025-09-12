@@ -98,7 +98,6 @@ function AnnotationPublishControl({
           style={buttonStyle}
         >
           <Menu
-            containerPositioned={false}
             contentClass={classnames(
               // Ensure the menu is wide enough to "reach" the right-aligned
               // up-pointing menu arrow

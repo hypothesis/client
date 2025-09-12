@@ -56,11 +56,14 @@ export default function MenuKeyboardNavigation({
   }, [visible]);
 
   const onKeyDown = (event: KeyboardEvent) => {
-    const menuItems = Array.from(
-      menuRef.current!.querySelectorAll(
-        '[role^="menuitem"]',
-      ) as NodeListOf<HTMLElement>,
-    ).filter(isElementVisible);
+    const menu = menuRef.current;
+    const menuItems = menu
+      ? Array.from(
+          menu.querySelectorAll(
+            '[role^="menuitem"]',
+          ) as NodeListOf<HTMLElement>,
+        ).filter(isElementVisible)
+      : [];
 
     let focusedIndex = menuItems.findIndex(el =>
       el.contains(document.activeElement),
