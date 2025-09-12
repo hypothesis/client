@@ -1,7 +1,16 @@
-/* Styles for annotator UI elements. This stylesheet is loaded within shadow
-   roots to avoid affecting the host page. Styles for elements (eg. highlights)
-   which do not use shadow roots go in other bundles (eg. highlights.css,
-   pdfjs-overrides.scss). */
+/*
+Styles for annotator UI elements. This stylesheet is loaded within shadow roots
+to avoid affecting the host page. Styles for elements (eg. highlights) which do
+not use shadow roots go in other bundles (eg. highlights.css,
+pdfjs-overrides.scss).
+
+# Important note about CSS custom @property declarations
+
+Tailwind generates CSS that relies on custom @property declarations. These
+declarations are ignored when loaded in Shadow DOM. To work around that we have
+logic in `src/annotator/util/shadow-root.ts` to duplicate the properties in the
+host page. See shadow-root.ts for more details.
+*/
 
 @import 'tailwindcss' source(none);
 @config '../../../tailwind-annotator.config.js';
