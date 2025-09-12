@@ -1,4 +1,4 @@
-import { createShadowRoot } from '../shadow-root';
+import { createShadowRoot, getPropertyStyleSheet } from '../shadow-root';
 
 describe('annotator/util/shadow-root', () => {
   let container;
@@ -48,6 +48,18 @@ describe('annotator/util/shadow-root', () => {
       const linkEl = container.shadowRoot.querySelector('link[rel=stylesheet]');
       assert.isNull(linkEl);
       link.setAttribute('rel', 'stylesheet');
+    });
+
+    it('registers CSS @property declarations in a new stylesheet in the main document', () => {
+      createShadowRoot(container);
+      const sheet = getPropertyStyleSheet();
+
+      assert.instanceOf(sheet, CSSStyleSheet);
+      assert.include(document.adoptedStyleSheets, sheet);
+      const propRules = [...sheet.rules].filter(
+        rule => rule instanceof CSSPropertyRule,
+      );
+      assert.equal(propRules.length, 59);
     });
   });
 });

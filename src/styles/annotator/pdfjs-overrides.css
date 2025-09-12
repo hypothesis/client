@@ -1,0 +1,12 @@
+/* Hide annotation layer while selecting text.
+   See https://github.com/hypothesis/client/issues/1464. */
+#viewer.is-selecting .annotationLayer {
+  display: none;
+}
+
+/* Override tiny base 10px font-size in older versions of PDF.js. This is
+   necessary for styling components in shadow DOMs that rely on REM- based
+   scales. See https://github.com/mozilla/pdf.js/issues/14555. */
+html {
+  font-size: 100%;
+}

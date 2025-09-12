@@ -41,27 +41,6 @@ export default {
           quote: '#58cef4',
         },
       },
-      // Content in the sidebar should never exceed a max-width of `768px`, and
-      // that content should be auto-centered
-      // See https://tailwindcss.com/docs/container
-      container: {
-        center: true,
-        // Horizontal padding is larger for wider screens
-        padding: {
-          // Precise horizontal padding for annotation-card alignment
-          DEFAULT: '9px',
-          lg: '4rem',
-        },
-        // By default, tailwind will provide appropriately-sized containers at
-        // every breakpoint available in `screens`, but for the sidebar, only
-        // one width matters: the width associated with the `lg` breakpoint.
-        // The content container should never be larger than that. `container`
-        // has a `max-width:100%` until the `lg` breakpoint, after which it
-        // never exceeds `768px`.
-        screens: {
-          lg: '768px',
-        },
-      },
       fontFamily: {
         mono: ['"Open Sans Mono"', 'Menlo', '"DejaVu Sans Mono"', 'monospace'],
         sans: [
@@ -220,7 +199,7 @@ export default {
       // element had the `.theme-clean` class.
       addVariant('theme-clean', '.theme-clean &');
     }),
-    plugin(({ addComponents, addUtilities }) => {
+    plugin(({ addUtilities }) => {
       addUtilities({
         // Tailwind does not provide hyphens-related utility classes.
         '.hyphens-none': {
@@ -232,14 +211,6 @@ export default {
         // Tailwind does not provide this specific break utility: https://tailwindcss.com/docs/word-break
         '.break-anywhere': {
           'overflow-wrap': 'anywhere',
-        },
-      });
-      addComponents({
-        // Add a custom class to set all properties to initial values. Used
-        // within shadow DOMs. This must be on the components layer such that it
-        // gets applied "before" utility classes.
-        '.all-initial': {
-          all: 'initial',
         },
       });
     }),
