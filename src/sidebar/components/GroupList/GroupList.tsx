@@ -79,31 +79,27 @@ function GroupList({ settings }: GroupListProps) {
     // and pass an empty string.
     const altName = orgName(focusedGroup) ? orgName(focusedGroup) : '';
     label = (
-      <span
-        className={classnames(
-          // Add some vertical padding so that the dropdown has some space
-          'py-1',
+      <>
+        {icon && (
+          <img
+            className={classnames(
+              // Tiny adjustment to make H logo align better with group name
+              'relative top-[1px] w-4 h-4',
+            )}
+            src={icon}
+            alt={altName}
+          />
         )}
-      >
         <span
           className={classnames(
-            // Don't allow this label to shrink (wrap to next line)
-            'shrink-0 flex items-center gap-x-1 text-md text-color-text font-bold',
+            'text-md text-color-text font-bold',
+            // Add some vertical padding so that the dropdown has some space
+            'py-1',
           )}
         >
-          {icon && (
-            <img
-              className={classnames(
-                // Tiny adjustment to make H logo align better with group name
-                'relative top-[1px] w-4 h-4',
-              )}
-              src={icon}
-              alt={altName}
-            />
-          )}
           {focusedGroup.name}
         </span>
-      </span>
+      </>
     );
   } else {
     label = <span>…</span>;

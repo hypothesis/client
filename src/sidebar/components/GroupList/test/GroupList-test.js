@@ -224,14 +224,18 @@ describe('GroupList', () => {
     fakeServiceConfig.returns({ icon: 'test-icon' });
     const wrapper = createGroupList();
     const label = wrapper.find('Menu').prop('label');
-    const img = mount(label).find('img');
+    const img = mount(<div>{label}</div>).find('img');
     assert.equal(img.prop('src'), 'test-icon');
   });
 
   it('does not render an icon if the the publisher-provided icon is missing', () => {
     const wrapper = createGroupList();
     const label = wrapper.find('Menu').prop('label');
-    assert.isFalse(mount(label).find('img').exists());
+    assert.isFalse(
+      mount(<div>{label}</div>)
+        .find('img')
+        .exists(),
+    );
   });
 
   /**
