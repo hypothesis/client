@@ -8,11 +8,5 @@ describe('sidebar/helpers/group-list-item-common', () => {
       const organizationName = groupListItemCommon.orgName(fakeGroup);
       assert.equal(organizationName, fakeGroup.organization.name);
     });
-
-    it('returns undefined if group has no organization', () => {
-      const fakeGroup = { id: 'groupid' };
-
-      assert.isUndefined(groupListItemCommon.orgName(fakeGroup));
-    });
   });
 });

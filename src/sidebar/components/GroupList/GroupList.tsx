@@ -24,6 +24,40 @@ function publisherProvidedIcon(settings: SidebarSettings) {
   return svc && svc.icon ? svc.icon : null;
 }
 
+type GroupNameProps = {
+  group: Group;
+  settings: SidebarSettings;
+};
+
+function GroupName({ group, settings }: GroupNameProps) {
+  const icon = group.organization.logo || publisherProvidedIcon(settings) || '';
+  const altName = orgName(group);
+
+  return (
+    <>
+      {icon && (
+        <img
+          className={classnames(
+            // Tiny adjustment to make H logo align better with group name
+            'relative top-[1px] w-4 h-4',
+          )}
+          src={icon}
+          alt={altName}
+        />
+      )}
+      <span
+        className={classnames(
+          'text-md text-color-text font-bold truncate',
+          // Add some vertical padding so that the dropdown has some space
+          'py-1',
+        )}
+      >
+        {group.name}
+      </span>
+    </>
+  );
+}
+
 export type GroupListProps = {
   settings: SidebarSettings;
 };
@@ -70,40 +104,11 @@ function GroupList({ settings }: GroupListProps) {
   // to move this state to the `Menu` component.
   const [expandedGroup, setExpandedGroup] = useState<Group | null>(null);
 
-  let label;
-  if (focusedGroup) {
-    const icon =
-      focusedGroup.organization.logo || publisherProvidedIcon(settings) || '';
-
-    // If org name is missing, then treat this icon like decoration
-    // and pass an empty string.
-    const altName = orgName(focusedGroup) ? orgName(focusedGroup) : '';
-    label = (
-      <>
-        {icon && (
-          <img
-            className={classnames(
-              // Tiny adjustment to make H logo align better with group name
-              'relative top-[1px] w-4 h-4',
-            )}
-            src={icon}
-            alt={altName}
-          />
-        )}
-        <span
-          className={classnames(
-            'text-md text-color-text font-bold truncate',
-            // Add some vertical padding so that the dropdown has some space
-            'py-1',
-          )}
-        >
-          {focusedGroup.name}
-        </span>
-      </>
-    );
-  } else {
-    label = <span>…</span>;
-  }
+  const label = focusedGroup ? (
+    <GroupName group={focusedGroup} settings={settings} />
+  ) : (
+    <span>…</span>
+  );
 
   const isThirdParty = isThirdPartyService(settings);
 

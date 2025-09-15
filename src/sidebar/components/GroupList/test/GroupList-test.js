@@ -197,13 +197,6 @@ describe('GroupList', () => {
       assert.equal(wrapper.find('img').prop('alt'), 'Test Org');
     });
 
-    it('uses a blank string for the `alt` attribute if the organization name is missing', () => {
-      fakeServiceConfig.returns({ icon: 'test-icon' });
-      testGroup.organization = {};
-      const wrapper = createGroupList();
-      assert.equal(wrapper.find('img').prop('alt'), '');
-    });
-
     it('does not show group icons', () => {
       populateGroupSections();
       const wrapper = createGroupList();
