@@ -1,4 +1,25 @@
 /**
+ * Stylesheet injected into the main document in order to declare CSS custom
+ * properties which are used within shadow DOM.
+ *
+ * This is needed to work around https://github.com/tailwindlabs/tailwindcss/issues/15005.
+ *
+ * See also https://developer.chrome.com/docs/css-ui/css-names#property
+ * and https://github.com/w3c/csswg-drafts/issues/10541.
+ */
+let propertyStyleSheet: CSSStyleSheet | undefined;
+
+// For use in tests.
+export function getPropertyStyleSheet() {
+  return propertyStyleSheet;
+}
+
+// For use in tests.
+export function resetPropertyStyleSheet() {
+  propertyStyleSheet = undefined;
+}
+
+/**
  * Load stylesheets for annotator UI components into the shadow DOM root.
  */
 function loadStyles(shadowRoot: ShadowRoot) {
@@ -16,7 +37,33 @@ function loadStyles(shadowRoot: ShadowRoot) {
   const linkEl = document.createElement('link');
   linkEl.rel = 'stylesheet';
   linkEl.href = url;
+  linkEl.crossOrigin = 'anonymous';
   shadowRoot.appendChild(linkEl);
+
+  // When styles are loaded for the first time, wait for the stylesheet to load,
+  // then extract `@property` declarations and append them to a stylesheet in
+  // the top-level document.
+  if (propertyStyleSheet === undefined) {
+    propertyStyleSheet = new CSSStyleSheet();
+    const sheet = propertyStyleSheet;
+
+    linkEl.addEventListener(
+      'load',
+      () => {
+        /* istanbul ignore next */
+        if (!linkEl.sheet) {
+          return;
+        }
+        for (const rule of linkEl.sheet.rules) {
+          if (rule instanceof CSSPropertyRule) {
+            sheet.insertRule(rule.cssText);
+          }
+        }
+        document.adoptedStyleSheets.push(sheet);
+      },
+      { once: true },
+    );
+  }
 }
 
 /**

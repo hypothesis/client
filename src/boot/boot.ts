@@ -95,17 +95,30 @@ function injectLink(
   doc.head.appendChild(link);
 }
 
+type PreloadOptions = {
+  crossOrigin?: boolean;
+};
+
 /**
  * Preload a URL using a `<link rel="preload" as="<type>" ...>` element
  *
  * This can be used to preload an API request or other resource which we know
  * that the client will load.
  */
-function preloadURL(doc: Document, type: string, url: string) {
+function preloadURL(
+  doc: Document,
+  type: string,
+  url: string,
+  { crossOrigin }: PreloadOptions = {},
+) {
   const link = doc.createElement('link');
   link.rel = 'preload';
   link.as = type;
   link.href = url;
+
+  if (crossOrigin) {
+    link.crossOrigin = 'anonymous';
+  }
 
   // If this is a resource that we are going to read the contents of, then we
   // need to make a cross-origin request. For other types, use a non cross-origin
@@ -150,7 +163,10 @@ export function bootHypothesisClient(doc: Document, config: AnnotatorConfig) {
   injectLink(doc, 'profile', 'html', config.profileAppUrl);
 
   // Preload the styles used by the shadow roots of annotator UI elements.
-  preloadURL(doc, 'style', assetURL(config, 'styles/annotator.css'));
+  preloadURL(doc, 'style', assetURL(config, 'styles/annotator.css'), {
+    // Enable style rules to be accessed from JS. See notes in shadow-root.ts.
+    crossOrigin: true,
+  });
 
   // Register the URL of the annotation client which is currently being used to drive
   // annotation interactions.
