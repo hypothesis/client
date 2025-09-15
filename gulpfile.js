@@ -28,7 +28,7 @@ gulp.task('build-sidebar-tailwind-css', () =>
       './src/styles/sidebar/sidebar.css',
       './src/styles/ui-playground/ui-playground.css',
     ],
-    { autoprefixer: false, tailwind: true },
+    { tailwind: true },
   ),
 );
 
