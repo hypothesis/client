@@ -50,7 +50,7 @@
   --default-ring-color: #59a7e8;
 }
 
-@use '@hypothesis/annotation-ui/lib/StyledText.css';
+@import '@hypothesis/annotation-ui/StyledText.css';
 
 @layer components {
   /* Style a background to contain a vertical dashed line, horizontally-
