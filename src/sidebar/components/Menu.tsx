@@ -187,8 +187,8 @@ export default function Menu({
         aria-expanded={isOpen ? 'true' : 'false'}
         aria-haspopup={true}
         className={classnames(
-          'focus-visible-ring',
-          'flex items-center justify-center rounded transition-colors',
+          'focus-visible-ring rounded transition-colors',
+          'flex items-center justify-center gap-x-1',
           {
             'text-grey-7 hover:text-grey-9': !isOpen,
             'text-brand': isOpen,
@@ -201,21 +201,16 @@ export default function Menu({
         aria-label={title}
         title={title}
       >
-        <span
-          // wrapper is needed to serve as the flex layout for the label and indicator content.
-          className="flex items-center gap-x-1"
-        >
-          {label}
-          {menuIndicator && (
-            <span
-              className={classnames({
-                'rotate-180 text-color-text': isOpen,
-              })}
-            >
-              <MenuExpandIcon className="w-2.5 h-2.5" />
-            </span>
-          )}
-        </span>
+        {label}
+        {menuIndicator && (
+          <span
+            className={classnames({
+              'rotate-180 text-color-text': isOpen,
+            })}
+          >
+            <MenuExpandIcon className="w-2.5 h-2.5" />
+          </span>
+        )}
       </button>
       {isOpen && (
         <div
