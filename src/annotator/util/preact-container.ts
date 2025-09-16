@@ -33,7 +33,9 @@ export class PreactContainer implements Destroyable {
   constructor(name: string, render: () => ComponentChild) {
     const tag = `hypothesis-${name}`;
     this._element = document.createElement(tag);
-    this._shadowRoot = createShadowRoot(this._element);
+
+    const { shadowRoot } = createShadowRoot(this._element);
+    this._shadowRoot = shadowRoot;
     this._render = render;
   }
 

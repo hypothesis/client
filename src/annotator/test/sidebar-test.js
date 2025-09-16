@@ -909,12 +909,18 @@ describe('Sidebar', () => {
 
   describe('window resize events', () => {
     let sidebar;
+    let initialWindowWidth;
 
     beforeEach(async () => {
       // Configure the sidebar to open on load and wait for the initial open to
       // complete.
       sidebar = createSidebar({ openSidebar: true });
       connectSidebarApp();
+      initialWindowWidth = window.innerWidth;
+    });
+
+    afterEach(() => {
+      window.innerWidth = initialWindowWidth;
     });
 
     it('hides the sidebar if window width is < MIN_RESIZE', () => {

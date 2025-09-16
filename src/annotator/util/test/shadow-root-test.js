@@ -28,7 +28,7 @@ describe('annotator/util/shadow-root', () => {
 
   describe('createShadowRoot', () => {
     it('attaches a shadow root to the container', () => {
-      const shadowRoot = createShadowRoot(container);
+      const { shadowRoot } = createShadowRoot(container);
 
       assert.ok(shadowRoot);
       assert.equal(container.shadowRoot, shadowRoot);
@@ -57,7 +57,7 @@ describe('annotator/util/shadow-root', () => {
     });
 
     it('registers CSS @property declarations in a new stylesheet in the main document', async () => {
-      const root = createShadowRoot(container);
+      const { shadowRoot: root } = createShadowRoot(container);
       const propertySheet = getPropertyStyleSheet();
 
       // Simulate annotator.css styles loading.

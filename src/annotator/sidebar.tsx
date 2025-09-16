@@ -264,8 +264,14 @@ export class Sidebar implements Destroyable {
       // Wrap up the 'iframeContainer' element into a shadow DOM, so it is not
       // affected by host CSS styles
       this._hypothesisSidebar = document.createElement('hypothesis-sidebar');
-      const shadowRoot = createShadowRoot(this._hypothesisSidebar);
+      const { shadowRoot, stylesLoaded } = createShadowRoot(
+        this._hypothesisSidebar,
+      );
       shadowRoot.appendChild(this.iframeContainer);
+
+      // If the sidebar is opened before styles have finished loading, then we
+      // may need to adjust the size afterwards.
+      stylesLoaded.then(() => this._onResize());
 
       element.appendChild(this._hypothesisSidebar);
 
@@ -603,15 +609,21 @@ export class Sidebar implements Destroyable {
   }
 
   /**
-   * On window resize events, update the marginLeft of the sidebar by calling hide/show methods.
+   * Update the horizontal position of the sidebar.
+   *
+   * This should be invoked when the window is resized or the intrinsic size
+   * of the sidebar changes (eg. because asynchronously loaded styles finish
+   * loading).
    */
   _onResize() {
-    if (this.toolbar.sidebarOpen === true) {
-      if (window.innerWidth < MIN_RESIZE) {
-        this.close();
-      } else {
-        this.open();
-      }
+    if (!this.toolbar.sidebarOpen) {
+      return;
+    }
+
+    if (window.innerWidth < MIN_RESIZE) {
+      this.close();
+    } else {
+      this.open();
     }
   }
 
