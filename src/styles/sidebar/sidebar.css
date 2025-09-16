@@ -13,7 +13,6 @@
     @apply bg-white text-color-text;
   }
 
-
   /* See https://tailwindcss.com/docs/upgrade-guide#default-border-color. */
   * {
     border-color: #dbdbdb;
@@ -77,14 +76,14 @@
 
   /* Applies to any text: strikeout effect. */
   .p-redacted-text {
-	  @apply line-through grayscale contrast-50 text-color-text-light;
+    @apply line-through grayscale contrast-50 text-color-text-light;
   }
 
   /* Disable scroll anchoring as it interferes with `ThreadList` and
 	   `visible-threads` calculations and can cause a render loop. */
-	.js-thread-list-scroll-root {
-		overflow-anchor: none;
-	}
+  .js-thread-list-scroll-root {
+    overflow-anchor: none;
+  }
 }
 
 @utility container {
