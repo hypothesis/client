@@ -40,6 +40,9 @@ function GroupName({ group, settings }: GroupNameProps) {
           className={classnames(
             // Tiny adjustment to make H logo align better with group name
             'relative top-[1px] w-4 h-4',
+            // Hide the icon when the sidebar is smaller than 350px, to leave as
+            // much space as possible to the group name
+            'max-[350px]:hidden',
           )}
           src={icon}
           alt={altName}
