@@ -22,7 +22,7 @@ export function resetPropertyStyleSheet() {
 /**
  * Load stylesheets for annotator UI components into the shadow DOM root.
  */
-function loadStyles(shadowRoot: ShadowRoot) {
+function loadStyles(shadowRoot: ShadowRoot): Promise<void> {
   // Find the preloaded stylesheet added by the boot script.
   const url = (
     document.querySelector(
@@ -31,7 +31,7 @@ function loadStyles(shadowRoot: ShadowRoot) {
   )?.href;
 
   if (!url) {
-    return;
+    return Promise.resolve();
   }
 
   const linkEl = document.createElement('link');
@@ -64,7 +64,18 @@ function loadStyles(shadowRoot: ShadowRoot) {
       { once: true },
     );
   }
+
+  return new Promise(resolve => {
+    linkEl.addEventListener('load', () => resolve());
+  });
 }
+
+export type ShadowRootContainer = {
+  shadowRoot: ShadowRoot;
+
+  /** Promise that resolves when styles have completed loading. */
+  stylesLoaded: Promise<void>;
+};
 
 /**
  * Create the shadow root for an annotator UI component and load the annotator
@@ -72,8 +83,8 @@ function loadStyles(shadowRoot: ShadowRoot) {
  *
  * @param container - Container element to render the UI into
  */
-export function createShadowRoot(container: HTMLElement): ShadowRoot {
+export function createShadowRoot(container: HTMLElement): ShadowRootContainer {
   const shadowRoot = container.attachShadow({ mode: 'open' });
-  loadStyles(shadowRoot);
-  return shadowRoot;
+  const stylesLoaded = loadStyles(shadowRoot);
+  return { shadowRoot, stylesLoaded };
 }
