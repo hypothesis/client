@@ -1,9 +1,10 @@
 import { usePopoverShouldClose } from '@hypothesis/frontend-shared';
 import { MenuExpandIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, Ref } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
+import { downcastRef } from '../../shared/type-coercions';
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
 
 /**
@@ -63,6 +64,9 @@ export type MenuProps = {
    * toggle button has only an icon as a label.
    */
   title: string;
+
+  /** A ref to the menu toggle button */
+  buttonRef?: Ref<HTMLButtonElement | undefined>;
 };
 
 const noop = () => {};
@@ -97,6 +101,7 @@ export default function Menu({
   onOpenChanged,
   menuIndicator = true,
   title,
+  buttonRef,
 }: MenuProps) {
   let [isOpen, setOpen]: [boolean, (open: boolean) => void] =
     useState(defaultOpen);
@@ -208,6 +213,7 @@ export default function Menu({
         onClick={toggleMenu}
         aria-label={title}
         title={title}
+        ref={downcastRef(buttonRef)}
       >
         {label}
         {menuIndicator && (

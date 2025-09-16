@@ -1,6 +1,7 @@
 import { PlusIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import { useMemo, useState } from 'preact/hooks';
+import type { RefObject } from 'preact';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import type { Group } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
@@ -27,11 +28,38 @@ function publisherProvidedIcon(settings: SidebarSettings) {
 type GroupNameProps = {
   group: Group;
   settings: SidebarSettings;
+
+  /** Reference to the menu button element that contains this component */
+  menuButtonRef: RefObject<HTMLButtonElement | undefined>;
 };
 
-function GroupName({ group, settings }: GroupNameProps) {
-  const icon = group.organization.logo || publisherProvidedIcon(settings) || '';
+function GroupName({ group, settings, menuButtonRef }: GroupNameProps) {
+  const [showIcon, setShowIcon] = useState(true);
+  const icon =
+    showIcon &&
+    (group.organization.logo || publisherProvidedIcon(settings) || '');
   const altName = orgName(group);
+
+  // Hide the icon when there's little space for the group name.
+  //
+  // We could hide the icon conditionally, when it causes the name to be truncated,
+  // but if hiding the icon stops truncating the name, it would enter an endless
+  // loop of hiding/showing the icon, so we just stick with a minimum size after
+  // which the icon is unconditionally hidden.
+  useEffect(() => {
+    const menuButtonEl = menuButtonRef?.current;
+    /* istanbul ignore next */
+    if (!menuButtonEl) {
+      return () => {};
+    }
+
+    const observer = new ResizeObserver(() => {
+      setShowIcon(menuButtonEl.clientWidth >= 200);
+    });
+    observer.observe(menuButtonEl);
+
+    return () => observer.disconnect();
+  });
 
   return (
     <>
@@ -73,6 +101,7 @@ function GroupList({ settings }: GroupListProps) {
   const myGroups = store.getMyGroups();
   const focusedGroup = store.focusedGroup();
   const userid = store.profile().userid;
+  const menuButtonRef = useRef<HTMLButtonElement | undefined>(undefined);
 
   // Prevent changing groups during an import
   const disabled = store.importsPending() > 0;
@@ -105,7 +134,11 @@ function GroupList({ settings }: GroupListProps) {
   const [expandedGroup, setExpandedGroup] = useState<Group | null>(null);
 
   const label = focusedGroup ? (
-    <GroupName group={focusedGroup} settings={settings} />
+    <GroupName
+      group={focusedGroup}
+      settings={settings}
+      menuButtonRef={menuButtonRef}
+    />
   ) : (
     <span>…</span>
   );
@@ -138,6 +171,7 @@ function GroupList({ settings }: GroupListProps) {
       label={label}
       onOpenChanged={() => setExpandedGroup(null)}
       title={menuTitle}
+      buttonRef={menuButtonRef}
     >
       {currentGroupsSorted.length > 0 && (
         <GroupListSection
