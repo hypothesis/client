@@ -8,8 +8,9 @@
     @apply h-full;
   }
 
+  /* Set text styles except for font-family and font-size, which are defined separately. */
   body {
-    @apply bg-white font-sans text-base text-color-text;
+    @apply bg-white text-color-text;
   }
 
 
@@ -88,4 +89,14 @@
 
 @utility container {
   @apply m-auto px-[9px] max-w-[768px];
+}
+
+/* Set the main font-family and font-size.
+
+   These are defined in unlayered styles rather than the base layer so that
+   they take precedence over default styles that Chrome sets in all pages
+   served from an extension. See https://stackoverflow.com/a/72050395/434243
+   and https://source.chromium.org/chromium/chromium/src/+/main:extensions/renderer/resources/extension_fonts.css;drc=60039d4d4bd70512e21a2dfe586602aca1d9d35e. */
+body {
+  @apply font-sans text-base;
 }
