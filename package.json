@@ -112,8 +112,8 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
     "lint": "eslint --cache .",
-    "checkformatting": "prettier --cache --check '**/*.{js,scss,ts,tsx,d.ts}'",
-    "format": "prettier --cache --list-different --write '**/*.{js,scss,ts,tsx,d.ts}'",
+    "checkformatting": "prettier --cache --check '**/*.{css,js,scss,ts,tsx,d.ts}'",
+    "format": "prettier --cache --list-different --write '**/*.{css,js,scss,ts,tsx,d.ts}'",
     "test": "gulp test",
     "test:watch": "gulp test --live",
     "typecheck": "tsc --build tsconfig.json"
