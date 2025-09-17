@@ -40,6 +40,11 @@ describe('annotator/util/shadow-root', () => {
       const linkEl = container.shadowRoot.querySelector('link[rel=stylesheet]');
       assert.ok(linkEl);
       assert.include(linkEl.href, 'annotator.css');
+      assert.equal(linkEl.crossOrigin, 'anonymous');
+
+      // Make sure we prevented Via from removing the `crossorigin` attribute.
+      linkEl.removeAttribute('crossorigin');
+      assert.equal(linkEl.crossOrigin, 'anonymous');
     });
 
     it('does not inject stylesheets into the shadow root if style is not found', () => {

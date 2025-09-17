@@ -116,15 +116,16 @@ function preloadURL(
   link.as = type;
   link.href = url;
 
-  if (crossOrigin) {
+  // Enable JS to read the response if opted-in, or this is a URL we're going to
+  // use via `fetch` in JS.
+  if (crossOrigin || type === 'fetch') {
     link.crossOrigin = 'anonymous';
-  }
 
-  // If this is a resource that we are going to read the contents of, then we
-  // need to make a cross-origin request. For other types, use a non cross-origin
-  // request which returns a response that is opaque.
-  if (type === 'fetch') {
-    link.crossOrigin = 'anonymous';
+    // Prevent the frontend part of pywb (wombat) in viahtml from removing the
+    // `crossorigin` attribute.
+    //
+    // See https://github.com/webrecorder/wombat/blob/7433dede629b1c919c4c9c1e2c2daf1ac6665973/src/wombat.js#L2422
+    link.removeAttribute = () => {};
   }
 
   tagElement(link);
