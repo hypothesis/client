@@ -199,20 +199,5 @@ export default {
       // element had the `.theme-clean` class.
       addVariant('theme-clean', '.theme-clean &');
     }),
-    plugin(({ addUtilities }) => {
-      addUtilities({
-        // Tailwind does not provide hyphens-related utility classes.
-        '.hyphens-none': {
-          hyphens: 'none',
-        },
-        '.hyphens-auto': {
-          hyphens: 'auto',
-        },
-        // Tailwind does not provide this specific break utility: https://tailwindcss.com/docs/word-break
-        '.break-anywhere': {
-          'overflow-wrap': 'anywhere',
-        },
-      });
-    }),
   ],
 };
