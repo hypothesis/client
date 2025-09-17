@@ -133,6 +133,10 @@ describe('bootstrap', () => {
       );
       assert.equal(preloadLinks[0].as, 'style');
       assert.equal(preloadLinks[0].crossOrigin, 'anonymous');
+
+      // Make sure we prevented Via from removing the `crossorigin` attribute.
+      preloadLinks[0].removeAttribute('crossorigin');
+      assert.equal(preloadLinks[0].crossOrigin, 'anonymous');
     });
 
     it('creates the link to the sidebar iframe', () => {
