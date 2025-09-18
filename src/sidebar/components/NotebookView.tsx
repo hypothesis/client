@@ -134,8 +134,7 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
         <div
           className={classnames(
             'container flex flex-row-reverse relative',
-            // Compensate for container's right padding, which is defined in
-            // tailwind.config.js
+            // Compensate for container's right padding.
             'right-[4rem]',
           )}
         >
