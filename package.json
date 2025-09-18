@@ -15,7 +15,7 @@
     "@babel/preset-typescript": "^7.16.7",
     "@hypothesis/annotation-ui": "^1.0.0",
     "@hypothesis/frontend-build": "^5.0.0",
-    "@hypothesis/frontend-shared": "^10.1.0",
+    "@hypothesis/frontend-shared": "^10.3.0",
     "@hypothesis/frontend-testing": "^1.7.1",
     "@npmcli/arborist": "^9.0.0",
     "@octokit/rest": "^22.0.0",
