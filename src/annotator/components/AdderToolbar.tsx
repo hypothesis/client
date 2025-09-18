@@ -5,7 +5,7 @@ import {
   PointerDownIcon,
   PointerUpIcon,
 } from '@hypothesis/frontend-shared';
-import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import type { IconComponent } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { useShortcut } from '../../shared/shortcut';

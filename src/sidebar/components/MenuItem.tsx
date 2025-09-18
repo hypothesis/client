@@ -3,7 +3,7 @@ import {
   MenuExpandIcon,
   Slider,
 } from '@hypothesis/frontend-shared';
-import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import type { IconComponent } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren, Ref } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';

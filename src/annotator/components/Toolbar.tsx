@@ -10,11 +10,11 @@ import {
   PinIcon,
   ShowIcon,
 } from '@hypothesis/frontend-shared';
-import type { ButtonProps } from '@hypothesis/frontend-shared/lib/components/input/Button';
+import type { ButtonProps } from '@hypothesis/frontend-shared';
 import type {
   IconComponent,
   PresentationalProps,
-} from '@hypothesis/frontend-shared/lib/types';
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { JSX, RefObject } from 'preact';
 

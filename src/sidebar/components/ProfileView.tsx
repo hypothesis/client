@@ -6,7 +6,7 @@ import {
   Scroll,
   SpinnerSpokesIcon,
 } from '@hypothesis/frontend-shared';
-import type { PresentationalProps } from '@hypothesis/frontend-shared/lib/types';
+import type { PresentationalProps } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren, JSX } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
