@@ -1,4 +1,4 @@
-import tailwindConfig from '@hypothesis/frontend-shared/lib/tailwind.preset.js';
+import tailwindConfig from '@hypothesis/frontend-shared/tailwind.preset.js';
 import plugin from 'tailwindcss/plugin.js';
 
 const focusBlue = '#59a7e8';
