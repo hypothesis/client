@@ -5,10 +5,9 @@ import {
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
 
-import ShareDialog from '../ShareDialog';
-import { $imports } from '../ShareDialog';
+import SharePanel, { $imports } from '../SharePanel';
 
-describe('ShareDialog', () => {
+describe('SharePanel', () => {
   let fakeStore;
 
   const fakePrivateGroup = {
@@ -18,7 +17,7 @@ describe('ShareDialog', () => {
   };
 
   const createComponent = (props = {}) =>
-    mount(<ShareDialog shareTab {...props} />);
+    mount(<SharePanel shareTab {...props} />);
 
   beforeEach(() => {
     fakeStore = {
@@ -96,7 +95,7 @@ describe('ShareDialog', () => {
     it(
       'should pass a11y checks',
       checkAccessibility({
-        content: () => <ShareDialog shareTab />,
+        content: () => <SharePanel shareTab />,
       }),
     );
   });

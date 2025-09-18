@@ -10,7 +10,7 @@ import ExportAnnotations from './ExportAnnotations';
 import ImportAnnotations from './ImportAnnotations';
 import ShareAnnotations from './ShareAnnotations';
 
-export type ShareDialogProps = {
+export type SharePanelProps = {
   /** If true, the share tab will be rendered. Defaults to false */
   shareTab?: boolean;
 };
@@ -20,7 +20,7 @@ export type ShareDialogProps = {
  * - If provided tabs include `export` or `import`, will show a tabbed interface
  * - Else, shows a single "Share annotations" interface
  */
-export default function ShareDialog({ shareTab }: ShareDialogProps) {
+export default function SharePanel({ shareTab }: SharePanelProps) {
   const store = useSidebarStore();
   const focusedGroup = store.focusedGroup();
   const groupName = (focusedGroup && focusedGroup.name) || '...';
