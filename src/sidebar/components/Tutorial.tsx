@@ -4,7 +4,7 @@ import {
   HighlightIcon,
   ReplyIcon,
 } from '@hypothesis/frontend-shared';
-import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import type { IconComponent } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../types/config';

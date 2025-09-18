@@ -1,4 +1,4 @@
-import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import type { IconComponent } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { FilterOption } from '../store/modules/filters';

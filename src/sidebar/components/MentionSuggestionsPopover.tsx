@@ -1,5 +1,5 @@
 import { Popover } from '@hypothesis/frontend-shared';
-import type { PopoverProps } from '@hypothesis/frontend-shared/lib/components/feedback/Popover';
+import type { PopoverProps } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { UserItem } from '../helpers/mention-suggestions';

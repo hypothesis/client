@@ -1,6 +1,6 @@
 import type { DialogProps } from '@hypothesis/frontend-shared';
 import { Dialog, Slider } from '@hypothesis/frontend-shared';
-import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import type { IconComponent } from '@hypothesis/frontend-shared';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
