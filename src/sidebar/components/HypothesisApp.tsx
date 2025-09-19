@@ -17,7 +17,7 @@ import AnnotationView from './AnnotationView';
 import HelpPanel from './HelpPanel';
 import NotebookView from './NotebookView';
 import ProfileView from './ProfileView';
-import ShareDialog from './ShareDialog';
+import SharePanel from './SharePanel';
 import SidebarView from './SidebarView';
 import StreamView from './StreamView';
 import ToastMessages from './ToastMessages';
@@ -168,7 +168,7 @@ function HypothesisApp({
         <ToastMessages />
         <HelpPanel />
         <SearchPanel />
-        <ShareDialog shareTab={!isThirdParty} />
+        <SharePanel shareTab={!isThirdParty} />
 
         {route && (
           <main>
