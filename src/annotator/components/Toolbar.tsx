@@ -187,7 +187,7 @@ export default function Toolbar({
         <Button
           classes={classnames(
             'transition-colors focus-visible-ring ring-inset',
-            'w-[27px] h-[27px] mt-[140px] ml-px-1.5',
+            'w-[27px] h-[27px] mt-[140px] ml-[6px]',
             'flex items-center justify-center bg-white border',
             'text-grey-6 hover:text-grey-9 transition-colors',
             // Turn off right border to blend with sidebar
@@ -224,7 +224,7 @@ export default function Toolbar({
           >
             {isSidebarOpen ? <CaretRightIcon /> : <CaretLeftIcon />}
           </Button>
-          <div className="space-y-px-1.5 mt-px-2">
+          <div className="space-y-[6px] mt-[8px]">
             <ToolbarButton
               title="Show highlights"
               icon={showHighlights ? ShowIcon : HideIcon}
