@@ -66,7 +66,7 @@ export default function SearchIconButton() {
           expanded={isSearchPanelOpen}
           pressed={isSearchPanelOpen}
           onClick={toggleSearchPanel}
-          title="Search"
+          title="Show search panel"
         />
       )}
     </>
