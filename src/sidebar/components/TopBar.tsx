@@ -120,7 +120,7 @@ function TopBar({
                   expanded={isAnnotationsPanelOpen}
                   pressed={isAnnotationsPanelOpen}
                   onClick={toggleSharePanel}
-                  title="Share annotations on this page"
+                  title="Show share panel"
                   data-testid="share-icon-button"
                 />
               )}
@@ -132,7 +132,7 @@ function TopBar({
               expanded={isHelpPanelOpen}
               pressed={isHelpPanelOpen}
               onClick={requestHelp}
-              title="Help"
+              title="Show help panel"
               data-testid="help-icon-button"
             />
           )}

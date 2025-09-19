@@ -170,7 +170,7 @@ describe('TopBar', () => {
   context('when using a first-party service', () => {
     it('shows the share annotations button', () => {
       const wrapper = createTopBar();
-      assert.isTrue(wrapper.exists('[title="Share annotations on this page"]'));
+      assert.isTrue(wrapper.exists('[title="Show share panel"]'));
     });
   });
 
