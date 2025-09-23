@@ -169,6 +169,34 @@ describe('ThreadCard', () => {
     });
   });
 
+  describe('key down', () => {
+    [
+      { key: 'Enter', shouldScroll: true },
+      { key: ' ', shouldScroll: true },
+      { key: 'ArrowUp', shouldScroll: false },
+      { key: 'Escape', shouldScroll: false },
+    ].forEach(({ key, shouldScroll }) => {
+      it('scrolls to the annotation when Enter or Space are pressed on the `ThreadCard`', () => {
+        const wrapper = createComponent();
+
+        wrapper.find(threadCardSelector).simulate('keydown', { key });
+
+        assert.equal(fakeFrameSync.scrollToAnnotation.called, shouldScroll);
+      });
+    });
+
+    it('does not scroll to annotation when key is pressed in `ThreadCard` targeting other element', () => {
+      const wrapper = createComponent();
+
+      wrapper
+        .find(threadCardSelector)
+        .props()
+        .onKeyDown({ key: 'Enter', target: document.createElement('a') });
+
+      assert.notCalled(fakeFrameSync.scrollToAnnotation);
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility({
