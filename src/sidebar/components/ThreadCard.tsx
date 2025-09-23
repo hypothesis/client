@@ -81,7 +81,9 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
       )}
       data-testid="thread-card"
       elementRef={cardRef}
-      tabIndex={-1}
+      tabIndex={0}
+      role="article"
+      aria-label="Press Enter to scroll annotation into view"
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
@@ -91,6 +93,20 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
       }}
       onMouseEnter={() => setThreadHovered(thread.annotation ?? null)}
       onMouseLeave={() => setThreadHovered(null)}
+      onKeyDown={e => {
+        // Simulate default button behavior, where `Enter` and `Space` trigger
+        // click action
+        if (
+          // Trigger event only if the target is the card itself, so that we do
+          // not scroll to the annotation while editing it, or if the key is
+          // pressed to interact with a child button or link.
+          e.target === cardRef.current &&
+          ['Enter', ' '].includes(e.key) &&
+          thread.annotation
+        ) {
+          scrollToAnnotation(thread.annotation);
+        }
+      }}
       key={thread.id}
     >
       <CardContent>{threadContent}</CardContent>
