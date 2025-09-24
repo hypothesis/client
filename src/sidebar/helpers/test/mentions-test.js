@@ -204,6 +204,18 @@ Hello ${mentionTag('jane.doe', 'example.com')}.`,
     ]),
     textWithTags: `Hello ${displayNameMentionTag('Dwayne "The Rock" Johnson', 'djohnson')}`,
   },
+  // Mentions with other text right before
+  {
+    text: 'Hello@[Jane]',
+    usersMap: new Map([['Jane', { userid: 'acct:jane@hypothes.is' }]]),
+    textWithTags: `Hello${displayNameMentionTag('Jane', 'jane')}`,
+  },
+  // Mentions with other text right after
+  {
+    text: '@[Jane]look at this',
+    usersMap: new Map([['Jane', { userid: 'acct:jane@hypothes.is' }]]),
+    textWithTags: `${displayNameMentionTag('Jane', 'jane')}look at this`,
+  },
 ].forEach(({ text, usersMap, textWithTags }) => {
   describe('wrapDisplayNameMentions', () => {
     it('wraps every display-name mention in a mention tag', () => {

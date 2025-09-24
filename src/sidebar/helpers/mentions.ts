@@ -2,7 +2,8 @@ import type { Mention } from '../../types/api';
 import { buildAccountID } from './account-id';
 import type { UserItem } from './mention-suggestions';
 
-// Pattern that matches characters treated as the boundary of a mention.
+// Pattern that matches characters treated as the boundary of a username
+// mention.
 const BOUNDARY_CHARS = String.raw`[\s,.;:|?!'"\-()[\]{}]`;
 
 // Pattern that matches Hypothesis usernames.
@@ -21,10 +22,10 @@ const USERNAME_MENTIONS_PAT = new RegExp(
 const DISPLAY_NAME_PAT = String.raw`[^\]^[]*`;
 
 // Pattern that finds display-name-based mentions in text.
-const DISPLAY_NAME_MENTIONS_PAT = new RegExp(
-  `(^|${BOUNDARY_CHARS})@\\[(${DISPLAY_NAME_PAT})](?=${BOUNDARY_CHARS}|$)`,
-  'g',
-);
+// As opposed to username-based mentions, we do not require a specific set of
+// boundary characters, allowing mentions to be followed/preceded by pieces of
+// plain text
+const DISPLAY_NAME_MENTIONS_PAT = new RegExp(`@\\[(${DISPLAY_NAME_PAT})]`, 'g');
 
 /**
  * Create a mention tag for provided userid and content.
@@ -73,18 +74,14 @@ export function wrapDisplayNameMentions(
   text: string,
   usersMap: Map<string, UserItem>,
 ): string {
-  return text.replace(
-    DISPLAY_NAME_MENTIONS_PAT,
-    (match, precedingChar, displayName) => {
-      const suggestion = usersMap.get(displayName);
-      if (!suggestion) {
-        return `${precedingChar}${displayNameMention(displayName)}`;
-      }
+  return text.replace(DISPLAY_NAME_MENTIONS_PAT, (match, displayName) => {
+    const suggestion = usersMap.get(displayName);
+    if (!suggestion) {
+      return displayNameMention(displayName);
+    }
 
-      const mentionTag = buildMentionTag(suggestion.userid, `@${displayName}`);
-      return `${precedingChar}${mentionTag}`;
-    },
-  );
+    return buildMentionTag(suggestion.userid, `@${displayName}`);
+  });
 }
 
 // Pattern that matches the special tag used to wrap mentions.
