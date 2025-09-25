@@ -8,6 +8,7 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import AnnotationPublishControl, {
   $imports,
@@ -17,6 +18,7 @@ describe('AnnotationPublishControl', () => {
   let fakeGroup;
   let fakeSettings;
   let fakeApplyTheme;
+  let fakeUseContentTruncated;
 
   let fakeOnSave;
   let fakeOnCancel;
@@ -54,11 +56,15 @@ describe('AnnotationPublishControl', () => {
     };
 
     fakeApplyTheme = sinon.stub();
+    fakeUseContentTruncated = sinon.stub().returns(false);
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../../helpers/theme': {
         applyTheme: fakeApplyTheme,
+      },
+      '../../hooks/use-content-truncated': {
+        useContentTruncated: fakeUseContentTruncated,
       },
     });
   });
@@ -199,6 +205,16 @@ describe('AnnotationPublishControl', () => {
       cancelBtn.props().onClick();
 
       assert.calledOnce(fakeOnCancel);
+    });
+  });
+
+  [true, false].forEach(isTruncated => {
+    it('adds title to publish button when its content is truncated', () => {
+      fakeUseContentTruncated.returns(isTruncated);
+
+      const wrapper = createAnnotationPublishControl();
+
+      assert.equal(!!getPublishButton(wrapper).prop('title'), isTruncated);
     });
   });
 
