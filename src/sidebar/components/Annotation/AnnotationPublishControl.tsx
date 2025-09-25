@@ -7,10 +7,12 @@ import {
   MenuExpandIcon,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
+import { useRef } from 'preact/hooks';
 
 import type { Group } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
 import { applyTheme } from '../../helpers/theme';
+import { useContentTruncated } from '../../hooks/use-content-truncated';
 import { withServices } from '../../service-context';
 import Menu from '../Menu';
 import MenuItem from '../MenuItem';
@@ -71,13 +73,21 @@ function AnnotationPublishControl({
     </div>
   );
 
+  const postButtonText = `Post to ${isPrivate ? 'Only Me' : group.name}`;
+  const postButtonRef = useRef<HTMLButtonElement | null>(null);
+  const isButtonContentTruncated = useContentTruncated(postButtonRef);
+
   return (
     <div className="flex flex-row gap-x-3">
-      <div className="flex relative">
+      <div className="flex relative max-w-full min-w-0">
         <Button
           classes={classnames(
             // Turn off right-side border radius to align with menu-open button
             'rounded-r-none',
+            // Truncate text in this button. It also requires overwriting its
+            // `display` property from flex to block, as `text-overflow: ellipsis`
+            // does not work with flex elements
+            'truncate !block',
           )}
           data-testid="publish-control-button"
           style={buttonStyle}
@@ -85,8 +95,10 @@ function AnnotationPublishControl({
           disabled={isDisabled}
           size="lg"
           variant="primary"
+          title={isButtonContentTruncated ? postButtonText : undefined}
+          elementRef={postButtonRef}
         >
-          Post to {isPrivate ? 'Only Me' : group.name}
+          {postButtonText}
         </Button>
         {/* This wrapper div is necessary because of peculiarities with
              Safari: see https://github.com/hypothesis/client/issues/2302 */}
