@@ -7,6 +7,7 @@ import {
   MenuExpandIcon,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
+import { useEffect, useRef, useState } from 'preact/hooks';
 
 import type { Group } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
@@ -71,13 +72,34 @@ function AnnotationPublishControl({
     </div>
   );
 
+  const postButtonText = `Post to ${isPrivate ? 'Only Me' : group.name}`;
+  const postButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [showPostButtonTitle, setShowPostButtonTitle] =
+    useState<boolean>(false);
+  useEffect(() => {
+    const buttonEl = postButtonRef.current;
+    if (!buttonEl) {
+      return () => {};
+    }
+
+    const observer = new ResizeObserver(() => {
+      setShowPostButtonTitle(buttonEl.scrollWidth > buttonEl.clientWidth);
+    });
+    observer.observe(buttonEl);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="flex flex-row gap-x-3">
-      <div className="flex relative">
+      <div className="flex relative max-w-full min-w-0">
         <Button
           classes={classnames(
             // Turn off right-side border radius to align with menu-open button
             'rounded-r-none',
+            // Truncate text in this button.
+            // It requires overwriting its `display` property from flex to block
+            '!block truncate',
           )}
           data-testid="publish-control-button"
           style={buttonStyle}
@@ -85,8 +107,10 @@ function AnnotationPublishControl({
           disabled={isDisabled}
           size="lg"
           variant="primary"
+          title={showPostButtonTitle ? postButtonText : undefined}
+          elementRef={postButtonRef}
         >
-          Post to {isPrivate ? 'Only Me' : group.name}
+          {postButtonText}
         </Button>
         {/* This wrapper div is necessary because of peculiarities with
              Safari: see https://github.com/hypothesis/client/issues/2302 */}
