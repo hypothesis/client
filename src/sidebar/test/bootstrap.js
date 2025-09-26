@@ -19,7 +19,9 @@ globalThis.context ??= globalThis.describe;
 // Configure Enzyme for UI tests.
 configure({ adapter: new Adapter() });
 
-// Unmount all UI components after each test.
 afterEach(() => {
+  // Unmount all UI components after each test.
   unmountAll();
+  // Restore all created mocks during a test, to free-up memory
+  sinon.restore();
 });

@@ -30,16 +30,6 @@ describe('Sidebar', () => {
   let fakeSendErrorsTo;
   let fakeEmitter;
 
-  beforeAll(() => {
-    // Make `requestAnimationFrame` invoke its callback synchronously. rAF is
-    // used to debounce some internal actions.
-    sinon.stub(window, 'requestAnimationFrame').yields();
-  });
-
-  afterAll(() => {
-    window.requestAnimationFrame.restore();
-  });
-
   // Helpers for getting the channels used for host <-> guest/sidebar communication.
   // These currently rely on knowing the implementation detail of which order
   // the channels are created in.
@@ -132,6 +122,10 @@ describe('Sidebar', () => {
   };
 
   beforeEach(() => {
+    // Make `requestAnimationFrame` invoke its callback synchronously. rAF is
+    // used to debounce some internal actions.
+    sinon.stub(window, 'requestAnimationFrame').yields();
+
     sidebars = [];
     containers = [];
 
