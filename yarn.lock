@@ -6063,22 +6063,22 @@ __metadata:
   linkType: hard
 
 "chai@npm:^5.2.0":
-  version: 5.3.1
-  resolution: "chai@npm:5.3.1"
+  version: 5.3.3
+  resolution: "chai@npm:5.3.3"
   dependencies:
     assertion-error: ^2.0.1
     check-error: ^2.1.1
     deep-eql: ^5.0.1
     loupe: ^3.1.0
     pathval: ^2.0.0
-  checksum: e68804fbf0936f338519ea4bbfded3f3cd00e6b24a847efe4c50b8fcb63a9d0e9a08a77ae409de59718dca44810d00d6a0e7f9db57afb39e2853a82ac6afa0e2
+  checksum: bc4091f1cccfee63f6a3d02ce477fe847f5c57e747916a11bd72675c9459125084e2e55dc2363ee2b82b088a878039ee7ee27c75d6d90f7de9202bf1b12ce573
   languageName: node
   linkType: hard
 
 "chai@npm:^6.0.1":
-  version: 6.0.1
-  resolution: "chai@npm:6.0.1"
-  checksum: 70fb4f9bfdd6f7720c99e0a6dadeeb650ffc15e0c02326577ad0e39d12313c61b8231e5b7b2c96a8c946a46435c0b2fa0f126b92b044e0eb28c2e00b98f1b713
+  version: 6.2.0
+  resolution: "chai@npm:6.2.0"
+  checksum: 4a2a2ef9b44a26a9e561ac0447ecfafdad9083642e52f6be7c7d9ecf548eef07df6858641e148dd06e3eb82e515145218308e16700d399effcee38301eb4d531
   languageName: node
   linkType: hard
 
