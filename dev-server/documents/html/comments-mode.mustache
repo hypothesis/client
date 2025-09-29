@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Reading without annotating</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; padding: 2rem; color: #1a1a1a; }
+    main { max-width: 60ch; margin: 0 auto; }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .byline { color: #666; margin-top: 0; }
+    .poem p { margin: 0 0 1rem 0; }
+    .comments-link {
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+     }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Reading without annotating</h1>
+    <p class="byline">A lighthearted lament, by George Percy Tennyson.</p>
+
+    <a href="#" class="comments-link" data-hypothesis-trigger>Show comments (<span data-hypothesis-annotation-count>0</span>)</a>
+    <section class="poem" aria-label="poem">
+      <p>
+        I opened a book with a poet inside,<br />
+        Their lines like a rollercoaster ride.<br />
+        My pencil leapt up with a scholarly cheer—<br />
+        <em>“At last I can scribble my insights right here!”</em>
+      </p>
+
+      <p>
+        But lo! came a voice from the margins so thin:<br />
+        “No underlining, no arrows, no pen.<br />
+        No brackets, no circles, no footnotes allowed,<br />
+        Your thoughts must stay quiet, not shouted aloud.”
+      </p>
+
+      <p>
+        So I sat with my notions all bottled in tight,<br />
+        Each metaphor begging for comment that night.<br />
+        The enjambment was itching, the rhyme scheme was sly,<br />
+        The simile winked as it danced on by.
+      </p>
+
+      <p>
+        I tried to behave, just a reader, not more,<br />
+        But my fingers kept twitching like paws on the floor.<br />
+        For reading a poem without leaving a mark<br />
+        Feels like eating a s’more without touching the dark.
+      </p>
+
+      <p>
+        So I closed it in silence, no notes in the page,<br />
+        A scholar imprisoned inside of a cage.<br />
+        And I muttered: “Dear poet, your lines were well-played,<br />
+        But my best annotations are stuck in my head.”
+      </p>
+    </section>
+  </main>
+  <!-- nb. The `enableExperimentalNewNoteButton` option ought be unnecessary
+       in comments mode, since you cannot comment without it. -->
+  <script type="application/json" class="js-hypothesis-config">
+  {
+    "commentsMode": true,
+    "theme": "clean",
+    "enableExperimentalNewNoteButton": true
+  }
+  </script>
+
+  {{{ hypothesisScript }}}
+</body>
+</html>
