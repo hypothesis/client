@@ -17,7 +17,6 @@ gulp.task('watch-js', () => watchJS('./rollup.config.js'));
 
 gulp.task('build-annotator-tailwind-css', () =>
   buildCSS(['./src/styles/annotator/annotator.css'], {
-    autoprefixer: false,
     tailwind: true,
   }),
 );
@@ -34,14 +33,11 @@ gulp.task('build-sidebar-tailwind-css', () =>
 
 // Style bundles that don't use Tailwind.
 gulp.task('build-standalone-css', () =>
-  buildCSS(
-    [
-      './src/styles/annotator/highlights.scss',
-      './src/styles/annotator/pdfjs-overrides.css',
-      './node_modules/katex/dist/katex.min.css',
-    ],
-    { autoprefixer: false },
-  ),
+  buildCSS([
+    './src/styles/annotator/highlights.scss',
+    './src/styles/annotator/pdfjs-overrides.css',
+    './node_modules/katex/dist/katex.min.css',
+  ]),
 );
 
 gulp.task(
