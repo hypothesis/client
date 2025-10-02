@@ -80,14 +80,6 @@
   }
 }
 
-/* Tailwind has a built-in pointer-coarse variant. This alias exists for
-   compatibility. */
-@custom-variant touch {
-  @media (pointer: coarse) {
-    @slot;
-  }
-}
-
 @layer base {
   html,
   body {

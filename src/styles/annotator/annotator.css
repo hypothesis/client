@@ -89,14 +89,6 @@ host page. See shadow-root.ts for more details.
   }
 }
 
-/* Tailwind has a built-in pointer-coarse variant. This alias exists for
-   compatibility. */
-@custom-variant touch {
-  @media (pointer: coarse) {
-    @slot;
-  }
-}
-
 /* Styles for `<hypothesis-*>` elements in the host page.
 
    `:host` rules have lower precedence than global CSS, unless `!important` is used.
