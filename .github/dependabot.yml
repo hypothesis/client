@@ -21,6 +21,10 @@ updates:
       sentry:
         patterns:
           - '@sentry/*'
+      tailwind:
+        patterns:
+          - 'tailwindcss'
+          - '@tailwindcss/*'
       typescript-types:
         patterns:
           - '@types/*'
