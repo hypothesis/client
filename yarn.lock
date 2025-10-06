@@ -2638,8 +2638,8 @@ __metadata:
   linkType: hard
 
 "@hypothesis/frontend-build@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "@hypothesis/frontend-build@npm:5.0.0"
+  version: 5.0.1
+  resolution: "@hypothesis/frontend-build@npm:5.0.1"
   dependencies:
     commander: ^14.0.0
     fancy-log: ^2.0.0
@@ -2660,7 +2660,7 @@ __metadata:
       optional: true
     tailwindcss:
       optional: true
-  checksum: 946dbab011df26c8b43e413385ebd916ecc42847647a5a88eeffd8b677a46f6d567b0b7274ba761cb4207d8e6957b57cf432d0e5332d47609e78ac2ced45d473
+  checksum: e2f6bdb9b541c303b81bdbc6079a462a408823c1a294102565370bf441659f54ad3218ae9cb71218523fe58202b3f45049bc5a8ae7800cf19bf1f253dda65cea
   languageName: node
   linkType: hard
 
