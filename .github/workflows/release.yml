@@ -1,7 +1,7 @@
 name: Release
 
 permissions:
-  id-token: write # Required for AWS OIDC auth.
+  id-token: write # Required for AWS OIDC auth and trusted publishing.
   contents: write # Required to tag
 
 concurrency:
@@ -127,12 +127,14 @@ jobs:
       run: scripts/create-github-release.js v$NEW_VERSION
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
+    - name: Setup Nodejs
+      uses: actions/setup-node@v4
+      with:
+        # Explicitly setting up node 24, since npm >=11.5.1 is required for trusted publishing
+        node-version: '24'
     - name: Publish npm package
-      env:
-        NPM_TOKEN: ${{ secrets.npm_token }}
       run: |
-        echo 'npmAuthToken: "${{ env.NPM_TOKEN }}"' >> $HOME/.yarnrc.yml
-        yarn npm publish
+        npm publish --access public
         scripts/wait-for-npm-release.sh latest
     - name: Deploy to S3
       run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }}
