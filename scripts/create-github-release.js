@@ -17,11 +17,14 @@ const pkg = JSON.parse(fs.readFileSync(`${__dirname}/../package.json`));
 
 async function createGitHubRelease({ previousVersion }) {
   // See https://github.com/docker/docker/issues/679
-  const GITHUB_ORG_REPO_PAT = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+  const GITHUB_ORG_REPO_PAT =
+    /github\.com\/([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)\.git$/;
+  const repoUrl = pkg.repository?.url;
+  const match = repoUrl?.match(GITHUB_ORG_REPO_PAT);
 
-  if (!pkg.repository || !pkg.repository.match(GITHUB_ORG_REPO_PAT)) {
+  if (!match || !match[1]) {
     throw new Error(
-      'package.json is missing a "repository" field of the form :owner/:repo',
+      'package.json is missing a "repository"."url" field of the form git+https://github.com/:owner/:repo',
     );
   }
 
@@ -34,7 +37,7 @@ async function createGitHubRelease({ previousVersion }) {
   });
 
   const changes = await changelistSinceTag(octokit, previousVersion);
-  const [owner, repo] = pkg.repository.split('/');
+  const [owner, repo] = match[1].split('/');
   const releaseName = `v${pkg.version}`;
 
   console.log(
