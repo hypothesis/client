@@ -19,6 +19,9 @@ export function useRootThread(): ThreadAnnotationsResult {
   const selectionState = store.selectionState();
   const filters = store.getFilterValues();
   const showTabs = route === 'sidebar';
+  const topAnnotationsPlaceholder = store.isFeatureEnabled(
+    'top_annos_placeholder',
+  );
 
   const threadState = useMemo((): ThreadState => {
     const selection = { ...selectionState, filterQuery: query, filters };
@@ -26,8 +29,16 @@ export function useRootThread(): ThreadAnnotationsResult {
       annotations,
       selection,
       showTabs,
+      topAnnotationsPlaceholder,
     };
-  }, [annotations, query, selectionState, filters, showTabs]);
+  }, [
+    selectionState,
+    query,
+    filters,
+    annotations,
+    showTabs,
+    topAnnotationsPlaceholder,
+  ]);
 
   return threadAnnotations(threadState);
 }

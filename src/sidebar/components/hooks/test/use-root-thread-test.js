@@ -64,4 +64,16 @@ describe('sidebar/components/hooks/use-root-thread', () => {
       assert.equal(threadState.showTabs, showTabs);
     });
   });
+
+  [true, false].forEach(topAnnotationsPlaceholder => () => {
+    it('sets topAnnotationsPlaceholder based on top_annos_placeholder FF', () => {
+      fakeStore.isFeatureEnabled.returns(topAnnotationsPlaceholder);
+      mount(<DummyComponent />);
+
+      assert.equal(
+        lastRootThread.topAnnotationsPlaceholder,
+        topAnnotationsPlaceholder,
+      );
+    });
+  });
 });
