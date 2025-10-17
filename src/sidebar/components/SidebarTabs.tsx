@@ -138,7 +138,7 @@ function SidebarTabs({
     tabCountsSummaryPieces.push(`${noteCount} ${term}`);
   }
   if (orphanCount > 0) {
-    const term = pluralize(noteCount, 'orphan', 'orphans');
+    const term = pluralize(noteCount, 'unanchored', 'unanchored');
     tabCountsSummaryPieces.push(`${orphanCount} ${term}`);
   }
   const tabCountsSummary = tabCountsSummaryPieces.join(', ');
@@ -180,11 +180,11 @@ function SidebarTabs({
               count={orphanCount}
               isWaitingToAnchor={isWaitingToAnchorAnnotations}
               isSelected={selectedTab === 'orphan'}
-              label="Orphans"
+              label="Unanchored"
               name="orphan"
               onSelect={() => selectTab('orphan')}
             >
-              Orphans
+              Unanchored
             </Tab>
           )}
         </div>

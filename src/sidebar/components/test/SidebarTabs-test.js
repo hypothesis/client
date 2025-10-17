@@ -162,31 +162,28 @@ describe('SidebarTabs', () => {
     });
   });
 
-  describe('orphans tab', () => {
-    it('should display orphans tab if there is 1 or more orphans', () => {
+  describe('unanchored tab', () => {
+    it('should display unanchored tab if there is 1 or more orphans', () => {
       stubTabCounts({ orphan: 1 });
       const wrapper = createComponent();
 
-      const orphanTab = wrapper.find('Tab[label="Orphans"]');
-      assert.isTrue(orphanTab.exists());
+      const unanchoredTab = wrapper.find('Tab[label="Unanchored"]');
+      assert.isTrue(unanchoredTab.exists());
     });
 
-    it('should display orphans tab as selected when it is active', () => {
+    it('should display unanchored tab as selected when it is active', () => {
       fakeStore.selectedTab.returns('orphan');
       stubTabCounts({ orphan: 1 });
 
       const wrapper = createComponent();
 
-      const orphanTab = wrapper.find('Tab[label="Orphans"]');
-      assert.isTrue(orphanTab.find('LinkButton').prop('pressed'));
+      const unanchoredTab = wrapper.find('Tab[label="Unanchored"]');
+      assert.isTrue(unanchoredTab.find('LinkButton').prop('pressed'));
     });
 
-    it('should not display orphans tab if there are 0 orphans', () => {
+    it('should not display unanchored tab if there are 0 orphans', () => {
       const wrapper = createComponent();
-
-      const orphanTab = wrapper.find('Tab[label="Orphans"]');
-
-      assert.isFalse(orphanTab.exists());
+      assert.isFalse(wrapper.exists('Tab[label="Unanchored"]'));
     });
   });
 
@@ -257,12 +254,12 @@ describe('SidebarTabs', () => {
   [
     { label: 'Annotations', tab: 'annotation' },
     { label: 'Page Notes', tab: 'note' },
-    { label: 'Orphans', tab: 'orphan' },
+    { label: 'Unanchored', tab: 'orphan' },
   ].forEach(({ label, tab }) => {
     it(`should change the selected tab when "${label}" tab is clicked`, () => {
       // Pre-select a different tab than the one we are about to click.
       fakeStore.selectedTab.returns('other-tab');
-      // Make the "Orphans" tab appear.
+      // Make the "Unanchored" tab appear.
       stubTabCounts({ orphan: 1 });
 
       const wrapper = createComponent();
@@ -305,7 +302,7 @@ describe('SidebarTabs', () => {
         note: 0,
         orphan: 4,
       },
-      message: '4 orphans',
+      message: '4 unanchored',
     },
     {
       tabCounts: {
@@ -313,7 +310,7 @@ describe('SidebarTabs', () => {
         note: 3,
         orphan: 4,
       },
-      message: '2 annotations, 3 notes, 4 orphans',
+      message: '2 annotations, 3 notes, 4 unanchored',
     },
     {
       tabCounts: {
@@ -321,7 +318,7 @@ describe('SidebarTabs', () => {
         note: 1,
         orphan: 1,
       },
-      message: '1 annotation, 1 note, 1 orphan',
+      message: '1 annotation, 1 note, 1 unanchored',
     },
   ].forEach(({ tabCounts, message }) => {
     it('reports annotation count to screen readers', () => {
