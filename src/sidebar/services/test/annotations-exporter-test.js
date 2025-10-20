@@ -47,7 +47,7 @@ describe('AnnotationsExporter', () => {
     // Title should actually be an array
     baseAnnotation.document.title = [baseAnnotation.document.title];
 
-    exporter = new AnnotationsExporter();
+    exporter = new AnnotationsExporter({});
   });
 
   describe('buildJSONExportContent', () => {

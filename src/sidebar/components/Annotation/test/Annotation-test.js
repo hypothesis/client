@@ -34,6 +34,7 @@ describe('Annotation', () => {
         isReply={false}
         replyCount={0}
         threadIsCollapsed={true}
+        settings={{}}
         {...props}
       />,
     );

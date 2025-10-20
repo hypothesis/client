@@ -311,23 +311,34 @@ describe('sidebar/helpers/annotation-metadata', () => {
         fixtures.oldReply(),
       ];
       assert.equal(
-        annotationMetadata.annotationRole(annotationAnnotation),
+        annotationMetadata.annotationRole(annotationAnnotation, {}),
         'Annotation',
       );
 
       assert.equal(
-        annotationMetadata.annotationRole(highlightAnnotation),
+        annotationMetadata.annotationRole(highlightAnnotation, {}),
         'Highlight',
       );
 
       assert.equal(
-        annotationMetadata.annotationRole(pageNoteAnnotation),
+        annotationMetadata.annotationRole(pageNoteAnnotation, {}),
         'Page note',
       );
 
       replyAnnotations.forEach(reply => {
-        assert.equal(annotationMetadata.annotationRole(reply), 'Reply');
+        assert.equal(annotationMetadata.annotationRole(reply, {}), 'Reply');
       });
+    });
+
+    it('returns "Comment" for page notes when comments mode is enabled', () => {
+      const pageNoteAnnotation = fixtures.newPageNote();
+
+      assert.equal(
+        annotationMetadata.annotationRole(pageNoteAnnotation, {
+          commentsMode: true,
+        }),
+        'Comment',
+      );
     });
   });
 

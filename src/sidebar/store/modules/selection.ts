@@ -20,6 +20,10 @@ const TAB_SORTKEY_DEFAULT: Record<TabName, SortKey> = {
   orphan: 'location',
 };
 
+function defaultSortKeyForTab(tab: TabName, commentsMode?: boolean) {
+  return commentsMode ? 'newest' : TAB_SORTKEY_DEFAULT[tab];
+}
+
 function initialSelection(settings: SidebarSettings): BooleanMap {
   const selection: BooleanMap = {};
   // TODO: Do not take into account existence of `settings.query` here
@@ -65,6 +69,8 @@ export type State = {
    * ID or tag of an annotation that should be given keyboard focus.
    */
   focusRequest: string | null;
+
+  commentsMode?: boolean;
 };
 
 function initialState(settings: SidebarSettings): State {
@@ -72,13 +78,14 @@ function initialState(settings: SidebarSettings): State {
     selected: initialSelection(settings),
     expanded: initialSelection(settings),
     forcedVisible: {},
-    selectedTab: 'annotation',
-    sortKey: TAB_SORTKEY_DEFAULT.annotation,
+    selectedTab: settings.commentsMode ? 'note' : 'annotation',
+    sortKey: defaultSortKeyForTab('annotation', settings.commentsMode),
     focusRequest: null,
+    commentsMode: settings.commentsMode,
   };
 }
 
-function setTab(newTab: TabName, oldTab: TabName) {
+function setTab(newTab: TabName, oldTab: TabName, commentsMode?: boolean) {
   // Do nothing if the "new tab" is the same as the tab already selected.
   // This will avoid resetting the `sortKey`, too.
   if (oldTab === newTab) {
@@ -86,7 +93,7 @@ function setTab(newTab: TabName, oldTab: TabName) {
   }
   return {
     selectedTab: newTab,
-    sortKey: TAB_SORTKEY_DEFAULT[newTab],
+    sortKey: defaultSortKeyForTab(newTab, commentsMode),
   };
 }
 
@@ -111,7 +118,7 @@ const reducers = {
   },
 
   SELECT_TAB(state: State, action: { tab: TabName }) {
-    return setTab(action.tab, state.selectedTab);
+    return setTab(action.tab, state.selectedTab, state.commentsMode);
   },
 
   SET_EXPANDED(state: State, action: { id: string; expanded: boolean }) {
@@ -160,7 +167,7 @@ const reducers = {
 
     const haveOnlyPageNotes = noteCount === topLevelAnnotations.length;
     if (action.currentAnnotationCount === 0 && haveOnlyPageNotes) {
-      return setTab('note', state.selectedTab);
+      return setTab('note', state.selectedTab, state.commentsMode);
     }
     return {};
   },
@@ -210,7 +217,7 @@ const reducers = {
       return collection;
     };
     return {
-      ...setTab(newTab, state.selectedTab),
+      ...setTab(newTab, state.selectedTab, state.commentsMode),
       expanded: removeAnns({ ...state.expanded }),
       forcedVisible: removeAnns({ ...state.forcedVisible }),
       selected: removeAnns({ ...state.selected }),
@@ -366,10 +373,11 @@ function sortKey(state: State) {
  */
 const sortKeys = createSelector(
   (state: State) => state.selectedTab,
-  selectedTab => {
+  (state: State) => state.commentsMode,
+  (selectedTab, commentsMode) => {
     const sortKeysForTab: SortKey[] = ['newest', 'oldest'];
-    if (selectedTab !== 'note') {
-      // Location is inapplicable to Notes tab
+    if (selectedTab !== 'note' && !commentsMode) {
+      // Location is inapplicable to Notes tab or comments mode
       sortKeysForTab.push('location');
     }
     return sortKeysForTab;

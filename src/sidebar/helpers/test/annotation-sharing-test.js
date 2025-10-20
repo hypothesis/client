@@ -73,6 +73,10 @@ describe('sidebar/helpers/annotation-sharing', () => {
       assert.isTrue(sharingUtil.sharingEnabled({}));
     });
 
+    it('returns false if comments mode is enabled', () => {
+      assert.isFalse(sharingUtil.sharingEnabled({ commentsMode: true }));
+    });
+
     it('returns true if service settings `enableShareLinks` is non-boolean', () => {
       fakeServiceConfig.returns({ enableShareLinks: 'foo' });
       assert.isTrue(sharingUtil.sharingEnabled({}));

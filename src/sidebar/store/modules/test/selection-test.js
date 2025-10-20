@@ -7,16 +7,47 @@ import { selectionModule } from '../selection';
 
 describe('sidebar/store/modules/selection', () => {
   let store;
-  const fakeSettings = [{}, {}];
+  let fakeSettings;
 
   const getSelectionState = () => {
     return store.getState().selection;
   };
 
-  beforeEach(() => {
-    store = createStore(
+  function initializeStore() {
+    return createStore(
       [annotationsModule, filtersModule, selectionModule, routeModule],
-      fakeSettings,
+      [fakeSettings],
+    );
+  }
+
+  beforeEach(() => {
+    fakeSettings = {};
+    store = initializeStore();
+  });
+
+  describe('initial state', () => {
+    it.each([
+      {
+        commentsMode: false,
+        expectedSelectedTab: 'annotation',
+        expectedSortKey: 'location',
+      },
+      {
+        commentsMode: true,
+        expectedSelectedTab: 'note',
+        expectedSortKey: 'newest',
+      },
+    ])(
+      'initializes state based on settings',
+      ({ commentsMode, expectedSelectedTab, expectedSortKey }) => {
+        fakeSettings.commentsMode = commentsMode;
+
+        const store = initializeStore();
+        const state = store.getState().selection;
+
+        assert.equal(state.selectedTab, expectedSelectedTab);
+        assert.equal(state.sortKey, expectedSortKey);
+      },
     );
   });
 
@@ -335,6 +366,23 @@ describe('sidebar/store/modules/selection', () => {
       });
 
       assert.equal(getSelectionState().selectedTab, 'annotation');
+    });
+  });
+
+  describe('sortKeys with comments mode', () => {
+    it('does not return location when comments mode is enabled', () => {
+      fakeSettings.commentsMode = true;
+
+      const store = initializeStore();
+
+      store.selectTab('annotation');
+      assert.deepEqual(store.sortKeys(), ['newest', 'oldest']);
+
+      store.selectTab('note');
+      assert.deepEqual(store.sortKeys(), ['newest', 'oldest']);
+
+      store.selectTab('orphan');
+      assert.deepEqual(store.sortKeys(), ['newest', 'oldest']);
     });
   });
 });
