@@ -122,6 +122,8 @@ export type GuestConfig = {
   contentReady?: Promise<void>;
 
   sideBySide?: SideBySideOptions;
+
+  commentsMode?: boolean;
 };
 
 /**
@@ -267,6 +269,7 @@ export class Guest
   private _hoveredAnnotations: Set<string>;
 
   private _outsideAssignmentNotice: OutsideAssignmentNoticeController | null;
+  private _commentsMode: boolean;
 
   /**
    * @param element -
@@ -286,6 +289,7 @@ export class Guest
 
     this.element = element;
     this._contentReady = config.contentReady;
+    this._commentsMode = config.commentsMode ?? false;
     this._hostFrame = hostFrame;
     this._highlightsVisible = false;
     this._isAdderVisible = false;
@@ -1015,6 +1019,11 @@ export class Guest
     this.selectedRanges = [annotatableRange];
     this._hostRPC.call('textSelected');
 
+    // Do not show adder in comments mode
+    if (this._commentsMode) {
+      return;
+    }
+
     this._adder.annotationsForSelection = annotationsForSelection();
     this._isAdderVisible = true;
     this._adder.show(focusRect, isBackwards);
@@ -1100,7 +1109,10 @@ export class Guest
    */
   private _handleShortcut(event: KeyboardEvent) {
     if (matchShortcut(event, 'Ctrl+Shift+H')) {
-      this.setHighlightsVisible(!this._highlightsVisible);
+      this.setHighlightsVisible(
+        // Never show highlights when comment mode is enabled
+        !this._highlightsVisible && !this._commentsMode,
+      );
     }
   }
 

@@ -58,6 +58,19 @@ Client Behavior
 These settings configure the behavior and initial state of the client when it
 loads.
 
+.. option:: commentsMode
+
+   ``Boolean``. Controls whether the sidebar should work in comments mode.
+   (Default: ``false``.).
+
+   When comments mode is enabled, some things will behave differently:
+
+   1. The adder is no longer displayed when text is selected in the host frame.
+   2. Only page notes can be created.
+   3. The "Annotations" tab is hidden, and the "Page notes" tab is renamed to "Comments".
+   4. Annotations are sorted from newer to older by default.
+   5. Wording is changed to use the "comment" terminology, instead of annotation.
+
 .. option:: openSidebar
 
    ``Boolean``. Controls whether the sidebar opens automatically on startup.

@@ -42,6 +42,7 @@ function configurationKeys(context: Context): string[] {
       'contentReady',
       'subFrameIdentifier',
       'sideBySide',
+      'commentsMode',
     ],
     sidebar: [
       'appType',
@@ -61,6 +62,7 @@ function configurationKeys(context: Context): string[] {
       'sidebarAppUrl',
       'theme',
       'usernameUrl',
+      'commentsMode',
     ],
     notebook: [
       'branding',
@@ -212,6 +214,11 @@ const configDefinitions: ConfigDefinitionMap = {
   sideBySide: {
     allowInBrowserExt: true,
     getValue: settings => settings.sideBySide,
+  },
+  commentsMode: {
+    defaultValue: false,
+    allowInBrowserExt: false,
+    getValue: getHostPageSetting,
   },
 };
 

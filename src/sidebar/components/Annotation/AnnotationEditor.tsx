@@ -211,7 +211,7 @@ function AnnotationEditor({
     if (pendingTag) {
       onAddTag(pendingTag);
     }
-    const successMessage = `${annotationRole(annotation)} ${
+    const successMessage = `${annotationRole(annotation, settings)} ${
       isSaved(annotation) ? 'updated' : 'saved'
     }`;
     try {
