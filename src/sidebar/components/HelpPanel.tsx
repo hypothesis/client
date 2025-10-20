@@ -3,6 +3,7 @@ import { ExternalIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useId, useMemo, useState } from 'preact/hooks';
 
+import type { SidebarSettings } from '../../types/config';
 import { username } from '../helpers/account-id';
 import { VersionData } from '../helpers/version-data';
 import { withServices } from '../service-context';
@@ -42,6 +43,7 @@ function HelpPanelTab({ linkText, url }: HelpPanelTabProps) {
 
 type HelpPanelProps = {
   session: SessionService;
+  settings: SidebarSettings;
 };
 
 type PanelKey = 'tutorial' | 'versionInfo';
@@ -49,7 +51,7 @@ type PanelKey = 'tutorial' | 'versionInfo';
 /**
  * A help sidebar panel with two sub-panels: tutorial and version info.
  */
-function HelpPanel({ session }: HelpPanelProps) {
+function HelpPanel({ session, settings }: HelpPanelProps) {
   const store = useSidebarStore();
   const frames = store.frames();
   const mainFrame = store.mainFrame();
@@ -69,7 +71,9 @@ function HelpPanel({ session }: HelpPanelProps) {
     !!store.profile().preferences.show_sidebar_tutorial;
 
   // The "Tutorial" (getting started) subpanel is the default panel shown
-  const [activeSubPanel, setActiveSubPanel] = useState<PanelKey>('tutorial');
+  const [activeSubPanel, setActiveSubPanel] = useState<PanelKey>(
+    settings.commentsMode ? 'versionInfo' : 'tutorial',
+  );
 
   // Build version details about this session/app
   const versionData = useMemo(() => {
@@ -114,17 +118,19 @@ function HelpPanel({ session }: HelpPanelProps) {
       onActiveChanged={onActiveChanged}
     >
       <TabHeader closeTitle="Close help panel">
-        <Tab
-          id={tutorialTabId}
-          aria-controls={tutorialPanelId}
-          variant="tab"
-          textContent="Help"
-          selected={activeSubPanel === 'tutorial'}
-          onClick={() => setActiveSubPanel('tutorial')}
-          data-testid="tutorial-tab"
-        >
-          Help
-        </Tab>
+        {!settings.commentsMode && (
+          <Tab
+            id={tutorialTabId}
+            aria-controls={tutorialPanelId}
+            variant="tab"
+            textContent="Help"
+            selected={activeSubPanel === 'tutorial'}
+            onClick={() => setActiveSubPanel('tutorial')}
+            data-testid="tutorial-tab"
+          >
+            Help
+          </Tab>
+        )}
         <Tab
           id={versionTabId}
           aria-controls={versionPanelId}
@@ -139,18 +145,22 @@ function HelpPanel({ session }: HelpPanelProps) {
       </TabHeader>
       <Card
         classes={classnames({
-          'rounded-tl-none': activeSubPanel === 'tutorial',
+          'rounded-tl-none':
+            activeSubPanel === 'tutorial' || settings.commentsMode,
         })}
       >
         <div className="border-b">
-          <TabPanel
-            id={tutorialPanelId}
-            aria-labelledby={tutorialTabId}
-            active={activeSubPanel === 'tutorial'}
-            title="Getting started"
-          >
-            <Tutorial />
-          </TabPanel>
+          {!settings.commentsMode && (
+            <TabPanel
+              id={tutorialPanelId}
+              aria-labelledby={tutorialTabId}
+              active={activeSubPanel === 'tutorial'}
+              title="Getting started"
+              data-testid="tutorial-panel"
+            >
+              <Tutorial />
+            </TabPanel>
+          )}
           <TabPanel
             id={versionPanelId}
             aria-labelledby={versionTabId}
@@ -172,4 +182,4 @@ function HelpPanel({ session }: HelpPanelProps) {
   );
 }
 
-export default withServices(HelpPanel, ['session']);
+export default withServices(HelpPanel, ['session', 'settings']);

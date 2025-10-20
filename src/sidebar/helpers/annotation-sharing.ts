@@ -36,5 +36,5 @@ export function isShareableURI(uri: string): boolean {
  */
 export function sharingEnabled(settings: SidebarSettings): boolean {
   const service = serviceConfig(settings);
-  return service?.enableShareLinks !== false;
+  return !settings.commentsMode && service?.enableShareLinks !== false;
 }

@@ -8,6 +8,7 @@ import type { CSVSeparator } from '../../shared/csv';
 import { escapeCSVValue } from '../../shared/csv';
 import { trimAndDedent } from '../../shared/trim-and-dedent';
 import type { APIAnnotationData, Profile } from '../../types/api';
+import type { SidebarSettings } from '../../types/config';
 import {
   annotationRole,
   isReply,
@@ -54,6 +55,12 @@ export type HTMLExportOptions = TextExportOptions;
  * @inject
  */
 export class AnnotationsExporter {
+  private _settings: SidebarSettings;
+
+  constructor(settings: SidebarSettings) {
+    this._settings = settings;
+  }
+
   buildJSONExportContent(
     annotations: APIAnnotationData[],
     {
@@ -99,7 +106,7 @@ export class AnnotationsExporter {
         `Created at: ${formatSortableDateTime(new Date(annotation.created))}`,
         `Author: ${extractUsername(annotation)}`,
         page ? `Page: ${page}` : undefined,
-        `Type: ${annotationRole(annotation)}`,
+        `Type: ${annotationRole(annotation, this._settings)}`,
         annotationQuote ? `Quote: "${annotationQuote}"` : undefined,
         annotationDescription
           ? `Description: ${annotationDescription}`
@@ -148,7 +155,7 @@ export class AnnotationsExporter {
         pageLabel(annotation) ?? '',
         uri,
         groupName,
-        annotationRole(annotation),
+        annotationRole(annotation, this._settings),
         quote(annotation) ?? description(annotation) ?? '',
         annotation.text,
         annotation.tags.join(','),
@@ -282,7 +289,7 @@ export class AnnotationsExporter {
                       )}
                       <tr>
                         <td>Type:</td>
-                        <td>{annotationRole(annotation)}</td>
+                        <td>{annotationRole(annotation, this._settings)}</td>
                       </tr>
                       {annotationQuote && (
                         <tr>

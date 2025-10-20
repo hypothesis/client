@@ -3,17 +3,20 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import TopBar, { $imports } from '../TopBar';
 
 describe('TopBar', () => {
-  const fakeSettings = {};
+  let fakeSettings;
   let fakeFrameSync;
   let fakeStore;
   let fakeStreamer;
   let fakeServiceConfig;
 
   beforeEach(() => {
+    fakeSettings = {};
+
     fakeStore = {
       hasFetchedProfile: sinon.stub().returns(false),
       isLoggedIn: sinon.stub().returns(false),
@@ -178,6 +181,16 @@ describe('TopBar', () => {
     fakeServiceConfig.returns({
       enableShareImportExportPanel: false,
     });
+    const wrapper = createTopBar();
+    const shareButton = getButton(wrapper, 'share-icon-button');
+    assert.isFalse(shareButton.exists());
+  });
+
+  it('hides share menu when comments mode is enabled', () => {
+    fakeServiceConfig.returns({
+      enableShareImportExportPanel: true,
+    });
+    fakeSettings.commentsMode = true;
     const wrapper = createTopBar();
     const shareButton = getButton(wrapper, 'share-icon-button');
     assert.isFalse(shareButton.exists());

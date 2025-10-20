@@ -3,6 +3,7 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import SidebarTabs, { $imports } from '../SidebarTabs';
 
@@ -327,6 +328,59 @@ describe('SidebarTabs', () => {
       const status = wrapper.find('[role="status"]');
       assert.equal(status.text(), message);
     });
+  });
+
+  describe('comments mode', () => {
+    it.each([
+      {
+        commentsMode: false,
+        shouldShowAnnosTab: true,
+        expectedNoteText: 'Page notes',
+        expectedButtonText: 'New note',
+        expectedFallbackMessage: 'There are no page notes in this group.',
+      },
+      {
+        commentsMode: true,
+        shouldShowAnnosTab: false,
+        expectedNoteText: 'Comments',
+        expectedButtonText: 'Add comment',
+        expectedFallbackMessage: 'There are no comments in this group.',
+      },
+    ])(
+      'shows different contents if comments mode is enabled',
+      ({
+        commentsMode,
+        shouldShowAnnosTab,
+        expectedNoteText,
+        expectedButtonText,
+        expectedFallbackMessage,
+      }) => {
+        fakeStore.selectedTab.returns('note');
+        stubTabCounts({ note: 0 });
+
+        fakeSettings.enableExperimentalNewNoteButton = true;
+        fakeSettings.commentsMode = commentsMode;
+
+        const wrapper = createComponent();
+
+        assert.equal(
+          wrapper.exists('Tab[name="annotation"]'),
+          shouldShowAnnosTab,
+        );
+        assert.equal(
+          wrapper.find('Tab[name="note"]').prop('label'),
+          expectedNoteText,
+        );
+        assert.equal(
+          wrapper.find('Button[data-testid="new-note-button"]').text(),
+          expectedButtonText,
+        );
+        assert.equal(
+          wrapper.find('Card[data-testid="notes-unavailable-message"]').text(),
+          expectedFallbackMessage,
+        );
+      },
+    );
   });
 
   it(

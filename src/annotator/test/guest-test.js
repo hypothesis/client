@@ -1061,6 +1061,12 @@ describe('Guest', () => {
       assert.called(FakeAdder.instance.show);
     });
 
+    it('does not shows the adder if comments mode is enabled', () => {
+      createGuest({ commentsMode: true });
+      simulateSelectionWithText();
+      assert.notCalled(FakeAdder.instance.show);
+    });
+
     it('sets the annotations associated with the selection', () => {
       createGuest();
       const ann = { $tag: 't1' };
@@ -1988,5 +1994,22 @@ describe('Guest', () => {
       assert.equal(guest.highlightsVisible, true);
       assert.calledWith(hostRPC().call, 'highlightsVisibleChanged', true);
     });
+
+    it.each([true, false])(
+      'does not show highlights when comments mode is disabled',
+      commentsMode => {
+        const guest = createGuest({ commentsMode });
+
+        guest.element.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            ctrlKey: true,
+            shiftKey: true,
+            key: 'h',
+          }),
+        );
+
+        assert.equal(guest.highlightsVisible, !commentsMode);
+      },
+    );
   });
 });
