@@ -20,6 +20,10 @@ const TAB_SORTKEY_DEFAULT: Record<TabName, SortKey> = {
   orphan: 'location',
 };
 
+function defaultSortKeyForTab(tab: TabName, commentsMode?: boolean) {
+  return commentsMode ? 'newest' : TAB_SORTKEY_DEFAULT[tab];
+}
+
 function initialSelection(settings: SidebarSettings): BooleanMap {
   const selection: BooleanMap = {};
   // TODO: Do not take into account existence of `settings.query` here
@@ -72,8 +76,8 @@ function initialState(settings: SidebarSettings): State {
     selected: initialSelection(settings),
     expanded: initialSelection(settings),
     forcedVisible: {},
-    selectedTab: 'annotation',
-    sortKey: TAB_SORTKEY_DEFAULT.annotation,
+    selectedTab: settings.commentsMode ? 'note' : 'annotation',
+    sortKey: defaultSortKeyForTab('annotation', settings.commentsMode),
     focusRequest: null,
   };
 }
@@ -86,7 +90,7 @@ function setTab(newTab: TabName, oldTab: TabName) {
   }
   return {
     selectedTab: newTab,
-    sortKey: TAB_SORTKEY_DEFAULT[newTab],
+    sortKey: defaultSortKeyForTab(newTab /* TODO , false */),
   };
 }
 

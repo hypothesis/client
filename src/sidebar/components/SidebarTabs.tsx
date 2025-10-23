@@ -155,25 +155,27 @@ function SidebarTabs({
         )}
       >
         <div className="flex gap-x-6 theme-clean:ml-[15px] mt-1" role="tablist">
-          <Tab
-            count={annotationCount}
-            isWaitingToAnchor={isWaitingToAnchorAnnotations}
-            isSelected={selectedTab === 'annotation'}
-            label="Annotations"
-            name="annotation"
-            onSelect={() => selectTab('annotation')}
-          >
-            Annotations
-          </Tab>
+          {!settings.commentsMode && (
+            <Tab
+              count={annotationCount}
+              isWaitingToAnchor={isWaitingToAnchorAnnotations}
+              isSelected={selectedTab === 'annotation'}
+              label="Annotations"
+              name="annotation"
+              onSelect={() => selectTab('annotation')}
+            >
+              Annotations
+            </Tab>
+          )}
           <Tab
             count={noteCount}
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
             isSelected={selectedTab === 'note'}
-            label="Page notes"
+            label={settings.commentsMode ? 'Comments' : 'Page Notes'}
             name="note"
             onSelect={() => selectTab('note')}
           >
-            Page Notes
+            {settings.commentsMode ? 'Comments' : 'Page Notes'}
           </Tab>
           {orphanCount > 0 && (
             <Tab
@@ -204,14 +206,15 @@ function SidebarTabs({
                   style={applyTheme(['ctaBackgroundColor'], settings)}
                 >
                   <PlusIcon />
-                  New note
+                  {settings.commentsMode ? 'Add comment' : 'New note'}
                 </Button>
               </div>
             )}
           {!isLoading && showNotesUnavailableMessage && (
             <Card data-testid="notes-unavailable-message" variant="flat">
               <CardContent classes="text-center">
-                There are no page notes in this group.
+                There are no {settings.commentsMode ? 'comments' : 'page notes'}{' '}
+                in this group.
               </CardContent>
             </Card>
           )}

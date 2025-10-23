@@ -70,7 +70,7 @@ function AnnotationActionBar({
     userProfile.userid !== annotation.user;
 
   const onDelete = async () => {
-    const annType = annotationRole(annotation);
+    const annType = annotationRole(annotation, settings);
     if (
       await confirm({
         title: `Delete ${annType.toLowerCase()}?`,

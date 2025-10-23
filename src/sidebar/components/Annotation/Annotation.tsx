@@ -7,6 +7,7 @@ import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
 import type { Annotation as IAnnotation } from '../../../types/api';
+import type { SidebarSettings } from '../../../types/config';
 import {
   annotationRole,
   isOrphan,
@@ -66,6 +67,7 @@ export type AnnotationProps = {
 
   // injected
   annotationsService: AnnotationsService;
+  settings: SidebarSettings;
 };
 
 /**
@@ -80,6 +82,7 @@ function Annotation({
   replyCount,
   threadIsCollapsed,
   annotationsService,
+  settings,
 }: AnnotationProps) {
   const store = useSidebarStore();
 
@@ -115,9 +118,10 @@ function Annotation({
     () => formatDateTime(annotation.created),
     [annotation.created],
   );
+  const role = annotationRole(annotation, settings);
   const annotationDescription = isSaved(annotation)
-    ? annotationRole(annotation)
-    : `New ${annotationRole(annotation).toLowerCase()}`;
+    ? role
+    : `New ${role.toLowerCase()}`;
   const state = store.isAnnotationHighlighted(annotation)
     ? ' - Highlighted'
     : '';
@@ -188,4 +192,4 @@ function Annotation({
   );
 }
 
-export default withServices(Annotation, ['annotationsService']);
+export default withServices(Annotation, ['annotationsService', 'settings']);

@@ -3,7 +3,7 @@ import AnnotationReplyToggle from './AnnotationReplyToggle';
 
 type EmptyAnnotationProps = Omit<
   AnnotationProps,
-  'annotation' | 'annotationsService'
+  'annotation' | 'annotationsService' | 'settings'
 >;
 
 /**

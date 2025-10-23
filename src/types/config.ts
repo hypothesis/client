@@ -204,6 +204,14 @@ export type ConfigFromHost = {
 
   /** URL template for username links. */
   usernameUrl?: string;
+
+  /**
+   * Whether app should load in comments mode or not.
+   *
+   * Comments mode disables the adder, hides the Annotations tab, and renames
+   * "Page notes" to "Comments".
+   */
+  commentsMode?: boolean;
 };
 
 /**

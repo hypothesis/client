@@ -7,6 +7,7 @@ import type {
   ShapeSelector,
   TextQuoteSelector,
 } from '../../types/api';
+import type { SidebarSettings } from '../../types/config';
 
 /**
  * Utility functions for querying annotation metadata.
@@ -125,13 +126,16 @@ export function isAnnotation(annotation: Annotation): boolean {
 /**
  * Return a human-readable string describing the annotation's role.
  */
-export function annotationRole(annotation: APIAnnotationData): string {
+export function annotationRole(
+  annotation: APIAnnotationData,
+  { commentsMode }: SidebarSettings,
+): string {
   if (isReply(annotation)) {
     return 'Reply';
   } else if (isHighlight(annotation)) {
     return 'Highlight';
   } else if (isPageNote(annotation)) {
-    return 'Page note';
+    return commentsMode ? 'Comment' : 'Page note';
   }
   return 'Annotation';
 }

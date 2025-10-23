@@ -1,7 +1,7 @@
 import { LinkButton, HelpIcon, ShareIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import type { SidebarSettings } from '../../types/config';
+import type { Service, SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
@@ -35,18 +35,16 @@ export type TopBarProps = {
 type ControlName = 'share' | 'account' | 'help';
 
 function controlEnabled(settings: SidebarSettings, name: ControlName) {
-  const config = serviceConfig(settings);
-  if (!config) {
-    return true;
-  }
+  const config: Partial<Service> = serviceConfig(settings) ?? {};
   switch (name) {
     case 'share':
-      return config.enableShareImportExportPanel ?? true;
+      return (
+        !settings.commentsMode && (config.enableShareImportExportPanel ?? true)
+      );
     case 'account':
       return config.enableAccountMenu ?? true;
     case 'help':
       return config.enableHelpPanel ?? true;
-    /* istanbul ignore next: unused default */
     default:
       return true;
   }
