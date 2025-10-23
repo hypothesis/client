@@ -2628,9 +2628,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hypothesis/frontend-build@npm:^5.0.0":
-  version: 5.0.2
-  resolution: "@hypothesis/frontend-build@npm:5.0.2"
+"@hypothesis/frontend-build@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "@hypothesis/frontend-build@npm:5.1.0"
   dependencies:
     commander: ^14.0.0
     fancy-log: ^2.0.0
@@ -2641,7 +2641,7 @@ __metadata:
     rollup: ^4.0.2
     sass: ^1.43.2
     tailwindcss: ^3.0.11 || ^4.1.0
-    vitest: ^3.1.1
+    vitest: ^3.1.1 || ^4.0.1
   peerDependenciesMeta:
     "@tailwindcss/postcss":
       optional: true
@@ -2651,7 +2651,7 @@ __metadata:
       optional: true
     tailwindcss:
       optional: true
-  checksum: 81be91a4c67ed103c0e058b7b19f00370b7becb57f0bd5084fe0b2518819df75f790421d0e247a21ece01d78cb0a94918b585559cad52e2b782555257db2ba95
+  checksum: 38131aa73178f74a03689ca6eeb1307c835143cecb1e0c1632d8a6a10591bd46a153da87f37dd8b21d03eaf7ab0ec86b5898dc56fda4cb2034c8a8760baf760d
   languageName: node
   linkType: hard
 
@@ -2667,16 +2667,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hypothesis/frontend-testing@npm:^1.7.1":
-  version: 1.7.2
-  resolution: "@hypothesis/frontend-testing@npm:1.7.2"
+"@hypothesis/frontend-testing@npm:^1.8.0":
+  version: 1.8.0
+  resolution: "@hypothesis/frontend-testing@npm:1.8.0"
   dependencies:
     axe-core: ^4.8.2
     enzyme: ^3.11.0
     preact: ^10.18.1
   peerDependencies:
-    vitest: ^3.1.2
-  checksum: bb2c9aae42ec72ee9ed8f8a021283583a3fca4aa6935ac1a888dbf09a717c9df4d48a0efb4dc208f296e31eff0391e69a16f27cd3fdd1a9cf5cad856a4a9de90
+    vitest: ^3.1.2 || ^4.0.1
+  checksum: 712e42ebf591bc8f958596edbff1874b44f80df181ed7db9c8f7646ddedab53ebef64f485b9c3a3fe617425cc479cb975c9974a1873b6daceaefe5b4c2883be6
   languageName: node
   linkType: hard
 
@@ -8375,9 +8375,9 @@ __metadata:
     "@babel/preset-react": ^7.0.0
     "@babel/preset-typescript": ^7.16.7
     "@hypothesis/annotation-ui": ^1.0.2
-    "@hypothesis/frontend-build": ^5.0.0
+    "@hypothesis/frontend-build": ^5.1.0
     "@hypothesis/frontend-shared": ^10.3.1
-    "@hypothesis/frontend-testing": ^1.7.1
+    "@hypothesis/frontend-testing": ^1.8.0
     "@npmcli/arborist": ^9.0.0
     "@octokit/rest": ^22.0.0
     "@rollup/plugin-babel": ^6.0.0
