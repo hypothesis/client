@@ -10960,11 +10960,11 @@ __metadata:
   linkType: hard
 
 "preact-render-to-string@npm:^6.4.0":
-  version: 6.6.2
-  resolution: "preact-render-to-string@npm:6.6.2"
+  version: 6.6.3
+  resolution: "preact-render-to-string@npm:6.6.3"
   peerDependencies:
     preact: ">=10 || >= 11.0.0-0"
-  checksum: 16f499182f1d7794602e87461818897bc853d9a41b11aa48e6c9092fcf2f3cbccb4302ae5c8716807c78de1030d2ea84f2ccd07277f740ef202639dac1c42549
+  checksum: 3f5a278ce79512b969b8935dbad08177c4bf129428cf321fa08a50d4cc19955fb257fd94e3addee63a3ab2f65c577db8dc0f0c2bf15d43032a16215b8e05f30e
   languageName: node
   linkType: hard
 
