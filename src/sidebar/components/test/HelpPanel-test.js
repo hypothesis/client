@@ -18,7 +18,9 @@ describe('HelpPanel', () => {
 
   function createComponent(props) {
     return mount(
-      <HelpPanel session={fakeSessionService} settings={{}} {...props} />,
+      <div>
+        <HelpPanel session={fakeSessionService} settings={{}} {...props} />
+      </div>,
     );
   }
 
@@ -274,9 +276,7 @@ describe('HelpPanel', () => {
     );
   });
 
-  // FIXME Skipping for now, as it's failing for an apparently unrelated reason.
-  //       Investigate.
-  it.skip(
+  it(
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
