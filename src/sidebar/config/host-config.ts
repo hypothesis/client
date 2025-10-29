@@ -53,8 +53,8 @@ export function hostPageConfig(window: Window): ConfigFromAnnotator {
     'theme',
 
     'usernameUrl',
-
     'commentsMode',
+    'groupsAllowlist',
   ];
 
   // We need to coerce incoming values from the host config for 2 reasons:

@@ -428,6 +428,7 @@ export class GroupsService {
     // The `groups` property may be a list of group IDs or a promise for one,
     // if we're in the LMS app and the group list is being fetched asynchronously.
     const groupIdsOrPromise = this._serviceConfig?.groups;
+    let groupsToReturn: Group[];
 
     if (Array.isArray(groupIdsOrPromise) || isPromise(groupIdsOrPromise)) {
       let groupIds: string[] = [];
@@ -438,10 +439,18 @@ export class GroupsService {
           `Unable to fetch group configuration: ${e.message}`,
         );
       }
-      return this._loadServiceSpecifiedGroups(groupIds);
+      groupsToReturn = await this._loadServiceSpecifiedGroups(groupIds);
     } else {
-      return this._loadGroupsForUserAndDocument();
+      groupsToReturn = await this._loadGroupsForUserAndDocument();
     }
+
+    // Filter loaded groups if the `groupsAllowlist` setting was provided
+    const { groupsAllowlist } = this._settings;
+    if (groupsAllowlist) {
+      this._store.filterGroups(groupsAllowlist);
+    }
+
+    return groupsToReturn;
   }
 
   /**

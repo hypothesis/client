@@ -97,7 +97,9 @@ function GroupList({ settings }: GroupListProps) {
 
   const defaultAuthority = store.defaultAuthority();
   const canCreateNewGroup =
-    userid && !isThirdPartyUser(userid, defaultAuthority);
+    !settings.groupsAllowlist &&
+    userid &&
+    !isThirdPartyUser(userid, defaultAuthority);
   const newGroupLink = store.getLink('groups.new');
 
   // The group whose submenu is currently open, or `null` if no group item is

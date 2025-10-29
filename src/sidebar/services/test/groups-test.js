@@ -75,6 +75,7 @@ describe('GroupsService', () => {
         getGroup: sinon.stub(),
         hasFetchedProfile: sinon.stub().returns(false),
         loadGroups: sinon.stub(),
+        filterGroups: sinon.stub(),
         newAnnotations: sinon.stub().returns([]),
         allGroups() {
           return this.getState().groups.groups;
@@ -923,6 +924,16 @@ describe('GroupsService', () => {
 
         assert.notCalled(fakeStore.focusGroup);
       });
+    });
+
+    it('filters loaded groups if groupsAllowlist setting is true', async () => {
+      fakeSettings.groupsAllowlist = ['foo', 'bar'];
+      fakeApi.profile.groups.read.resolves([]);
+
+      const svc = createService();
+      await svc.load();
+
+      assert.calledWith(fakeStore.filterGroups, fakeSettings.groupsAllowlist);
     });
   });
 
