@@ -63,6 +63,7 @@ function configurationKeys(context: Context): string[] {
       'theme',
       'usernameUrl',
       'commentsMode',
+      'groupsAllowlist',
     ],
     notebook: [
       'branding',
@@ -217,6 +218,10 @@ const configDefinitions: ConfigDefinitionMap = {
   },
   commentsMode: {
     defaultValue: false,
+    allowInBrowserExt: false,
+    getValue: getHostPageSetting,
+  },
+  groupsAllowlist: {
     allowInBrowserExt: false,
     getValue: getHostPageSetting,
   },

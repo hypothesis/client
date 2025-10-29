@@ -65,11 +65,18 @@ loads.
 
    When comments mode is enabled, some things will behave differently:
 
-   1. The adder is no longer displayed when text is selected in the host frame.
+   1. The adder is not displayed when text is selected in the host frame.
    2. Only page notes can be created.
    3. The "Annotations" tab is hidden, and the "Page notes" tab is renamed to "Comments".
    4. Annotations are sorted from newer to older by default.
    5. Wording is changed to use the "comment" terminology, instead of annotation.
+
+.. option:: groupsAllowlist
+
+   ``String[]``. A list of group IDs to allow from the list of groups that would be normally available.
+
+   The user still needs to be able to see those groups either because they are members, or because it is featured in the
+   document
 
 .. option:: openSidebar
 

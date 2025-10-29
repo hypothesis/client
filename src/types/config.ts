@@ -212,6 +212,16 @@ export type ConfigFromHost = {
    * "Page notes" to "Comments".
    */
   commentsMode?: boolean;
+
+  /**
+   * A list of group IDs that are allowed to be displayed to the user.
+   *
+   * The user still needs to be a member of the group, or the group needs to be
+   * featured in the document.
+   * It is not possible to use this setting to load a group that the user would
+   * not be able to normally see.
+   */
+  groupsAllowlist?: string[];
 };
 
 /**

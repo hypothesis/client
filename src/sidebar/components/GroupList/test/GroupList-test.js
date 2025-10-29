@@ -150,8 +150,14 @@ describe('GroupList', () => {
       userid: 'acct:john@otherpublisher.org',
       expectNewGroupButton: false,
     },
-  ].forEach(({ userid, expectNewGroupButton }) => {
+    {
+      userid: 'acct:john@hypothes.is',
+      expectNewGroupButton: false,
+      groupsAllowlist: ['foo', 'bar'],
+    },
+  ].forEach(({ userid, expectNewGroupButton, groupsAllowlist }) => {
     it('displays "Create new group" button if user is logged in with first-party account', () => {
+      fakeSettings.groupsAllowlist = groupsAllowlist;
       fakeStore.profile.returns({ userid });
       const wrapper = createGroupList();
       const newGroupButton = wrapper.find('MenuItem[label="Create new group"]');

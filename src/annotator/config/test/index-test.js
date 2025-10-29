@@ -124,6 +124,7 @@ describe('annotator/config/index', () => {
             externalContainerSelector: 'fakeValue',
             focus: 'fakeValue',
             group: 'fakeValue',
+            groupsAllowlist: 'fakeValue',
             notebookAppUrl: 'fakeValue',
             profileAppUrl: 'fakeValue',
             onLayoutChange: 'fakeValue',
@@ -266,6 +267,7 @@ describe('annotator/config/index', () => {
           'theme',
           'usernameUrl',
           'commentsMode',
+          'groupsAllowlist',
         ],
       },
       {
