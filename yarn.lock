@@ -10378,12 +10378,12 @@ __metadata:
   linkType: hard
 
 "npm-packlist@npm:^10.0.0, npm-packlist@npm:^10.0.1":
-  version: 10.0.2
-  resolution: "npm-packlist@npm:10.0.2"
+  version: 10.0.3
+  resolution: "npm-packlist@npm:10.0.3"
   dependencies:
     ignore-walk: ^8.0.0
-    proc-log: ^5.0.0
-  checksum: 20967baef4ce24f1f41cab4a2bab86ea7bdbbadfed1245da8d006a41d22bde7955ceaa05afc782a21568e2fc19bee4851cb255f1dca8bb338381306ad79075e4
+    proc-log: ^6.0.0
+  checksum: f61e3aec179d82332b22e577d0a48bc3fc67012321db80f06a9b71dc58e2876ac18bb3b837e3635967b2641f4374a5b81794e25e35771b6a1fd9c65543e6e235
   languageName: node
   linkType: hard
 
@@ -11009,6 +11009,13 @@ __metadata:
   version: 5.0.0
   resolution: "proc-log@npm:5.0.0"
   checksum: c78b26ecef6d5cce4a7489a1e9923d7b4b1679028c8654aef0463b27f4a90b0946cd598f55799da602895c52feb085ec76381d007ab8dcceebd40b89c2f9dfe0
+  languageName: node
+  linkType: hard
+
+"proc-log@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "proc-log@npm:6.0.0"
+  checksum: 005a2aa24b8cbc98ca24fc49ccbdbbefb1f7932fcc96664e1008c59459ea66e8cc8bd463716d6c67e39327d45e8e080eb73bf32be70461425593b0f0d6acb91f
   languageName: node
   linkType: hard
 
