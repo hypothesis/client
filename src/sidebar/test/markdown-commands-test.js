@@ -137,7 +137,7 @@ describe('markdown commands', () => {
           formatState(output),
           'one [' +
             sel +
-            '](<sel>http://insert-your-link-here.com</sel>) three',
+            '](<sel>http://example.com/insert-your-link-here</sel>) three',
         );
       });
     });
