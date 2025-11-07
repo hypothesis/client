@@ -118,7 +118,7 @@ export function convertSelectionToLink(
     // Selection is not a URL, wrap it with a link and use the selection as
     // the label. Change the selection to the dummy link.
     const beforeURL = linkPrefix + '[' + selection + '](';
-    const dummyLink = 'http://insert-your-link-here.com';
+    const dummyLink = 'http://example.com/insert-your-link-here';
     newState = replaceText(
       state,
       state.selectionStart,
