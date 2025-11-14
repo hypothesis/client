@@ -14,12 +14,6 @@ export type ThreadState = {
   annotations: Annotation[];
   showTabs: boolean;
 
-  /**
-   * Whether deleted top-level annotations with replies should be represented
-   * via a placeholder or filtered out.
-   */
-  topAnnotationsPlaceholder: boolean;
-
   selection: {
     expanded: Record<string, boolean>;
     filterQuery: string | null;
@@ -48,10 +42,6 @@ export type ThreadAnnotationsResult = {
    * filters and selected tab.
    */
   rootThread: Thread;
-};
-
-export type ThreadAnnotationsOptions = {
-  topAnnotationsPlaceholder: boolean;
 };
 
 /**
@@ -113,12 +103,6 @@ function threadAnnotationsImpl(
 
   if (threadState.showTabs) {
     rootThread.children = rootThread.children.filter(thread => {
-      // If the root annotation in this thread has been deleted, we don't show
-      // it unless placeholders are enabled.
-      if (!thread.annotation && !threadState.topAnnotationsPlaceholder) {
-        return false;
-      }
-
       // If this annotation is still anchoring, we do not know whether it should
       // appear in the "Annotations" or "Orphans" tab.
       if (thread.annotation && isWaitingToAnchor(thread.annotation)) {
