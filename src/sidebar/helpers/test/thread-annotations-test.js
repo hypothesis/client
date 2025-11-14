@@ -25,7 +25,6 @@ describe('sidebar/helpers/thread-annotations', () => {
     fakeThreadState = {
       annotations: [],
       showTabs: true,
-      topAnnotationsPlaceholder: false,
       selection: {
         expanded: {},
         forcedVisible: [],
@@ -211,7 +210,7 @@ describe('sidebar/helpers/thread-annotations', () => {
           });
         });
 
-        it('filters threads where the root annotation does not exist if topAnnotationsPlaceholder is false', () => {
+        it('keeps threads as orphan, when the root annotation does not exist', () => {
           fakeBuildThread.returns({
             children: [
               {
@@ -221,28 +220,6 @@ describe('sidebar/helpers/thread-annotations', () => {
             ],
           });
           fakeThreadState.showTabs = true;
-          fakeThreadState.selection.selectedTab = 'annotation';
-
-          const { tabCounts, rootThread } = threadAnnotations(fakeThreadState);
-          assert.deepEqual(tabCounts, {
-            annotation: 0,
-            note: 0,
-            orphan: 0,
-          });
-          assert.equal(rootThread.children.length, 0);
-        });
-
-        it('keeps threads where the root annotation does not exist if topAnnotationsPlaceholder is true', () => {
-          fakeBuildThread.returns({
-            children: [
-              {
-                annotation: null,
-                children: [annotationFixtures.oldReply()],
-              },
-            ],
-          });
-          fakeThreadState.showTabs = true;
-          fakeThreadState.topAnnotationsPlaceholder = true;
           fakeThreadState.selection.selectedTab = 'orphan';
 
           const { tabCounts, rootThread } = threadAnnotations(fakeThreadState);
