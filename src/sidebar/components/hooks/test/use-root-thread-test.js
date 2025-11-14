@@ -1,4 +1,5 @@
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import { useRootThread, $imports } from '../use-root-thread';
 
@@ -13,7 +14,6 @@ describe('sidebar/components/hooks/use-root-thread', () => {
       filterQuery: sinon.stub().returns('itchy'),
       hasAppliedFilter: sinon.stub().returns(false),
       hasSelectedAnnotations: sinon.stub().returns(false),
-      isFeatureEnabled: sinon.stub().returns(true),
       route: sinon.stub().returns('sidebar'),
       selectionState: sinon.stub().returns({ hi: 'there' }),
       getFilterValues: sinon.stub().returns({ user: 'hotspur' }),
@@ -62,18 +62,6 @@ describe('sidebar/components/hooks/use-root-thread', () => {
       const threadState = fakeThreadAnnotations.getCall(0).args[0];
 
       assert.equal(threadState.showTabs, showTabs);
-    });
-  });
-
-  [true, false].forEach(topAnnotationsPlaceholder => () => {
-    it('sets topAnnotationsPlaceholder based on top_annos_placeholder FF', () => {
-      fakeStore.isFeatureEnabled.returns(topAnnotationsPlaceholder);
-      mount(<DummyComponent />);
-
-      assert.equal(
-        lastRootThread.topAnnotationsPlaceholder,
-        topAnnotationsPlaceholder,
-      );
     });
   });
 });
