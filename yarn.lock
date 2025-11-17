@@ -2731,15 +2731,15 @@ __metadata:
   linkType: hard
 
 "@hypothesis/annotation-ui@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@hypothesis/annotation-ui@npm:1.0.2"
+  version: 1.1.0
+  resolution: "@hypothesis/annotation-ui@npm:1.1.0"
   peerDependencies:
     "@hypothesis/frontend-shared": ^10.2.0
     dompurify: ^3.0.0
     escape-html: ^1.0.3
     katex: ^0.16.0
     showdown: ^2.0.0
-  checksum: 7a75b8fd4373bab3f832440ea0729f607add31f0b4414d992427e99504ded374270f8467da5c78d44b62dc22d9a034d2d67a9a6dae57dc0fff3da71cf97fac25
+  checksum: 945dfa4315f36717c0fd466632ae2c0dbd6c721e7c8855e2e881a294ca0806bac9871bd942284498e3d7e21d38e05392c7d860a0a51a155d07cc17a19db8c273
   languageName: node
   linkType: hard
 
