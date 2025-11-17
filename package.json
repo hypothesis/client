@@ -42,7 +42,7 @@
     "@types/scroll-into-view": "^1.16.0",
     "@types/shallowequal": "^1.1.1",
     "@types/showdown": "^2.0.0",
-    "@types/sinon": "^17.0.3",
+    "@types/sinon": "^21.0.0",
     "@vitest/browser": "^4.0.1",
     "@vitest/browser-playwright": "^4.0.1",
     "@vitest/coverage-istanbul": "^4.0.1",

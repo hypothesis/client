@@ -5049,11 +5049,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:^24.0.2":
-  version: 24.10.0
-  resolution: "@types/node@npm:24.10.0"
+  version: 24.10.1
+  resolution: "@types/node@npm:24.10.1"
   dependencies:
     undici-types: ~7.16.0
-  checksum: 268c843faae02ba88be2441759c26e73038583a7e221fa3000f2c1d7fdc1d06b28cb514fc5367f7cb147c3519cd25ddafdfa1f8566829b91fb096262ebe3f7bb
+  checksum: c2f370ae7a97c04991e0eee6b57e588a2abef0814a5f6e41fda5a9200cf02ae6654fad51c8372ee203ae4134bab80f5bf441c586f7f50e0fda3ba422f35eb3c0
   languageName: node
   linkType: hard
 
@@ -5092,12 +5092,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sinon@npm:^17.0.3":
-  version: 17.0.4
-  resolution: "@types/sinon@npm:17.0.4"
+"@types/sinon@npm:^21.0.0":
+  version: 21.0.0
+  resolution: "@types/sinon@npm:21.0.0"
   dependencies:
     "@types/sinonjs__fake-timers": "*"
-  checksum: 487f43bda8d8b2ef32d1b3c08e5a68e17705d2c7470ea89c8fd62e3a086f9a35faf65d37a57bf189004c4e7adbc5f9562dfaa332c54e06a8d99fc7361f3ac004
+  checksum: 9700d58ee14d4e487519b98c044b1c1c89cc8f1eb844fb4f264a20d5f742da0db94ebdda8a7704dc4e9a460c237e9ae946d32451fd65d8158443d1591084a300
   languageName: node
   linkType: hard
 
@@ -8613,7 +8613,7 @@ __metadata:
     "@types/scroll-into-view": ^1.16.0
     "@types/shallowequal": ^1.1.1
     "@types/showdown": ^2.0.0
-    "@types/sinon": ^17.0.3
+    "@types/sinon": ^21.0.0
     "@vitest/browser": ^4.0.1
     "@vitest/browser-playwright": ^4.0.1
     "@vitest/coverage-istanbul": ^4.0.1
