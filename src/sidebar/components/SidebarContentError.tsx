@@ -1,5 +1,7 @@
 import { Button, Panel, RestrictedIcon } from '@hypothesis/frontend-shared';
 
+import type { SidebarSettings } from '../../types/config';
+import { withServices } from '../service-context';
 import { useSidebarStore } from '../store';
 
 export type SidebarContentErrorProps = {
@@ -10,22 +12,30 @@ export type SidebarContentErrorProps = {
 
   /** A function that will launch the login flow for the user */
   onLoginRequest: () => void;
+
+  // injected
+  settings: SidebarSettings;
 };
 
 /**
  * Show an error indicating that an annotation or group referenced in the URL
  * could not be fetched.
  */
-export default function SidebarContentError({
+function SidebarContentError({
   errorType,
   onLoginRequest,
   showClearSelection = false,
+  settings: { commentsMode },
 }: SidebarContentErrorProps) {
   const store = useSidebarStore();
   const isLoggedIn = store.isLoggedIn();
 
   const errorTitle =
-    errorType === 'annotation' ? 'Annotation unavailable' : 'Group unavailable';
+    errorType === 'group'
+      ? 'Group unavailable'
+      : commentsMode
+        ? 'Comment unavailable'
+        : 'Annotation unavailable';
 
   const errorMessage = (() => {
     if (!isLoggedIn) {
@@ -36,8 +46,9 @@ export default function SidebarContentError({
       return `The current URL links to a group, but that group cannot be found,
         or you do not have permission to view the annotations in that group.`;
     }
-    return `The current URL links to an annotation, but that annotation
-      cannot be found, or you do not have permission to view it.`;
+    return `The current URL links to ${commentsMode ? 'a comment' : 'an annotation'},
+     but that ${commentsMode ? 'comment' : 'annotation'} cannot be found, or you
+     do not have permission to view it.`;
   })();
 
   return (
@@ -50,7 +61,7 @@ export default function SidebarContentError({
               variant={isLoggedIn ? 'primary' : undefined}
               onClick={() => store.clearSelection()}
             >
-              Show all annotations
+              Show all {commentsMode ? 'comments' : 'annotations'}
             </Button>
           )}
           {!isLoggedIn && (
@@ -63,3 +74,5 @@ export default function SidebarContentError({
     </div>
   );
 }
+
+export default withServices(SidebarContentError, ['settings']);
