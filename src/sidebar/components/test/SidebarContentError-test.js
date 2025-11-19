@@ -3,6 +3,7 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import SidebarContentError from '../SidebarContentError';
 import { $imports } from '../SidebarContentError';
@@ -15,6 +16,7 @@ describe('SidebarContentError', () => {
       <SidebarContentError
         errorType="annotation"
         onLoginRequest={sinon.stub()}
+        settings={{}}
         {...props}
       />,
     );
@@ -42,20 +44,27 @@ describe('SidebarContentError', () => {
       .at(0);
   };
 
-  it('should provide a button to clear the selection (show all annotations)', () => {
-    const fakeOnLogin = sinon.stub();
-    const wrapper = createComponent({
-      onLoginRequest: fakeOnLogin,
-      showClearSelection: true,
-    });
+  it.each([
+    { commentsMode: false, buttonText: 'Show all annotations' },
+    { commentsMode: true, buttonText: 'Show all comments' },
+  ])(
+    'should provide a button to clear the selection',
+    ({ commentsMode, buttonText }) => {
+      const fakeOnLogin = sinon.stub();
+      const wrapper = createComponent({
+        onLoginRequest: fakeOnLogin,
+        showClearSelection: true,
+        settings: { commentsMode },
+      });
 
-    const clearButton = findButtonByText(wrapper, 'Show all annotations');
+      const clearButton = findButtonByText(wrapper, buttonText);
 
-    assert.isTrue(clearButton.exists());
+      assert.isTrue(clearButton.exists());
 
-    clearButton.props().onClick();
-    assert.called(fakeStore.clearSelection);
-  });
+      clearButton.props().onClick();
+      assert.called(fakeStore.clearSelection);
+    },
+  );
 
   context('unavailable annotation, logged out', () => {
     it('should display error text about unavailable annotation', () => {
@@ -82,22 +91,45 @@ describe('SidebarContentError', () => {
     });
   });
 
-  context('unavailable annotation, logged in', () => {
-    it('should display error text about unavailable annotation', () => {
+  context('unavailable annotation/comment, logged in', () => {
+    beforeEach(() => {
       fakeStore.isLoggedIn.returns(true);
-
-      const wrapper = createComponent();
-
-      assert.include(
-        wrapper.text(),
-        'The current URL links to an annotation, but that annotation',
-      );
-      assert.notInclude(wrapper.text(), 'You may need to log in');
     });
 
-    it('should not provide an option to log in', () => {
-      fakeStore.isLoggedIn.returns(true);
+    it.each([
+      {
+        commentsMode: false,
+        expectedTitle: 'Annotation unavailable',
+        expectedText:
+          'The current URL links to an annotation, but that annotation cannot be found',
+      },
+      {
+        commentsMode: true,
+        expectedTitle: 'Comment unavailable',
+        expectedText:
+          'The current URL links to a comment, but that comment cannot be found',
+      },
+    ])(
+      'should display error text about unavailable annotation/comment',
+      ({ commentsMode, expectedTitle, expectedText }) => {
+        const wrapper = createComponent({
+          settings: { commentsMode },
+        });
 
+        const normalizedText = wrapper
+          .text()
+          // Replace newlines with spaces
+          .replace('\n', ' ')
+          // Replace groups of multiple spaces with a single space
+          .replace(/\s+/g, ' ');
+
+        assert.include(normalizedText, expectedTitle);
+        assert.include(normalizedText, expectedText);
+        assert.notInclude(normalizedText, 'You may need to log in');
+      },
+    );
+
+    it('should not provide an option to log in', () => {
       const wrapper = createComponent();
       const loginButton = findButtonByText(wrapper, 'Log in');
 
