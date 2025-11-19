@@ -14,6 +14,7 @@ describe('AnnotationShareControl', () => {
       <AnnotationShareControl
         annotation={fakeAnnotation}
         toastMessenger={fakeToastMessenger}
+        settings={{}}
         {...props}
       />,
       { connected: true },
@@ -62,6 +63,19 @@ describe('AnnotationShareControl', () => {
       assert.equal(baseShareControl(wrapper).prop('group'), group ?? null);
     });
   });
+
+  it.each([true, false, undefined])(
+    'passes commentsMode from settings to base share control',
+    commentsMode => {
+      const wrapper = createComponent({
+        settings: { commentsMode },
+      });
+      assert.equal(
+        baseShareControl(wrapper).prop('commentsMode'),
+        commentsMode,
+      );
+    },
+  );
 
   describe('copying the share URI to the clipboard', () => {
     it('confirms link copy when successful', async () => {
