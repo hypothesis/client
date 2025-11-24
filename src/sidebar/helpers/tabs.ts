@@ -15,15 +15,3 @@ export function tabForAnnotation(ann: Annotation): TabName {
     return 'annotation';
   }
 }
-
-/**
- * Return true if an annotation should be displayed in a given tab.
- */
-export function shouldShowInTab(ann: Annotation, tab: TabName): boolean {
-  if (metadata.isWaitingToAnchor(ann)) {
-    // Until this annotation anchors or fails to anchor, we do not know which
-    // tab it should be displayed in.
-    return false;
-  }
-  return tabForAnnotation(ann) === tab;
-}
