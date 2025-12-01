@@ -115,10 +115,10 @@ function ImportAnnotations({
   //     (`importAnnotations` will be falsey if this is not the case).
   const importReady = Boolean(
     store.focusedGroup() &&
-      store.defaultContentFrame() &&
-      store.hasFetchedAnnotations() &&
-      !store.isFetchingAnnotations() &&
-      importAnnotations,
+    store.defaultContentFrame() &&
+    store.hasFetchedAnnotations() &&
+    !store.isFetchingAnnotations() &&
+    importAnnotations,
   );
 
   // True if we're validating a JSON file after it has been selected.
