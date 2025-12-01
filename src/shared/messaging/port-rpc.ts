@@ -118,9 +118,10 @@ export type HandlerMap = Record<string, (...args: any) => void>;
  * @template Calls - Object type describing the calls made by this port,
  *   using {@link PortRPC.prototype.call}.
  */
-export class PortRPC<Handlers extends HandlerMap, Calls extends CallMap>
-  implements Destroyable
-{
+export class PortRPC<
+  Handlers extends HandlerMap,
+  Calls extends CallMap,
+> implements Destroyable {
   /**
    * Map of sequence number to response callback, for RPC calls sent from
    * this instance.
