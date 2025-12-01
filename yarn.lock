@@ -3044,18 +3044,18 @@ __metadata:
   linkType: hard
 
 "@npmcli/arborist@npm:^9.0.0":
-  version: 9.1.7
-  resolution: "@npmcli/arborist@npm:9.1.7"
+  version: 9.1.8
+  resolution: "@npmcli/arborist@npm:9.1.8"
   dependencies:
     "@isaacs/string-locale-compare": ^1.1.0
-    "@npmcli/fs": ^4.0.0
+    "@npmcli/fs": ^5.0.0
     "@npmcli/installed-package-contents": ^4.0.0
     "@npmcli/map-workspaces": ^5.0.0
     "@npmcli/metavuln-calculator": ^9.0.2
     "@npmcli/name-from-folder": ^4.0.0
     "@npmcli/node-gyp": ^5.0.0
     "@npmcli/package-json": ^7.0.0
-    "@npmcli/query": ^4.0.0
+    "@npmcli/query": ^5.0.0
     "@npmcli/redact": ^4.0.0
     "@npmcli/run-script": ^10.0.0
     bin-links: ^6.0.0
@@ -3065,7 +3065,7 @@ __metadata:
     json-stringify-nice: ^1.1.4
     lru-cache: ^11.2.1
     minimatch: ^10.0.3
-    nopt: ^8.0.0
+    nopt: ^9.0.0
     npm-install-checks: ^8.0.0
     npm-package-arg: ^13.0.0
     npm-pick-manifest: ^11.0.1
@@ -3073,7 +3073,7 @@ __metadata:
     pacote: ^21.0.2
     parse-conflict-json: ^5.0.1
     proc-log: ^6.0.0
-    proggy: ^3.0.0
+    proggy: ^4.0.0
     promise-all-reject-late: ^1.0.0
     promise-call-limit: ^3.0.1
     semver: ^7.3.7
@@ -3082,7 +3082,7 @@ __metadata:
     walk-up-path: ^4.0.0
   bin:
     arborist: bin/index.js
-  checksum: 3dbfd94ba5566f4d401f6abd9d4001a202d5ebb7a4d73d54fd634c3f1180d1b5ea4d30644efc2b0cb2e79a043bbb26a77c82f01b6ff0764fcaf0eb05eea55615
+  checksum: 121ed816b1b9b0bd153f6fe0cdbb9e0f9ea4f600d48383ac11ecaf1bfca4b29ff99bae99b14205d87eaf7a276c26cda8890b2d0068118b067be9a56a4394fe8c
   languageName: node
   linkType: hard
 
@@ -3101,6 +3101,15 @@ __metadata:
   dependencies:
     semver: ^7.3.5
   checksum: 68951c589e9a4328698a35fd82fe71909a257d6f2ede0434d236fa55634f0fbcad9bb8755553ce5849bd25ee6f019f4d435921ac715c853582c4a7f5983c8d4a
+  languageName: node
+  linkType: hard
+
+"@npmcli/fs@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@npmcli/fs@npm:5.0.0"
+  dependencies:
+    semver: ^7.3.5
+  checksum: 897dac32eb37e011800112d406b9ea2ebd96f1dab01bb8fbeb59191b86f6825dffed6a89f3b6c824753d10f8735b76d630927bd7610e9e123b129ef2e5f02cb5
   languageName: node
   linkType: hard
 
@@ -3253,12 +3262,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@npmcli/query@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@npmcli/query@npm:4.0.0"
+"@npmcli/query@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@npmcli/query@npm:5.0.0"
   dependencies:
-    postcss-selector-parser: ^6.1.2
-  checksum: 5aafa9d09c7f1fbbf35b8ec9c0fc27e8869183aca8da6a957154d630ad82a08dcf21743f158d04c31b2cd950301db7efbfcb48a59ba98a584763212bc9dcc946
+    postcss-selector-parser: ^7.0.0
+  checksum: 7c1cbfb7787b977f5476f8b15c9f9a759f90ad098e061e32df2bfdb91940977ce34c807bff114de4edb9bdfb4eda70b5e299256498bbe9d693aa0f87a065f627
   languageName: node
   linkType: hard
 
@@ -5558,6 +5567,13 @@ __metadata:
   version: 2.0.0
   resolution: "abbrev@npm:2.0.0"
   checksum: 0e994ad2aa6575f94670d8a2149afe94465de9cedaaaac364e7fb43a40c3691c980ff74899f682f4ca58fa96b4cbd7421a015d3a6defe43a442117d7821a2f36
+  languageName: node
+  linkType: hard
+
+"abbrev@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "abbrev@npm:4.0.0"
+  checksum: d0344b63d28e763f259b4898c41bdc92c08e9d06d0da5617d0bbe4d78244e46daea88c510a2f9472af59b031d9060ec1a999653144e793fd029a59dae2f56dc8
   languageName: node
   linkType: hard
 
@@ -10377,6 +10393,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nopt@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "nopt@npm:9.0.0"
+  dependencies:
+    abbrev: ^4.0.0
+  bin:
+    nopt: bin/nopt.js
+  checksum: 7a5d9ab0629eaec1944a95438cc4efa6418ed2834aa8eb21a1bea579a7d8ac3e30120131855376a96ef59ab0e23ad8e0bc94d3349770a95e5cb7119339f7c7fb
+  languageName: node
+  linkType: hard
+
 "nopt@npm:~1.0.10":
   version: 1.0.10
   resolution: "nopt@npm:1.0.10"
@@ -11073,13 +11100,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-selector-parser@npm:^6.1.2":
-  version: 6.1.2
-  resolution: "postcss-selector-parser@npm:6.1.2"
+"postcss-selector-parser@npm:^7.0.0":
+  version: 7.1.1
+  resolution: "postcss-selector-parser@npm:7.1.1"
   dependencies:
     cssesc: ^3.0.0
     util-deprecate: ^1.0.2
-  checksum: ce9440fc42a5419d103f4c7c1847cb75488f3ac9cbe81093b408ee9701193a509f664b4d10a2b4d82c694ee7495e022f8f482d254f92b7ffd9ed9dea696c6f84
+  checksum: 36d71bd8e1c9db9c3d4ecefd3f8c30aace141a3a1a266473bc9a1b7a0c1c2dfbaef2ac20cc8ea287b17131cbb3690c1c0fe7a4d9272db9f09b136da2413bc3ea
   languageName: node
   linkType: hard
 
@@ -11147,10 +11174,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proggy@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "proggy@npm:3.0.0"
-  checksum: 8c274b56e8eaaa1f59ea938df3c501d80d24fbfd3dffd1de42a66e2657d131f5e0b7165127457a3a7b38e1dcc71a81060a685c6840001136ecad36cec900bfc8
+"proggy@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "proggy@npm:4.0.0"
+  checksum: 9f63245658b588a1290b1f1a092af5ac06ba005580b874d4c3e525217b30fbdf8c248403f963e8d4521319e080c9aa4c13e45fce3e6e2a9a38eb61dab4f88a83
   languageName: node
   linkType: hard
 
