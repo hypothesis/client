@@ -8730,7 +8730,7 @@ __metadata:
     postcss: ^8.0.3
     preact: ^10.4.0
     preact-render-to-string: ^6.4.0
-    prettier: 3.7.3
+    prettier: 3.7.4
     redux: ^5.0.0
     redux-thunk: ^3.1.0
     reselect: ^5.0.1
@@ -11173,12 +11173,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.7.3":
-  version: 3.7.3
-  resolution: "prettier@npm:3.7.3"
+"prettier@npm:3.7.4":
+  version: 3.7.4
+  resolution: "prettier@npm:3.7.4"
   bin:
     prettier: bin/prettier.cjs
-  checksum: fc3da17f1394f7e634eee762b1a42e0324cc6d78f8f966c746aed82c2712d24451db919e9dfa381b6fb4684b9cb04e25cfd08f47c55da92a814f9fa1e2427433
+  checksum: 955e37e87b1151ca3b3282463f5295f4c415821884791df152ff66e6eb1c5257115153cccba61b13962546100dd00ae45670ff27077dcab04c977d84036eaf80
   languageName: node
   linkType: hard
 
