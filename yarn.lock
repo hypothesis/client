@@ -11173,11 +11173,11 @@ __metadata:
   linkType: hard
 
 "preact-render-to-string@npm:^6.4.0":
-  version: 6.6.3
-  resolution: "preact-render-to-string@npm:6.6.3"
+  version: 6.6.4
+  resolution: "preact-render-to-string@npm:6.6.4"
   peerDependencies:
     preact: ">=10 || >= 11.0.0-0"
-  checksum: 3f5a278ce79512b969b8935dbad08177c4bf129428cf321fa08a50d4cc19955fb257fd94e3addee63a3ab2f65c577db8dc0f0c2bf15d43032a16215b8e05f30e
+  checksum: e8ba6c683333a1dfbddc21751c756a2612234037b74de8e0f38b2cd9efe043c982249828e7c852c0c55b05225bc0377e0d869f5e41269aa0a1451daef6ee8fd3
   languageName: node
   linkType: hard
 
