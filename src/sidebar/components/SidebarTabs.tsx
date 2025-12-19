@@ -111,7 +111,6 @@ function SidebarTabs({
   annotationsService,
   isLoading,
   settings,
-  frameSync,
 }: SidebarTabsProps) {
   const { rootThread, tabCounts } = useRootThread();
   const store = useSidebarStore();
@@ -148,9 +147,9 @@ function SidebarTabs({
   const tabCountsSummary = tabCountsSummaryPieces.join(', ');
 
   const createPageNoteWithDocumentMeta = useCallback(async () => {
-    const { metadata } = await frameSync.getDocumentInfo();
-    annotationsService.createPageNote(metadata);
-  }, [annotationsService, frameSync]);
+    // const { metadata } = await frameSync.getDocumentInfo();
+    annotationsService.createPageNote(/* metadata */);
+  }, [annotationsService]);
 
   return (
     <>
