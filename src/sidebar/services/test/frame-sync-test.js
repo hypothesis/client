@@ -1,4 +1,5 @@
 import { delay } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import { EventEmitter } from '../../../shared/event-emitter';
 import { Injector } from '../../../shared/injector';
@@ -1277,6 +1278,38 @@ describe('FrameSyncService', () => {
 
       assert.instanceOf(err, Error);
       assert.equal(err.message, 'Something went wrong');
+    });
+  });
+
+  describe('#getDocumentInfo', () => {
+    beforeEach(async () => {
+      await frameSync.connect();
+    });
+
+    it('rejects if guest is not connected', async () => {
+      let err;
+      try {
+        await frameSync.getDocumentInfo();
+      } catch (e) {
+        err = e;
+      }
+      assert.instanceOf(err, Error);
+      assert.equal(err.message, 'No guest connected');
+    });
+
+    it('requests document info from guest', async () => {
+      await connectGuest();
+
+      guestRPC().call.callsFake((method, callback) => {
+        if (method === 'getDocumentInfo') {
+          delay(0).then(() => callback({ title: 'foo' }));
+        }
+      });
+
+      const document = await frameSync.getDocumentInfo();
+
+      assert.calledWith(guestRPC().call, 'getDocumentInfo', sinon.match.func);
+      assert.deepEqual(document, { title: 'foo' });
     });
   });
 });

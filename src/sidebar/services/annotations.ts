@@ -1,7 +1,7 @@
 import type { ModerationStatus } from '@hypothesis/annotation-ui';
 
 import { generateHexString } from '../../shared/random';
-import type { AnnotationData } from '../../types/annotator';
+import type { AnnotationData, DocumentMetadata } from '../../types/annotator';
 import type {
   APIAnnotationData,
   Annotation,
@@ -211,7 +211,7 @@ export class AnnotationsService {
    * Create a new empty "page note" annotation and add it to the store. If the
    * user is not logged in, open the `loginPrompt` panel instead.
    */
-  createPageNote() {
+  createPageNote(document?: DocumentMetadata) {
     const topLevelFrame = this._store.mainFrame();
     if (!this._store.isLoggedIn()) {
       this._store.openSidebarPanel('loginPrompt');
@@ -227,7 +227,8 @@ export class AnnotationsService {
         },
       ],
       uri: topLevelFrame.uri,
-    };
+      document,
+    } satisfies Partial<AnnotationData>;
     this.create(pageNoteAnnotation);
   }
 

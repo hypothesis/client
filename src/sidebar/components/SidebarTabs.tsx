@@ -8,6 +8,7 @@ import {
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
+import { useCallback } from 'preact/hooks';
 
 import { pluralize } from '../../shared/pluralize';
 import type { SidebarSettings } from '../../types/config';
@@ -15,6 +16,7 @@ import type { TabName } from '../../types/sidebar';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import type { AnnotationsService } from '../services/annotations';
+import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
 import ThreadList from './ThreadList';
 import { useRootThread } from './hooks/use-root-thread';
@@ -99,6 +101,7 @@ export type SidebarTabsProps = {
   // injected
   settings: SidebarSettings;
   annotationsService: AnnotationsService;
+  frameSync: FrameSyncService;
 };
 
 /**
@@ -108,6 +111,7 @@ function SidebarTabs({
   annotationsService,
   isLoading,
   settings,
+  frameSync,
 }: SidebarTabsProps) {
   const { rootThread, tabCounts } = useRootThread();
   const store = useSidebarStore();
@@ -142,6 +146,11 @@ function SidebarTabs({
     tabCountsSummaryPieces.push(`${orphanCount} ${term}`);
   }
   const tabCountsSummary = tabCountsSummaryPieces.join(', ');
+
+  const createPageNoteWithDocumentMeta = useCallback(async () => {
+    const { metadata } = await frameSync.getDocumentInfo();
+    annotationsService.createPageNote(metadata);
+  }, [annotationsService, frameSync]);
 
   return (
     <>
@@ -201,7 +210,7 @@ function SidebarTabs({
               <div className="flex justify-end">
                 <Button
                   data-testid="new-note-button"
-                  onClick={() => annotationsService.createPageNote()}
+                  onClick={createPageNoteWithDocumentMeta}
                   variant="primary"
                   style={applyTheme(['ctaBackgroundColor'], settings)}
                 >
@@ -244,4 +253,8 @@ function SidebarTabs({
   );
 }
 
-export default withServices(SidebarTabs, ['annotationsService', 'settings']);
+export default withServices(SidebarTabs, [
+  'annotationsService',
+  'frameSync',
+  'settings',
+]);

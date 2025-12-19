@@ -11,6 +11,7 @@ describe('SidebarTabs', () => {
   // mock services
   let fakeAnnotationsService;
   let fakeSettings;
+  let fakeFrameSync;
   let fakeStore;
   let fakeUseRootThread;
 
@@ -19,6 +20,7 @@ describe('SidebarTabs', () => {
       <SidebarTabs
         annotationsService={fakeAnnotationsService}
         settings={fakeSettings}
+        frameSync={fakeFrameSync}
         isLoading={false}
         {...props}
       />,
@@ -45,6 +47,9 @@ describe('SidebarTabs', () => {
     };
     fakeSettings = {
       enableExperimentalNewNoteButton: false,
+    };
+    fakeFrameSync = {
+      getDocumentInfo: sinon.stub().resolves({ metadata: {} }),
     };
     fakeStore = {
       selectTab: sinon.stub(),
@@ -151,13 +156,17 @@ describe('SidebarTabs', () => {
         assert.deepEqual(button.prop('style'), { backgroundColor: '#00f' });
       });
 
-      it('should add a new page note on click', () => {
+      it('should add a new page note on click', async () => {
         fakeSettings.enableExperimentalNewNoteButton = true;
         fakeStore.selectedTab.returns('note');
 
         const wrapper = createComponent();
-        wrapper.find('Button[data-testid="new-note-button"]').props().onClick();
+        await wrapper
+          .find('Button[data-testid="new-note-button"]')
+          .props()
+          .onClick();
 
+        assert.calledOnce(fakeFrameSync.getDocumentInfo);
         assert.calledOnce(fakeAnnotationsService.createPageNote);
       });
     });

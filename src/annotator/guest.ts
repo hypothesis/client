@@ -643,6 +643,13 @@ export class Guest
 
     this._sidebarRPC.on('deleteAnnotation', (tag: string) => this.detach(tag));
 
+    // Expose document info to the sidebar on demand, so that annotation
+    // creation can be triggered from there (e.g. via the experimental new note
+    // button)
+    this._sidebarRPC.on('getDocumentInfo', async callback =>
+      callback(await this.getDocumentInfo()),
+    );
+
     this._sidebarRPC.on(
       'loadAnnotations',
       async (annotations: AnnotationData[]) => {

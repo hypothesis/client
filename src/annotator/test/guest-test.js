@@ -1,4 +1,5 @@
-import { delay } from '@hypothesis/frontend-testing';
+import { delay, waitFor } from '@hypothesis/frontend-testing';
+import sinon from 'sinon';
 
 import { EventEmitter } from '../../shared/event-emitter';
 import { DrawError } from '../draw-tool';
@@ -733,6 +734,30 @@ describe('Guest', () => {
         emitSidebarEvent('deleteAnnotation', 'tag1');
 
         assert.calledOnce(fakeBucketBarClient.update);
+      });
+    });
+
+    describe('on "getDocumentInfo" event', () => {
+      it('gets guest document info', async () => {
+        const callback = sinon.stub();
+
+        createGuest();
+        emitSidebarEvent('getDocumentInfo', callback);
+
+        await waitFor(() => callback.called);
+
+        assert.calledWith(
+          callback,
+          sinon.match({
+            uri: 'https://example.com/test.pdf',
+            metadata: {
+              title: 'Test title',
+              documentFingerprint: 'test-fingerprint',
+            },
+          }),
+        );
+        assert.called(fakeIntegration.uri);
+        assert.called(fakeIntegration.getMetadata);
       });
     });
 

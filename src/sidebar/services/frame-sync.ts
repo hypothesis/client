@@ -11,6 +11,7 @@ import {
   isMessageEqual,
 } from '../../shared/messaging';
 import type { Message } from '../../shared/messaging';
+import { promiseWithResolvers } from '../../shared/promise-with-resolvers';
 import type {
   AnnotationData,
   DocumentInfo,
@@ -702,6 +703,20 @@ export class FrameSyncService {
         }
       });
     });
+  }
+
+  async getDocumentInfo(): Promise<DocumentInfo> {
+    // Get the guest for the main frame. This assumes that the annotation is
+    // anchored in the main frame.
+    const guest = this._guestRPC.get(null);
+    if (!guest) {
+      throw new Error('No guest connected');
+    }
+
+    const { promise, resolve } = promiseWithResolvers<DocumentInfo>();
+    guest.call('getDocumentInfo', resolve);
+
+    return promise;
   }
 
   // Only used to cleanup tests
