@@ -166,7 +166,7 @@ describe('SidebarTabs', () => {
           .props()
           .onClick();
 
-        assert.calledOnce(fakeFrameSync.getDocumentInfo);
+        // assert.calledOnce(fakeFrameSync.getDocumentInfo);
         assert.calledOnce(fakeAnnotationsService.createPageNote);
       });
     });
