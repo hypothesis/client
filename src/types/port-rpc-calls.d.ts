@@ -202,6 +202,11 @@ export type SidebarToGuestCalls = {
    * current activity / assignment.
    */
   setOutsideAssignmentNoticeVisible(visible: boolean): void;
+
+  /**
+   * Expose the guest document info to the sidebar
+   */
+  getDocumentInfo(callback: (info: DocumentInfo) => void): void;
 };
 
 /** Calls that the sidebar makes to the host. */

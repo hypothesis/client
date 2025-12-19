@@ -314,18 +314,22 @@ describe('AnnotationsService', () => {
       assert.isNull(getLastAddedAnnotation());
     });
 
-    it('should create a new unsaved annotation with page note defaults', () => {
-      svc.createPageNote();
+    it.each([undefined, { title: 'foo' }])(
+      'should create a new unsaved annotation with page note defaults',
+      document => {
+        svc.createPageNote(document);
 
-      const annotation = getLastAddedAnnotation();
+        const annotation = getLastAddedAnnotation();
 
-      assert.equal(annotation.uri, 'http://www.example.com');
-      assert.deepEqual(annotation.target, [
-        {
-          source: 'http://www.example.com',
-        },
-      ]);
-    });
+        assert.equal(annotation.uri, 'http://www.example.com');
+        assert.deepEqual(annotation.target, [
+          {
+            source: 'http://www.example.com',
+          },
+        ]);
+        assert.deepEqual(annotation.document, document);
+      },
+    );
   });
 
   describe('delete', () => {
