@@ -1,5 +1,6 @@
 import { generateHexString } from '../../shared/random';
 import { warnOnce } from '../../shared/warn-once';
+import { tabForAnnotation } from '../helpers/tabs';
 import type { SidebarStore } from '../store';
 import { watch } from '../util/watch';
 import { Socket } from '../websocket';
@@ -95,6 +96,18 @@ export class StreamerService {
         updates.map(({ id }) => id).filter(Boolean) as string[],
       );
       this._window.setTimeout(() => this._store.highlightAnnotations([]), 5000);
+
+      // Move keyboard focus into the first updated annotation
+      const sortedUpdates = [...updates]
+        .filter(annotation => annotation.id)
+        .sort((a, b) => a.updated.localeCompare(b.updated));
+      const first = sortedUpdates[0];
+
+      if (first?.id) {
+        const tab = tabForAnnotation(first);
+        this._store.selectTab(tab);
+        this._store.setAnnotationFocusRequest(first.id);
+      }
     }
 
     const deletions = Object.keys(this._store.pendingDeletions()).map(id => ({
