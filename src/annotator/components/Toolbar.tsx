@@ -210,7 +210,7 @@ export default function Toolbar({
               'transition-colors focus-visible-ring ring-inset',
               // Height and width to align with the sidebar's top bar
               'h-[40px] w-[33px] pl-[6px] rounded-bl',
-              'bg-white text-grey-5 hover:text-grey-9',
+              'bg-white text-grey-6 hover:text-grey-9',
               // Turn on left and bottom borders to continue the
               // border of the sidebar's top bar
               'border-l border-b',
