@@ -432,6 +432,27 @@ describe('StreamerService', () => {
         await timeoutPromise;
         assert.calledWith(fakeStore.highlightAnnotations, []);
       });
+
+      it('handles "past" notifications', () => {
+        const pastNotification = {
+          type: 'annotation-notification',
+          options: { action: 'past' },
+          payload: [{ id: 'past-id' }],
+        };
+        fakeWebSocket.notify(pastNotification);
+        assert.calledWith(fakeStore.receiveRealTimeUpdates, {
+          updatedAnnotations: pastNotification.payload,
+        });
+      });
+
+      it('ignores unknown actions', () => {
+        fakeWebSocket.notify({
+          type: 'annotation-notification',
+          options: { action: 'unknown' },
+          payload: [],
+        });
+        assert.notCalled(fakeStore.receiveRealTimeUpdates);
+      });
     });
 
     context('when the app is the sidebar', () => {
@@ -493,6 +514,44 @@ describe('StreamerService', () => {
       fakeWebSocket.notify(fixtures.createNotification);
       activeStreamer.applyPendingUpdates();
       assert.calledWith(fakeStore.clearPendingUpdates);
+    });
+
+    it('focuses the oldest updated annotation and selects the correct tab', () => {
+      const updates = {
+        newest: {
+          id: 'newest',
+          updated: '2024-01-02T00:00:00Z',
+          target: [{ selector: [{ type: 'TextQuoteSelector' }] }],
+        },
+        oldest: {
+          id: 'oldest',
+          updated: '2024-01-01T00:00:00Z',
+          target: [],
+        },
+      };
+      fakeStore.pendingUpdates.returns(updates);
+
+      activeStreamer.applyPendingUpdates();
+
+      assert.calledWith(fakeStore.selectTab, 'note');
+      assert.calledWith(fakeStore.setAnnotationFocusRequest, 'oldest');
+    });
+
+    it('does not focus if no updates have IDs', () => {
+      fakeStore.pendingUpdates.returns({
+        'no-id': { updated: '2024-01-01T00:00:00Z' },
+      });
+      activeStreamer.applyPendingUpdates();
+      assert.notCalled(fakeStore.setAnnotationFocusRequest);
+    });
+
+    it('does nothing if there are no pending updates or deletions', () => {
+      fakeStore.pendingUpdates.returns({});
+      fakeStore.pendingDeletions.returns({});
+      activeStreamer.applyPendingUpdates();
+      assert.notCalled(fakeStore.addAnnotations);
+      assert.notCalled(fakeStore.removeAnnotations);
+      assert.called(fakeStore.clearPendingUpdates);
     });
   });
 
@@ -574,6 +633,30 @@ describe('StreamerService', () => {
           assert.called(console.warn);
         });
       });
+    });
+  });
+
+  describe('#setConfig', () => {
+    it('sends configuration messages immediately if connected', async () => {
+      createDefaultStreamer();
+      await activeStreamer.connect();
+      fakeWebSocket.messages = [];
+
+      activeStreamer.setConfig('test', { foo: 'bar' });
+      assert.deepEqual(fakeWebSocket.messages, [{ foo: 'bar' }]);
+    });
+
+    it('does not send null configuration messages on reconnect', async () => {
+      createDefaultStreamer();
+      activeStreamer.setConfig('test', null);
+      await activeStreamer.connect();
+
+      // Reconnect to trigger _sendClientConfig
+      fakeWebSocket.messages = [];
+      fakeWebSocket.emit('open');
+
+      const testMsg = fakeWebSocket.messages.find(msg => msg === null);
+      assert.isUndefined(testMsg);
     });
   });
 
