@@ -130,6 +130,8 @@ describe('StreamerService', () => {
         receiveRealTimeUpdates: sinon.stub(),
         removeAnnotations: sinon.stub(),
         highlightAnnotations: sinon.stub(),
+        selectTab: sinon.stub(),
+        setAnnotationFocusRequest: sinon.stub(),
       },
     );
 
