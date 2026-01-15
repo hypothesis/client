@@ -1,4 +1,4 @@
-import { suggestedFilename } from '../export-annotations';
+import { formatDate, suggestedFilename } from '../export-annotations';
 
 describe('suggestedFilename', () => {
   [
@@ -54,7 +54,7 @@ describe('suggestedFilename', () => {
 
   it('defaults to current date', () => {
     const result = suggestedFilename({});
-    const dateStr = new Date().toISOString().slice(0, 10);
+    const dateStr = formatDate(new Date());
     assert.equal(result, `${dateStr}-Hypothesis`);
   });
 });
