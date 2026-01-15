@@ -47,7 +47,6 @@ export type Tool = 'rect' | 'point';
  *
  * When drawing is active, DrawTool creates an overlay into which the incomplete
  * shape is drawn. The shape is updated in response to user gestures.
- *
  * Drawing is initiated using {@link DrawTool.draw}. Only one shape can be
  * drawn at a time.
  */
@@ -70,6 +69,18 @@ export class DrawTool implements Destroyable {
 
   /** Controller for ending the drawing operation. */
   private _abortDraw?: AbortController;
+
+  /** For rectangle tool: track if we're in two-click mode (waiting for second click). */
+  private _waitingForSecondClick: boolean = false;
+
+  /** For rectangle tool: initial click position when in two-click mode. */
+  private _firstClickPoint?: { x: number; y: number };
+
+  /** For rectangle tool: track if pointer moved significantly (indicating drag). */
+  private _hasMoved: boolean = false;
+
+  /** Threshold in pixels to distinguish between click and drag. */
+  private readonly _dragThreshold = 5;
 
   /**
    * @param root - Container in which the user can draw a shape. The drawing
@@ -130,9 +141,33 @@ export class DrawTool implements Destroyable {
     this._drawEnd = resolve;
     this._drawError = reject;
 
+    // Reset two-click mode state
+    this._waitingForSecondClick = false;
+    this._firstClickPoint = undefined;
+    this._hasMoved = false;
+
     this._surface.addEventListener('pointerdown', e => {
       switch (this._tool) {
         case 'rect':
+          // If we're waiting for a second click, this is the second click
+          if (this._waitingForSecondClick && this._firstClickPoint) {
+            // Complete the rectangle with the second click
+            this._shape = {
+              type: 'rect',
+              left: this._firstClickPoint.x,
+              top: this._firstClickPoint.y,
+              right: e.clientX,
+              bottom: e.clientY,
+            };
+            this._waitingForSecondClick = false;
+            this._firstClickPoint = undefined;
+            resolve(normalizeRect(this._shape));
+            this._abortDraw?.abort();
+            e.stopPropagation();
+            return;
+          }
+
+          // First click: initialize rectangle and track position
           this._shape = {
             type: 'rect',
             left: e.clientX,
@@ -140,6 +175,8 @@ export class DrawTool implements Destroyable {
             right: e.clientX,
             bottom: e.clientY,
           };
+          this._hasMoved = false;
+          this._renderSurface();
           break;
         case 'point':
           this._shape = {
@@ -158,6 +195,15 @@ export class DrawTool implements Destroyable {
       }
       switch (this._shape.type) {
         case 'rect':
+          // Check if pointer has moved significantly (indicating drag)
+          if (!this._hasMoved) {
+            const deltaX = Math.abs(e.clientX - this._shape.left);
+            const deltaY = Math.abs(e.clientY - this._shape.top);
+            this._hasMoved =
+              deltaX >= this._dragThreshold || deltaY >= this._dragThreshold;
+          }
+
+          // Update rectangle during drag
           this._shape.right = e.clientX;
           this._shape.bottom = e.clientY;
           break;
@@ -170,14 +216,51 @@ export class DrawTool implements Destroyable {
     });
 
     this._surface.addEventListener('pointerup', e => {
+      // If we're waiting for second click, don't process pointerup
+      // (the second click will be handled in pointerdown)
+      if (this._waitingForSecondClick) {
+        e.stopPropagation();
+        return;
+      }
+
       if (!this._shape) {
         return;
       }
       switch (this._shape.type) {
         case 'rect':
-          this._shape.right = e.clientX;
-          this._shape.bottom = e.clientY;
-          resolve(normalizeRect(this._shape));
+          // If there was significant movement, treat as drag and complete immediately
+          if (this._hasMoved) {
+            this._shape.right = e.clientX;
+            this._shape.bottom = e.clientY;
+            resolve(normalizeRect(this._shape));
+          } else {
+            // Check if pointerup is at approximately the same position as pointerdown
+            // (within threshold) to determine if we should enter two-click mode
+            const deltaX = Math.abs(e.clientX - this._shape.left);
+            const deltaY = Math.abs(e.clientY - this._shape.top);
+            const isAtSamePosition =
+              deltaX < this._dragThreshold && deltaY < this._dragThreshold;
+
+            if (isAtSamePosition) {
+              // No movement: treat as first click in two-click mode
+              // Store the first click position and wait for second click
+              this._firstClickPoint = {
+                x: this._shape.left,
+                y: this._shape.top,
+              };
+              this._waitingForSecondClick = true;
+              // Keep the shape visible as a point indicator
+              this._renderSurface();
+              // Don't resolve yet - wait for second click
+              e.stopPropagation();
+              return;
+            } else {
+              // Some movement but less than threshold: complete the rectangle
+              this._shape.right = e.clientX;
+              this._shape.bottom = e.clientY;
+              resolve(normalizeRect(this._shape));
+            }
+          }
           break;
         case 'point':
           this._shape.x = e.clientX;
@@ -239,6 +322,9 @@ export class DrawTool implements Destroyable {
       this._drawError = undefined;
       this._drawEnd = undefined;
       this._abortDraw = undefined;
+      this._waitingForSecondClick = false;
+      this._firstClickPoint = undefined;
+      this._hasMoved = false;
     };
 
     // Draw the initial empty surface
@@ -257,6 +343,10 @@ export class DrawTool implements Destroyable {
       this._drawError(new DrawError(kind, 'Drawing canceled'));
     }
     this._abortDraw?.abort();
+    // Reset two-click mode state
+    this._waitingForSecondClick = false;
+    this._firstClickPoint = undefined;
+    this._hasMoved = false;
   }
 
   private _renderSurface() {
@@ -265,6 +355,42 @@ export class DrawTool implements Destroyable {
       return;
     }
     if (this._shape?.type === 'rect') {
+      // If waiting for second click, show a visual indicator at the first click point
+      if (this._waitingForSecondClick && this._firstClickPoint) {
+        const point = this._firstClickPoint;
+        render(
+          <>
+            {/* Show a crosshair or circle at the first click point */}
+            <circle
+              stroke="grey"
+              stroke-width="2px"
+              fill="none"
+              cx={point.x}
+              cy={point.y}
+              r={8}
+            />
+            <line
+              stroke="grey"
+              stroke-width="1px"
+              x1={point.x - 12}
+              y1={point.y}
+              x2={point.x + 12}
+              y2={point.y}
+            />
+            <line
+              stroke="grey"
+              stroke-width="1px"
+              x1={point.x}
+              y1={point.y - 12}
+              x2={point.x}
+              y2={point.y + 12}
+            />
+          </>,
+          this._surface,
+        );
+        return;
+      }
+
       // Normalize rect because SVG rects must have positive width and height.
       const rect = normalizeRect(this._shape);
       render(

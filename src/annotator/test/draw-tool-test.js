@@ -143,7 +143,7 @@ describe('DrawTool', () => {
   });
 
   describe('drawing a rect', () => {
-    it('finishes drawing when mouse is released', async () => {
+    it('finishes drawing when mouse is released after dragging', async () => {
       const shapePromise = tool.draw('rect');
       sendPointerEvent('pointerdown');
       sendPointerEvent('pointermove', 5, 5);
@@ -158,6 +158,75 @@ describe('DrawTool', () => {
         right: 10,
         bottom: 20,
       });
+    });
+
+    it('allows creating rectangle with two clicks (WCAG 2.5.7)', async () => {
+      const shapePromise = tool.draw('rect');
+      // First click: no significant movement
+      sendPointerEvent('pointerdown', 10, 10);
+      sendPointerEvent('pointerup', 10, 10); // Same position, no drag
+
+      // Surface should still be visible, waiting for second click
+      assert.ok(getSurface());
+
+      // Second click completes the rectangle
+      sendPointerEvent('pointerdown', 50, 60);
+      const shape = await shapePromise;
+
+      assert.deepEqual(shape, {
+        type: 'rect',
+        left: 10,
+        top: 10,
+        right: 50,
+        bottom: 60,
+      });
+    });
+
+    it('shows visual indicator after first click in two-click mode', async () => {
+      const shapePromise = tool.draw('rect');
+      // First click: no significant movement
+      sendPointerEvent('pointerdown', 10, 10);
+      sendPointerEvent('pointerup', 10, 10);
+
+      // Check that surface is still visible with indicator
+      const surface = getSurface();
+      assert.ok(surface);
+
+      // Should have a circle and crosshair lines (indicator elements)
+      const circle = surface.querySelector('circle');
+      const lines = surface.querySelectorAll('line');
+      assert.ok(circle, 'Should show circle indicator');
+      assert.equal(lines.length, 2, 'Should show crosshair lines');
+
+      tool.cancel();
+      try {
+        await shapePromise;
+      } catch {
+        /* noop */
+      }
+    });
+
+    it('can cancel drawing with Escape while waiting for second click', async () => {
+      const shapePromise = tool.draw('rect');
+      // First click: no significant movement
+      sendPointerEvent('pointerdown', 10, 10);
+      sendPointerEvent('pointerup', 10, 10);
+
+      // Press Escape to cancel
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape' }),
+      );
+
+      let err;
+      try {
+        await shapePromise;
+      } catch (e) {
+        err = e;
+      }
+
+      assert.instanceOf(err, DrawError);
+      assert.equal(err.kind, 'canceled');
+      assert.notOk(getSurface());
     });
 
     it('ignores "pointermove" and "pointerup" events before an initial "pointerdown"', async () => {
