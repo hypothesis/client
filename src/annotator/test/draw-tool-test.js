@@ -229,6 +229,41 @@ describe('DrawTool', () => {
       assert.notOk(getSurface());
     });
 
+    it('ignores pointerup events while waiting for second click', async () => {
+      const shapePromise = tool.draw('rect');
+      // First click: no significant movement
+      sendPointerEvent('pointerdown', 10, 10);
+      sendPointerEvent('pointerup', 10, 10);
+
+      // Surface should still be visible, waiting for second click
+      assert.ok(getSurface());
+
+      // Send additional pointerup events - these should be ignored
+      sendPointerEvent('pointerup', 20, 20);
+      sendPointerEvent('pointerup', 30, 30);
+
+      // Drawing should still be in progress (not completed)
+      let shapeResolved = false;
+      shapePromise.then(() => {
+        shapeResolved = true;
+      });
+      await delay(0);
+      assert.isFalse(shapeResolved, 'Drawing should not be completed yet');
+      assert.ok(getSurface(), 'Surface should still be visible');
+
+      // Second click completes the rectangle
+      sendPointerEvent('pointerdown', 50, 60);
+      const shape = await shapePromise;
+
+      assert.deepEqual(shape, {
+        type: 'rect',
+        left: 10,
+        top: 10,
+        right: 50,
+        bottom: 60,
+      });
+    });
+
     it('ignores "pointermove" and "pointerup" events before an initial "pointerdown"', async () => {
       const shapePromise = tool.draw('rect');
       sendPointerEvent('pointermove', 5, 5);
