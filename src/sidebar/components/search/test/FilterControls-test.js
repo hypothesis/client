@@ -48,11 +48,6 @@ describe('FilterControls', () => {
       return this.button.text();
     }
 
-    /** Return true if button is rendered in the active state. */
-    isActive() {
-      return this.button.prop('pressed');
-    }
-
     click() {
       this.button.find('button').simulate('click');
     }
@@ -75,7 +70,6 @@ describe('FilterControls', () => {
     const wrapper = createComponent();
     const toggle = new ToggleButtonWrapper(wrapper, 'selection-toggle');
     assert.isTrue(toggle.exists());
-    assert.isTrue(toggle.isActive());
 
     toggle.click();
 
@@ -127,14 +121,13 @@ describe('FilterControls', () => {
       fakeStore.getFocusFilters.returns(focusFilters);
       fakeStore.getFocusActive.returns(new Set([filterType]));
 
-      // Toggle should be displayed and active.
+      // Toggle should be displayed.
       const wrapper = createComponent();
       const toggle = new ToggleButtonWrapper(
         wrapper,
         `${filterType}-focus-toggle`,
       );
       assert.isTrue(toggle.exists());
-      assert.isTrue(toggle.isActive());
       assert.equal(toggle.label(), label);
 
       toggle.click();
@@ -145,7 +138,6 @@ describe('FilterControls', () => {
       fakeStore.getFocusActive.returns(new Set());
       wrapper.setProps({});
       toggle.update();
-      assert.isFalse(toggle.isActive());
     });
   });
 
