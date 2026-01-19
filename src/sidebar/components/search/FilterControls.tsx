@@ -67,12 +67,11 @@ function FilterToggle({
       })}
       disabled={disabled}
       onClick={() => setActive(!active)}
-      pressed={active}
       variant="custom"
       title={description}
     >
       {IconComponent && <IconComponent className="w-em h-em" />}
-      <span className="max-w-36 truncate">{label}</span>
+      <span className="max-w-56 truncate">{label}</span>
       <div
         // Vertical divider line between label and active/inactive state.
         // This should fill the button vertically.
@@ -161,7 +160,7 @@ export default function FilterControls({
         <b>Filters</b>
         {hasSelection && (
           <FilterToggle
-            label={`${selectedCount} selected`}
+            label={`Remove ${selectedCount} selected annotation filter`}
             description={`Show ${selectedCount} selected annotations`}
             active={true}
             setActive={() => store.clearSelection()}
