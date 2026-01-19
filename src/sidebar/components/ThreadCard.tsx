@@ -82,8 +82,7 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
       data-testid="thread-card"
       elementRef={cardRef}
       tabIndex={0}
-      role="article"
-      aria-label="Press Enter to scroll annotation into view"
+      aria-description="Press Enter to scroll annotation into view"
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
