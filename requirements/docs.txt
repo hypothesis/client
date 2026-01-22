@@ -47,10 +47,11 @@ mdurl==0.1.1
     # via markdown-it-py
 myst-parser==0.18.0
     # via -r docs.in
-packaging==21.3
+packaging==26.0
     # via
     #   build
     #   sphinx
+    #   wheel
 pep517==0.13.0
     # via build
 pip-sync-faster==0.0.2
@@ -61,8 +62,6 @@ pip-tools==6.8.0
     #   pip-sync-faster
 pygments==2.15.0
     # via sphinx
-pyparsing==3.0.9
-    # via packaging
 pytz==2022.1
     # via babel
 pyyaml==6.0
@@ -105,7 +104,7 @@ typing-extensions==4.3.0
     # via myst-parser
 urllib3==2.6.0
     # via requests
-wheel==0.38.1
+wheel==0.46.2
     # via pip-tools
 zipp==3.19.1
     # via importlib-metadata
