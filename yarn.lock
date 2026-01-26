@@ -5125,12 +5125,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^24.0.2":
+"@types/node@npm:*":
   version: 24.10.1
   resolution: "@types/node@npm:24.10.1"
   dependencies:
     undici-types: ~7.16.0
   checksum: c2f370ae7a97c04991e0eee6b57e588a2abef0814a5f6e41fda5a9200cf02ae6654fad51c8372ee203ae4134bab80f5bf441c586f7f50e0fda3ba422f35eb3c0
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^25.0.10":
+  version: 25.0.10
+  resolution: "@types/node@npm:25.0.10"
+  dependencies:
+    undici-types: ~7.16.0
+  checksum: 9cd16e0c6ebc674f351a79e423f3488691ee867d8c940aa321102bec85d8cbed4e213b429910ca63ee79397512ac7f7f8ea79f7d0ea7d5b2a11d7300385ff118
   languageName: node
   linkType: hard
 
@@ -8707,7 +8716,7 @@ __metadata:
     "@types/dompurify": ^3.0.0
     "@types/escape-html": ^1.0.1
     "@types/katex": ^0.16.0
-    "@types/node": ^24.0.2
+    "@types/node": ^25.0.10
     "@types/retry": ^0.12.1
     "@types/scroll-into-view": ^1.16.0
     "@types/shallowequal": ^1.1.1
