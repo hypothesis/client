@@ -53,6 +53,7 @@ describe('Guest', () => {
   let FakePortRPC;
   let fakePortRPCs;
   let fakeOutsideAssignmentNotice;
+  let fakeSetAllShortcuts;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -210,6 +211,7 @@ describe('Guest', () => {
       destroy: sinon.stub(),
       setVisible: sinon.stub(),
     };
+    fakeSetAllShortcuts = sinon.stub();
 
     class FakeSelectionObserver {
       constructor(callback) {
@@ -222,6 +224,9 @@ describe('Guest', () => {
       '../shared/messaging': {
         PortFinder: sinon.stub().returns(fakePortFinder),
         PortRPC: FakePortRPC,
+      },
+      '../shared/shortcut-config': {
+        setAllShortcuts: fakeSetAllShortcuts,
       },
       './adder': { Adder: FakeAdder },
       './anchoring/text-range': {
@@ -540,6 +545,17 @@ describe('Guest', () => {
 
         emitSidebarEvent('setHighlightsVisible', false);
         assert.calledWith(fakeHighlighter.setHighlightsVisible, false);
+      });
+    });
+
+    describe('on "shortcutsUpdated" event', () => {
+      it('updates guest shortcut config', () => {
+        createGuest();
+        const shortcuts = { applyUpdates: 'k' };
+
+        emitSidebarEvent('shortcutsUpdated', shortcuts);
+
+        assert.calledWith(fakeSetAllShortcuts, shortcuts);
       });
     });
 

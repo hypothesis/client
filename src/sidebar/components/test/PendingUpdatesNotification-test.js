@@ -11,6 +11,7 @@ describe('PendingUpdatesNotification', () => {
   let fakeStreamer;
   let fakeAnalytics;
   let fakeStore;
+  let fakeShortcuts;
 
   beforeEach(() => {
     fakeSetTimeout = sinon.stub();
@@ -27,10 +28,16 @@ describe('PendingUpdatesNotification', () => {
       hasPendingUpdatesOrDeletions: sinon.stub().returns(true),
       isFeatureEnabled: sinon.stub().returns(false),
     };
+    fakeShortcuts = {
+      applyUpdates: 'l',
+    };
 
     $imports.$mock({
       '../store': {
         useSidebarStore: () => fakeStore,
+      },
+      '../../shared/shortcut-config': {
+        useShortcutsConfig: () => fakeShortcuts,
       },
     });
   });

@@ -9,6 +9,7 @@ import type { IconComponent } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { useShortcut } from '../../shared/shortcut';
+import { useShortcutsConfig } from '../../shared/shortcut-config';
 
 /**
  * Render an inverted light-on-dark "pill" with the given `badgeCount`
@@ -213,13 +214,15 @@ export default function AdderToolbar({
   onCommand,
   annotationCount = 0,
 }: AdderToolbarProps) {
+  const shortcuts = useShortcutsConfig();
+
   // Since the selection toolbar is only shown when there is a selection
   // of static text, we can use a plain key without any modifier as
   // the shortcut. This avoids conflicts with browser/OS shortcuts.
-  const annotateShortcut = isVisible ? 'a' : null;
-  const highlightShortcut = isVisible ? 'h' : null;
-  const showShortcut = isVisible ? 's' : null;
-  const hideShortcut = isVisible ? 'Escape' : null;
+  const annotateShortcut = isVisible ? shortcuts.annotateSelection : null;
+  const highlightShortcut = isVisible ? shortcuts.highlightSelection : null;
+  const showShortcut = isVisible ? shortcuts.showSelection : null;
+  const hideShortcut = isVisible ? shortcuts.hideAdder : null;
 
   // Add a shortcut to close the adder. Note, there is no button associated with this
   // shortcut because any outside click will also hide the adder.

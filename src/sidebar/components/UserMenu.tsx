@@ -1,5 +1,5 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared';
-import { useState } from 'preact/hooks';
+import { useCallback, useState } from 'preact/hooks';
 
 import type { Service, SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
@@ -10,10 +10,13 @@ import {
 import { withServices } from '../service-context';
 import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
+import KeyboardShortcutsModal from './KeyboardShortcutsModal';
 import Menu from './Menu';
 import MenuItem from './MenuItem';
 import MenuSection from './MenuSection';
 import OpenDashboardMenuItem from './OpenDashboardMenuItem';
+import { useShortcutsConfig } from '../../shared/shortcut-config';
+import { useShortcut } from '../../shared/shortcut';
 
 export type UserMenuProps = {
   onLogout: () => void;
@@ -39,6 +42,7 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
   const username = getUsername(profile.userid);
   const displayName = profile.user_info?.display_name ?? username;
   const [isOpen, setOpen] = useState(false);
+  const [isShortcutsOpen, setShortcutsOpen] = useState(false);
 
   const serviceSupports = (feature: keyof Service) =>
     service && !!service[feature];
@@ -87,51 +91,77 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
       <ProfileIcon />
     </span>
   );
+
+  const shortcuts = useShortcutsConfig();
+
+  const openKeyboardShortcuts = useCallback((event?: KeyboardEvent) => {
+    event?.preventDefault();
+    setShortcutsOpen(true);
+    setOpen(false);
+  }, []);
+
+  useShortcut(shortcuts.openKeyboardShortcuts, openKeyboardShortcuts);
+  
   return (
-    // Allow keyboard shortcut 'n' to open Notebook
-    /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
-    <div data-testid="user-menu" onKeyDown={onKeyDown}>
-      <Menu
-        label={menuLabel}
-        title={displayName}
-        align="right"
-        open={isOpen}
-        onOpenChanged={setOpen}
-      >
-        <MenuSection>
-          <MenuItem
-            label={displayName}
-            isDisabled={!isSelectableProfile}
-            href={profileHref}
-            onClick={isSelectableProfile ? onProfileSelected : undefined}
-          />
-          {!isThirdParty && (
-            <MenuItem
-              label="Account settings"
-              href={store.getLink('account.settings')}
-            />
-          )}
-          {isProfileEnabled && (
-            <MenuItem label="Your profile" onClick={() => onSelectProfile()} />
-          )}
-          <MenuItem label="Open notebook" onClick={() => onSelectNotebook()} />
-        </MenuSection>
-        {settings.dashboard?.showEntryPoint && (
-          <MenuSection>
-            <OpenDashboardMenuItem isMenuOpen={isOpen} />
-          </MenuSection>
-        )}
-        {logoutAvailable && (
+    <>
+      {/* Allow keyboard shortcut 'n' to open Notebook */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <div data-testid="user-menu" onKeyDown={onKeyDown}>
+        <Menu
+          label={menuLabel}
+          title={displayName}
+          align="right"
+          open={isOpen}
+          onOpenChanged={setOpen}
+        >
           <MenuSection>
             <MenuItem
-              isDisabled={logoutDisabled}
-              label="Log out"
-              onClick={onLogout}
+              label={displayName}
+              isDisabled={!isSelectableProfile}
+              href={profileHref}
+              onClick={isSelectableProfile ? onProfileSelected : undefined}
+            />
+            {!isThirdParty && (
+              <MenuItem
+                label="Account settings"
+                href={store.getLink('account.settings')}
+              />
+            )}
+            {isProfileEnabled && (
+              <MenuItem label="Your profile" onClick={() => onSelectProfile()} />
+            )}
+            <MenuItem label="Open notebook" onClick={() => onSelectNotebook()} />
+          </MenuSection>
+          <MenuSection>
+            <MenuItem
+              label="Keyboard shortcuts"
+              onClick={() => {
+                setShortcutsOpen(true);
+                setOpen(false);
+              }}
             />
           </MenuSection>
-        )}
-      </Menu>
-    </div>
+          {settings.dashboard?.showEntryPoint && (
+            <MenuSection>
+              <OpenDashboardMenuItem isMenuOpen={isOpen} />
+            </MenuSection>
+          )}
+          {logoutAvailable && (
+            <MenuSection>
+              <MenuItem
+                isDisabled={logoutDisabled}
+                label="Log out"
+                onClick={onLogout}
+              />
+            </MenuSection>
+          )}
+        </Menu>
+      </div>
+      <KeyboardShortcutsModal
+        open={isShortcutsOpen}
+        onClose={() => setShortcutsOpen(false)}
+      />
+    </>
   );
 }
 

@@ -6,6 +6,7 @@ type DialogProps = {
   closed: boolean;
   children: ComponentChildren;
   onClose: () => void;
+  className?: string;
   'data-testid'?: string;
   'aria-label'?: string;
 };
@@ -14,6 +15,7 @@ function NativeDialog({
   closed,
   onClose,
   children,
+  className,
   'data-testid': testId,
   'aria-label': label,
 }: DialogProps) {
@@ -39,7 +41,10 @@ function NativeDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="relative m-5 w-full h-full backdrop:bg-black/50"
+      className={classnames(
+        'relative m-5 w-full h-full backdrop:bg-black/50',
+        className,
+      )}
       data-testid={testId}
       aria-label={label}
     >
@@ -52,7 +57,7 @@ function NativeDialog({
  * Temporary fallback used in browsers not supporting `dialog` element.
  * It can be removed once all browsers we support can use it.
  */
-function FallbackDialog({ closed, children, ...rest }: DialogProps) {
+function FallbackDialog({ closed, children, className, ...rest }: DialogProps) {
   return (
     <div
       {...rest}
@@ -61,7 +66,9 @@ function FallbackDialog({ closed, children, ...rest }: DialogProps) {
         { hidden: closed },
       )}
     >
-      <div className="relative w-full h-full">{children}</div>
+      <div className={classnames('relative w-full h-full', className)}>
+        {children}
+      </div>
     </div>
   );
 }
