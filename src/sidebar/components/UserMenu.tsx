@@ -1,6 +1,8 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared';
 import { useCallback, useState } from 'preact/hooks';
 
+import { useShortcut } from '../../shared/shortcut';
+import { useShortcutsConfig } from '../../shared/shortcut-config';
 import type { Service, SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import {
@@ -15,8 +17,6 @@ import Menu from './Menu';
 import MenuItem from './MenuItem';
 import MenuSection from './MenuSection';
 import OpenDashboardMenuItem from './OpenDashboardMenuItem';
-import { useShortcutsConfig } from '../../shared/shortcut-config';
-import { useShortcut } from '../../shared/shortcut';
 
 export type UserMenuProps = {
   onLogout: () => void;
@@ -101,7 +101,7 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
   }, []);
 
   useShortcut(shortcuts.openKeyboardShortcuts, openKeyboardShortcuts);
-  
+
   return (
     <>
       {/* Allow keyboard shortcut 'n' to open Notebook */}
@@ -128,9 +128,15 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
               />
             )}
             {isProfileEnabled && (
-              <MenuItem label="Your profile" onClick={() => onSelectProfile()} />
+              <MenuItem
+                label="Your profile"
+                onClick={() => onSelectProfile()}
+              />
             )}
-            <MenuItem label="Open notebook" onClick={() => onSelectNotebook()} />
+            <MenuItem
+              label="Open notebook"
+              onClick={() => onSelectNotebook()}
+            />
           </MenuSection>
           <MenuSection>
             <MenuItem
