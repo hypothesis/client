@@ -59,6 +59,11 @@ describe('FrameSyncService', () => {
   let fakeToastMessenger;
   let fakePortRPCs;
   let fakePortFinder;
+  let fakeShortcuts;
+  let getAllShortcuts;
+  let shortcutsListener;
+  let shortcutsUnsubscribe;
+  let subscribeShortcuts;
 
   let fakeStore;
   let fakeWindow;
@@ -101,6 +106,19 @@ describe('FrameSyncService', () => {
       destroy: sinon.stub(),
       discover: sinon.stub().resolves(sidebarPort),
     };
+
+    fakeShortcuts = {
+      annotateSelection: 'a',
+      openSearchSlash: '/',
+    };
+    shortcutsListener = null;
+    shortcutsUnsubscribe = sinon.stub();
+    getAllShortcuts = sinon.stub().returns({ ...fakeShortcuts });
+    subscribeShortcuts = sinon.stub().callsFake(listener => {
+      shortcutsListener = listener;
+      listener({ ...fakeShortcuts });
+      return shortcutsUnsubscribe;
+    });
 
     fakeStore = fakeReduxStore(
       {
@@ -171,6 +189,10 @@ describe('FrameSyncService', () => {
       '../../shared/messaging': {
         PortFinder: sinon.stub().returns(fakePortFinder),
         PortRPC: FakePortRPC,
+      },
+      '../../shared/shortcut-config': {
+        getAllShortcuts,
+        subscribeShortcuts,
       },
     });
 
@@ -1168,6 +1190,41 @@ describe('FrameSyncService', () => {
 
       assert.calledWith(hostRPC().call, 'featureFlagsUpdated', currentFlags());
       assert.calledWith(guestRPC().call, 'featureFlagsUpdated', currentFlags());
+    });
+  });
+
+  describe('sending shortcut updates to frames', () => {
+    beforeEach(async () => {
+      await frameSync.connect();
+    });
+
+    it('sends shortcuts to guest frames when they connect', async () => {
+      await connectGuest();
+
+      assert.calledWith(
+        guestRPC().call,
+        'shortcutsUpdated',
+        sinon.match(fakeShortcuts),
+      );
+    });
+
+    it('sends updated shortcuts to guest frames', async () => {
+      await connectGuest();
+      guestRPC().call.resetHistory();
+
+      const updatedShortcuts = { annotateSelection: 'b' };
+      shortcutsListener(updatedShortcuts);
+
+      assert.calledWith(
+        guestRPC().call,
+        'shortcutsUpdated',
+        sinon.match(updatedShortcuts),
+      );
+    });
+
+    it('unsubscribes from shortcut updates on destroy', () => {
+      frameSync.destroy();
+      assert.calledOnce(shortcutsUnsubscribe);
     });
   });
 

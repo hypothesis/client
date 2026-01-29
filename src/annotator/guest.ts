@@ -4,6 +4,7 @@ import { EventEmitter } from '../shared/event-emitter';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
 import { matchShortcut } from '../shared/shortcut';
+import { getAllShortcuts, setAllShortcuts } from '../shared/shortcut-config';
 import type {
   AbstractRange,
   AnnotationData,
@@ -626,6 +627,12 @@ export class Guest
       (flags: Record<string, boolean>) => this.features.update(flags),
     );
 
+    this._sidebarRPC.on('shortcutsUpdated', shortcuts => {
+      // Shortcuts are configured in the sidebar but used in the guest frame.
+      // Without this, the guest would keep stale shortcuts.
+      setAllShortcuts(shortcuts);
+    });
+
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
     this._sidebarRPC.on('hoverAnnotations', (tags: string[]) =>
@@ -1115,7 +1122,8 @@ export class Guest
    * Handle a potential shortcut trigger.
    */
   private _handleShortcut(event: KeyboardEvent) {
-    if (matchShortcut(event, 'Ctrl+Shift+H')) {
+    const toggleHighlights = getAllShortcuts().toggleHighlights;
+    if (toggleHighlights && matchShortcut(event, toggleHighlights)) {
       this.setHighlightsVisible(
         // Never show highlights when comment mode is enabled
         !this._highlightsVisible && !this._commentsMode,
