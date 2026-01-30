@@ -29,12 +29,10 @@ describe('KeyboardShortcutsModal', () => {
     );
   };
 
-  const findButton = (wrapper, label) =>
-    wrapper.find('Button').filterWhere(node => node.props().children === label);
-  const findShortcutInput = (wrapper, label) =>
-    wrapper
-      .find('Input')
-      .filterWhere(node => node.prop('aria-label') === `Shortcut for ${label}`);
+  const findButton = (wrapper, testId) =>
+    wrapper.find(`[data-testid="${testId}"]`).first();
+  const findShortcutInput = (wrapper, id) =>
+    wrapper.find(`[data-testid="shortcut-input-${id}"]`).first();
 
   beforeEach(() => {
     fakeSession = {
@@ -101,7 +99,7 @@ describe('KeyboardShortcutsModal', () => {
   it('saves shortcuts when there are no duplicates', () => {
     const wrapper = createComponent();
 
-    const saveButton = findButton(wrapper, 'Save');
+    const saveButton = findButton(wrapper, 'save-shortcuts-button');
     saveButton.props().onClick();
 
     assert.calledWith(
@@ -119,7 +117,7 @@ describe('KeyboardShortcutsModal', () => {
     const wrapper = createComponent();
 
     assert.isTrue(wrapper.exists('[data-testid="duplicate-shortcuts-error"]'));
-    const saveButton = findButton(wrapper, 'Save');
+    const saveButton = findButton(wrapper, 'save-shortcuts-button');
     assert.isTrue(saveButton.prop('disabled'));
   });
 
@@ -138,7 +136,7 @@ describe('KeyboardShortcutsModal', () => {
   it('resets shortcuts to defaults', () => {
     const wrapper = createComponent();
 
-    const resetButton = findButton(wrapper, 'Reset all shortcuts to defaults');
+    const resetButton = findButton(wrapper, 'reset-shortcuts-button');
     resetButton.props().onClick();
 
     assert.called(fakeResetShortcuts);
@@ -156,7 +154,7 @@ describe('KeyboardShortcutsModal', () => {
 
     const wrapper = createComponent();
 
-    const saveButton = findButton(wrapper, 'Save');
+    const saveButton = findButton(wrapper, 'save-shortcuts-button');
     saveButton.props().onClick();
 
     assert.notCalled(fakeSession.updateShortcutPreferences);
@@ -169,11 +167,76 @@ describe('KeyboardShortcutsModal', () => {
 
     const wrapper = createComponent();
 
-    const saveButton = findButton(wrapper, 'Save');
+    const saveButton = findButton(wrapper, 'save-shortcuts-button');
     await saveButton.props().onClick();
 
     wrapper.update();
     assert.isTrue(wrapper.exists('[data-testid="save-shortcuts-error"]'));
+  });
+
+  it('shows an error message when resetting shortcuts fails', async () => {
+    fakeSession.updateShortcutPreferences.rejects(
+      new Error('Error resetting shortcuts'),
+    );
+
+    const wrapper = createComponent();
+
+    const resetButton = findButton(wrapper, 'reset-shortcuts-button');
+    await resetButton.props().onClick();
+
+    wrapper.update();
+    assert.isTrue(wrapper.exists('[data-testid="save-shortcuts-error"]'));
+  });
+
+  it('clears save errors when updating a shortcut', async () => {
+    fakeSession.updateShortcutPreferences.rejects(
+      new Error('Error saving shortcuts'),
+    );
+    fakeParseShortcutInputEvent.returns({
+      shortcut: 'ctrl+k',
+      shouldClear: false,
+    });
+
+    const wrapper = createComponent();
+
+    const saveButton = findButton(wrapper, 'save-shortcuts-button');
+    await saveButton.props().onClick();
+    wrapper.update();
+    assert.isTrue(wrapper.exists('[data-testid="save-shortcuts-error"]'));
+
+    const event = new KeyboardEvent('keydown', { key: 'k', ctrlKey: true });
+    findShortcutInput(wrapper, 'applyUpdates').props().onKeyDown(event);
+
+    wrapper.update();
+    assert.isFalse(wrapper.exists('[data-testid="save-shortcuts-error"]'));
+  });
+
+  it('renders shortcut labels and descriptions when provided', () => {
+    fakeShortcutDefinitions.splice(
+      0,
+      fakeShortcutDefinitions.length,
+      {
+        id: 'applyUpdates',
+        label: 'Apply new updates',
+        description: 'Apply any new updates in the thread',
+        group: 'Sidebar',
+      },
+      {
+        id: 'annotateSelection',
+        label: 'Annotate selection',
+        group: 'Annotator',
+      },
+    );
+
+    const wrapper = createComponent();
+
+    const label = wrapper.find('[data-testid="shortcut-label-applyUpdates"]');
+    assert.equal(label.text(), 'Apply new updates');
+    const description = wrapper.find(
+      '[data-testid="shortcut-description-applyUpdates"]',
+    );
+    assert.equal(description.length, 1);
+    assert.equal(description.text(), 'Apply any new updates in the thread');
   });
 
   it('restores profile shortcuts on close', () => {
@@ -190,10 +253,10 @@ describe('KeyboardShortcutsModal', () => {
 
     const wrapper = createComponent({ onClose });
 
-    const input = findShortcutInput(wrapper, 'Apply new updates');
+    const input = findShortcutInput(wrapper, 'applyUpdates');
     input.props().onKeyDown(new KeyboardEvent('keydown', { key: 'x' }));
 
-    const cancelButton = findButton(wrapper, 'Cancel');
+    const cancelButton = findButton(wrapper, 'cancel-shortcuts-button');
     cancelButton.props().onClick();
 
     assert.calledWith(fakeSetShortcut, 'applyUpdates', 'x');
@@ -221,7 +284,7 @@ describe('KeyboardShortcutsModal', () => {
     const wrapper = createComponent();
     const event = new KeyboardEvent('keydown', { key: 'k', ctrlKey: true });
 
-    findShortcutInput(wrapper, 'Apply new updates').props().onKeyDown(event);
+    findShortcutInput(wrapper, 'applyUpdates').props().onKeyDown(event);
 
     assert.calledWith(fakeParseShortcutInputEvent, event);
     assert.calledWith(fakeSetShortcut, 'applyUpdates', parsedShortcut.shortcut);
@@ -239,7 +302,7 @@ describe('KeyboardShortcutsModal', () => {
       stopPropagation: sinon.stub(),
     };
 
-    findShortcutInput(wrapper, 'Apply new updates').props().onKeyDown(event);
+    findShortcutInput(wrapper, 'applyUpdates').props().onKeyDown(event);
 
     assert.called(event.preventDefault);
     assert.called(event.stopPropagation);
@@ -250,7 +313,7 @@ describe('KeyboardShortcutsModal', () => {
 
     const wrapper = createComponent();
 
-    findShortcutInput(wrapper, 'Apply new updates')
+    findShortcutInput(wrapper, 'applyUpdates')
       .props()
       .onKeyDown(new KeyboardEvent('keydown', { key: 'Shift' }));
 
@@ -265,7 +328,7 @@ describe('KeyboardShortcutsModal', () => {
 
     const wrapper = createComponent();
 
-    findShortcutInput(wrapper, 'Apply new updates')
+    findShortcutInput(wrapper, 'applyUpdates')
       .props()
       .onKeyDown(new KeyboardEvent('keydown', { key: 'Backspace' }));
 

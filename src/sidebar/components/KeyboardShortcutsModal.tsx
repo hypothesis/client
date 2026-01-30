@@ -102,14 +102,25 @@ function ShortcutBody({
                   className="flex items-center justify-between gap-3"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{label}</div>
+                    <div
+                      className="text-sm font-medium truncate"
+                      data-testid={`shortcut-label-${id}`}
+                    >
+                      {label}
+                    </div>
                     {description && (
-                      <div className="text-xs text-grey-6">{description}</div>
+                      <div
+                        className="text-xs text-grey-6"
+                        data-testid={`shortcut-description-${id}`}
+                      >
+                        {description}
+                      </div>
                     )}
                   </div>
                   <div className="w-32">
                     <Input
                       aria-label={`Shortcut for ${label}`}
+                      data-testid={`shortcut-input-${id}`}
                       value={shortcutsKeyValue[id] ?? ''}
                       onKeyDown={(e: KeyboardEvent) =>
                         handleShortcutInputKeyDown(id, e)
@@ -156,6 +167,7 @@ function ShortcutActions({
         }}
         variant="custom"
         classes="text-sm text-grey-7 hover:text-grey-9 w-min"
+        data-testid="reset-shortcuts-button"
       >
         Reset all shortcuts to defaults
       </Button>
@@ -175,6 +187,7 @@ function ShortcutActions({
           variant="primary"
           disabled={!!duplicateShortcutsMessage}
           classes="w-min"
+          data-testid="save-shortcuts-button"
         >
           Save
         </Button>
@@ -182,6 +195,7 @@ function ShortcutActions({
           onClick={handleClose}
           variant="custom"
           classes="text-sm text-grey-7 hover:text-grey-9 w-min"
+          data-testid="cancel-shortcuts-button"
         >
           Cancel
         </Button>
