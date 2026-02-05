@@ -8,10 +8,8 @@ describe('KeyboardShortcutsModal', () => {
   let fakeSession;
   let fakeStore;
   let fakeShortcuts;
-  let fakeDefaultShortcuts;
   let fakeShortcutDefinitions;
   let fakeGetAllShortcuts;
-  let fakeGetDefaultShortcuts;
   let fakeParseShortcutInputEvent;
   let fakeRepeatableShortcutGroups;
   let fakeResetShortcuts;
@@ -43,11 +41,6 @@ describe('KeyboardShortcutsModal', () => {
       annotateSelection: 'a',
     };
 
-    fakeDefaultShortcuts = {
-      applyUpdates: 'l',
-      annotateSelection: 'a',
-    };
-
     fakeShortcutDefinitions = [
       {
         id: 'applyUpdates',
@@ -69,7 +62,6 @@ describe('KeyboardShortcutsModal', () => {
     };
 
     fakeGetAllShortcuts = sinon.stub().returns(fakeShortcuts);
-    fakeGetDefaultShortcuts = sinon.stub().returns(fakeDefaultShortcuts);
     fakeParseShortcutInputEvent = sinon.stub();
     fakeResetShortcuts = sinon.stub();
     fakeSetAllShortcuts = sinon.stub();
@@ -80,7 +72,6 @@ describe('KeyboardShortcutsModal', () => {
       '../store': { useSidebarStore: () => fakeStore },
       '../../shared/shortcut-config': {
         getAllShortcuts: fakeGetAllShortcuts,
-        getDefaultShortcuts: fakeGetDefaultShortcuts,
         parseShortcutInputEvent: fakeParseShortcutInputEvent,
         repeatableShortcutGroups: fakeRepeatableShortcutGroups,
         resetShortcuts: fakeResetShortcuts,
@@ -140,10 +131,7 @@ describe('KeyboardShortcutsModal', () => {
     resetButton.props().onClick();
 
     assert.called(fakeResetShortcuts);
-    assert.calledWith(
-      fakeSession.updateShortcutPreferences,
-      fakeGetDefaultShortcuts.returnValues[0],
-    );
+    assert.calledWith(fakeSession.updateShortcutPreferences, {});
   });
 
   it('does not save shortcuts when duplicates exist', () => {
