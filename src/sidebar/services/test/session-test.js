@@ -205,7 +205,7 @@ describe('SessionService', () => {
 
     it('applies shortcut preferences from the profile', () => {
       const session = createService();
-      const shortcuts = { sidebar: { createAnnotation: ['c'] } };
+      const shortcuts = { applyUpdates: 'c' };
 
       session.update({
         userid: 'anne',
@@ -231,7 +231,7 @@ describe('SessionService', () => {
       const updatedProfile = {
         userid: 'acct:user@hypothes.is',
         preferences: {
-          shortcuts_preferences: { sidebar: { createAnnotation: ['c'] } },
+          shortcuts_preferences: { applyUpdates: 'c' },
         },
       };
       fakeApi.profile.update.resolves(updatedProfile);

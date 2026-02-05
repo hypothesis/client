@@ -10,7 +10,6 @@ import { useMemo, useState } from 'preact/hooks';
 import ModalDialog from '../../annotator/components/ModalDialog';
 import {
   getAllShortcuts,
-  getDefaultShortcuts,
   parseShortcutInputEvent,
   repeatableShortcutGroups,
   resetShortcuts,
@@ -159,7 +158,7 @@ function ShortcutActions({
         onClick={async () => {
           resetShortcuts();
           try {
-            await session.updateShortcutPreferences(getDefaultShortcuts());
+            await session.updateShortcutPreferences({});
             onSaveError(null);
           } catch {
             onSaveError('Unable to save keyboard shortcuts');

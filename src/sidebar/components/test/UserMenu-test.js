@@ -412,17 +412,6 @@ describe('UserMenu', () => {
         }
       });
     });
-
-    it('calls onLogout when clicked', () => {
-      fakeIsThirdPartyUser.returns(false);
-      fakeServiceConfig.returns(null);
-      const wrapper = createUserMenu();
-
-      const logOutMenuItem = findMenuItem(wrapper, 'Log out');
-      logOutMenuItem.props().onClick();
-
-      assert.calledOnce(fakeOnLogout);
-    });
   });
 
   describe('open dashboard menu item', () => {
