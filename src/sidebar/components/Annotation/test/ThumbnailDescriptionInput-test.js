@@ -26,6 +26,14 @@ describe('ThumbnailDescriptionInput', () => {
     assert.calledWith(onEdit, 'new description');
   });
 
+  it('sets maxlength attribute to 5000', () => {
+    const wrapper = mount(<ThumbnailDescriptionInput description="" />, {
+      connected: true,
+    });
+
+    assert.equal(wrapper.find('input').prop('maxlength'), 5000);
+  });
+
   it('displays alt-text info popover when info button is clicked', () => {
     const wrapper = mount(<ThumbnailDescriptionInput description="foo bar" />, {
       connected: true,
