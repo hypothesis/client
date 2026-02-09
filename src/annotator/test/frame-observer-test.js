@@ -233,19 +233,19 @@ describe('annotator/frame-observer', () => {
       // Create frame without src first, so it starts as about:blank
       const frame = document.createElement('iframe');
       container.append(frame);
-      
+
       // Call onDocumentReady while frame is still about:blank with src set
       // This tests the branch where hasBlankDocumentThatWillNavigate returns true
       frame.src = sameOriginURL;
       const unsubscribe = onDocumentReady(frame, callback, { pollInterval: 1 });
-      
+
       // Wait for frame to load - callback should be called after navigation
       await waitForEvent(frame, 'load');
       await waitForCall(callback);
-      
+
       // Callback should eventually be called after navigation completes
       assert.calledWith(callback, null);
-      
+
       unsubscribe();
     });
 
@@ -270,15 +270,15 @@ describe('annotator/frame-observer', () => {
 
       // Remove frame from DOM to make contentDocument null
       frame.remove();
-      
+
       // Call onDocumentReady after frame is removed
       // This tests the branch at line 183 where frame.contentDocument is null
       // pollOnUnload should return early without adding event listener
       onDocumentReady(frame, callback, { pollInterval: 1 });
-      
+
       // Wait a bit to ensure pollOnUnload was called
       await delay(20);
-      
+
       // Callback should eventually be called with error
       await waitForCall(callback);
       assertCalledWithError(callback, 'Frame is disconnected');
@@ -299,13 +299,13 @@ describe('annotator/frame-observer', () => {
       // This will call checkForDocumentChange, which should find the document
       // already in the WeakSet and return early (line 202 branch: documents.has(currentDocument) === true)
       frame.contentWindow.dispatchEvent(new Event('unload'));
-      
+
       // Wait for any polling to occur
       await delay(50);
-      
+
       // Callback should not be called again since document is already in WeakSet
       assert.notCalled(callback);
-      
+
       unsubscribe1();
     });
 

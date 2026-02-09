@@ -260,7 +260,8 @@ describe('Guest', () => {
       },
       './range-util': rangeUtil,
       './outside-assignment-notice': {
-        OutsideAssignmentNoticeController: FakeOutsideAssignmentNoticeController,
+        OutsideAssignmentNoticeController:
+          FakeOutsideAssignmentNoticeController,
       },
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
@@ -785,7 +786,9 @@ describe('Guest', () => {
           right: 10,
           bottom: 10,
         });
-        fakeIntegration.describe.resolves([{ type: 'FragmentSelector', value: '' }]);
+        fakeIntegration.describe.resolves([
+          { type: 'FragmentSelector', value: '' },
+        ]);
 
         createGuest();
         emitHostEvent('activateMoveMode');
@@ -824,7 +827,9 @@ describe('Guest', () => {
       it('starts point annotation with move mode when keyboard not active', async () => {
         fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
         fakeDrawTool.draw.resolves({ type: 'point', x: 50, y: 50 });
-        fakeIntegration.describe.resolves([{ type: 'FragmentSelector', value: '' }]);
+        fakeIntegration.describe.resolves([
+          { type: 'FragmentSelector', value: '' },
+        ]);
 
         createGuest();
         emitHostEvent('activatePointMoveMode');
@@ -924,7 +929,6 @@ describe('Guest', () => {
           assert.calledWith(fakeOutsideAssignmentNotice.setVisible, arg);
         });
       });
-
     });
 
     describe('on "renderThumbnail" event', () => {
@@ -1194,9 +1198,9 @@ describe('Guest', () => {
 
       assert.calledOnce(FakeAdder.instance.show);
       // annotationsForSelection() uses selectedRange() ?? new Range(); with null we pass a collapsed Range to itemsForRange
-      const itemsForRangeCall = rangeUtil.itemsForRange.getCalls().find(
-        call => call.args[0] instanceof Range && call.args[0].collapsed,
-      );
+      const itemsForRangeCall = rangeUtil.itemsForRange
+        .getCalls()
+        .find(call => call.args[0] instanceof Range && call.args[0].collapsed);
       assert.ok(
         itemsForRangeCall,
         'itemsForRange was called with a collapsed Range (fallback when selectedRange is null)',
@@ -2273,7 +2277,9 @@ describe('Guest', () => {
         right: 10,
         bottom: 10,
       });
-      fakeIntegration.describe.resolves([{ type: 'FragmentSelector', value: '' }]);
+      fakeIntegration.describe.resolves([
+        { type: 'FragmentSelector', value: '' },
+      ]);
 
       createGuest();
       document.body.dispatchEvent(
@@ -2362,7 +2368,9 @@ describe('Guest', () => {
         right: 10,
         bottom: 10,
       });
-      fakeIntegration.describe.resolves([{ type: 'FragmentSelector', value: '' }]);
+      fakeIntegration.describe.resolves([
+        { type: 'FragmentSelector', value: '' },
+      ]);
 
       createGuest();
       hostRPC().call.resetHistory();
@@ -2620,7 +2628,9 @@ describe('Guest', () => {
       guest.setHighlightsVisible(false, false /* notifyHost */);
       sidebarRPC().call.resetHistory();
 
-      guest.element.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+      guest.element.dispatchEvent(
+        new MouseEvent('mouseout', { bubbles: true }),
+      );
 
       assert.notCalled(sidebarRPC().call);
     });
