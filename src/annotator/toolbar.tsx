@@ -1,7 +1,7 @@
 import { createRef, render } from 'preact';
 import type { RefObject } from 'preact';
 
-import type { AnnotationTool } from '../types/annotator';
+import type { AnnotationTool, KeyboardMode } from '../types/annotator';
 import Toolbar from './components/Toolbar';
 
 export type ToolbarOptions = {
@@ -33,6 +33,11 @@ export class ToolbarController {
   private _createAnnotation: (tool: AnnotationTool | null) => void;
   private _sidebarToggleButton: RefObject<HTMLButtonElement>;
   private _supportedAnnotationTools: AnnotationTool[];
+  private _keyboardMode: KeyboardMode;
+  private _keyboardActive: boolean;
+  private _onModeClick?: () => void;
+  private _onActivateMoveMode?: () => void;
+  private _onActivatePointMoveMode?: () => void;
 
   /**
    * @param container - Element into which the toolbar is rendered
@@ -48,6 +53,8 @@ export class ToolbarController {
     this._sidebarOpen = false;
     this._sidebarContainerId = options.sidebarContainerId;
     this._supportedAnnotationTools = ['selection'];
+    this._keyboardMode = null;
+    this._keyboardActive = false;
 
     this._closeSidebar = () => setSidebarOpen(false);
     this._toggleSidebar = () => setSidebarOpen(!this._sidebarOpen);
@@ -157,6 +164,33 @@ export class ToolbarController {
     return this._supportedAnnotationTools;
   }
 
+  set keyboardModeState(state: {
+    keyboardActive: boolean;
+    keyboardMode: KeyboardMode;
+  }) {
+    this._keyboardActive = state.keyboardActive;
+    this._keyboardMode = state.keyboardMode;
+    this.render();
+  }
+
+  get keyboardModeState() {
+    return {
+      keyboardActive: this._keyboardActive,
+      keyboardMode: this._keyboardMode,
+    };
+  }
+
+  set modeButtonCallbacks(callbacks: {
+    onModeClick?: () => void;
+    onActivateMoveMode?: () => void;
+    onActivatePointMoveMode?: () => void;
+  }) {
+    this._onModeClick = callbacks.onModeClick;
+    this._onActivateMoveMode = callbacks.onActivateMoveMode;
+    this._onActivatePointMoveMode = callbacks.onActivatePointMoveMode;
+    this.render();
+  }
+
   render() {
     render(
       <Toolbar
@@ -172,6 +206,11 @@ export class ToolbarController {
         toggleSidebar={this._toggleSidebar}
         toggleSidebarRef={this._sidebarToggleButton}
         useMinimalControls={this.useMinimalControls}
+        keyboardMode={this._keyboardMode}
+        keyboardActive={this._keyboardActive}
+        onModeClick={this._onModeClick}
+        onActivateMoveMode={this._onActivateMoveMode}
+        onActivatePointMoveMode={this._onActivatePointMoveMode}
       />,
       this.container,
     );

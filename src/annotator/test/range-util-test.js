@@ -78,6 +78,16 @@ describe('annotator/range-util', () => {
       const range = new Range();
       assert.isFalse(rangeUtil.isNodeInRange(range, node));
     });
+
+    it('returns false when range and node do not share a common ancestor', () => {
+      const range = document.createRange();
+      range.selectNodeContents(document.body);
+      const otherDoc = document.implementation.createHTMLDocument('');
+      const nodeInOtherDoc = otherDoc.body.appendChild(
+        otherDoc.createElement('span'),
+      );
+      assert.isFalse(rangeUtil.isNodeInRange(range, nodeInOtherDoc));
+    });
   });
 
   describe('getTextBoundingBoxes', () => {
@@ -117,6 +127,16 @@ describe('annotator/range-util', () => {
         roundCoords(testNode.getBoundingClientRect()),
       );
     });
+
+    it('returns empty array for text node when sub-range is collapsed', () => {
+      testNode.innerHTML = 'ab';
+      const textNode = testNode.firstChild;
+      const rng = testNode.ownerDocument.createRange();
+      rng.setStart(textNode, 1);
+      rng.setEnd(textNode, 1);
+      const boxes = rangeUtil.getTextBoundingBoxes(rng);
+      assert.deepEqual(boxes, []);
+    });
   });
 
   describe('selectionFocusRect', () => {
@@ -148,9 +168,24 @@ describe('annotator/range-util', () => {
         1,
       );
     });
+
+    it('returns null when range has only whitespace (no bounding boxes)', () => {
+      testNode.innerHTML = '   ';
+      testNode.appendChild(document.createTextNode('  '));
+      const range = testNode.ownerDocument.createRange();
+      range.setStart(testNode.firstChild, 0);
+      range.setEnd(testNode.lastChild, 2);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      assert.isNull(rangeUtil.selectionFocusRect(selection));
+    });
   });
 
   describe('selectedRange', () => {
+    it('returns `null` when selection argument is null', () => {
+      assert.isNull(selectedRange(null));
+    });
+
     it('returns `null` if selection has no ranges', () => {
       window.getSelection().empty();
       assert.isNull(selectedRange());
@@ -208,6 +243,62 @@ describe('annotator/range-util', () => {
       range = selectedRange(fakeSelection);
       assert.equal(range.toString(), 'foobarbaz');
     });
+
+    it('unions two ranges correctly when first range starts after second', () => {
+      const parent = document.createElement('div');
+      const el1 = document.createElement('span');
+      el1.textContent = 'a';
+      const el2 = document.createElement('span');
+      el2.textContent = 'b';
+      parent.append(el1, el2);
+      document.body.appendChild(parent);
+
+      const rangeFirst = new Range();
+      rangeFirst.setStart(el2, 0);
+      rangeFirst.setEnd(el2, 1);
+      const rangeSecond = new Range();
+      rangeSecond.setStart(el1, 0);
+      rangeSecond.setEnd(el1, 1);
+
+      const fakeSelection = {
+        rangeCount: 2,
+        getRangeAt: i => (i === 0 ? rangeFirst : rangeSecond),
+      };
+
+      const range = selectedRange(fakeSelection);
+      assert.equal(range.startContainer, el1);
+      assert.equal(range.endContainer, el2);
+      assert.equal(range.toString(), 'ab');
+      parent.remove();
+    });
+
+    it('unions two ranges correctly when first range starts before second', () => {
+      const parent = document.createElement('div');
+      const el1 = document.createElement('span');
+      el1.textContent = 'a';
+      const el2 = document.createElement('span');
+      el2.textContent = 'b';
+      parent.append(el1, el2);
+      document.body.appendChild(parent);
+
+      const rangeFirst = new Range();
+      rangeFirst.setStart(el1, 0);
+      rangeFirst.setEnd(el1, 1);
+      const rangeSecond = new Range();
+      rangeSecond.setStart(el2, 0);
+      rangeSecond.setEnd(el2, 1);
+
+      const fakeSelection = {
+        rangeCount: 2,
+        getRangeAt: i => (i === 0 ? rangeFirst : rangeSecond),
+      };
+
+      const range = selectedRange(fakeSelection);
+      assert.equal(range.startContainer, el1);
+      assert.equal(range.endContainer, el2);
+      assert.equal(range.toString(), 'ab');
+      parent.remove();
+    });
   });
 
   describe('isSelectionBackwards', () => {
@@ -238,6 +329,29 @@ describe('annotator/range-util', () => {
         );
         assert.equal(isSelectionBackwards(getSelection()), backwards);
       });
+    });
+
+    it('returns false when focusNode differs from anchorNode and startContainer is not focusNode', () => {
+      // Create a forward selection where focusNode !== anchorNode
+      // This tests the branch: range.startContainer === selection.focusNode (should be false for forward selection)
+      // container already has 'first' and 'second' as text nodes from beforeEach
+      const selection = getSelection();
+      selection.removeAllRanges();
+      
+      // Create a forward selection: anchor at first node (index 0), focus at second node (index 1)
+      // The range created will start at first node, so startContainer will be first node
+      // focusNode will be second node
+      // So startContainer !== focusNode, should return false
+      selection.setBaseAndExtent(container.childNodes[0], 0, container.childNodes[1], 0);
+      
+      // Verify setup: focusNode !== anchorNode
+      assert.notEqual(selection.focusNode, selection.anchorNode);
+      assert.equal(selection.anchorNode, container.childNodes[0]);
+      assert.equal(selection.focusNode, container.childNodes[1]);
+      
+      // For forward selection, range.startContainer (first node) !== focusNode (second node)
+      // So isSelectionBackwards should return false
+      assert.isFalse(isSelectionBackwards(selection));
     });
   });
 

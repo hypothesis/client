@@ -18,7 +18,65 @@ import type {
 import classnames from 'classnames';
 import type { JSX, RefObject } from 'preact';
 
-import type { AnnotationTool } from '../../types/annotator';
+import type {
+  AnnotationTool,
+  KeyboardMode,
+} from '../../types/annotator';
+import { MoveModeIcon, ResizeModeIcon } from './icons';
+
+/**
+ * Title for the rectangle annotation toolbar button based on keyboard state.
+ */
+function getRectAnnotationButtonTitle(
+  keyboardActive: boolean,
+  activeTool: AnnotationTool | null,
+  keyboardMode: KeyboardMode,
+): string {
+  if (!keyboardActive || activeTool !== 'rect') {
+    return 'Rectangle annotation';
+  }
+  if (keyboardMode === 'move') {
+    return 'Move mode (Ctrl+Shift+Y) - Click to switch to Resize mode';
+  }
+  if (keyboardMode === 'resize') {
+    return 'Resize mode (Ctrl+Shift+J) - Click to switch to Rectangle mode';
+  }
+  return 'Rectangle mode - Click to switch to Move mode';
+}
+
+/**
+ * Handler for Enter key on annotation buttons: activates move mode when not
+ * already in keyboard mode (so that when in keyboard mode, Enter is left to
+ * the draw-tool to confirm).
+ */
+function createEnterActivateHandler(
+  callback: (() => void) | undefined,
+  keyboardActive: boolean,
+) {
+  return (e: JSX.TargetedKeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter' && callback && !keyboardActive) {
+      e.preventDefault();
+      e.stopPropagation();
+      callback();
+    }
+  };
+}
+
+/**
+ * Icon component that changes based on the current keyboard mode.
+ * - rect: same as main rect button (SelectionIcon).
+ * - move: SelectionIcon with MoveModeIcon drawn inside it (per design).
+ * - resize: ResizeModeIcon only (replaces the annotation icon).
+ */
+function KeyboardModeIcon({ mode }: { mode: KeyboardMode }) {
+  if (mode === 'move') {
+    return <MoveModeIcon />
+  }
+  if (mode === 'resize') {
+    return <ResizeModeIcon />;
+  }
+  return <SelectionIcon />;
+}
 
 // TODO: ToolbarButton should be extracted as a shared design pattern or
 // component
@@ -29,6 +87,8 @@ type ToolbarButtonProps = PresentationalProps &
   } & {
     /** True if the button changes background when pressed. */
     pressedBackground?: boolean;
+    /** True if the button is currently pressed/active. */
+    pressed?: boolean;
   };
 
 /**
@@ -135,6 +195,21 @@ export type ToolbarProps = {
    * Specifies which tools are supported for creating new annotations.
    */
   supportedTools: AnnotationTool[];
+
+  /** Current keyboard mode: 'move' for moving, 'resize' for resizing, null when inactive */
+  keyboardMode?: KeyboardMode;
+
+  /** Whether keyboard mode is active */
+  keyboardActive?: boolean;
+
+  /** Callback when mode button is clicked - cycles through modes */
+  onModeClick?: () => void;
+
+  /** Callback to activate move mode (equivalent to Ctrl+Shift+Y) */
+  onActivateMoveMode?: () => void;
+
+  /** Callback to activate point annotation with move mode */
+  onActivatePointMoveMode?: () => void;
 };
 
 /**
@@ -158,6 +233,11 @@ export default function Toolbar({
   toggleSidebar,
   toggleSidebarRef,
   useMinimalControls = false,
+  keyboardMode = null,
+  keyboardActive = false,
+  onModeClick,
+  onActivateMoveMode,
+  onActivatePointMoveMode,
 }: ToolbarProps) {
   return (
     <div
@@ -249,11 +329,27 @@ export default function Toolbar({
               <ToolbarButton
                 data-testid="rect-annotation"
                 pressed={activeTool === 'rect'}
-                title="Rectangle annotation"
-                icon={SelectionIcon}
-                onClick={() =>
-                  createAnnotation(activeTool === 'rect' ? null : 'rect')
+                title={getRectAnnotationButtonTitle(
+                  keyboardActive,
+                  activeTool,
+                  keyboardMode ?? null,
+                )}
+                icon={
+                  keyboardActive && activeTool === 'rect'
+                    ? (() => <KeyboardModeIcon mode={keyboardMode ?? 'rect'} />) as IconComponent
+                    : SelectionIcon
                 }
+                onClick={() => {
+                  if (keyboardActive && activeTool === 'rect') {
+                    onModeClick?.();
+                  } else {
+                    createAnnotation(activeTool === 'rect' ? null : 'rect');
+                  }
+                }}
+                onKeyDown={createEnterActivateHandler(
+                  onActivateMoveMode,
+                  keyboardActive,
+                )}
               />
             )}
             {supportedTools.includes('point') && (
@@ -265,6 +361,10 @@ export default function Toolbar({
                 onClick={() =>
                   createAnnotation(activeTool === 'point' ? null : 'point')
                 }
+                onKeyDown={createEnterActivateHandler(
+                  onActivatePointMoveMode,
+                  keyboardActive,
+                )}
               />
             )}
           </div>

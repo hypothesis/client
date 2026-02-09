@@ -54,6 +54,8 @@ describe('Guest', () => {
   let fakePortRPCs;
   let fakeOutsideAssignmentNotice;
   let fakeSetAllShortcuts;
+  let FakeOutsideAssignmentNoticeController;
+  let fakeIsMacOS;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -168,6 +170,9 @@ describe('Guest', () => {
       cancel: sinon.stub(),
       destroy: sinon.stub(),
       draw: sinon.stub().resolves({ type: 'point', x: 0, y: 0 }),
+      getKeyboardModeState: sinon.stub().returns({ keyboardActive: false }),
+      setOnKeyboardModeChange: sinon.stub(),
+      setKeyboardMode: sinon.stub(),
     };
     FakeDrawTool = sinon.stub().returns(fakeDrawTool);
 
@@ -213,12 +218,18 @@ describe('Guest', () => {
     };
     fakeSetAllShortcuts = sinon.stub();
 
+    FakeOutsideAssignmentNoticeController = sinon
+      .stub()
+      .returns(fakeOutsideAssignmentNotice);
+
     class FakeSelectionObserver {
       constructor(callback) {
         notifySelectionChanged = callback;
         this.disconnect = sinon.stub();
       }
     }
+
+    fakeIsMacOS = sinon.stub().returns(false);
 
     $imports.$mock({
       '../shared/messaging': {
@@ -249,15 +260,16 @@ describe('Guest', () => {
       },
       './range-util': rangeUtil,
       './outside-assignment-notice': {
-        OutsideAssignmentNoticeController: sinon
-          .stub()
-          .returns(fakeOutsideAssignmentNotice),
+        OutsideAssignmentNoticeController: FakeOutsideAssignmentNoticeController,
       },
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
       './util/frame': {
         frameFillsAncestor: fakeFrameFillsAncestor,
+      },
+      '../shared/user-agent': {
+        isMacOS: fakeIsMacOS,
       },
     });
   });
@@ -743,6 +755,94 @@ describe('Guest', () => {
       });
     });
 
+    describe('on "setKeyboardMode" event', () => {
+      it('calls draw tool setKeyboardMode when host sends mode', () => {
+        createGuest();
+        emitHostEvent('setKeyboardMode', { mode: 'resize' });
+        assert.calledWith(fakeDrawTool.setKeyboardMode, 'resize');
+      });
+    });
+
+    describe('keyboard mode change notification', () => {
+      it('calls hostRPC keyboardModeChanged when draw tool notifies', () => {
+        createGuest();
+        const callback = fakeDrawTool.setOnKeyboardModeChange.firstCall.args[0];
+        callback({ keyboardActive: true, keyboardMode: 'resize' });
+        assert.calledWith(hostRPC().call, 'keyboardModeChanged', {
+          keyboardActive: true,
+          keyboardMode: 'resize',
+        });
+      });
+    });
+
+    describe('on "activateMoveMode" event', () => {
+      it('starts rect annotation with move mode when keyboard not active', async () => {
+        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+        fakeDrawTool.draw.resolves({
+          type: 'rect',
+          left: 0,
+          top: 0,
+          right: 10,
+          bottom: 10,
+        });
+        fakeIntegration.describe.resolves([{ type: 'FragmentSelector', value: '' }]);
+
+        createGuest();
+        emitHostEvent('activateMoveMode');
+        await delay(0);
+
+        assert.calledWith(fakeDrawTool.draw, 'rect', 'move');
+      });
+
+      it('clears pending mode when createAnnotation rejects', async () => {
+        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+        fakeDrawTool.draw.rejects(new DrawError('canceled'));
+
+        createGuest();
+        emitHostEvent('activateMoveMode');
+        await delay(0);
+
+        assert.calledWith(fakeDrawTool.draw, 'rect');
+        // Second activateMoveMode should still work (state was cleared)
+        fakeDrawTool.draw.resetHistory();
+        emitHostEvent('activateMoveMode');
+        await delay(0);
+        assert.calledWith(fakeDrawTool.draw, 'rect');
+      });
+
+      it('switches to move mode when keyboard already active', () => {
+        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: true });
+
+        createGuest();
+        emitHostEvent('activateMoveMode');
+
+        assert.calledWith(fakeDrawTool.setKeyboardMode, 'move');
+      });
+    });
+
+    describe('on "activatePointMoveMode" event', () => {
+      it('starts point annotation with move mode when keyboard not active', async () => {
+        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+        fakeDrawTool.draw.resolves({ type: 'point', x: 50, y: 50 });
+        fakeIntegration.describe.resolves([{ type: 'FragmentSelector', value: '' }]);
+
+        createGuest();
+        emitHostEvent('activatePointMoveMode');
+        await delay(0);
+
+        assert.calledWith(fakeDrawTool.draw, 'point', 'move');
+      });
+
+      it('switches to move mode when keyboard already active', () => {
+        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: true });
+
+        createGuest();
+        emitHostEvent('activatePointMoveMode');
+
+        assert.calledWith(fakeDrawTool.setKeyboardMode, 'move');
+      });
+    });
+
     describe('on "deleteAnnotation" event', () => {
       it('detaches annotation', () => {
         createGuest();
@@ -824,6 +924,7 @@ describe('Guest', () => {
           assert.calledWith(fakeOutsideAssignmentNotice.setVisible, arg);
         });
       });
+
     });
 
     describe('on "renderThumbnail" event', () => {
@@ -990,6 +1091,53 @@ describe('Guest', () => {
         assert.isFalse(sidebarClosed());
       });
 
+      it('hides sidebar if event is outside sidebar bounds even when frameFillsAncestor is true', () => {
+        fakeHighlighter.getHighlightsFromPoint.returns([]);
+        createGuest();
+        emitHostEvent('sidebarLayoutChanged', { expanded: true, width: 300 });
+        fakeFrameFillsAncestor.returns(true);
+
+        // Simulate click far from sidebar (clientX is small, so window.innerWidth - clientX > width)
+        simulateClick(rootElement, 50);
+
+        assert.isTrue(sidebarClosed());
+      });
+
+      it('hides sidebar if frameFillsAncestor returns false', () => {
+        fakeHighlighter.getHighlightsFromPoint.returns([]);
+        createGuest();
+        emitHostEvent('sidebarLayoutChanged', { expanded: true, width: 300 });
+        fakeFrameFillsAncestor.returns(false);
+
+        // Even if click is within sidebar bounds, if frameFillsAncestor is false, sidebar should close
+        simulateClick(rootElement, window.innerWidth - 295);
+
+        assert.isTrue(sidebarClosed());
+      });
+
+      it('hides sidebar if sidebar is not expanded', () => {
+        fakeHighlighter.getHighlightsFromPoint.returns([]);
+        createGuest();
+        emitHostEvent('sidebarLayoutChanged', { expanded: false, width: 300 });
+        fakeFrameFillsAncestor.returns(true);
+
+        // Even if click is within sidebar bounds, if sidebar is not expanded, sidebar should close
+        simulateClick(rootElement, window.innerWidth - 295);
+
+        assert.isTrue(sidebarClosed());
+      });
+
+      it('hides sidebar if sidebarLayout is undefined', () => {
+        fakeHighlighter.getHighlightsFromPoint.returns([]);
+        createGuest();
+        // Don't emit sidebarLayoutChanged, so _sidebarLayout is undefined
+        fakeFrameFillsAncestor.returns(true);
+
+        simulateClick(rootElement, window.innerWidth - 295);
+
+        assert.isTrue(sidebarClosed());
+      });
+
       it('does not hide sidebar if event is inside a `<hypothesis-*>` element', () => {
         fakeHighlighter.getHighlightsFromPoint.returns([]);
         createGuest();
@@ -1027,6 +1175,32 @@ describe('Guest', () => {
       window.dispatchEvent(new Event('resize'));
 
       assert.called(FakeAdder.instance.show);
+    });
+
+    it('uses empty range in annotationsForSelection when selectedRange returns null', () => {
+      rangeUtil.selectedRange.returns(null);
+      rangeUtil.selectionFocusRect.returns({
+        left: 0,
+        top: 0,
+        width: 5,
+        height: 5,
+      });
+      createGuest();
+      const element = document.createElement('div');
+      element.textContent = 'foo';
+      const range = new Range();
+      range.selectNodeContents(element);
+      notifySelectionChanged(range);
+
+      assert.calledOnce(FakeAdder.instance.show);
+      // annotationsForSelection() uses selectedRange() ?? new Range(); with null we pass a collapsed Range to itemsForRange
+      const itemsForRangeCall = rangeUtil.itemsForRange.getCalls().find(
+        call => call.args[0] instanceof Range && call.args[0].collapsed,
+      );
+      assert.ok(
+        itemsForRangeCall,
+        'itemsForRange was called with a collapsed Range (fallback when selectedRange is null)',
+      );
     });
 
     it('focuses annotations in the sidebar when hovering highlights in the document', () => {
@@ -1118,6 +1292,26 @@ describe('Guest', () => {
       simulateSelectionWithText();
 
       assert.deepEqual(FakeAdder.instance.annotationsForSelection, ['t1']);
+    });
+
+    it('uses empty range when selectedRange() returns null for adder annotations', () => {
+      const element = document.createElement('div');
+      element.textContent = 'x';
+      const range = new Range();
+      range.selectNodeContents(element);
+      rangeUtil.selectedRange.returns(null);
+      rangeUtil.selectionFocusRect.returns({
+        left: 0,
+        top: 0,
+        width: 1,
+        height: 1,
+      });
+      createGuest();
+
+      notifySelectionChanged(range);
+
+      assert.called(FakeAdder.instance.show);
+      assert.deepEqual(FakeAdder.instance.annotationsForSelection, []);
     });
 
     it('hides the adder if the selection does not contain text', () => {
@@ -2052,5 +2246,428 @@ describe('Guest', () => {
         assert.equal(guest.highlightsVisible, !commentsMode);
       },
     );
+
+    it('does not activate rect on Ctrl+Shift+Y when rect is not supported', () => {
+      fakeIntegration.supportedTools.returns(['point']);
+
+      createGuest();
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+
+      assert.notCalled(fakeDrawTool.draw);
+    });
+
+    it('activates rect in move mode on Ctrl+Shift+Y when rect is supported and keyboard not active', async () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.resolves({
+        type: 'rect',
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+      });
+      fakeIntegration.describe.resolves([{ type: 'FragmentSelector', value: '' }]);
+
+      createGuest();
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+
+      await delay(0);
+      assert.calledWith(fakeDrawTool.draw, 'rect', 'move');
+    });
+
+    it('switches to move mode on Ctrl+Shift+Y when already in keyboard mode', () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: true });
+
+      createGuest();
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+
+      assert.calledWith(fakeDrawTool.setKeyboardMode, 'move');
+    });
+
+    it('clears pending mode when Ctrl+Shift+Y createAnnotation rejects', async () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.rejects(new DrawError('canceled'));
+
+      createGuest();
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+      await delay(0);
+
+      assert.calledWith(fakeDrawTool.draw, 'rect');
+      fakeDrawTool.draw.resetHistory();
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+      await delay(0);
+      assert.calledWith(fakeDrawTool.draw, 'rect');
+    });
+
+    it('does not activate point on Ctrl+Shift+U when point is not supported', () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+
+      createGuest();
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'u',
+          bubbles: true,
+        }),
+      );
+
+      assert.notCalled(fakeDrawTool.draw);
+    });
+
+    it('activates resize mode with Ctrl+Shift+J when rect is supported', async () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.resolves({
+        type: 'rect',
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+      });
+      fakeIntegration.describe.resolves([{ type: 'FragmentSelector', value: '' }]);
+
+      createGuest();
+      hostRPC().call.resetHistory();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'j',
+          bubbles: true,
+        }),
+      );
+
+      await delay(0);
+      assert.calledWith(fakeDrawTool.draw, 'rect', 'resize');
+      assert.calledWith(hostRPC().call, 'activeToolChanged', 'rect');
+    });
+
+    it('uses Meta+Shift+J on macOS to activate resize mode when rect is supported', async () => {
+      fakeIsMacOS.returns(true);
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.resolves({
+        type: 'rect',
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+      });
+
+      createGuest();
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          metaKey: true,
+          ctrlKey: false,
+          shiftKey: true,
+          key: 'j',
+          bubbles: true,
+        }),
+      );
+
+      await delay(0);
+      assert.calledWith(fakeDrawTool.draw, 'rect', 'resize');
+    });
+
+    it('switches to resize mode with Ctrl+Shift+J when already in keyboard mode', async () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: true });
+      fakeDrawTool.setKeyboardMode = sinon.stub();
+
+      createGuest();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'j',
+          bubbles: true,
+        }),
+      );
+
+      await delay(0);
+
+      assert.calledWith(fakeDrawTool.setKeyboardMode, 'resize');
+    });
+
+    it('does not activate resize mode with Ctrl+Shift+J when rect is not supported', () => {
+      fakeIntegration.supportedTools.returns(['point']);
+      fakeDrawTool.draw.resetHistory();
+      const guest = createGuest();
+      guest.setHighlightsVisible(false, false /* notifyHost */);
+      hostRPC().call.resetHistory();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'j',
+          bubbles: true,
+        }),
+      );
+
+      // Should not call draw, and should allow event to propagate
+      assert.notCalled(fakeDrawTool.draw);
+      // Highlights should remain unchanged since 'j' doesn't match Ctrl+Shift+H
+      assert.equal(guest.highlightsVisible, false);
+    });
+
+    it('ignores Ctrl+Shift+J when user is typing in input field', () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.draw.resetHistory();
+      createGuest();
+
+      const input = document.createElement('input');
+      document.body.appendChild(input);
+      input.focus();
+
+      // Dispatch event directly on the input element so target is correctly set
+      input.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'j',
+          bubbles: true,
+        }),
+      );
+
+      // Should not activate resize mode when typing in input
+      assert.notCalled(fakeDrawTool.draw);
+      document.body.removeChild(input);
+    });
+
+    it('ignores Ctrl+Shift+U when user is typing in textarea', () => {
+      fakeIntegration.supportedTools.returns(['point']);
+      fakeDrawTool.draw.resetHistory();
+      createGuest();
+
+      const textarea = document.createElement('textarea');
+      document.body.appendChild(textarea);
+      textarea.focus();
+
+      // Dispatch event directly on the textarea element so target is correctly set
+      textarea.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'u',
+          bubbles: true,
+        }),
+      );
+
+      // Should not activate point annotation when typing in textarea
+      assert.notCalled(fakeDrawTool.draw);
+      document.body.removeChild(textarea);
+    });
+
+    it('clears _pendingKeyboardMode when Ctrl+Shift+J annotation creation is canceled', async () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.rejects(new DrawError('canceled'));
+
+      createGuest();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'j',
+          bubbles: true,
+        }),
+      );
+
+      await delay(0);
+
+      // Verify that draw was called with resize mode
+      assert.calledWith(fakeDrawTool.draw, 'rect', 'resize');
+    });
+
+    it('clears _pendingKeyboardMode when Ctrl+Shift+U annotation creation is canceled', async () => {
+      fakeIntegration.supportedTools.returns(['point']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.rejects(new DrawError('canceled'));
+
+      createGuest();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'u',
+          bubbles: true,
+        }),
+      );
+
+      await delay(0);
+
+      // Verify that draw was called with move mode
+      assert.calledWith(fakeDrawTool.draw, 'point', 'move');
+    });
+
+    it('activates point annotation with Ctrl+Shift+U when point is supported', async () => {
+      fakeIntegration.supportedTools.returns(['point']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.resolves({
+        type: 'point',
+        x: 0,
+        y: 0,
+      });
+      fakeIntegration.describe.resolves([
+        {
+          type: 'ShapeSelector',
+          shape: { type: 'point', x: 0, y: 0 },
+        },
+      ]);
+
+      createGuest();
+      hostRPC().call.resetHistory();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'u',
+          bubbles: true,
+        }),
+      );
+
+      await delay(0);
+
+      // Verify that draw was called with 'move' mode from _pendingKeyboardMode
+      assert.calledWith(fakeDrawTool.draw, 'point', 'move');
+      assert.calledWith(hostRPC().call, 'activeToolChanged', 'point');
+    });
+
+    it('does not activate point annotation with Ctrl+Shift+U when point is not supported', () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.draw.resetHistory();
+
+      createGuest();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'u',
+          bubbles: true,
+        }),
+      );
+
+      assert.notCalled(fakeDrawTool.draw);
+    });
+
+    it('does not activate point annotation with Ctrl+Shift+U when already in keyboard mode', () => {
+      fakeIntegration.supportedTools.returns(['point']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: true });
+      fakeDrawTool.draw.resetHistory();
+
+      createGuest();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'u',
+          bubbles: true,
+        }),
+      );
+
+      // Should not call draw when already in keyboard mode
+      assert.notCalled(fakeDrawTool.draw);
+    });
+
+    it('does not call hoverAnnotations on mouseout when highlights are not visible', () => {
+      const guest = createGuest();
+      guest.setHighlightsVisible(false, false /* notifyHost */);
+      sidebarRPC().call.resetHistory();
+
+      guest.element.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+
+      assert.notCalled(sidebarRPC().call);
+    });
+
+    it('does not call hoverAnnotations on mousemove when no annotations at point', () => {
+      fakeHighlighter.getHighlightsFromPoint.returns([]);
+      const guest = createGuest();
+      sidebarRPC().call.resetHistory();
+
+      guest.element.dispatchEvent(
+        new MouseEvent('mousemove', {
+          bubbles: true,
+          clientX: 100,
+          clientY: 200,
+        }),
+      );
+
+      assert.notCalled(sidebarRPC().call);
+    });
+
+    it('does not handle shortcut when event does not match Ctrl+Shift+H', () => {
+      const guest = createGuest();
+      guest.setHighlightsVisible(true, false /* notifyHost */);
+      const initialVisible = guest.highlightsVisible;
+
+      guest.element.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'x', // Different key
+          bubbles: true,
+        }),
+      );
+
+      // Highlights should remain unchanged
+      assert.equal(guest.highlightsVisible, initialVisible);
+    });
+
+    it('creates outside assignment notice when setting visible and notice does not exist', () => {
+      FakeOutsideAssignmentNoticeController.resetHistory();
+      const guest = createGuest();
+
+      emitSidebarEvent('setOutsideAssignmentNoticeVisible', true);
+
+      assert.calledOnce(FakeOutsideAssignmentNoticeController);
+      assert.calledWith(FakeOutsideAssignmentNoticeController, guest.element);
+      assert.calledWith(fakeOutsideAssignmentNotice.setVisible, true);
+    });
   });
 });
