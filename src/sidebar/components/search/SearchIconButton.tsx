@@ -2,6 +2,7 @@ import { SearchIcon, Spinner } from '@hypothesis/frontend-shared';
 import { useCallback, useRef } from 'preact/hooks';
 
 import { useShortcut } from '../../../shared/shortcut';
+import { useShortcutsConfig } from '../../../shared/shortcut-config';
 import { isMacOS } from '../../../shared/user-agent';
 import type { SidebarStore } from '../../store';
 import { useSidebarStore } from '../../store';
@@ -17,6 +18,7 @@ import TopBarToggleButton from '../TopBarToggleButton';
  */
 function useSearchKeyboardShortcuts(store: SidebarStore) {
   const prevFocusRef = useRef<HTMLOrSVGElement | null>(null);
+  const shortcuts = useShortcutsConfig();
 
   const openSearch = useCallback(
     (event: KeyboardEvent) => {
@@ -42,7 +44,7 @@ function useSearchKeyboardShortcuts(store: SidebarStore) {
 
   const modifierKey = isMacOS() ? 'meta' : 'ctrl';
 
-  useShortcut('/', openSearch);
+  useShortcut(shortcuts.openSearch, openSearch);
   useShortcut(`${modifierKey}+k`, openSearch);
 }
 

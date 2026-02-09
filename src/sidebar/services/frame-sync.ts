@@ -12,6 +12,10 @@ import {
 } from '../../shared/messaging';
 import type { Message } from '../../shared/messaging';
 import { promiseWithResolvers } from '../../shared/promise-with-resolvers';
+import {
+  getAllShortcuts,
+  subscribeShortcuts,
+} from '../../shared/shortcut-config';
 import type {
   AnnotationData,
   DocumentInfo,
@@ -138,6 +142,9 @@ export class FrameSyncService {
   private _store: SidebarStore;
   private _toastMessenger: ToastMessengerService;
 
+  /** Unsubscribe handler for shortcut config updates. */
+  private _shortcutsUnsubscribe: (() => void) | null;
+
   /**
    * Tag of an annotation that should be scrolled to after anchoring completes.
    *
@@ -189,6 +196,7 @@ export class FrameSyncService {
       source: 'sidebar',
     });
     this._listeners = new ListenerCollection();
+    this._shortcutsUnsubscribe = null;
 
     this._hostRPC = new PortRPC();
     this._guestRPC = new Map();
@@ -212,6 +220,7 @@ export class FrameSyncService {
     this._setupSyncToGuests();
     this._setupHostEvents();
     this._setupFeatureFlagSync();
+    this._setupShortcutsSync();
     this._setupToastMessengerEvents();
   }
 
@@ -504,6 +513,7 @@ export class FrameSyncService {
     // Synchronize highlight visibility in this guest with the sidebar's controls.
     guestRPC.call('setHighlightsVisible', this._highlightsVisible);
     guestRPC.call('featureFlagsUpdated', this._store.features());
+    guestRPC.call('shortcutsUpdated', getAllShortcuts());
 
     // If we have content banner data, send it to the guest. If there are
     // multiple guests the banner is likely only appropriate for the main one.
@@ -556,6 +566,21 @@ export class FrameSyncService {
 
     // Watch for future flag changes.
     watch(this._store.subscribe, getFlags, sendFlags);
+  }
+
+  /**
+   * Set up synchronization of keyboard shortcuts to guest frames.
+   *
+   * Shortcuts are configured in the sidebar UI but used in guest frames.
+   * We broadcast updates from the sidebar to keep guests in sync.
+   */
+  private _setupShortcutsSync() {
+    this._shortcutsUnsubscribe?.();
+    this._shortcutsUnsubscribe = subscribeShortcuts(shortcuts => {
+      for (const guest of this._guestRPC.values()) {
+        guest.call('shortcutsUpdated', shortcuts);
+      }
+    });
   }
 
   private _setupToastMessengerEvents() {
@@ -723,5 +748,7 @@ export class FrameSyncService {
   destroy() {
     this._portFinder.destroy();
     this._listeners.removeAll();
+    this._shortcutsUnsubscribe?.();
+    this._shortcutsUnsubscribe = null;
   }
 }

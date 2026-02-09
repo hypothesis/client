@@ -1,4 +1,5 @@
-import type { Profile } from '../../types/api';
+import { setAllShortcuts } from '../../shared/shortcut-config';
+import type { Profile, ShortcutsPreferences } from '../../types/api';
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import type { SidebarStore } from '../store';
@@ -95,6 +96,18 @@ export class SessionService {
   }
 
   /**
+   * Persist the user's keyboard shortcut overrides server-side.
+   */
+  async updateShortcutPreferences(preferences: ShortcutsPreferences) {
+    const updatedProfile = await this._api.profile.update(
+      {},
+      { preferences: { shortcuts_preferences: preferences } },
+    );
+
+    this.update(updatedProfile);
+  }
+
+  /**
    * Update the local profile data.
    *
    * This method can be used to update the profile data in the client when new
@@ -107,6 +120,10 @@ export class SessionService {
     const userChanged = profile.userid !== prevProfile.userid;
 
     this._store.updateProfile(profile);
+
+    // Update the shortcut config with the new preferences.
+    const shortcuts = profile.preferences?.shortcuts_preferences ?? {};
+    setAllShortcuts(shortcuts);
 
     this._lastLoad = Promise.resolve(profile);
     this._lastLoadTime = Date.now();

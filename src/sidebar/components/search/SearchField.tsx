@@ -10,6 +10,7 @@ import type { RefObject, JSX } from 'preact';
 import { useState } from 'preact/hooks';
 
 import { useShortcut } from '../../../shared/shortcut';
+import { useShortcutsConfig } from '../../../shared/shortcut-config';
 import { useSidebarStore } from '../../store';
 
 export type SearchFieldProps = {
@@ -50,6 +51,7 @@ export default function SearchField({
   const store = useSidebarStore();
   const isLoading = store.isLoading();
   const input = useSyncedRef(inputRef);
+  const shortcuts = useShortcutsConfig();
 
   // The active filter query from the previous render.
   const [prevQuery, setPrevQuery] = useState(query);
@@ -57,8 +59,9 @@ export default function SearchField({
   // The query that the user is currently typing, but may not yet have applied.
   const [pendingQuery, setPendingQuery] = useState(query);
 
-  // As long as this input is mounted, pressing `/` should make it recover focus
-  useShortcut('/', e => {
+  // As long as this input is mounted, pressing the "open search" shortcut
+  // should make it recover focus
+  useShortcut(shortcuts.openSearch, e => {
     if (document.activeElement !== input.current) {
       e.preventDefault();
       input.current?.focus();

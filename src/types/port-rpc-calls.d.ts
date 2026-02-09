@@ -6,6 +6,7 @@
  */
 import type { ToastMessage } from '@hypothesis/frontend-shared';
 
+import type { ShortcutMap } from '../shared/shortcut-config';
 import type {
   AnchorPosition,
   AnnotationData,
@@ -201,6 +202,9 @@ export type SidebarToGuestCalls = {
 
   /** The active feature flags changed. */
   featureFlagsUpdated(flags: Record<string, boolean>): void;
+
+  /** The current keyboard shortcuts changed. */
+  shortcutsUpdated(shortcuts: ShortcutMap): void;
 
   /**
    * Indicate in the guest which highlights correspond to hovered annotations

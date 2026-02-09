@@ -4,24 +4,33 @@ import { mount } from '@hypothesis/frontend-testing';
 import SearchIconButton, { $imports } from '../SearchIconButton';
 
 describe('SearchIconButton', () => {
-  let fakeIsMacOS;
   let fakeStore;
+  let fakeShortcuts;
+  let fakeIsMacOS;
 
   const createSearchIconButton = () => {
     return mount(<SearchIconButton />, { connected: true });
   };
 
   beforeEach(() => {
-    fakeIsMacOS = sinon.stub().returns(false);
     fakeStore = {
       isLoading: sinon.stub().returns(false),
       isSidebarPanelOpen: sinon.stub().returns(false),
       openSidebarPanel: sinon.stub(),
       toggleSidebarPanel: sinon.stub(),
     };
+    fakeShortcuts = {
+      openSearch: '/',
+    };
+    fakeIsMacOS = sinon.stub().returns(false);
 
     $imports.$mock({
       '../../store': { useSidebarStore: () => fakeStore },
+      '../../../shared/shortcut-config': {
+        useShortcutsConfig: () => ({
+          ...fakeShortcuts,
+        }),
+      },
       '../../../shared/user-agent': {
         isMacOS: fakeIsMacOS,
       },

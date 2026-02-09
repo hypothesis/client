@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import { pluralize } from '../../shared/pluralize';
 import { useShortcut } from '../../shared/shortcut';
+import { useShortcutsConfig } from '../../shared/shortcut-config';
 import { withServices } from '../service-context';
 import type { AnalyticsService } from '../services/analytics';
 import type { StreamerService } from '../services/streamer';
@@ -85,6 +86,8 @@ function PendingUpdatesNotification({
   const pendingMentionCount = store.pendingMentionCount();
   const mentionsEnabled = store.isFeatureEnabled('at_mentions');
   const hasPendingChanges = store.hasPendingUpdatesOrDeletions();
+  const shortcuts = useShortcutsConfig();
+  const applyUpdatesShortcutLabel = shortcuts.applyUpdates ?? 'l';
   const applyPendingUpdates = useCallback(() => {
     streamer.applyPendingUpdates();
     analytics.trackEvent('client.realtime.apply_updates');
@@ -92,7 +95,10 @@ function PendingUpdatesNotification({
   const [collapsed, setCollapsed] = useState(false);
   const timeout = useRef<number | null>(null);
 
-  useShortcut('l', () => hasPendingChanges && applyPendingUpdates());
+  useShortcut(
+    shortcuts.applyUpdates,
+    () => hasPendingChanges && applyPendingUpdates(),
+  );
 
   useEffect(() => {
     if (hasPendingChanges) {
@@ -139,7 +145,9 @@ function PendingUpdatesNotification({
             count={pendingMentionCount}
           />
         )}
-        <span className="sr-only">load them by pressing l</span>
+        <span className="sr-only">
+          load them by pressing {applyUpdatesShortcutLabel}
+        </span>
       </Button>
     </div>
   );

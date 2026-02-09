@@ -359,10 +359,15 @@ export type Annotation = ClientAnnotationData & APIAnnotationData;
  */
 export type SavedAnnotation = Annotation & { id: string };
 
+export type ShortcutsPreferences = Partial<
+  Record<string, string | null>
+> | null;
+
 export type Profile = {
   userid: string | null;
   preferences: {
     show_sidebar_tutorial?: boolean;
+    shortcuts_preferences?: ShortcutsPreferences;
   };
   features: Record<string, boolean>;
   user_info?: UserInfo;

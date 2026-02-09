@@ -13,6 +13,7 @@ describe('UserMenu', () => {
   let fakeSettings;
   let fakeStore;
   let fakeIsFeatureEnabled;
+  let fakeShortcuts;
 
   const createUserMenu = () => {
     return mount(
@@ -43,6 +44,7 @@ describe('UserMenu', () => {
     fakeServiceConfig = sinon.stub();
     fakeSettings = {};
     fakeIsFeatureEnabled = sinon.stub().returns(false);
+    fakeShortcuts = { openKeyboardShortcuts: 'k' };
     fakeStore = {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
       focusedGroupId: sinon.stub().returns('mygroup'),
@@ -58,6 +60,9 @@ describe('UserMenu', () => {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
       '../config/service-config': { serviceConfig: fakeServiceConfig },
+      '../../shared/shortcut-config': {
+        useShortcutsConfig: () => fakeShortcuts,
+      },
       '../store': { useSidebarStore: () => fakeStore },
     });
   });
@@ -294,6 +299,48 @@ describe('UserMenu', () => {
       assert.calledWith(fakeFrameSync.notifyHost, 'openNotebook', 'mygroup');
       // Now the menu is "closed" again
       assert.isFalse(wrapper.find('Menu').props().open);
+    });
+  });
+
+  describe('keyboard shortcuts', () => {
+    it('opens the shortcuts modal when menu item clicked', () => {
+      const wrapper = createUserMenu();
+      openMenu(wrapper);
+
+      const shortcutsMenuItem = findMenuItem(wrapper, 'Keyboard shortcuts');
+      shortcutsMenuItem.props().onClick();
+      wrapper.update();
+
+      assert.isTrue(wrapper.find('KeyboardShortcutsModal').prop('open'));
+      assert.isFalse(wrapper.find('Menu').props().open);
+    });
+
+    it('closes the shortcuts modal when onClose is called', () => {
+      const wrapper = createUserMenu();
+      const shortcutsMenuItem = findMenuItem(wrapper, 'Keyboard shortcuts');
+
+      shortcutsMenuItem.props().onClick();
+      wrapper.update();
+      assert.isTrue(wrapper.find('KeyboardShortcutsModal').prop('open'));
+
+      wrapper.find('KeyboardShortcutsModal').props().onClose();
+      wrapper.update();
+
+      assert.isFalse(wrapper.find('KeyboardShortcutsModal').prop('open'));
+    });
+
+    it('opens the shortcuts modal and closes the menu when shortcut is pressed', () => {
+      const wrapper = createUserMenu();
+
+      act(() => {
+        document.documentElement.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'k' }),
+        );
+      });
+      wrapper.update();
+
+      assert.isFalse(wrapper.find('Menu').props().open);
+      assert.isTrue(wrapper.find('KeyboardShortcutsModal').prop('open'));
     });
   });
 

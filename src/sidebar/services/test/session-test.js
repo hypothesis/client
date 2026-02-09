@@ -4,6 +4,7 @@ import { SessionService, $imports } from '../session';
 describe('SessionService', () => {
   let fakeApi;
   let fakeAuth;
+  let fakeSetAllShortcuts;
   let fakeSentry;
   let fakeServiceConfig;
   let fakeSettings;
@@ -25,6 +26,7 @@ describe('SessionService', () => {
       login: sinon.stub().returns(Promise.resolve()),
       logout: sinon.stub().resolves(),
     });
+    fakeSetAllShortcuts = sinon.stub();
     fakeSentry = {
       setUserInfo: sinon.spy(),
     };
@@ -54,6 +56,9 @@ describe('SessionService', () => {
     };
 
     $imports.$mock({
+      '../../shared/shortcut-config': {
+        setAllShortcuts: fakeSetAllShortcuts,
+      },
       '../config/service-config': { serviceConfig: fakeServiceConfig },
       '../util/retry': { retryPromiseOperation },
       '../util/sentry': fakeSentry,
@@ -196,6 +201,61 @@ describe('SessionService', () => {
       assert.calledWith(fakeSentry.setUserInfo, {
         id: 'anne',
       });
+    });
+
+    it('applies shortcut preferences from the profile', () => {
+      const session = createService();
+      const shortcuts = { applyUpdates: 'c' };
+
+      session.update({
+        userid: 'anne',
+        preferences: { shortcuts_preferences: shortcuts },
+      });
+
+      assert.calledWith(fakeSetAllShortcuts, shortcuts);
+    });
+
+    it('clears shortcuts when no preferences exist', () => {
+      const session = createService();
+
+      session.update({
+        userid: 'anne',
+      });
+
+      assert.calledWith(fakeSetAllShortcuts, {});
+    });
+  });
+
+  describe('#updateShortcutPreferences', () => {
+    it('persists shortcut overrides and updates the profile', async () => {
+      const updatedProfile = {
+        userid: 'acct:user@hypothes.is',
+        preferences: {
+          shortcuts_preferences: { applyUpdates: 'c' },
+        },
+      };
+      fakeApi.profile.update.resolves(updatedProfile);
+
+      const session = createService();
+      await session.updateShortcutPreferences(
+        updatedProfile.preferences.shortcuts_preferences,
+      );
+
+      assert.calledWith(
+        fakeApi.profile.update,
+        {},
+        {
+          preferences: {
+            shortcuts_preferences:
+              updatedProfile.preferences.shortcuts_preferences,
+          },
+        },
+      );
+      assert.calledWith(fakeStore.updateProfile, updatedProfile);
+      assert.calledWith(
+        fakeSetAllShortcuts,
+        updatedProfile.preferences.shortcuts_preferences,
+      );
     });
   });
 

@@ -160,7 +160,7 @@ export default function FilterControls({
         <b>Filters</b>
         {hasSelection && (
           <FilterToggle
-            label={`Remove ${selectedCount} selected annotation filter`}
+            label={`Clear filter: ${selectedCount} selected`}
             description={`Show only the ${selectedCount} selected annotations. Press to clear this filter and show all annotations.`}
             active={true}
             setActive={() => store.clearSelection()}
@@ -170,7 +170,7 @@ export default function FilterControls({
         {focusFilters.user && (
           <FilterToggle
             icon={ProfileIcon}
-            label={`By ${focusFilters.user.display}`}
+            label={`Clear filter: by author ${focusFilters.user.display}`}
             description={`Show annotations by ${focusFilters.user.display}. Press to clear this filter.`}
             active={focusActive.has('user')}
             // When a selection exists, it replaces other filters.
@@ -182,7 +182,7 @@ export default function FilterControls({
         {focusFilters.page && (
           <FilterToggle
             icon={FileGenericIcon}
-            label={`Pages ${focusFilters.page.display}`}
+            label={`Clear filter: pages ${focusFilters.page.display}`}
             description={`Show annotations on pages ${focusFilters.page.display}. Press to clear this filter.`}
             active={focusActive.has('page')}
             disabled={hasSelection}
@@ -193,7 +193,7 @@ export default function FilterControls({
         {focusFilters.cfi && (
           <FilterToggle
             icon={FileGenericIcon}
-            label="Selected chapter"
+            label="Clear filter: selected chapter"
             description="Show annotations on selected book chapter(s). Press to clear this filter."
             active={focusActive.has('cfi')}
             disabled={hasSelection}

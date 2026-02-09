@@ -95,7 +95,7 @@ describe('FilterControls', () => {
           display: 'Some User',
         },
       },
-      label: 'By Some User',
+      label: 'Clear filter: by author Some User',
     },
     {
       filterType: 'page',
@@ -104,7 +104,7 @@ describe('FilterControls', () => {
           display: '10-30',
         },
       },
-      label: 'Pages 10-30',
+      label: 'Clear filter: pages 10-30',
     },
     {
       filterType: 'cfi',
@@ -113,7 +113,7 @@ describe('FilterControls', () => {
           display: 'Chapter One',
         },
       },
-      label: 'Selected chapter',
+      label: 'Clear filter: selected chapter',
     },
   ].forEach(({ filterType, focusFilters, label }) => {
     it(`displays ${filterType} toggle if there is a ${filterType} focus filter configured`, () => {

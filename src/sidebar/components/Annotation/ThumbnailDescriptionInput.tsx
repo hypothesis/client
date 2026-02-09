@@ -30,7 +30,7 @@ export default function ThumbnailDescriptionInput({
           value={description}
           onInput={e => onEdit((e.target as HTMLInputElement).value)}
           // Maximum length for `target.description` field supported by the API.
-          maxlength={250}
+          maxlength={5000}
           classes="flex-1"
         />
         <IconButton
