@@ -32,15 +32,18 @@ export default function DrawToolKeyboardIndicator({
     return null;
   }
 
-  const modeText = mode === 'move' ? 'Move' : mode === 'resize' ? 'Resize' : 'Rectangle';
+  const modeText =
+    mode === 'move' ? 'Move' : mode === 'resize' ? 'Resize' : 'Rectangle';
   let instructions: string;
   if (mode === 'move') {
-    instructions = 'Use arrow keys to move, click mode button to switch modes, Enter to confirm';
+    instructions =
+      'Use arrow keys to move, click mode button to switch modes, Enter to confirm';
   } else if (mode === 'resize') {
     const cornerText = pinnedCornerToLabel(pinnedCorner, 'short');
     instructions = `Use arrow keys to resize (${cornerText} corner pinned), Tab to change corner, click mode button to switch modes, Enter to confirm`;
   } else {
-    instructions = 'Rectangle mode. Click the mode button to switch to Move or Resize mode.';
+    instructions =
+      'Rectangle mode. Click the mode button to switch to Move or Resize mode.';
   }
 
   return (

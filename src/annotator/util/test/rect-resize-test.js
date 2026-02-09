@@ -69,21 +69,19 @@ describe('annotator/util/rect-resize', () => {
   });
 
   describe('canModifyFromPinnedCorner', () => {
-    ['top-left', 'top-right', 'bottom-right', 'bottom-left'].forEach(
-      corner => {
-        it(`returns true for active keys with ${corner}`, () => {
-          const edges = getActiveEdges(corner);
-          if (edges.top || edges.bottom) {
-            assert.isTrue(canModifyFromPinnedCorner('ArrowUp', corner));
-            assert.isTrue(canModifyFromPinnedCorner('ArrowDown', corner));
-          }
-          if (edges.left || edges.right) {
-            assert.isTrue(canModifyFromPinnedCorner('ArrowLeft', corner));
-            assert.isTrue(canModifyFromPinnedCorner('ArrowRight', corner));
-          }
-        });
-      },
-    );
+    ['top-left', 'top-right', 'bottom-right', 'bottom-left'].forEach(corner => {
+      it(`returns true for active keys with ${corner}`, () => {
+        const edges = getActiveEdges(corner);
+        if (edges.top || edges.bottom) {
+          assert.isTrue(canModifyFromPinnedCorner('ArrowUp', corner));
+          assert.isTrue(canModifyFromPinnedCorner('ArrowDown', corner));
+        }
+        if (edges.left || edges.right) {
+          assert.isTrue(canModifyFromPinnedCorner('ArrowLeft', corner));
+          assert.isTrue(canModifyFromPinnedCorner('ArrowRight', corner));
+        }
+      });
+    });
 
     it('returns false for unknown key', () => {
       assert.isFalse(canModifyFromPinnedCorner('ArrowFoo', 'top-left'));
@@ -145,12 +143,11 @@ describe('annotator/util/rect-resize', () => {
       it('ArrowRight expands right even when result width is still below minWidth', () => {
         // Expansion always applies so user can grow out of an invalid (too-small) state
         const small = { ...baseRect, left: 50, right: 59 };
-        const r = applyResizeArrowKey(
-          small,
-          'ArrowRight',
-          'top-left',
-          { ...constraints, minWidth: 20, increment: 10 },
-        );
+        const r = applyResizeArrowKey(small, 'ArrowRight', 'top-left', {
+          ...constraints,
+          minWidth: 20,
+          increment: 10,
+        });
         assert.equal(r.right, 69);
       });
     });

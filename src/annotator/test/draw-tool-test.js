@@ -394,21 +394,23 @@ describe('DrawTool', () => {
     it('Enter does nothing when shape is null', async () => {
       const shapePromise = tool.draw('rect', 'move').catch(() => {});
       await delay(0);
-      
+
       // Set shape to null to test the branch at line 437
       tool._shape = undefined;
-      
+
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
       );
       await delay(0);
-      
+
       // Promise should not resolve because shape is null
       let resolved = false;
-      shapePromise.then(() => { resolved = true; });
+      shapePromise.then(() => {
+        resolved = true;
+      });
       await delay(10);
       assert.isFalse(resolved, 'Enter should not confirm when shape is null');
-      
+
       tool.cancel();
       await shapePromise.catch(() => {});
     });
@@ -464,10 +466,10 @@ describe('DrawTool', () => {
       // Set to the same mode - should not change keyboardMode (line 689 check: keyboardMode !== mode)
       // The condition at line 689 prevents updating when mode is the same
       tool.setKeyboardMode('move');
-      
+
       // Mode should still be 'move'
       assert.equal(tool.getKeyboardModeState().keyboardMode, 'move');
-      
+
       tool.cancel();
       await shapePromise;
     });
@@ -475,23 +477,23 @@ describe('DrawTool', () => {
     it('setKeyboardMode resets pinned corner when switching to resize mode', async () => {
       const shapePromise = tool.draw('rect', 'resize').catch(() => {});
       await delay(0);
-      
+
       // Cycle to a different corner
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
       );
       await delay(0);
-      
+
       // Switch to resize mode again - should reset pinned corner to top-left (line 692-693)
       tool.setKeyboardMode('resize');
-      
+
       // Pinned corner should be reset to top-left
       // Verify by checking that ArrowRight works (it works with top-left)
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
       );
       await delay(0);
-      
+
       tool.cancel();
       await shapePromise;
     });
@@ -499,14 +501,14 @@ describe('DrawTool', () => {
     it('setKeyboardMode handles rect mode branch (line 696)', async () => {
       const shapePromise = tool.draw('rect', 'move').catch(() => {});
       await delay(0);
-      
+
       // Switch to 'rect' mode - tests the branch at line 696
       tool.setKeyboardMode('rect');
-      
+
       // Should still be active but in rect mode
       assert.isTrue(tool.getKeyboardModeState().keyboardActive);
       assert.equal(tool.getKeyboardModeState().keyboardMode, 'rect');
-      
+
       tool.cancel();
       await shapePromise;
     });
@@ -556,16 +558,16 @@ describe('DrawTool', () => {
     it('Tab does nothing when keyboardMode is not resize', async () => {
       const shapePromise = tool.draw('rect', 'move').catch(() => {});
       await delay(0);
-      
+
       // Tab should be ignored when not in resize mode (line 422 condition)
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
       );
       await delay(0);
-      
+
       // Should still be in move mode
       assert.equal(tool.getKeyboardModeState().keyboardMode, 'move');
-      
+
       tool.cancel();
       await shapePromise;
     });
@@ -573,13 +575,13 @@ describe('DrawTool', () => {
     it('Tab does nothing when tool is not rect', async () => {
       const shapePromise = tool.draw('point', 'resize').catch(() => {});
       await delay(0);
-      
+
       // Tab should be ignored when tool is not 'rect' (line 422 condition: tool === 'rect')
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
       );
       await delay(0);
-      
+
       tool.cancel();
       await shapePromise;
     });
@@ -755,7 +757,7 @@ describe('DrawTool', () => {
         new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
       );
       await delay(0);
-      
+
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }),
       );
@@ -1116,7 +1118,7 @@ describe('DrawTool', () => {
       const shapePromise = tool.draw('rect', 'move');
       // Add catch handler immediately to prevent unhandled rejection
       const caughtPromise = shapePromise.catch(err => err);
-      
+
       await delay(0);
       assert.isTrue(tool.getKeyboardModeState().keyboardActive);
 
@@ -1151,7 +1153,10 @@ describe('DrawTool', () => {
       );
       await delay(0);
 
-      assert.isTrue(tool.getKeyboardModeState().keyboardActive, 'draw still active after Enter from input');
+      assert.isTrue(
+        tool.getKeyboardModeState().keyboardActive,
+        'draw still active after Enter from input',
+      );
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
@@ -1163,23 +1168,23 @@ describe('DrawTool', () => {
     it('_updateAnnouncer handles missing containers gracefully', async () => {
       const shapePromise = tool.draw('rect', 'move').catch(() => {});
       await delay(0);
-      
+
       // Set containers to undefined to test early return in _updateAnnouncer (line 709)
       // This simulates the case where containers were removed or never created
       const originalAnnouncer = tool._announcerContainer;
       const originalIndicator = tool._indicatorContainer;
       tool._announcerContainer = undefined;
       tool._indicatorContainer = undefined;
-      
+
       // Try to trigger _updateAnnouncer by changing keyboard mode
       // This should not throw even if containers are missing (early return)
       tool.setKeyboardMode('resize');
       await delay(0);
-      
+
       // Restore containers so the test can complete normally
       tool._announcerContainer = originalAnnouncer;
       tool._indicatorContainer = originalIndicator;
-      
+
       // Should still work normally
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
@@ -1191,15 +1196,15 @@ describe('DrawTool', () => {
     it('_updateAnnouncer does not call onKeyboardModeChange when callback is not set', async () => {
       const shapePromise = tool.draw('rect', 'move').catch(() => {});
       await delay(0);
-      
+
       // Ensure callback is not set (unregister)
       tool.setOnKeyboardModeChange(undefined);
-      
+
       // Trigger _updateAnnouncer by changing keyboard mode
       // Should not throw even if callback is undefined (line 758 check)
       tool.setKeyboardMode('resize');
       await delay(0);
-      
+
       // Should still work normally
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
@@ -1211,12 +1216,12 @@ describe('DrawTool', () => {
     it('_updateAnnouncer handles shape type point correctly', async () => {
       const shapePromise = tool.draw('point', 'move').catch(() => {});
       await delay(0);
-      
+
       // Verify that _updateAnnouncer handles point type (line 719 branch)
       // This should set x and y but not width/height
       tool.setKeyboardMode('move');
       await delay(0);
-      
+
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
       );
@@ -1227,14 +1232,14 @@ describe('DrawTool', () => {
     it('_updateAnnouncer handles case when shape is undefined', async () => {
       const shapePromise = tool.draw('rect', 'move').catch(() => {});
       await delay(0);
-      
+
       // Set shape to undefined to test the branch at line 718
       tool._shape = undefined;
-      
+
       // Trigger _updateAnnouncer - should handle undefined shape gracefully
       tool.setKeyboardMode('resize');
       await delay(0);
-      
+
       // Restore shape for test completion
       tool._shape = {
         type: 'rect',
@@ -1243,7 +1248,7 @@ describe('DrawTool', () => {
         right: 50,
         bottom: 50,
       };
-      
+
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
       );
