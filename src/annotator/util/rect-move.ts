@@ -42,8 +42,6 @@ export function applyMoveArrowKeyToRect(
   viewport: ViewportBounds,
 ): Rect {
   const { left, top, right, bottom } = rect;
-  const width = right - left;
-  const height = bottom - top;
 
   switch (key) {
     case 'ArrowUp': {
