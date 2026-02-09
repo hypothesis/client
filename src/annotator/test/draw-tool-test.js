@@ -375,12 +375,6 @@ describe('DrawTool', () => {
       await shapePromise;
     });
 
-    it('setOnActivateAnnotationMode stores callback', () => {
-      const onActivateAnnotationMode = sinon.stub();
-      tool.setOnActivateAnnotationMode(onActivateAnnotationMode);
-      assert.ok(true, 'setter did not throw');
-    });
-
     it('Enter confirms rect when in keyboard mode', async () => {
       const shapePromise = tool.draw('rect', 'move');
       await delay(0);
@@ -727,6 +721,22 @@ describe('DrawTool', () => {
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+      );
+      await delay(0);
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+      );
+      const shape = await shapePromise;
+      assert.equal(shape.type, 'rect');
+    });
+
+    it('ArrowLeft does not modify from top-left corner in resize mode (early return)', async () => {
+      const shapePromise = tool.draw('rect', 'resize');
+      await delay(0);
+      // Default pinned corner is top-left; ArrowLeft does not modify (only right/bottom active)
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }),
       );
       await delay(0);
 
@@ -1182,9 +1192,8 @@ describe('DrawTool', () => {
       const shapePromise = tool.draw('rect', 'move').catch(() => {});
       await delay(0);
       
-      // Ensure callback is not set
+      // Ensure callback is not set (unregister)
       tool.setOnKeyboardModeChange(undefined);
-      tool._onKeyboardModeChange = undefined;
       
       // Trigger _updateAnnouncer by changing keyboard mode
       // Should not throw even if callback is undefined (line 758 check)

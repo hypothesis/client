@@ -142,7 +142,8 @@ describe('annotator/util/rect-resize', () => {
         assert.equal(r.bottom, 110);
       });
 
-      it('ArrowRight does not set right when result width would be below minWidth', () => {
+      it('ArrowRight expands right even when result width is still below minWidth', () => {
+        // Expansion always applies so user can grow out of an invalid (too-small) state
         const small = { ...baseRect, left: 50, right: 59 };
         const r = applyResizeArrowKey(
           small,
@@ -150,7 +151,7 @@ describe('annotator/util/rect-resize', () => {
           'top-left',
           { ...constraints, minWidth: 20, increment: 10 },
         );
-        assert.equal(r.right, 59);
+        assert.equal(r.right, 69);
       });
     });
 

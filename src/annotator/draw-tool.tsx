@@ -26,6 +26,7 @@ import {
   applyResizeArrowKey,
   canModifyFromPinnedCorner,
 } from './util/rect-resize';
+import { isEditableContext } from './util/node';
 
 /** Normalize a rect so that `left <= right` and `top <= bottom`. */
 function normalizeRect(r: Rect): Rect {
@@ -392,12 +393,8 @@ export class DrawTool implements Destroyable {
     document.body.addEventListener(
       'keydown',
       (e: KeyboardEvent) => {
-        // Check if user is typing in an input field - don't intercept keyboard shortcuts
-        // This ensures WCAG 2.1.4 compliance by not interfering with normal text input
-        if (
-          e.target instanceof HTMLElement &&
-          ['INPUT', 'TEXTAREA'].includes(e.target.tagName)
-        ) {
+        // Don't intercept when the user is typing in an editable context - WCAG 2.1.4.
+        if (isEditableContext(e.target)) {
           return;
         }
 
@@ -591,9 +588,6 @@ export class DrawTool implements Destroyable {
       return;
     }
 
-    const containerRect = this._container.getBoundingClientRect();
-    const maxX = containerRect.width;
-    const maxY = containerRect.height;
     const viewport = getViewportBounds(
       this._container,
       DrawTool._RESERVED_VIEWPORT_TOP,
@@ -604,8 +598,7 @@ export class DrawTool implements Destroyable {
         this._shape,
         key,
         increment,
-        maxX,
-        maxY,
+        viewport,
       );
       this._renderSurface();
       this._updateAnnouncer();
@@ -627,11 +620,13 @@ export class DrawTool implements Destroyable {
         if (!canModifyFromPinnedCorner(key, this._pinnedCorner)) {
           return;
         }
+        const viewportWidth = viewport.maxRight - viewport.minLeft;
+        const viewportHeight = viewport.maxBottom - viewport.minTop;
         const constraints = {
           minWidth: this._minRectangleSize,
           minHeight: this._minRectangleSize,
-          maxWidth: maxX * this._maxRectangleSizeRatio,
-          maxHeight: maxY * this._maxRectangleSizeRatio,
+          maxWidth: viewportWidth * this._maxRectangleSizeRatio,
+          maxHeight: viewportHeight * this._maxRectangleSizeRatio,
           increment,
         };
         this._shape = clampRectToViewport(
@@ -655,26 +650,17 @@ export class DrawTool implements Destroyable {
     keyboardMode: KeyboardMode;
   }) => void;
 
-  /** Callback to activate annotation mode when hotkey is pressed outside of drawing mode */
-  private _onActivateAnnotationMode?: (mode: 'move' | 'resize') => void;
-
   /**
    * Set callback to be notified when keyboard mode state changes.
+   * Pass undefined to clear the callback.
    */
   setOnKeyboardModeChange(
-    callback: (state: {
+    callback?: (state: {
       keyboardActive: boolean;
       keyboardMode: KeyboardMode;
     }) => void,
   ) {
     this._onKeyboardModeChange = callback;
-  }
-
-  /**
-   * Set callback to activate annotation mode when hotkey is pressed.
-   */
-  setOnActivateAnnotationMode(callback: (mode: 'move' | 'resize' | 'rect') => void) {
-    this._onActivateAnnotationMode = callback;
   }
 
   /**
@@ -790,7 +776,6 @@ export class DrawTool implements Destroyable {
     render(
       <DrawToolSurface
         shape={this._shape}
-        tool={this._tool}
         waitingForSecondClick={this._waitingForSecondClick}
         firstClickPoint={this._firstClickPoint}
         keyboardMode={this._keyboardMode}
