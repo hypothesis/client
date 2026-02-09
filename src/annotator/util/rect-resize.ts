@@ -78,17 +78,15 @@ export function applyResizeArrowKey(
     case 'top-left': {
       switch (key) {
         case 'ArrowRight': {
+          // Expansion: always apply (subject to maxWidth), even if current width < minWidth.
           const newRight = Math.min(left + maxWidth, right + increment);
-          if (newRight - left >= minWidth) {
-            result.right = newRight;
-          }
+          result.right = newRight;
           break;
         }
         case 'ArrowDown': {
+          // Expansion: always apply (subject to maxHeight), even if current height < minHeight.
           const newBottom = Math.min(top + maxHeight, bottom + increment);
-          if (newBottom - top >= minHeight) {
-            result.bottom = newBottom;
-          }
+          result.bottom = newBottom;
           break;
         }
         case 'ArrowLeft':
@@ -106,17 +104,15 @@ export function applyResizeArrowKey(
           result.left = Math.min(right - minWidth, left + increment);
           break;
         case 'ArrowDown': {
+          // Expansion: always apply (subject to maxHeight), even if current height < minHeight.
           const newBottom = Math.min(top + maxHeight, bottom + increment);
-          if (newBottom - top >= minHeight) {
-            result.bottom = newBottom;
-          }
+          result.bottom = newBottom;
           break;
         }
         case 'ArrowLeft': {
+          // Expansion: always apply (subject to maxWidth), even if current width < minWidth.
           const newLeft = Math.max(right - maxWidth, left - increment);
-          if (right - newLeft >= minWidth) {
-            result.left = newLeft;
-          }
+          result.left = newLeft;
           break;
         }
         case 'ArrowUp':
@@ -134,17 +130,15 @@ export function applyResizeArrowKey(
           result.top = Math.min(bottom - minHeight, top + increment);
           break;
         case 'ArrowLeft': {
+          // Expansion: always apply (subject to maxWidth), even if current width < minWidth.
           const newLeft = Math.max(right - maxWidth, left - increment);
-          if (right - newLeft >= minWidth) {
-            result.left = newLeft;
-          }
+          result.left = newLeft;
           break;
         }
         case 'ArrowUp': {
+          // Expansion: always apply (subject to maxHeight), even if current height < minHeight.
           const newTop = Math.max(bottom - maxHeight, top - increment);
-          if (bottom - newTop >= minHeight) {
-            result.top = newTop;
-          }
+          result.top = newTop;
           break;
         }
       }
@@ -153,10 +147,9 @@ export function applyResizeArrowKey(
     case 'bottom-left': {
       switch (key) {
         case 'ArrowRight': {
+          // Expansion: always apply (subject to maxWidth), even if current width < minWidth.
           const newRight = Math.min(left + maxWidth, right + increment);
-          if (newRight - left >= minWidth) {
-            result.right = newRight;
-          }
+          result.right = newRight;
           break;
         }
         case 'ArrowDown':
@@ -166,10 +159,9 @@ export function applyResizeArrowKey(
           result.right = Math.max(left + minWidth, right - increment);
           break;
         case 'ArrowUp': {
+          // Expansion: always apply (subject to maxHeight), even if current height < minHeight.
           const newTop = Math.max(bottom - maxHeight, top - increment);
-          if (bottom - newTop >= minHeight) {
-            result.top = newTop;
-          }
+          result.top = newTop;
           break;
         }
       }
