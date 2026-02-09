@@ -45,6 +45,7 @@ import {
 } from './range-util';
 import { SelectionObserver } from './selection-observer';
 import { frameFillsAncestor } from './util/frame';
+import { isEditableContext } from './util/node';
 import { normalizeURI } from './util/url';
 
 /** HTML element created by the highlighter with an associated annotation. */
@@ -770,11 +771,9 @@ export class Guest
    */
   private _setupGlobalKeyboardListener() {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Check if user is typing in an input field - don't intercept keyboard shortcuts
-      if (
-        e.target instanceof HTMLElement &&
-        ['INPUT', 'TEXTAREA'].includes(e.target.tagName)
-      ) {
+      // Don't intercept keyboard shortcuts when the user is typing in an editable
+      // context (input, textarea, contenteditable, role="textbox") - WCAG 2.1.4.
+      if (isEditableContext(e.target)) {
         return;
       }
 

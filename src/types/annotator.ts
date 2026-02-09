@@ -473,8 +473,8 @@ export type AnnotationTool = 'selection' | 'rect' | 'point';
 export type PinnedCorner =
   | 'top-left'
   | 'top-right'
-  | 'bottom-left'
-  | 'bottom-right';
+  | 'bottom-right'
+  | 'bottom-left';
 
 /** Order of corners when cycling with Tab in resize mode. */
 export const RESIZE_CORNERS_ORDER: PinnedCorner[] = [

@@ -8,25 +8,24 @@ export type ViewportBounds = {
 };
 
 /**
- * Apply an arrow key to move a point, clamped to [0, maxX] x [0, maxY].
+ * Apply an arrow key to move a point, clamped to viewport bounds.
  * Returns a new point; does not mutate the input.
  */
 export function applyMoveArrowKeyToPoint(
   point: Point,
   key: string,
   increment: number,
-  maxX: number,
-  maxY: number,
+  viewport: ViewportBounds,
 ): Point {
   switch (key) {
     case 'ArrowUp':
-      return { ...point, y: Math.max(0, point.y - increment) };
+      return { ...point, y: Math.max(viewport.minTop, point.y - increment) };
     case 'ArrowDown':
-      return { ...point, y: Math.min(maxY, point.y + increment) };
+      return { ...point, y: Math.min(viewport.maxBottom, point.y + increment) };
     case 'ArrowLeft':
-      return { ...point, x: Math.max(0, point.x - increment) };
+      return { ...point, x: Math.max(viewport.minLeft, point.x - increment) };
     case 'ArrowRight':
-      return { ...point, x: Math.min(maxX, point.x + increment) };
+      return { ...point, x: Math.min(viewport.maxRight, point.x + increment) };
     default:
       return point;
   }
