@@ -769,7 +769,7 @@ describe('Sidebar', () => {
         connectGuest(sidebar);
         const firstGuest = guestRPC();
         connectGuest(sidebar);
-        const secondGuest = guestRPC(2);
+        guestRPC(2);
         // First guest has selection
         emitNthGuestEvent(1, 'textSelected');
         assert.equal(sidebar._guestWithSelection, firstGuest);
@@ -1076,7 +1076,7 @@ describe('Sidebar', () => {
             sidebar.iframeContainer.style.marginLeft = `${MIN_RESIZE}px`;
 
             // Force a reflow to ensure styles are applied
-            sidebar.iframeContainer.offsetHeight;
+            void sidebar.iframeContainer.offsetHeight;
 
             // Call _updateLayoutState without expanded parameter (undefined)
             // This will use the else branch in the outer if (line 631)
@@ -1203,7 +1203,6 @@ describe('Sidebar', () => {
       const sidebar = createSidebar({ openSidebar: true });
       assert.isNotNull(sidebar.iframeContainer);
 
-      const initialDisplay = sidebar.iframeContainer.style.display;
       connectSidebarApp();
       await sidebar.ready;
 
@@ -1229,7 +1228,7 @@ describe('Sidebar', () => {
 
     it('warns when bucketContainerSelector is invalid (statement coverage)', () => {
       const warnStub = sinon.stub(console, 'warn');
-      const sidebar = createSidebar({
+      createSidebar({
         bucketContainerSelector: '#non-existent-container',
       });
 
@@ -1726,7 +1725,7 @@ describe('Sidebar', () => {
           bucketContainerSelector: '#invalid-selector',
         });
         assert.calledWith(
-          console.warn,
+          warnStub,
           `Custom bucket container "#invalid-selector" not found`,
         );
       } finally {
