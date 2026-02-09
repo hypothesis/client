@@ -91,6 +91,34 @@ describe('annotator/anchoring/pdf', () => {
     container.remove();
   });
 
+  describe('FakePDFViewerApplication', () => {
+    it('uses default config when config is not provided', () => {
+      cleanupViewer();
+      viewer = new FakePDFViewerApplication({ container, content: ['page'] });
+      assert.ok(viewer.pdfViewer);
+      viewer.dispose();
+    });
+
+    it('notify with eventDispatch "dom" dispatches CustomEvent on container', () => {
+      const eventName = 'test-pdf-event';
+      const listener = sinon.stub();
+      container.addEventListener(eventName, listener);
+      viewer.pdfViewer.notify(eventName, { eventDispatch: 'dom' });
+      assert.calledOnce(listener);
+      assert.equal(listener.firstCall.args[0].type, eventName);
+      container.removeEventListener(eventName, listener);
+    });
+
+    it('notify with no second argument emits via eventBus', () => {
+      const eventName = 'test-pdf-event';
+      const listener = sinon.stub();
+      viewer.pdfViewer.eventBus.on(eventName, listener);
+      viewer.pdfViewer.notify(eventName);
+      assert.calledOnce(listener);
+      viewer.pdfViewer.eventBus.off(eventName, listener);
+    });
+  });
+
   describe('describe', () => {
     it('returns position and quote selectors', async () => {
       viewer.pdfViewer.setCurrentPage(2);

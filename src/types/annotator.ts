@@ -467,6 +467,32 @@ export type SideBySideMode = SideBySideOptions['mode'];
 export type AnnotationTool = 'selection' | 'rect' | 'point';
 
 /**
+ * Corner pinned during rectangle resize mode (keyboard).
+ * Order used for Tab cycling: top-left → top-right → bottom-right → bottom-left.
+ */
+export type PinnedCorner =
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right';
+
+/** Order of corners when cycling with Tab in resize mode. */
+export const RESIZE_CORNERS_ORDER: PinnedCorner[] = [
+  'top-left',
+  'top-right',
+  'bottom-right',
+  'bottom-left',
+];
+
+/**
+ * Keyboard mode for draw tool (rectangle/point annotation).
+ * - 'rect': rectangle mode, no move/resize
+ * - 'move': move shape with arrow keys
+ * - 'resize': resize rectangle with arrow keys (one corner pinned)
+ */
+export type KeyboardMode = 'move' | 'resize' | 'rect' | null;
+
+/**
  * Set of events dispatched on the shared event bus used by various annotator
  * components.
  */

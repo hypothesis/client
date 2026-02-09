@@ -12,6 +12,7 @@ import type {
   AnnotationTool,
   ContentInfoConfig,
   DocumentInfo,
+  KeyboardMode,
   RenderToBitmapOptions,
   SidebarLayout,
 } from './annotator';
@@ -79,6 +80,17 @@ export type GuestToHostCalls = CommonCalls & {
 
   /** The annotation tools supported by this guest have changed. */
   supportedToolsChanged(tools: AnnotationTool[]): void;
+
+  /**
+   * The keyboard mode state changed in the guest frame.
+   *
+   * This is emitted when the keyboard mode (rect/move/resize) changes while drawing
+   * annotations.
+   */
+  keyboardModeChanged(state: {
+    keyboardActive: boolean;
+    keyboardMode: KeyboardMode;
+  }): void;
 };
 
 /**
@@ -145,6 +157,31 @@ export type HostToGuestCalls = CommonCalls & {
 
   /** Scroll a highlight into view. */
   scrollToAnnotation(tag: string): void;
+
+  /**
+   * Set the keyboard mode in the guest frame.
+   *
+   * This is used when the user clicks the mode button in the toolbar to cycle through modes.
+   */
+  setKeyboardMode(opts: { mode: Exclude<KeyboardMode, null> }): void;
+
+  /**
+   * Activate move mode (equivalent to Ctrl+Shift+Y).
+   *
+   * This is used for accessibility when the user presses Enter on the rectangle
+   * annotation button. If not in keyboard mode, activates rectangle annotation
+   * with move mode. If already in keyboard mode, switches to move mode.
+   */
+  activateMoveMode(): void;
+
+  /**
+   * Activate point annotation with move mode (for accessibility).
+   *
+   * This is used for accessibility when the user presses Enter on the point
+   * annotation button. If not in keyboard mode, activates point annotation
+   * with move mode. If already in keyboard mode, switches to move mode.
+   */
+  activatePointMoveMode(): void;
 };
 
 /** Calls that the host makes to the sidebar. */

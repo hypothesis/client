@@ -25,6 +25,7 @@ import type {
   GuestToSidebarCalls,
   SidebarToGuestCalls,
 } from '../types/port-rpc-calls';
+import { isMacOS } from '../shared/user-agent';
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
@@ -271,6 +272,9 @@ export class Guest
   private _outsideAssignmentNotice: OutsideAssignmentNoticeController | null;
   private _commentsMode: boolean;
 
+  /** Pending keyboard mode to activate when annotation mode starts */
+  private _pendingKeyboardMode?: 'move' | 'resize';
+
   /**
    * @param element -
    *   The root element in which the `Guest` instance should be able to anchor
@@ -312,6 +316,13 @@ export class Guest
         this.selectAnnotations(tags, { focusInSidebar: true }),
     });
     this._drawTool = new DrawTool(this.element);
+    // Set up callback to notify when keyboard mode changes
+    this._drawTool.setOnKeyboardModeChange(state => {
+      this._hostRPC.call('keyboardModeChanged', state);
+    });
+
+    // Set up global keyboard listener for hotkeys (works even when not in annotation mode)
+    this._setupGlobalKeyboardListener();
 
     this._selectionObserver = new SelectionObserver(range => {
       if (range) {
@@ -544,6 +555,18 @@ export class Guest
       this.selectAnnotations(tags, { toggle }),
     );
 
+    this._hostRPC.on('setKeyboardMode', ({ mode }) => {
+      this._drawTool.setKeyboardMode(mode);
+    });
+
+    this._hostRPC.on('activateMoveMode', () => {
+      this._activateToolWithMoveMode('rect');
+    });
+
+    this._hostRPC.on('activatePointMoveMode', () => {
+      this._activateToolWithMoveMode('point');
+    });
+
     this._hostRPC.on('sidebarLayoutChanged', (sidebarLayout: SidebarLayout) => {
       if (frameFillsAncestor(window, hostFrame)) {
         this.fitSideBySide(sidebarLayout);
@@ -730,8 +753,111 @@ export class Guest
 
     this._integration.destroy();
 
+    this._globalKeyboardListenerCleanup?.();
+
     super.destroy();
   }
+
+  /**
+   * Set up global keyboard listener for hotkeys that work even when not in annotation mode.
+   */
+  private _setupGlobalKeyboardListener() {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if user is typing in an input field - don't intercept keyboard shortcuts
+      if (
+        e.target instanceof HTMLElement &&
+        ['INPUT', 'TEXTAREA'].includes(e.target.tagName)
+      ) {
+        return;
+      }
+
+      const isModifierPressed = isMacOS() ? e.metaKey : e.ctrlKey;
+      const isShiftPressed = e.shiftKey;
+
+      // Check if rectangle annotation is supported before activating keyboard mode
+      const supportedTools = this._integration.supportedTools();
+      const isRectSupported = supportedTools.includes('rect');
+      const isPointSupported = supportedTools.includes('point');
+
+      // Ctrl+Shift+Y: Activate annotation mode in move mode
+      if (isModifierPressed && isShiftPressed && e.key.toLowerCase() === 'y') {
+        // Only activate if rectangle annotation is supported
+        if (!isRectSupported) {
+          return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        // Check if we're already in annotation mode
+        const state = this._drawTool.getKeyboardModeState();
+        if (!state.keyboardActive) {
+          // Not in annotation mode - activate it
+          this._pendingKeyboardMode = 'move';
+          this.createAnnotation('rect').catch(() => {
+            // Ignore errors (user might have canceled)
+            this._pendingKeyboardMode = undefined;
+          });
+        } else {
+          // Already in annotation mode - switch to move mode
+          this._drawTool.setKeyboardMode('move');
+        }
+        return;
+      }
+
+      // Ctrl+Shift+J: Activate annotation mode in resize mode
+      if (isModifierPressed && isShiftPressed && e.key.toLowerCase() === 'j') {
+        // Only activate if rectangle annotation is supported
+        if (isRectSupported) {
+          e.preventDefault();
+          e.stopPropagation();
+          // Check if we're already in annotation mode
+          const state = this._drawTool.getKeyboardModeState();
+          if (!state.keyboardActive) {
+            // Not in annotation mode - activate it
+            this._pendingKeyboardMode = 'resize';
+            this.createAnnotation('rect').catch(() => {
+              // Ignore errors (user might have canceled)
+              this._pendingKeyboardMode = undefined;
+            });
+          } else {
+            // Already in annotation mode - switch to resize mode
+            this._drawTool.setKeyboardMode('resize');
+          }
+          return;
+        }
+        // If rect is not supported, let the event propagate to highlights toggle handler
+      }
+
+      // Ctrl+Shift+U: Activate pin annotation mode
+      if (isModifierPressed && isShiftPressed && e.key.toLowerCase() === 'u') {
+        // Only activate if point annotation is supported
+        if (!isPointSupported) {
+          return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        // Check if we're already in annotation mode
+        const state = this._drawTool.getKeyboardModeState();
+        if (!state.keyboardActive) {
+          // Not in annotation mode - activate pin annotation
+          this._pendingKeyboardMode = 'move';
+          this.createAnnotation('point').catch(() => {
+            // Ignore errors (user might have canceled)
+            this._pendingKeyboardMode = undefined;
+          });
+        }
+        return;
+      }
+    };
+
+    document.body.addEventListener('keydown', handleKeyDown);
+
+    // Store cleanup function
+    this._globalKeyboardListenerCleanup = () => {
+      document.body.removeEventListener('keydown', handleKeyDown);
+    };
+  }
+
+  private _globalKeyboardListenerCleanup?: () => void;
 
   /**
    * Anchor an annotation's selectors in the document.
@@ -897,7 +1023,10 @@ export class Guest
         this._hostRPC.call('activeToolChanged', tool);
 
         // Draw the shape for the new annotation's region.
-        const shape = await this._drawTool.draw(tool);
+        // Pass pending keyboard mode if set (from hotkey activation)
+        const initialMode = this._pendingKeyboardMode;
+        this._pendingKeyboardMode = undefined;
+        const shape = await this._drawTool.draw(tool, initialMode);
 
         // Create annotation data and send to sidebar.
         const info = await this.getDocumentInfo();
@@ -935,6 +1064,23 @@ export class Guest
       }
     } else {
       throw new Error('Unsupported annotation tool');
+    }
+  }
+
+  /**
+   * Activate annotation tool with move mode (for accessibility / Enter on toolbar).
+   * If not in keyboard mode, starts drawing with move mode. If already in keyboard
+   * mode, switches to move mode.
+   */
+  private _activateToolWithMoveMode(tool: 'rect' | 'point') {
+    const state = this._drawTool.getKeyboardModeState();
+    if (!state.keyboardActive) {
+      this._pendingKeyboardMode = 'move';
+      this.createAnnotation(tool).catch(() => {
+        this._pendingKeyboardMode = undefined;
+      });
+    } else {
+      this._drawTool.setKeyboardMode('move');
     }
   }
 
