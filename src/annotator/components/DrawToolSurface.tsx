@@ -1,4 +1,9 @@
-import type { KeyboardMode, PinnedCorner, Rect, Shape } from '../../types/annotator';
+import type {
+  KeyboardMode,
+  PinnedCorner,
+  Rect,
+  Shape,
+} from '../../types/annotator';
 import { getActiveEdges } from '../util/rect-resize';
 
 function normalizeRect(r: Rect): Rect {
@@ -48,8 +53,22 @@ export function DrawToolSurface({
             cy={y}
             r={8}
           />
-          <line stroke="grey" stroke-width="1px" x1={x - 12} y1={y} x2={x + 12} y2={y} />
-          <line stroke="grey" stroke-width="1px" x1={x} y1={y - 12} x2={x} y2={y + 12} />
+          <line
+            stroke="grey"
+            stroke-width="1px"
+            x1={x - 12}
+            y1={y}
+            x2={x + 12}
+            y2={y}
+          />
+          <line
+            stroke="grey"
+            stroke-width="1px"
+            x1={x}
+            y1={y - 12}
+            x2={x}
+            y2={y + 12}
+          />
         </>
       );
     }

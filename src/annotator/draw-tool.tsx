@@ -18,6 +18,7 @@ import {
   computeInitialShapePosition,
   getViewportBounds,
 } from './util/draw-tool-position';
+import { isEditableContext } from './util/node';
 import {
   applyMoveArrowKeyToPoint,
   applyMoveArrowKeyToRect,
@@ -26,7 +27,6 @@ import {
   applyResizeArrowKey,
   canModifyFromPinnedCorner,
 } from './util/rect-resize';
-import { isEditableContext } from './util/node';
 
 /** Normalize a rect so that `left <= right` and `top <= bottom`. */
 function normalizeRect(r: Rect): Rect {
@@ -155,11 +155,17 @@ export class DrawTool implements Destroyable {
 
     // Create containers for the announcer and indicator components
     this._announcerContainer = document.createElement('div');
-    this._announcerContainer.setAttribute('data-testid', 'draw-tool-announcer-container');
+    this._announcerContainer.setAttribute(
+      'data-testid',
+      'draw-tool-announcer-container',
+    );
     root.appendChild(this._announcerContainer);
 
     this._indicatorContainer = document.createElement('div');
-    this._indicatorContainer.setAttribute('data-testid', 'draw-tool-indicator-container');
+    this._indicatorContainer.setAttribute(
+      'data-testid',
+      'draw-tool-indicator-container',
+    );
     root.appendChild(this._indicatorContainer);
   }
 
@@ -182,7 +188,10 @@ export class DrawTool implements Destroyable {
     keyboardMode: KeyboardMode;
   } {
     // If keyboard is active but mode is null, default to 'rect'
-    const mode = this._keyboardActive && this._keyboardMode === null ? 'rect' : this._keyboardMode;
+    const mode =
+      this._keyboardActive && this._keyboardMode === null
+        ? 'rect'
+        : this._keyboardMode;
     return {
       keyboardActive: this._keyboardActive,
       keyboardMode: mode,
@@ -416,7 +425,11 @@ export class DrawTool implements Destroyable {
         }
 
         // Tab: Cycle through pinned corners in resize mode
-        if (e.key === 'Tab' && this._keyboardMode === 'resize' && this._tool === 'rect') {
+        if (
+          e.key === 'Tab' &&
+          this._keyboardMode === 'resize' &&
+          this._tool === 'rect'
+        ) {
           e.preventDefault();
           e.stopPropagation();
           const currentIndex = RESIZE_CORNERS_ORDER.indexOf(this._pinnedCorner);
@@ -444,7 +457,9 @@ export class DrawTool implements Destroyable {
         }
 
         // Arrow keys: Move or resize
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        if (
+          ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)
+        ) {
           e.preventDefault();
           e.stopPropagation();
           const increment = e.shiftKey
@@ -531,7 +546,9 @@ export class DrawTool implements Destroyable {
     };
 
     // Add scroll listener to container
-    this._container.addEventListener('scroll', this._scrollListener, { passive: true });
+    this._container.addEventListener('scroll', this._scrollListener, {
+      passive: true,
+    });
   }
 
   /**
@@ -630,12 +647,7 @@ export class DrawTool implements Destroyable {
           increment,
         };
         this._shape = clampRectToViewport(
-          applyResizeArrowKey(
-            normalized,
-            key,
-            this._pinnedCorner,
-            constraints,
-          ),
+          applyResizeArrowKey(normalized, key, this._pinnedCorner, constraints),
           viewport,
         );
         this._renderSurface();
@@ -715,7 +727,10 @@ export class DrawTool implements Destroyable {
     }
 
     // Convert null mode to 'rect' for display (when keyboard is active but no specific mode)
-    const displayMode: 'move' | 'resize' | 'rect' | null = this._keyboardActive && this._keyboardMode === null ? 'rect' : this._keyboardMode;
+    const displayMode: 'move' | 'resize' | 'rect' | null =
+      this._keyboardActive && this._keyboardMode === null
+        ? 'rect'
+        : this._keyboardMode;
 
     render(
       <DrawToolAnnouncer
