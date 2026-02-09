@@ -200,6 +200,125 @@ describe('Toolbar', () => {
     });
   });
 
+  describe('rectangle annotation button title', () => {
+    it('shows "Rectangle annotation" when keyboard mode is not active', () => {
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: 'rect',
+        keyboardActive: false,
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      assert.equal(button.prop('title'), 'Rectangle annotation');
+    });
+
+    it('shows move mode title when keyboard active and mode is move', () => {
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: 'rect',
+        keyboardActive: true,
+        keyboardMode: 'move',
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      assert.equal(
+        button.prop('title'),
+        'Move mode (Ctrl+Shift+Y) - Click to switch to Resize mode',
+      );
+    });
+
+    it('shows resize mode title when keyboard active and mode is resize', () => {
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: 'rect',
+        keyboardActive: true,
+        keyboardMode: 'resize',
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      assert.equal(
+        button.prop('title'),
+        'Resize mode (Ctrl+Shift+J) - Click to switch to Rectangle mode',
+      );
+    });
+
+    it('shows rectangle mode title when keyboard active and mode is rect', () => {
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: 'rect',
+        keyboardActive: true,
+        keyboardMode: 'rect',
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      assert.equal(
+        button.prop('title'),
+        'Rectangle mode - Click to switch to Move mode',
+      );
+    });
+  });
+
+  describe('Enter key on annotation buttons (accessibility)', () => {
+    it('calls onActivateMoveMode when Enter pressed on rect button and not in keyboard mode', () => {
+      const onActivateMoveMode = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        keyboardActive: false,
+        onActivateMoveMode,
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      button.simulate('keydown', { key: 'Enter' });
+      assert.calledOnce(onActivateMoveMode);
+    });
+
+    it('does not call onActivateMoveMode when Enter pressed on rect button and already in keyboard mode', () => {
+      const onActivateMoveMode = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: 'rect',
+        keyboardActive: true,
+        onActivateMoveMode,
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      button.simulate('keydown', { key: 'Enter' });
+      assert.notCalled(onActivateMoveMode);
+    });
+
+    it('calls onActivatePointMoveMode when Enter pressed on point button and not in keyboard mode', () => {
+      const onActivatePointMoveMode = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect', 'point'],
+        keyboardActive: false,
+        onActivatePointMoveMode,
+      });
+      const button = wrapper.find('button[data-testid="point-annotation"]');
+      button.simulate('keydown', { key: 'Enter' });
+      assert.calledOnce(onActivatePointMoveMode);
+    });
+
+    it('does not call onActivatePointMoveMode when Enter pressed on point button and already in keyboard mode', () => {
+      const onActivatePointMoveMode = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect', 'point'],
+        activeTool: 'point',
+        keyboardActive: true,
+        onActivatePointMoveMode,
+      });
+      const button = wrapper.find('button[data-testid="point-annotation"]');
+      button.simulate('keydown', { key: 'Enter' });
+      assert.notCalled(onActivatePointMoveMode);
+    });
+
+    it('does not call onActivateMoveMode when a key other than Enter is pressed on rect button', () => {
+      const onActivateMoveMode = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        keyboardActive: false,
+        onActivateMoveMode,
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      button.simulate('keydown', { key: ' ' });
+      button.simulate('keydown', { key: 'Tab' });
+      assert.notCalled(onActivateMoveMode);
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

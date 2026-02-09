@@ -38,6 +38,11 @@ describe('ToolbarController', () => {
     assert.equal(controller.newAnnotationType, 'note');
   });
 
+  it('passes sidebarContainerId to Toolbar when provided', () => {
+    createToolbar({ sidebarContainerId: 'sidebar-iframe-container' });
+    assert.equal(toolbarProps.sidebarContainerId, 'sidebar-iframe-container');
+  });
+
   it('re-renders when `useMinimalControls` changes', () => {
     const controller = createToolbar();
     assert.include(toolbarProps, {
@@ -155,6 +160,17 @@ describe('ToolbarController', () => {
     assert.called(setSidebarOpen);
   });
 
+  it('does not open sidebar when createAnnotation is called with a non-selection tool', () => {
+    const createAnnotation = sinon.stub();
+    const setSidebarOpen = sinon.stub();
+    createToolbar({ createAnnotation, setSidebarOpen });
+
+    toolbarProps.createAnnotation('rect');
+
+    assert.calledWith(createAnnotation, 'rect');
+    assert.notCalled(setSidebarOpen);
+  });
+
   describe('#getWidth', () => {
     it(`returns the toolbar's width`, () => {
       // For the measured width to return the correct value, the toolbar must be rendered
@@ -170,6 +186,46 @@ describe('ToolbarController', () => {
       const controller = createToolbar();
       toolbarProps.toggleSidebarRef.current = 'a-button';
       assert.equal(controller.sidebarToggleButton, 'a-button');
+    });
+  });
+
+  describe('#keyboardModeState', () => {
+    it('returns current keyboard mode state', () => {
+      const controller = createToolbar();
+      assert.deepEqual(controller.keyboardModeState, {
+        keyboardActive: false,
+        keyboardMode: null,
+      });
+    });
+
+    it('re-renders when keyboard mode state is set', () => {
+      const controller = createToolbar();
+      controller.keyboardModeState = {
+        keyboardActive: true,
+        keyboardMode: 'resize',
+      };
+
+      assert.equal(toolbarProps.keyboardActive, true);
+      assert.equal(toolbarProps.keyboardMode, 'resize');
+    });
+  });
+
+  describe('#modeButtonCallbacks', () => {
+    it('re-renders when mode button callbacks are set', () => {
+      const controller = createToolbar();
+      const onModeClick = sinon.stub();
+      const onActivateMoveMode = sinon.stub();
+      const onActivatePointMoveMode = sinon.stub();
+
+      controller.modeButtonCallbacks = {
+        onModeClick,
+        onActivateMoveMode,
+        onActivatePointMoveMode,
+      };
+
+      assert.equal(toolbarProps.onModeClick, onModeClick);
+      assert.equal(toolbarProps.onActivateMoveMode, onActivateMoveMode);
+      assert.equal(toolbarProps.onActivatePointMoveMode, onActivatePointMoveMode);
     });
   });
 });

@@ -70,6 +70,16 @@ describe('Adder', () => {
     assert.exists(shadowRoot.querySelector('[data-component="AdderToolbar"]'));
   });
 
+  it('positions adder correctly when container has a positioned ancestor', () => {
+    container.style.position = 'relative';
+    act(() => {
+      adder.show(rect(100, 200, 100, 20), false);
+    });
+    const pos = adderRect();
+    assert.isAbove(pos.top, 0);
+    assert.isAbove(pos.left, 0);
+  });
+
   describe('button and shortcut handling', () => {
     const getButton = label =>
       getContent(adder).querySelector(`button[title^="${label}"]`);
