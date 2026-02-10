@@ -13,7 +13,6 @@ describe('UserMenu', () => {
   let fakeSettings;
   let fakeStore;
   let fakeIsFeatureEnabled;
-  let fakeShortcuts;
 
   const createUserMenu = () => {
     return mount(
@@ -44,7 +43,6 @@ describe('UserMenu', () => {
     fakeServiceConfig = sinon.stub();
     fakeSettings = {};
     fakeIsFeatureEnabled = sinon.stub().returns(false);
-    fakeShortcuts = { openKeyboardShortcuts: 'k' };
     fakeStore = {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
       focusedGroupId: sinon.stub().returns('mygroup'),
@@ -60,9 +58,6 @@ describe('UserMenu', () => {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
       '../config/service-config': { serviceConfig: fakeServiceConfig },
-      '../../shared/shortcut-config': {
-        useShortcutsConfig: () => fakeShortcuts,
-      },
       '../store': { useSidebarStore: () => fakeStore },
     });
   });
@@ -327,20 +322,6 @@ describe('UserMenu', () => {
       wrapper.update();
 
       assert.isFalse(wrapper.find('KeyboardShortcutsModal').prop('open'));
-    });
-
-    it('opens the shortcuts modal and closes the menu when shortcut is pressed', () => {
-      const wrapper = createUserMenu();
-
-      act(() => {
-        document.documentElement.dispatchEvent(
-          new KeyboardEvent('keydown', { key: 'k' }),
-        );
-      });
-      wrapper.update();
-
-      assert.isFalse(wrapper.find('Menu').props().open);
-      assert.isTrue(wrapper.find('KeyboardShortcutsModal').prop('open'));
     });
   });
 

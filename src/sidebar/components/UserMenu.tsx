@@ -1,8 +1,6 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared';
-import { useCallback, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 
-import { useShortcut } from '../../shared/shortcut';
-import { useShortcutsConfig } from '../../shared/shortcut-config';
 import type { Service, SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import {
@@ -91,16 +89,6 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
       <ProfileIcon />
     </span>
   );
-
-  const shortcuts = useShortcutsConfig();
-
-  const openKeyboardShortcuts = useCallback((event?: KeyboardEvent) => {
-    event?.preventDefault();
-    setShortcutsOpen(true);
-    setOpen(false);
-  }, []);
-
-  useShortcut(shortcuts.openKeyboardShortcuts, openKeyboardShortcuts);
 
   return (
     <>

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'preact/hooks';
 
 export type ShortcutId =
   | 'applyUpdates'
-  | 'openKeyboardShortcuts'
   | 'openSearch'
   | 'annotateSelection'
   | 'highlightSelection'
@@ -26,7 +25,6 @@ export type ShortcutDefinition = {
 // Default shortcuts
 const defaultShortcuts: ShortcutMap = {
   applyUpdates: 'l',
-  openKeyboardShortcuts: 'k',
   openSearch: '/',
   annotateSelection: 'a',
   highlightSelection: 'h',
@@ -166,12 +164,6 @@ export const shortcutDefinitions: ShortcutDefinition[] = [
     id: 'applyUpdates',
     label: 'Load new updates',
     description: 'Loads new/updated annotations in the Sidebar.',
-    group: 'Sidebar',
-  },
-  {
-    id: 'openKeyboardShortcuts',
-    label: 'Open keyboard shortcuts',
-    description: 'Open the keyboard shortcuts settings.',
     group: 'Sidebar',
   },
   {
