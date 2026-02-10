@@ -767,6 +767,13 @@ export class Guest
   }
 
   /**
+   * Check if keyboard annotation mode shortcuts are enabled via feature flag.
+   */
+  private _isKeyboardAnnotationModeEnabled(): boolean {
+    return this.features.flagEnabled('vpat_keyboard');
+  }
+
+  /**
    * Set up global keyboard listener for hotkeys that work even when not in annotation mode.
    */
   private _setupGlobalKeyboardListener() {
@@ -786,7 +793,12 @@ export class Guest
       const isPointSupported = supportedTools.includes('point');
 
       // Ctrl+Shift+Y: Activate annotation mode in move mode
-      if (isModifierPressed && isShiftPressed && e.key.toLowerCase() === 'y') {
+      if (
+        isModifierPressed &&
+        isShiftPressed &&
+        e.key.toLowerCase() === 'y' &&
+        this._isKeyboardAnnotationModeEnabled()
+      ) {
         // Only activate if rectangle annotation is supported
         if (!isRectSupported) {
           return;
@@ -810,7 +822,12 @@ export class Guest
       }
 
       // Ctrl+Shift+J: Activate annotation mode in resize mode
-      if (isModifierPressed && isShiftPressed && e.key.toLowerCase() === 'j') {
+      if (
+        isModifierPressed &&
+        isShiftPressed &&
+        e.key.toLowerCase() === 'j' &&
+        this._isKeyboardAnnotationModeEnabled()
+      ) {
         // Only activate if rectangle annotation is supported
         if (isRectSupported) {
           e.preventDefault();
@@ -834,7 +851,12 @@ export class Guest
       }
 
       // Ctrl+Shift+U: Activate pin annotation mode
-      if (isModifierPressed && isShiftPressed && e.key.toLowerCase() === 'u') {
+      if (
+        isModifierPressed &&
+        isShiftPressed &&
+        e.key.toLowerCase() === 'u' &&
+        this._isKeyboardAnnotationModeEnabled()
+      ) {
         // Only activate if point annotation is supported
         if (!isPointSupported) {
           return;
