@@ -2616,6 +2616,81 @@ describe('Guest', () => {
       assert.isUndefined(guest._pendingKeyboardMode);
     });
 
+    it('clears _pendingKeyboardMode when Ctrl+Shift+Y createAnnotation rejects with unexpected error', async () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      // Reject with a non-DrawError to make createAnnotation throw
+      fakeDrawTool.draw.rejects(new Error('Unexpected error'));
+
+      const guest = createGuest();
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+      // Wait for the promise rejection and catch handler to execute (line 803)
+      await delay(10);
+
+      assert.calledWith(fakeDrawTool.draw, 'rect', 'move');
+      // Verify that _pendingKeyboardMode was cleared after error (line 803)
+      assert.isUndefined(guest._pendingKeyboardMode);
+    });
+
+    it('clears _pendingKeyboardMode when Ctrl+Shift+J createAnnotation rejects with unexpected error', async () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      // Reject with a non-DrawError to make createAnnotation throw
+      fakeDrawTool.draw.rejects(new Error('Unexpected error'));
+
+      const guest = createGuest();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'j',
+          bubbles: true,
+        }),
+      );
+
+      // Wait for the promise rejection and catch handler to execute (line 825)
+      await delay(10);
+
+      // Verify that draw was called with resize mode
+      assert.calledWith(fakeDrawTool.draw, 'rect', 'resize');
+      // Verify that _pendingKeyboardMode was cleared after error (line 825)
+      assert.isUndefined(guest._pendingKeyboardMode);
+    });
+
+    it('clears _pendingKeyboardMode when Ctrl+Shift+U createAnnotation rejects with unexpected error', async () => {
+      fakeIntegration.supportedTools.returns(['point']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      // Reject with a non-DrawError to make createAnnotation throw
+      fakeDrawTool.draw.rejects(new Error('Unexpected error'));
+
+      const guest = createGuest();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'u',
+          bubbles: true,
+        }),
+      );
+
+      // Wait for the promise rejection and catch handler to execute (line 850)
+      await delay(10);
+
+      // Verify that draw was called with move mode
+      assert.calledWith(fakeDrawTool.draw, 'point', 'move');
+      // Verify that _pendingKeyboardMode was cleared after error (line 850)
+      assert.isUndefined(guest._pendingKeyboardMode);
+    });
+
     it('activates point annotation with Ctrl+Shift+U when point is supported', async () => {
       fakeIntegration.supportedTools.returns(['point']);
       fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
