@@ -754,7 +754,7 @@ describe('DrawTool', () => {
       await delay(0);
       // Get initial shape state
       const initialShape = { ...tool._shape };
-      
+
       // Cycle to top-right: ArrowUp contracts height (bottom edge is active)
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
@@ -768,8 +768,12 @@ describe('DrawTool', () => {
 
       // Shape should change because ArrowUp contracts height from top-right corner
       // (canModifyFromPinnedCorner returns true since bottom edge is active)
-      assert.notDeepEqual(tool._shape, initialShape, 'Shape should change when ArrowUp is pressed from top-right corner');
-      
+      assert.notDeepEqual(
+        tool._shape,
+        initialShape,
+        'Shape should change when ArrowUp is pressed from top-right corner',
+      );
+
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
       );
@@ -780,26 +784,30 @@ describe('DrawTool', () => {
     it('calculates constraints and applies resize when canModifyFromPinnedCorner returns true', async () => {
       const shapePromise = tool.draw('rect', 'resize');
       await delay(0);
-      
+
       const shapeBefore = { ...tool._shape };
       const renderSurfaceSpy = sinon.spy(tool, '_renderSurface');
       const updateAnnouncerSpy = sinon.spy(tool, '_updateAnnouncer');
-      
+
       // ArrowRight should work with top-left corner (canModifyFromPinnedCorner returns true)
       // This should execute lines 640-652: calculate constraints and apply resize
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
       );
       await delay(0);
-      
+
       // Verify that resize was applied (shape changed) and render/announcer were called
-      assert.notDeepEqual(tool._shape, shapeBefore, 'Shape should change when resize is applied');
+      assert.notDeepEqual(
+        tool._shape,
+        shapeBefore,
+        'Shape should change when resize is applied',
+      );
       assert.called(renderSurfaceSpy);
       assert.called(updateAnnouncerSpy);
-      
+
       tool._renderSurface.restore();
       tool._updateAnnouncer.restore();
-      
+
       // Complete the drawing
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
