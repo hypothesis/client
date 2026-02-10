@@ -2295,6 +2295,141 @@ describe('Guest', () => {
   });
 
   describe('keyboard shortcuts', () => {
+    it('does not activate keyboard annotation modes when vpat_keyboard flag is disabled', () => {
+      fakeIntegration.supportedTools.returns(['rect', 'point']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+
+      createGuest();
+      // Ensure flag is disabled (default state)
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: false });
+
+      // Try Ctrl+Shift+Y
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+      assert.notCalled(fakeDrawTool.draw);
+
+      // Try Ctrl+Shift+J
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'j',
+          bubbles: true,
+        }),
+      );
+      assert.notCalled(fakeDrawTool.draw);
+
+      // Try Ctrl+Shift+U
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'u',
+          bubbles: true,
+        }),
+      );
+      assert.notCalled(fakeDrawTool.draw);
+    });
+
+    it('activates keyboard annotation modes when vpat_keyboard flag is enabled', async () => {
+      fakeIntegration.supportedTools.returns(['rect', 'point']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.resolves({
+        type: 'rect',
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+      });
+      fakeIntegration.describe.resolves([
+        { type: 'FragmentSelector', value: '' },
+      ]);
+
+      createGuest();
+      // Enable the flag
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
+
+      // Ctrl+Shift+Y should work
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+      await delay(0);
+      assert.calledWith(fakeDrawTool.draw, 'rect', 'move');
+    });
+
+    it('dynamically responds to vpat_keyboard flag changes', async () => {
+      fakeIntegration.supportedTools.returns(['rect']);
+      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+      fakeDrawTool.draw.resolves({
+        type: 'rect',
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+      });
+      fakeIntegration.describe.resolves([
+        { type: 'FragmentSelector', value: '' },
+      ]);
+
+      createGuest();
+
+      // Initially flag is disabled - shortcuts should not work
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: false });
+      fakeDrawTool.draw.resetHistory();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+      await delay(0);
+      assert.notCalled(fakeDrawTool.draw);
+
+      // Enable the flag - shortcuts should now work
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
+      fakeDrawTool.draw.resetHistory();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+      await delay(0);
+      assert.calledWith(fakeDrawTool.draw, 'rect', 'move');
+
+      // Disable the flag again - shortcuts should stop working
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: false });
+      fakeDrawTool.draw.resetHistory();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'y',
+          bubbles: true,
+        }),
+      );
+      await delay(0);
+      assert.notCalled(fakeDrawTool.draw);
+    });
+
     it('toggles highlights when shortcut is pressed', () => {
       const guest = createGuest();
       guest.setHighlightsVisible(true, false /* notifyHost */);
@@ -2342,6 +2477,7 @@ describe('Guest', () => {
       fakeIntegration.supportedTools.returns(['point']);
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           ctrlKey: true,
@@ -2369,6 +2505,7 @@ describe('Guest', () => {
       ]);
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           ctrlKey: true,
@@ -2387,6 +2524,7 @@ describe('Guest', () => {
       fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: true });
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           ctrlKey: true,
@@ -2405,6 +2543,7 @@ describe('Guest', () => {
       fakeDrawTool.draw.rejects(new DrawError('canceled'));
 
       const guest = createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           ctrlKey: true,
@@ -2436,6 +2575,7 @@ describe('Guest', () => {
       fakeIntegration.supportedTools.returns(['rect']);
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           ctrlKey: true,
@@ -2463,6 +2603,7 @@ describe('Guest', () => {
       ]);
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       hostRPC().call.resetHistory();
 
       document.body.dispatchEvent(
@@ -2492,6 +2633,7 @@ describe('Guest', () => {
       });
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           metaKey: true,
@@ -2512,6 +2654,7 @@ describe('Guest', () => {
       fakeDrawTool.setKeyboardMode = sinon.stub();
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2531,6 +2674,7 @@ describe('Guest', () => {
       fakeIntegration.supportedTools.returns(['point']);
       fakeDrawTool.draw.resetHistory();
       const guest = createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       guest.setHighlightsVisible(false, false /* notifyHost */);
       hostRPC().call.resetHistory();
 
@@ -2553,6 +2697,7 @@ describe('Guest', () => {
       fakeIntegration.supportedTools.returns(['rect']);
       fakeDrawTool.draw.resetHistory();
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       const input = document.createElement('input');
       document.body.appendChild(input);
@@ -2577,6 +2722,7 @@ describe('Guest', () => {
       fakeIntegration.supportedTools.returns(['point']);
       fakeDrawTool.draw.resetHistory();
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       const textarea = document.createElement('textarea');
       document.body.appendChild(textarea);
@@ -2603,6 +2749,7 @@ describe('Guest', () => {
       fakeDrawTool.draw.rejects(new DrawError('canceled'));
 
       const guest = createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2628,6 +2775,7 @@ describe('Guest', () => {
       fakeDrawTool.draw.rejects(new DrawError('canceled'));
 
       const guest = createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2653,6 +2801,7 @@ describe('Guest', () => {
       fakeDrawTool.draw.rejects(new Error('Unexpected error'));
 
       const guest = createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           ctrlKey: true,
@@ -2676,6 +2825,7 @@ describe('Guest', () => {
       fakeDrawTool.draw.rejects(new Error('Unexpected error'));
 
       const guest = createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2702,6 +2852,7 @@ describe('Guest', () => {
       fakeDrawTool.draw.rejects(new Error('Unexpected error'));
 
       const guest = createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2737,6 +2888,7 @@ describe('Guest', () => {
       ]);
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
       hostRPC().call.resetHistory();
 
       document.body.dispatchEvent(
@@ -2760,6 +2912,7 @@ describe('Guest', () => {
       fakeDrawTool.draw.resetHistory();
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2779,6 +2932,7 @@ describe('Guest', () => {
       fakeDrawTool.draw.resetHistory();
 
       createGuest();
+      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
