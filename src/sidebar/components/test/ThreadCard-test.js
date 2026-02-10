@@ -169,6 +169,97 @@ describe('ThreadCard', () => {
     });
   });
 
+  describe('keyboard focus events', () => {
+    it('calls hoverAnnotation when focus enters the card (focusin)', () => {
+      const wrapper = createComponent();
+      const cardElement = wrapper.find(threadCardSelector).getDOMNode();
+
+      // Simulate focusin event
+      const focusInEvent = new FocusEvent('focusin', { bubbles: true });
+      cardElement.dispatchEvent(focusInEvent);
+
+      assert.calledWith(fakeFrameSync.hoverAnnotation, fakeThread.annotation);
+    });
+
+    it('calls hoverAnnotation with null when annotation is null on focusin', () => {
+      fakeThread.annotation = null;
+      const wrapper = createComponent();
+      const cardElement = wrapper.find(threadCardSelector).getDOMNode();
+
+      const focusInEvent = new FocusEvent('focusin', { bubbles: true });
+      cardElement.dispatchEvent(focusInEvent);
+
+      assert.calledWith(fakeFrameSync.hoverAnnotation, null);
+    });
+
+    it('clears hover when focus leaves the card entirely (focusout with null relatedTarget)', () => {
+      const wrapper = createComponent();
+      const cardElement = wrapper.find(threadCardSelector).getDOMNode();
+
+      // Simulate focusout event with null relatedTarget (focus leaving document)
+      const focusOutEvent = new FocusEvent('focusout', {
+        bubbles: true,
+        relatedTarget: null,
+      });
+      cardElement.dispatchEvent(focusOutEvent);
+
+      assert.calledWith(fakeFrameSync.hoverAnnotation, null);
+    });
+
+    it('clears hover when focusout relatedTarget is not a Node', () => {
+      const wrapper = createComponent();
+      const cardElement = wrapper.find(threadCardSelector).getDOMNode();
+
+      // Create a focusout event with null relatedTarget (simulating focus leaving document)
+      // When relatedTarget is null, it should clear hover
+      const focusOutEvent = new FocusEvent('focusout', {
+        bubbles: true,
+        relatedTarget: null,
+      });
+
+      cardElement.dispatchEvent(focusOutEvent);
+
+      assert.calledWith(fakeFrameSync.hoverAnnotation, null);
+    });
+
+    it('clears hover when focusout relatedTarget is outside the card', () => {
+      const wrapper = createComponent();
+      const cardElement = wrapper.find(threadCardSelector).getDOMNode();
+
+      // Create an element outside the card
+      const outsideElement = document.createElement('div');
+      document.body.appendChild(outsideElement);
+
+      const focusOutEvent = new FocusEvent('focusout', {
+        bubbles: true,
+        relatedTarget: outsideElement,
+      });
+      cardElement.dispatchEvent(focusOutEvent);
+
+      assert.calledWith(fakeFrameSync.hoverAnnotation, null);
+      document.body.removeChild(outsideElement);
+    });
+
+    it('does not clear hover when focus moves within the card (focusout)', () => {
+      const wrapper = createComponent();
+      const cardElement = wrapper.find(threadCardSelector).getDOMNode();
+
+      // Create an element inside the card
+      const innerElement = document.createElement('button');
+      cardElement.appendChild(innerElement);
+
+      // Simulate focusout event with relatedTarget inside the card
+      const focusOutEvent = new FocusEvent('focusout', {
+        bubbles: true,
+        relatedTarget: innerElement,
+      });
+      cardElement.dispatchEvent(focusOutEvent);
+
+      // Should not have been called with null (focus is still within card)
+      assert.neverCalledWith(fakeFrameSync.hoverAnnotation, null);
+    });
+  });
+
   describe('key down', () => {
     [
       { key: 'Enter', shouldScroll: true },
