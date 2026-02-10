@@ -1300,6 +1300,35 @@ describe('DrawTool', () => {
       const shape = await shapePromise;
       assert.equal(shape.type, 'rect');
     });
+
+    it('_handleArrowKey returns early when canModifyFromPinnedCorner returns false in resize mode', async () => {
+      const shapePromise = tool.draw('rect', 'resize').catch(() => {});
+      await delay(0);
+
+      // Ensure we're in resize mode with a valid shape
+      tool.setKeyboardMode('resize');
+      await delay(0);
+      assert.isTrue(tool.getKeyboardModeState().keyboardActive);
+      assert.equal(tool.getKeyboardModeState().keyboardMode, 'resize');
+      assert.ok(tool._shape);
+
+      // Store initial shape to verify it doesn't change
+      const initialShape = { ...tool._shape };
+
+      // Call _handleArrowKey directly with an invalid key that will cause
+      // canModifyFromPinnedCorner to return false (line 638 early return)
+      // Using 'ArrowFoo' which is not a valid arrow key, so canModifyFromPinnedCorner
+      // will return false in its default case
+      tool._handleArrowKey('ArrowFoo', 10);
+      await delay(0);
+
+      // Shape should not have changed because the early return at line 638
+      // prevents any resize operation
+      assert.deepEqual(tool._shape, initialShape);
+
+      tool.cancel();
+      await shapePromise;
+    });
   });
 
   it('scrolls elements underneath drawing surface when "wheel" events are received', async () => {

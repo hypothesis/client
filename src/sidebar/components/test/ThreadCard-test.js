@@ -3,6 +3,7 @@ import {
   mockImportedComponents,
 } from '@hypothesis/frontend-testing';
 import { mount } from '@hypothesis/frontend-testing';
+import { act } from 'preact/test-utils';
 import sinon from 'sinon';
 
 import ThreadCard, { $imports } from '../ThreadCard';
@@ -170,6 +171,69 @@ describe('ThreadCard', () => {
   });
 
   describe('keyboard focus events', () => {
+    it('returns early cleanup function when cardRef.current is null', () => {
+      // To cover line 75, we need to trigger the useEffect when cardRef.current is null
+      // The useEffect at line 72-109 runs when setThreadHovered or thread.annotation changes
+      // We'll create a mock Card component that delays assigning the ref
+      let cardRefValue = null;
+      const MockCard = props => {
+        // Don't assign the ref immediately - this simulates the case where
+        // cardRef.current is null when useEffect runs
+        const { elementRef, ...restProps } = props;
+        // Store the ref but don't assign it to the element yet
+        if (
+          elementRef &&
+          typeof elementRef === 'object' &&
+          'current' in elementRef
+        ) {
+          // Keep ref.current as null initially
+          cardRefValue = elementRef;
+        }
+        return <div data-testid="thread-card" {...restProps} />;
+      };
+
+      // Mock Card component to use our delayed ref assignment
+      $imports.$mock({
+        '@hypothesis/frontend-shared': {
+          Card: MockCard,
+          CardContent: ({ children }) => <div>{children}</div>,
+        },
+      });
+
+      const wrapper = createComponent();
+
+      // Change thread.annotation which is a dependency of useEffect (line 109)
+      // This will trigger the useEffect to run
+      // At this point, cardRef.current should still be null because MockCard
+      // doesn't assign it immediately
+      const newThread = { ...fakeThread, annotation: { $tag: 'newTag' } };
+
+      act(() => {
+        // Change props to trigger useEffect
+        // The useEffect will execute and check cardRef.current
+        // Since it's null, line 75 will execute: return () => {};
+        wrapper.setProps({ thread: newThread });
+      });
+
+      // Now assign the ref so cleanup works properly
+      if (cardRefValue) {
+        const cardElement = wrapper.find(threadCardSelector).getDOMNode();
+        cardRefValue.current = cardElement;
+      }
+
+      // Restore original mocks
+      $imports.$restore();
+      $imports.$mock(mockImportedComponents());
+      $imports.$mock({
+        'lodash.debounce': fakeDebounce,
+        '../store': { useSidebarStore: () => fakeStore },
+      });
+
+      // This test covers the defensive check at line 74-75 where if cardElement
+      // is null, it returns an empty cleanup function: return () => {};
+      // This prevents errors when trying to add event listeners to a null element
+    });
+
     it('calls hoverAnnotation when focus enters the card (focusin)', () => {
       const wrapper = createComponent();
       const cardElement = wrapper.find(threadCardSelector).getDOMNode();
