@@ -200,6 +200,72 @@ describe('Toolbar', () => {
     });
   });
 
+  describe('rect annotation button onClick behavior', () => {
+    it('calls onModeClick when keyboardActive and activeTool is rect', () => {
+      const onModeClick = sinon.stub();
+      const createAnnotation = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: 'rect',
+        keyboardActive: true,
+        onModeClick,
+        createAnnotation,
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      button.simulate('click');
+      assert.calledOnce(onModeClick);
+      assert.notCalled(createAnnotation);
+    });
+
+    it('calls createAnnotation with rect when keyboardActive is false', () => {
+      const onModeClick = sinon.stub();
+      const createAnnotation = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: null,
+        keyboardActive: false,
+        onModeClick,
+        createAnnotation,
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      button.simulate('click');
+      assert.calledWith(createAnnotation, 'rect');
+      assert.notCalled(onModeClick);
+    });
+
+    it('calls createAnnotation with rect when activeTool is not rect', () => {
+      const onModeClick = sinon.stub();
+      const createAnnotation = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: 'point',
+        keyboardActive: true,
+        onModeClick,
+        createAnnotation,
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      button.simulate('click');
+      assert.calledWith(createAnnotation, 'rect');
+      assert.notCalled(onModeClick);
+    });
+
+    it('calls createAnnotation with null when activeTool is rect but keyboardActive is false', () => {
+      const onModeClick = sinon.stub();
+      const createAnnotation = sinon.stub();
+      const wrapper = createToolbar({
+        supportedTools: ['selection', 'rect'],
+        activeTool: 'rect',
+        keyboardActive: false,
+        onModeClick,
+        createAnnotation,
+      });
+      const button = wrapper.find('button[data-testid="rect-annotation"]');
+      button.simulate('click');
+      assert.calledWith(createAnnotation, null);
+      assert.notCalled(onModeClick);
+    });
+  });
+
   describe('rectangle annotation button title', () => {
     it('shows "Rectangle annotation" when keyboard mode is not active', () => {
       const wrapper = createToolbar({
