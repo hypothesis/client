@@ -749,10 +749,13 @@ describe('DrawTool', () => {
       assert.equal(shape.type, 'rect');
     });
 
-    it('ArrowUp does not modify from top-right corner in resize mode', async () => {
+    it('ArrowUp modifies from top-right corner in resize mode (contracts height)', async () => {
       const shapePromise = tool.draw('rect', 'resize');
       await delay(0);
-      // Cycle to top-right: ArrowUp does not modify (top is false, only bottom active)
+      // Get initial shape state
+      const initialShape = { ...tool._shape };
+      
+      // Cycle to top-right: ArrowUp contracts height (bottom edge is active)
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
       );
@@ -763,13 +766,47 @@ describe('DrawTool', () => {
       );
       await delay(0);
 
-      // Shape should not change because ArrowUp doesn't modify from top-right
-      // (canModifyFromPinnedCorner returns false)
+      // Shape should change because ArrowUp contracts height from top-right corner
+      // (canModifyFromPinnedCorner returns true since bottom edge is active)
+      assert.notDeepEqual(tool._shape, initialShape, 'Shape should change when ArrowUp is pressed from top-right corner');
+      
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
       );
       const shape = await shapePromise;
       assert.equal(shape.type, 'rect');
+    });
+
+    it('calculates constraints and applies resize when canModifyFromPinnedCorner returns true', async () => {
+      const shapePromise = tool.draw('rect', 'resize');
+      await delay(0);
+      
+      const shapeBefore = { ...tool._shape };
+      const renderSurfaceSpy = sinon.spy(tool, '_renderSurface');
+      const updateAnnouncerSpy = sinon.spy(tool, '_updateAnnouncer');
+      
+      // ArrowRight should work with top-left corner (canModifyFromPinnedCorner returns true)
+      // This should execute lines 640-652: calculate constraints and apply resize
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+      );
+      await delay(0);
+      
+      // Verify that resize was applied (shape changed) and render/announcer were called
+      assert.notDeepEqual(tool._shape, shapeBefore, 'Shape should change when resize is applied');
+      assert.called(renderSurfaceSpy);
+      assert.called(updateAnnouncerSpy);
+      
+      tool._renderSurface.restore();
+      tool._updateAnnouncer.restore();
+      
+      // Complete the drawing
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+      );
+      await shapePromise.catch(() => {
+        // Ignore errors from canceling
+      });
     });
 
     it('Arrow keys contract rect in resize mode with top-left pinned (ArrowLeft, ArrowUp)', async () => {
