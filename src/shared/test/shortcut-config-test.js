@@ -32,17 +32,14 @@ describe('shared/shortcut-config', () => {
       setAllShortcuts({
         applyUpdates: 'k',
         annotateSelection: null,
-        openKeyboardShortcuts: 123,
+        openSearch: 123,
         extra: 'ignored',
       });
 
       const shortcuts = getAllShortcuts();
       assert.equal(shortcuts.applyUpdates, 'k');
       assert.isNull(shortcuts.annotateSelection);
-      assert.equal(
-        shortcuts.openKeyboardShortcuts,
-        defaults.openKeyboardShortcuts,
-      );
+      assert.equal(shortcuts.openSearch, defaults.openSearch);
       assert.isUndefined(shortcuts.extra);
     });
   });
