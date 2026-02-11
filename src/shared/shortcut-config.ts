@@ -98,10 +98,12 @@ export function parseShortcutInputEvent(
 ): { shortcut: string; shouldClear: boolean } | null {
   const { key } = event;
 
+  // Ignore modifier keys
   if (key === 'Shift' || key === 'Control' || key === 'Alt' || key === 'Meta') {
     return null;
   }
 
+  // Ignore tab
   if (key === 'Tab') {
     return null;
   }

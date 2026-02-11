@@ -99,6 +99,19 @@ describe('KeyboardShortcutsModal', () => {
     );
   });
 
+  it('calls onSave and clears save error when save succeeds', async () => {
+    const onClose = sinon.stub();
+
+    const wrapper = createComponent({ onClose });
+
+    const saveButton = findButton(wrapper, 'save-shortcuts-button');
+    await saveButton.props().onClick();
+
+    assert.calledWith(fakeSession.updateShortcutPreferences, fakeShortcuts);
+    assert.called(onClose);
+    assert.isFalse(wrapper.exists('[data-testid="save-shortcuts-error"]'));
+  });
+
   it('shows an error and disables saving when duplicates exist', () => {
     fakeShortcuts = {
       applyUpdates: 'a',

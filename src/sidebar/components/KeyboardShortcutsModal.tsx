@@ -28,16 +28,16 @@ type ShortcutGroups = Record<string, typeof shortcutDefinitions>;
 type ShortcutsConfig = ReturnType<typeof useShortcutsConfig>;
 
 type ShortcutHeaderProps = {
-  handleClose: () => void;
+  onClose: () => void;
 };
 
-function ShortcutHeader({ handleClose }: ShortcutHeaderProps) {
+function ShortcutHeader({ onClose }: ShortcutHeaderProps) {
   return (
     <div className="flex items-center justify-between border-b px-4 py-3">
       <h2 className="text-lg font-bold">Keyboard shortcuts</h2>
       <IconButton
         title="Close keyboard shortcuts"
-        onClick={handleClose}
+        onClick={onClose}
         variant="dark"
         classes={classnames('!bg-transparent enabled:hover:!bg-grey-3')}
       >
@@ -141,14 +141,16 @@ function ShortcutBody({
 
 type ShortcutActionsProps = {
   duplicateShortcutsMessage: string | null;
-  handleClose: () => void;
+  onCancel: () => void;
+  onSave: () => void;
   session: SessionService;
   onSaveError: (message: string | null) => void;
 };
 
 function ShortcutActions({
   duplicateShortcutsMessage,
-  handleClose,
+  onCancel,
+  onSave,
   session,
   onSaveError,
 }: ShortcutActionsProps) {
@@ -179,6 +181,7 @@ function ShortcutActions({
             try {
               await session.updateShortcutPreferences(getAllShortcuts());
               onSaveError(null);
+              onSave();
             } catch {
               onSaveError('Unable to save keyboard shortcuts');
             }
@@ -191,7 +194,7 @@ function ShortcutActions({
           Save
         </Button>
         <Button
-          onClick={handleClose}
+          onClick={onCancel}
           variant="custom"
           classes="text-sm text-grey-7 hover:text-grey-9 w-min"
           data-testid="cancel-shortcuts-button"
@@ -227,7 +230,7 @@ function KeyboardShortcutsModal({
     setAllShortcuts(profile.preferences?.shortcuts_preferences ?? {});
   };
 
-  const handleClose = () => {
+  const handleCancel = () => {
     restoreProfileShortcuts();
     setSaveError(null);
     onClose();
@@ -294,14 +297,14 @@ function KeyboardShortcutsModal({
   return (
     <ModalDialog
       closed={!open}
-      onClose={handleClose}
+      onClose={handleCancel}
       aria-label="Keyboard shortcuts"
       data-testid="keyboard-shortcuts-modal"
       className="m-0 bg-transparent"
     >
       <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-6">
         <div className="relative w-full sm:h-auto sm:max-w-xl bg-white rounded shadow-lg">
-          <ShortcutHeader handleClose={handleClose} />
+          <ShortcutHeader onClose={handleCancel} />
 
           <ShortcutBody
             duplicateShortcutsMessage={duplicateShortcutsMessage}
@@ -312,7 +315,8 @@ function KeyboardShortcutsModal({
 
           <ShortcutActions
             duplicateShortcutsMessage={duplicateShortcutsMessage}
-            handleClose={handleClose}
+            onCancel={handleCancel}
+            onSave={onClose}
             session={session}
             onSaveError={setSaveError}
           />
