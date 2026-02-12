@@ -666,6 +666,9 @@ export class DrawTool implements Destroyable {
    * This is used when the user clicks the mode button in the toolbar.
    */
   setKeyboardMode(mode: 'move' | 'resize' | 'rect') {
+    if (!this._surface) {
+      return; // No drawing in progress
+    }
     if (!this._keyboardActive) {
       // Activate keyboard mode first if not active
       this._activateKeyboardMode();
