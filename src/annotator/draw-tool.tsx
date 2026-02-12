@@ -17,6 +17,7 @@ import {
   clampRectToViewport,
   computeInitialShapePosition,
   getViewportBounds,
+  normalizeRect,
 } from './util/draw-tool-position';
 import { isEditableContext } from './util/node';
 import {
@@ -28,20 +29,6 @@ import {
   canModifyFromPinnedCorner,
 } from './util/rect-resize';
 
-/** Normalize a rect so that `left <= right` and `top <= bottom`. */
-function normalizeRect(r: Rect): Rect {
-  const minX = Math.min(r.left, r.right);
-  const maxX = Math.max(r.left, r.right);
-  const minY = Math.min(r.top, r.bottom);
-  const maxY = Math.max(r.top, r.bottom);
-  return {
-    type: 'rect',
-    left: minX,
-    top: minY,
-    right: maxX,
-    bottom: maxY,
-  };
-}
 
 /**
  * Reason why drawing was canceled.
@@ -784,9 +771,6 @@ export class DrawTool implements Destroyable {
     /* istanbul ignore next */
     if (!this._surface) {
       return;
-    }
-    if (this._keyboardActive) {
-      this._updateAnnouncer();
     }
     render(
       <DrawToolSurface

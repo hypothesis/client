@@ -558,7 +558,9 @@ export class Guest
     );
 
     this._hostRPC.on('setKeyboardMode', ({ mode }) => {
-      this._drawTool.setKeyboardMode(mode);
+      if (['move', 'resize', 'rect'].includes(mode)) {
+        this._drawTool.setKeyboardMode(mode);
+      }
     });
 
     this._hostRPC.on('activateMoveMode', () => {
