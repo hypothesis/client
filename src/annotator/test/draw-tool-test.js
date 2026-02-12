@@ -429,6 +429,16 @@ describe('DrawTool', () => {
       assert.isNumber(shape.y);
     });
 
+    it('setKeyboardMode returns early when no surface is active', () => {
+      // Call setKeyboardMode without starting a drawing session
+      // This should return early without throwing or changing state
+      tool.setKeyboardMode('move');
+
+      // Verify that keyboard mode state is unchanged (should be inactive)
+      assert.isFalse(tool.getKeyboardModeState().keyboardActive);
+      assert.isNull(tool.getKeyboardModeState().keyboardMode);
+    });
+
     it('setKeyboardMode activates keyboard mode and updates announcer when not yet active', async () => {
       const shapePromise = tool.draw('rect').catch(() => {});
       await delay(0);
