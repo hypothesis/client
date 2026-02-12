@@ -1,7 +1,10 @@
 import type { Rect, Shape } from '../../types/annotator';
 import type { ViewportBounds } from './rect-move';
 
-function normalizeRect(r: Rect): Rect {
+/**
+ * Normalize a rect so that `left <= right` and `top <= bottom`.
+ */
+export function normalizeRect(r: Rect): Rect {
   return {
     type: 'rect',
     left: Math.min(r.left, r.right),
@@ -146,20 +149,14 @@ export function clampRectToViewport(
   const r = normalizeRect(rect);
   const width = r.right - r.left;
   const height = r.bottom - r.top;
-  let left = r.left;
-  let top = r.top;
-  if (left < viewport.minLeft) {
-    left = viewport.minLeft;
-  }
-  if (left + width > viewport.maxRight) {
-    left = viewport.maxRight - width;
-  }
-  if (top < viewport.minTop) {
-    top = viewport.minTop;
-  }
-  if (top + height > viewport.maxBottom) {
-    top = viewport.maxBottom - height;
-  }
+  const left = Math.max(
+    viewport.minLeft,
+    Math.min(r.left, viewport.maxRight - width),
+  );
+  const top = Math.max(
+    viewport.minTop,
+    Math.min(r.top, viewport.maxBottom - height),
+  );
   return {
     type: 'rect',
     left,

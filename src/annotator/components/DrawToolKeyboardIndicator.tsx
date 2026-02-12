@@ -48,10 +48,9 @@ export default function DrawToolKeyboardIndicator({
 
   return (
     <div
-      className="fixed bottom-4 right-4 bg-white border border-grey-3 rounded shadow-lg p-3 z-50 pointer-events-none"
+      className="fixed bottom-4 left-4 bg-white border border-grey-3 rounded shadow-lg p-3 z-50 pointer-events-none"
       data-testid="draw-tool-keyboard-indicator"
       role="status"
-      aria-live="polite"
     >
       <div className="text-sm font-semibold text-grey-9">
         Keyboard mode: {modeText}
