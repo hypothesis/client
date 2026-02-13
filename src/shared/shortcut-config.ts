@@ -7,7 +7,10 @@ export type ShortcutId =
   | 'highlightSelection'
   | 'toggleHighlights'
   | 'showSelection'
-  | 'hideAdder';
+  | 'hideAdder'
+  | 'activateRectMove'
+  | 'activateRectResize'
+  | 'activatePoint';
 
 export type ShortcutValue = string | null;
 
@@ -31,7 +34,17 @@ const defaultShortcuts: ShortcutMap = {
   toggleHighlights: 'ctrl+shift+h',
   showSelection: 's',
   hideAdder: 'Escape',
+  activateRectMove: 'ctrl+shift+y',
+  activateRectResize: 'ctrl+shift+j',
+  activatePoint: 'ctrl+shift+u',
 };
+
+// Shortcut IDs that are only shown when the vpat_keyboard feature flag is enabled.
+export const KEYBOARD_ANNOTATION_SHORTCUT_IDS: ShortcutId[] = [
+  'activateRectMove',
+  'activateRectResize',
+  'activatePoint',
+];
 
 // Shortcut groups that are allowed to share the same key.
 export const repeatableShortcutGroups: ShortcutId[][] = [];
@@ -202,6 +215,24 @@ export const shortcutDefinitions: ShortcutDefinition[] = [
     id: 'hideAdder',
     label: 'Close the Adder',
     description: 'Closes the Adder when it is open.',
+    group: 'Annotator',
+  },
+  {
+    id: 'activateRectMove',
+    label: 'Create rectangle selection',
+    description: 'Create annotation and move rectangle selection',
+    group: 'Annotator',
+  },
+  {
+    id: 'activateRectResize',
+    label: 'Resize rectangle selection',
+    description: 'Change the rectangle selection size',
+    group: 'Annotator',
+  },
+  {
+    id: 'activatePoint',
+    label: 'Create pin selection',
+    description: 'Create annotation and move pin selection',
     group: 'Annotator',
   },
 ];
