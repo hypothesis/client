@@ -59,6 +59,7 @@ describe('KeyboardShortcutsModal', () => {
     fakeStore = {
       hasFetchedProfile: sinon.stub().returns(false),
       profile: sinon.stub().returns({}),
+      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     fakeGetAllShortcuts = sinon.stub().returns(fakeShortcuts);
@@ -72,6 +73,11 @@ describe('KeyboardShortcutsModal', () => {
       '../store': { useSidebarStore: () => fakeStore },
       '../../shared/shortcut-config': {
         getAllShortcuts: fakeGetAllShortcuts,
+        KEYBOARD_ANNOTATION_SHORTCUT_IDS: [
+          'activateRectMove',
+          'activateRectResize',
+          'activatePoint',
+        ],
         parseShortcutInputEvent: fakeParseShortcutInputEvent,
         repeatableShortcutGroups: fakeRepeatableShortcutGroups,
         resetShortcuts: fakeResetShortcuts,
