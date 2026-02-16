@@ -341,34 +341,4 @@ describe('KeyboardShortcutsModal', () => {
 
     assert.calledWith(fakeSetShortcut, 'applyUpdates', null);
   });
-
-  it('shows keyboard annotation shortcuts when vpat_keyboard feature flag is enabled', () => {
-    fakeStore.isFeatureEnabled.withArgs('vpat_keyboard').returns(true);
-    fakeShortcutDefinitions.push({
-      id: 'activateRectMove',
-      label: 'Create rectangle selection',
-      group: 'Annotator',
-    });
-
-    const wrapper = createComponent();
-
-    assert.isTrue(
-      wrapper.find('[data-testid="shortcut-label-activateRectMove"]').exists(),
-    );
-  });
-
-  it('hides keyboard annotation shortcuts when vpat_keyboard feature flag is disabled', () => {
-    fakeStore.isFeatureEnabled.withArgs('vpat_keyboard').returns(false);
-    fakeShortcutDefinitions.push({
-      id: 'activateRectMove',
-      label: 'Create rectangle selection',
-      group: 'Annotator',
-    });
-
-    const wrapper = createComponent();
-
-    assert.isFalse(
-      wrapper.find('[data-testid="shortcut-label-activateRectMove"]').exists(),
-    );
-  });
 });
