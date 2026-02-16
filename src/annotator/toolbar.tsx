@@ -191,14 +191,6 @@ export class ToolbarController {
     this.render();
   }
 
-  get modeButtonCallbacks() {
-    return {
-      onModeClick: this._onModeClick,
-      onActivateMoveMode: this._onActivateMoveMode,
-      onActivatePointMoveMode: this._onActivatePointMoveMode,
-    };
-  }
-
   render() {
     render(
       <Toolbar

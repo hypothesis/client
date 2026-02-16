@@ -14,6 +14,7 @@ function mountSurface(props) {
 
 describe('DrawToolSurface', () => {
   const defaultProps = {
+    tool: 'rect',
     waitingForSecondClick: false,
     firstClickPoint: undefined,
     keyboardMode: null,

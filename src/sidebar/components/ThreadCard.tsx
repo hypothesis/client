@@ -82,16 +82,11 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
     const handleFocusOut = (e: FocusEvent) => {
       // Only clear hover if focus is moving outside the card entirely
       // (not just to another element within the card)
-      const relatedTarget = e.relatedTarget;
-
-      // If relatedTarget is null, focus is leaving the document/frame entirely.
-      // If relatedTarget exists but is not a Node or is not contained in the card,
-      // treat it as moving focus outside the card.
-      if (
-        !relatedTarget ||
-        !(relatedTarget instanceof Node) ||
-        !cardElement.contains(relatedTarget)
-      ) {
+      const relatedTarget = e.relatedTarget as Node | null;
+      
+      // If relatedTarget is null, focus is leaving the document/frame entirely
+      // If relatedTarget exists but is not contained in the card, focus is moving outside
+      if (!relatedTarget || !cardElement.contains(relatedTarget)) {
         setThreadHovered(null);
       }
       // If relatedTarget exists and is contained in the card, focus is moving

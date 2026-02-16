@@ -15,53 +15,45 @@ describe('annotator/util/rect-move', () => {
     it('moves point with arrow keys, clamped to bounds', () => {
       const point = { type: 'point', x: 50, y: 50 };
       assert.deepEqual(
-        applyMoveArrowKeyToPoint(point, 'ArrowUp', 10, viewport),
+        applyMoveArrowKeyToPoint(point, 'ArrowUp', 10, 200, 150),
         { type: 'point', x: 50, y: 40 },
       );
       assert.deepEqual(
-        applyMoveArrowKeyToPoint(point, 'ArrowDown', 10, viewport),
+        applyMoveArrowKeyToPoint(point, 'ArrowDown', 10, 200, 150),
         { type: 'point', x: 50, y: 60 },
       );
       assert.deepEqual(
-        applyMoveArrowKeyToPoint(point, 'ArrowLeft', 10, viewport),
+        applyMoveArrowKeyToPoint(point, 'ArrowLeft', 10, 200, 150),
         { type: 'point', x: 40, y: 50 },
       );
       assert.deepEqual(
-        applyMoveArrowKeyToPoint(point, 'ArrowRight', 10, viewport),
+        applyMoveArrowKeyToPoint(point, 'ArrowRight', 10, 200, 150),
         { type: 'point', x: 60, y: 50 },
       );
     });
 
-    it('clamps to viewport bounds', () => {
+    it('clamps to maxX and maxY', () => {
       const point = { type: 'point', x: 195, y: 145 };
       assert.deepEqual(
-        applyMoveArrowKeyToPoint(point, 'ArrowRight', 10, viewport),
+        applyMoveArrowKeyToPoint(point, 'ArrowRight', 10, 200, 150),
         { type: 'point', x: 200, y: 145 },
       );
       assert.deepEqual(
-        applyMoveArrowKeyToPoint(point, 'ArrowDown', 10, viewport),
+        applyMoveArrowKeyToPoint(point, 'ArrowDown', 10, 200, 150),
         { type: 'point', x: 195, y: 150 },
-      );
-    });
-
-    it('respects minTop when moving up', () => {
-      const point = { type: 'point', x: 50, y: 15 };
-      assert.deepEqual(
-        applyMoveArrowKeyToPoint(point, 'ArrowUp', 10, viewport),
-        { type: 'point', x: 50, y: 10 },
       );
     });
 
     it('does not mutate input', () => {
       const point = { type: 'point', x: 50, y: 50 };
-      applyMoveArrowKeyToPoint(point, 'ArrowRight', 10, viewport);
+      applyMoveArrowKeyToPoint(point, 'ArrowRight', 10, 200, 150);
       assert.equal(point.x, 50);
     });
 
     it('returns same point for unknown key (default branch)', () => {
       const point = { type: 'point', x: 50, y: 50 };
       assert.deepEqual(
-        applyMoveArrowKeyToPoint(point, 'UnknownKey', 10, viewport),
+        applyMoveArrowKeyToPoint(point, 'UnknownKey', 10, 200, 150),
         point,
       );
     });

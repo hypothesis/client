@@ -13,6 +13,7 @@ function normalizeRect(r: Rect): Rect {
 
 export type DrawToolSurfaceProps = {
   shape: Shape | undefined;
+  tool: 'rect' | 'point';
   waitingForSecondClick: boolean;
   firstClickPoint: { x: number; y: number } | undefined;
   keyboardMode: KeyboardMode;
@@ -29,6 +30,7 @@ const INACTIVE_EDGE_COLOR = 'grey';
  */
 export function DrawToolSurface({
   shape,
+  tool,
   waitingForSecondClick,
   firstClickPoint,
   keyboardMode,
