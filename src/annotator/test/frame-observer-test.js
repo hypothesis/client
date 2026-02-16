@@ -148,7 +148,7 @@ describe('annotator/frame-observer', () => {
     });
 
     it('does not add frame again if it is already in _annotatableFrames set', async () => {
-      createAnnotatableIFrame();
+      const iframe = createAnnotatableIFrame();
       await waitForCall(onFrameAdded);
       assert.calledOnce(onFrameAdded);
       onFrameAdded.resetHistory();
