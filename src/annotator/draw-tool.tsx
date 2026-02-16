@@ -29,6 +29,7 @@ import {
   canModifyFromPinnedCorner,
 } from './util/rect-resize';
 
+
 /**
  * Reason why drawing was canceled.
  *

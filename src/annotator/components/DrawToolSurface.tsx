@@ -1,6 +1,10 @@
-import type { KeyboardMode, PinnedCorner, Shape } from '../../types/annotator';
-import { normalizeRect } from '../util/draw-tool-position';
+import type {
+  KeyboardMode,
+  PinnedCorner,
+  Shape,
+} from '../../types/annotator';
 import { getActiveEdges } from '../util/rect-resize';
+import { normalizeRect } from '../util/draw-tool-position';
 
 export type DrawToolSurfaceProps = {
   shape: Shape | undefined;
