@@ -1131,7 +1131,7 @@ describe('Guest', () => {
 
       it('does not hide sidebar if event is within the bounds of the sidebar', () => {
         fakeHighlighter.getHighlightsFromPoint.returns([]);
-        createGuest();
+        const guest = createGuest();
         emitHostEvent('sidebarLayoutChanged', { expanded: true, width: 300 });
 
         // Configure frameFillsAncestor to return true with correct arguments
