@@ -8,11 +8,7 @@ import type {
 /**
  * List of feature flags that annotator code tests for.
  */
-const annotatorFlags = [
-  'pdf_image_annotation',
-  'styled_highlight_clusters',
-  'vpat_keyboard',
-];
+const annotatorFlags = ['pdf_image_annotation', 'styled_highlight_clusters'];
 
 /**
  * An observable container of feature flags.
