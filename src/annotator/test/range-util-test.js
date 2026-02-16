@@ -337,23 +337,18 @@ describe('annotator/range-util', () => {
       // container already has 'first' and 'second' as text nodes from beforeEach
       const selection = getSelection();
       selection.removeAllRanges();
-
+      
       // Create a forward selection: anchor at first node (index 0), focus at second node (index 1)
       // The range created will start at first node, so startContainer will be first node
       // focusNode will be second node
       // So startContainer !== focusNode, should return false
-      selection.setBaseAndExtent(
-        container.childNodes[0],
-        0,
-        container.childNodes[1],
-        0,
-      );
-
+      selection.setBaseAndExtent(container.childNodes[0], 0, container.childNodes[1], 0);
+      
       // Verify setup: focusNode !== anchorNode
       assert.notEqual(selection.focusNode, selection.anchorNode);
       assert.equal(selection.anchorNode, container.childNodes[0]);
       assert.equal(selection.focusNode, container.childNodes[1]);
-
+      
       // For forward selection, range.startContainer (first node) !== focusNode (second node)
       // So isSelectionBackwards should return false
       assert.isFalse(isSelectionBackwards(selection));

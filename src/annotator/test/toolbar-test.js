@@ -225,10 +225,7 @@ describe('ToolbarController', () => {
 
       assert.equal(toolbarProps.onModeClick, onModeClick);
       assert.equal(toolbarProps.onActivateMoveMode, onActivateMoveMode);
-      assert.equal(
-        toolbarProps.onActivatePointMoveMode,
-        onActivatePointMoveMode,
-      );
+      assert.equal(toolbarProps.onActivatePointMoveMode, onActivatePointMoveMode);
     });
   });
 });

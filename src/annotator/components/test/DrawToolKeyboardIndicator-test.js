@@ -27,9 +27,7 @@ describe('DrawToolKeyboardIndicator', () => {
     const wrapper = mount(
       <DrawToolKeyboardIndicator mode="move" keyboardActive={true} />,
     );
-    const text = wrapper
-      .find('[data-testid="draw-tool-keyboard-indicator"]')
-      .text();
+    const text = wrapper.find('[data-testid="draw-tool-keyboard-indicator"]').text();
     assert.include(text, 'Keyboard mode: Move');
     assert.include(text, 'Use arrow keys to move');
     assert.include(text, 'Enter to confirm');
@@ -43,9 +41,7 @@ describe('DrawToolKeyboardIndicator', () => {
         pinnedCorner="top-right"
       />,
     );
-    const text = wrapper
-      .find('[data-testid="draw-tool-keyboard-indicator"]')
-      .text();
+    const text = wrapper.find('[data-testid="draw-tool-keyboard-indicator"]').text();
     assert.include(text, 'Keyboard mode: Resize');
     assert.include(text, 'top-right corner pinned');
     assert.include(text, 'Tab to change corner');
@@ -55,9 +51,7 @@ describe('DrawToolKeyboardIndicator', () => {
     const wrapper = mount(
       <DrawToolKeyboardIndicator mode="rect" keyboardActive={true} />,
     );
-    const text = wrapper
-      .find('[data-testid="draw-tool-keyboard-indicator"]')
-      .text();
+    const text = wrapper.find('[data-testid="draw-tool-keyboard-indicator"]').text();
     assert.include(text, 'Keyboard mode: Rectangle');
     assert.include(text, 'Click the mode button to switch to Move or Resize');
   });
@@ -66,9 +60,7 @@ describe('DrawToolKeyboardIndicator', () => {
     const wrapper = mount(
       <DrawToolKeyboardIndicator mode="resize" keyboardActive={true} />,
     );
-    const text = wrapper
-      .find('[data-testid="draw-tool-keyboard-indicator"]')
-      .text();
+    const text = wrapper.find('[data-testid="draw-tool-keyboard-indicator"]').text();
     assert.include(text, 'top-left corner pinned');
   });
 });

@@ -5,7 +5,6 @@ import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
 import { matchShortcut } from '../shared/shortcut';
 import { getAllShortcuts, setAllShortcuts } from '../shared/shortcut-config';
-import { isMacOS } from '../shared/user-agent';
 import type {
   AbstractRange,
   AnnotationData,
@@ -27,6 +26,7 @@ import type {
   GuestToSidebarCalls,
   SidebarToGuestCalls,
 } from '../types/port-rpc-calls';
+import { isMacOS } from '../shared/user-agent';
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';

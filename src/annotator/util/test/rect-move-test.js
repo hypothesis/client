@@ -77,13 +77,10 @@ describe('annotator/util/rect-move', () => {
     };
 
     it('moves rect with arrow keys', () => {
-      assert.deepEqual(applyMoveArrowKeyToRect(rect, 'ArrowUp', 10, viewport), {
-        type: 'rect',
-        left: 50,
-        top: 10,
-        right: 120,
-        bottom: 70,
-      });
+      assert.deepEqual(
+        applyMoveArrowKeyToRect(rect, 'ArrowUp', 10, viewport),
+        { type: 'rect', left: 50, top: 10, right: 120, bottom: 70 },
+      );
       assert.deepEqual(
         applyMoveArrowKeyToRect(rect, 'ArrowDown', 10, viewport),
         { type: 'rect', left: 50, top: 30, right: 120, bottom: 90 },

@@ -56,12 +56,7 @@ describe('annotator/util/draw-tool-position', () => {
 
     it('does not mutate input', () => {
       const rect = { type: 'rect', left: 10, top: 10, right: 50, bottom: 40 };
-      clampRectToViewport(rect, {
-        minLeft: 0,
-        minTop: 0,
-        maxRight: 100,
-        maxBottom: 100,
-      });
+      clampRectToViewport(rect, { minLeft: 0, minTop: 0, maxRight: 100, maxBottom: 100 });
       assert.equal(rect.left, 10);
     });
   });

@@ -18,7 +18,10 @@ import type {
 import classnames from 'classnames';
 import type { JSX, RefObject } from 'preact';
 
-import type { AnnotationTool, KeyboardMode } from '../../types/annotator';
+import type {
+  AnnotationTool,
+  KeyboardMode,
+} from '../../types/annotator';
 import { MoveModeIcon, ResizeModeIcon } from './icons';
 
 /**
@@ -67,7 +70,7 @@ function createEnterActivateHandler(
  */
 function KeyboardModeIcon({ mode }: { mode: KeyboardMode }) {
   if (mode === 'move') {
-    return <MoveModeIcon />;
+    return <MoveModeIcon />
   }
   if (mode === 'resize') {
     return <ResizeModeIcon />;
@@ -333,9 +336,7 @@ export default function Toolbar({
                 )}
                 icon={
                   keyboardActive && activeTool === 'rect'
-                    ? ((() => (
-                        <KeyboardModeIcon mode={keyboardMode ?? 'rect'} />
-                      )) as IconComponent)
+                    ? (() => <KeyboardModeIcon mode={keyboardMode ?? 'rect'} />) as IconComponent
                     : SelectionIcon
                 }
                 onClick={() => {

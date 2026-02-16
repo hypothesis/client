@@ -61,8 +61,7 @@ export default function DrawToolAnnouncer({
       // Pin doesn't support resize, but announce if mode is set incorrectly
       announcement = 'Pin annotation mode. Use arrow keys to move.';
     } else {
-      announcement =
-        'Pin annotation mode. Use arrow keys to move, Enter to confirm.';
+      announcement = 'Pin annotation mode. Use arrow keys to move, Enter to confirm.';
     }
   } else if (tool === 'rect') {
     if (

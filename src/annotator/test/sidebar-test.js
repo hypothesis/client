@@ -253,6 +253,7 @@ describe('Sidebar', () => {
   // The early return branch when contentWindow is null would require mocking
   // the iframe element before construction, which is complex and may not be worth it.
 
+
   function getConfigString(sidebar) {
     return sidebar.iframe.src;
   }
@@ -413,8 +414,8 @@ describe('Sidebar', () => {
         sidebar.toolbar.modeButtonCallbacks.onActivateMoveMode();
       });
       // No guest RPC exists yet, so activateMoveMode is never called
-      const guestCalls = fakePortRPCs.filter(rpc =>
-        rpc.call.calledWith('activateMoveMode'),
+      const guestCalls = fakePortRPCs.filter(
+        rpc => rpc.call.calledWith('activateMoveMode'),
       );
       assert.isEmpty(guestCalls);
     });
@@ -426,8 +427,8 @@ describe('Sidebar', () => {
         sidebar.toolbar.modeButtonCallbacks.onModeClick();
       });
       // No guest RPC exists yet, so setKeyboardMode is never called (line 191 branch: !rpc)
-      const guestCalls = fakePortRPCs.filter(rpc =>
-        rpc.call.calledWith('setKeyboardMode'),
+      const guestCalls = fakePortRPCs.filter(
+        rpc => rpc.call.calledWith('setKeyboardMode'),
       );
       assert.isEmpty(guestCalls);
     });
@@ -439,8 +440,8 @@ describe('Sidebar', () => {
         sidebar.toolbar.modeButtonCallbacks.onActivatePointMoveMode();
       });
       // No guest RPC exists yet, so activatePointMoveMode is never called (line 214 branch: !rpc)
-      const guestCalls = fakePortRPCs.filter(rpc =>
-        rpc.call.calledWith('activatePointMoveMode'),
+      const guestCalls = fakePortRPCs.filter(
+        rpc => rpc.call.calledWith('activatePointMoveMode'),
       );
       assert.isEmpty(guestCalls);
     });
@@ -479,9 +480,7 @@ describe('Sidebar', () => {
       });
       guestRPC(1).call.resetHistory();
       sidebar.toolbar.modeButtonCallbacks.onModeClick();
-      assert.calledWith(guestRPC(1).call, 'setKeyboardMode', {
-        mode: 'resize',
-      });
+      assert.calledWith(guestRPC(1).call, 'setKeyboardMode', { mode: 'resize' });
 
       emitGuestEvent('keyboardModeChanged', {
         keyboardActive: true,
@@ -785,16 +784,16 @@ describe('Sidebar', () => {
         const sidebar = createSidebar();
         connectGuest(sidebar);
         connectGuest(sidebar);
-
+        
         const positions = [{ tag: 'test-tag', top: 100 }];
         fakeBucketBar.update.resetHistory();
-
+        
         // First guest should update bucketBar (line 449: indexOf === 0 is true)
         emitNthGuestEvent(1, 'anchorsChanged', positions);
         assert.calledWith(fakeBucketBar.update, positions);
-
+        
         fakeBucketBar.update.resetHistory();
-
+        
         // Second guest should NOT update bucketBar (indexOf !== 0, condition false)
         emitNthGuestEvent(2, 'anchorsChanged', positions);
         assert.notCalled(fakeBucketBar.update);
@@ -804,13 +803,13 @@ describe('Sidebar', () => {
         const sidebar = createSidebar();
         connectGuest(sidebar);
         connectGuest(sidebar);
-
+        
         // Remove first guest
         emitNthGuestEvent(1, 'close');
-
+        
         const positions = [{ tag: 'test-tag', top: 100 }];
         fakeBucketBar.update.resetHistory();
-
+        
         // Now second guest (which is now at index 0) should update bucketBar
         emitNthGuestEvent(2, 'anchorsChanged', positions);
         assert.calledWith(fakeBucketBar.update, positions);
@@ -942,12 +941,12 @@ describe('Sidebar', () => {
       it('handles drag gracefully when iframeContainer is null', () => {
         const originalContainer = sidebar.iframeContainer;
         sidebar.iframeContainer = null;
-
+        
         // Should not throw
         fireDragEvent({ type: 'dragstart' });
         fireDragEvent({ type: 'dragmove', deltaX: -50 });
         fireDragEvent({ type: 'dragend' });
-
+        
         // Restore for cleanup
         sidebar.iframeContainer = originalContainer;
       });
@@ -998,10 +997,7 @@ describe('Sidebar', () => {
               const margin = parseInt(sidebar.iframeContainer.style.marginLeft);
               const width = -margin;
               if (width < MIN_RESIZE) {
-                assert.notEqual(
-                  sidebar.iframeContainer.style.width,
-                  `${width}px`,
-                );
+                assert.notEqual(sidebar.iframeContainer.style.width, `${width}px`);
               }
               resolve();
             });
@@ -1014,7 +1010,7 @@ describe('Sidebar', () => {
         // Set final to same as initial - should not update (line 581 condition)
         sidebar._dragResizeState.final = sidebar._dragResizeState.initial;
         fireDragEvent({ type: 'dragmove', deltaX: 0 });
-
+        
         return new Promise(resolve => {
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -1030,7 +1026,7 @@ describe('Sidebar', () => {
         // Set final to null - should not update (line 580 condition)
         sidebar._dragResizeState.final = null;
         fireDragEvent({ type: 'dragmove', deltaX: 0 });
-
+        
         return new Promise(resolve => {
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -1045,13 +1041,13 @@ describe('Sidebar', () => {
         startDrag();
         // Set _renderFrame to simulate a pending frame (line 571 branch)
         sidebar._renderFrame = 12345; // Mock frame ID
-
+        
         // Call _updateLayout - should return early without scheduling new frame
         sidebar._updateLayout();
-
+        
         // _renderFrame should still be the same (not reset)
         assert.equal(sidebar._renderFrame, 12345);
-
+        
         // Clean up
         if (sidebar._renderFrame) {
           cancelAnimationFrame(sidebar._renderFrame);
@@ -1062,39 +1058,33 @@ describe('Sidebar', () => {
       it('_updateLayoutState uses else branch when leftMargin >= MIN_RESIZE', () => {
         // Open sidebar first to ensure it has a valid width
         sidebar.open();
-
+        
         // Wait for sidebar to be fully rendered
         return new Promise(resolve => {
           requestAnimationFrame(() => {
             // Set a valid width explicitly to ensure it's available for the test
             const testWidth = 400;
             sidebar.iframeContainer.style.width = `${testWidth}px`;
-
+            
             // Set a leftMargin that is >= MIN_RESIZE (0 or positive)
             // This tests the else branch at line 634 (leftMargin >= MIN_RESIZE)
             // When leftMargin >= MIN_RESIZE, the code adds width to frameVisibleWidth
             sidebar.iframeContainer.style.marginLeft = `${MIN_RESIZE}px`;
-
+            
             // Force a reflow to ensure styles are applied
             sidebar.iframeContainer.offsetHeight;
-
+            
             // Call _updateLayoutState without expanded parameter (undefined)
             // This will use the else branch in the outer if (line 631)
             // and then the else branch for leftMargin >= MIN_RESIZE (line 634)
             // which adds width to frameVisibleWidth: frameVisibleWidth = toolbarWidth + width
             sidebar._updateLayoutState();
-
+            
             // Verify that frameVisibleWidth was calculated correctly
             // When leftMargin >= MIN_RESIZE, frameVisibleWidth = toolbarWidth + width
             // Since width > 0, frameVisibleWidth > toolbarWidth, so expanded should be true (line 640)
-            assert.isTrue(
-              sidebar._layoutState.expanded,
-              'Sidebar should be expanded when leftMargin >= MIN_RESIZE and width > 0',
-            );
-            assert.isAtLeast(
-              sidebar._layoutState.width,
-              sidebar._layoutState.toolbarWidth,
-            );
+            assert.isTrue(sidebar._layoutState.expanded, 'Sidebar should be expanded when leftMargin >= MIN_RESIZE and width > 0');
+            assert.isAtLeast(sidebar._layoutState.width, sidebar._layoutState.toolbarWidth);
             resolve();
           });
         });
@@ -1187,14 +1177,14 @@ describe('Sidebar', () => {
       const sidebar = createSidebar({ openSidebar: true });
       const originalContainer = sidebar.iframeContainer;
       sidebar.iframeContainer = null;
-
+      
       const open = sandbox.stub(sidebar, 'open');
       connectSidebarApp();
       await sidebar.ready;
-
+      
       // Should still call open even if iframeContainer is null
       assert.calledOnce(open);
-
+      
       // Restore for cleanup
       sidebar.iframeContainer = originalContainer;
     });
@@ -1202,11 +1192,11 @@ describe('Sidebar', () => {
     it('handles connect event when iframeContainer exists', async () => {
       const sidebar = createSidebar({ openSidebar: true });
       assert.isNotNull(sidebar.iframeContainer);
-
+      
       const initialDisplay = sidebar.iframeContainer.style.display;
       connectSidebarApp();
       await sidebar.ready;
-
+      
       // iframeContainer.display should be set to '' (line 492)
       assert.equal(sidebar.iframeContainer.style.display, '');
     });
@@ -1232,13 +1222,13 @@ describe('Sidebar', () => {
       const sidebar = createSidebar({
         bucketContainerSelector: '#non-existent-container',
       });
-
+      
       // Should warn when bucketContainerSelector doesn't match any element (line 244)
       assert.calledWith(
         warnStub,
-        'Custom bucket container "#non-existent-container" not found',
+        'Custom bucket container "#non-existent-container" not found'
       );
-
+      
       warnStub.restore();
     });
 
@@ -1320,18 +1310,15 @@ describe('Sidebar', () => {
 
     it('sets marginLeft and removes collapsed class when iframeContainer exists', () => {
       const sidebar = createSidebar();
-      const initialWidth =
-        sidebar.iframeContainer.getBoundingClientRect().width;
+      const initialWidth = sidebar.iframeContainer.getBoundingClientRect().width;
       sidebar.open();
-
+      
       // Should set marginLeft to negative width (line 744)
       const marginLeft = parseInt(sidebar.iframeContainer.style.marginLeft);
       assert.equal(marginLeft, -initialWidth);
-
+      
       // Should remove collapsed class (line 745)
-      assert.isFalse(
-        sidebar.iframeContainer.classList.contains('sidebar-collapsed'),
-      );
+      assert.isFalse(sidebar.iframeContainer.classList.contains('sidebar-collapsed'));
     });
 
     it('does nothing when iframeContainer is undefined in open()', () => {
@@ -1340,7 +1327,7 @@ describe('Sidebar', () => {
       });
       // iframeContainer should be undefined for external container
       assert.isUndefined(sidebar.iframeContainer);
-
+      
       // Should not throw
       sidebar.open();
       assert.equal(fakeToolbar.sidebarOpen, true);
@@ -1370,14 +1357,12 @@ describe('Sidebar', () => {
       const sidebar = createSidebar();
       sidebar.open();
       sidebar.close();
-
+      
       // Should set marginLeft to empty string (line 761)
       assert.equal(sidebar.iframeContainer.style.marginLeft, '');
-
+      
       // Should add collapsed class (line 762)
-      assert.isTrue(
-        sidebar.iframeContainer.classList.contains('sidebar-collapsed'),
-      );
+      assert.isTrue(sidebar.iframeContainer.classList.contains('sidebar-collapsed'));
     });
 
     it('does nothing when iframeContainer is undefined in close()', () => {
@@ -1386,7 +1371,7 @@ describe('Sidebar', () => {
       });
       // iframeContainer should be undefined for external container
       assert.isUndefined(sidebar.iframeContainer);
-
+      
       sidebar.open();
       // Should not throw
       sidebar.close();
@@ -1682,18 +1667,15 @@ describe('Sidebar', () => {
     it('does not register anchorsChanged listener when bucketBar is null (clean theme)', () => {
       const sidebar = createSidebar({ theme: 'clean' });
       assert.isNull(sidebar.bucketBar);
-
+      
       // Connect a guest - should not register anchorsChanged because bucketBar is null
       connectGuest(sidebar);
-
+      
       // Verify that anchorsChanged was not registered (bucketBar check at line 447)
       const anchorsChangedRegistered = fakePortRPCs[1].on.args.some(
-        ([event]) => event === 'anchorsChanged',
+        ([event]) => event === 'anchorsChanged'
       );
-      assert.isFalse(
-        anchorsChangedRegistered,
-        'anchorsChanged should not be registered when bucketBar is null',
-      );
+      assert.isFalse(anchorsChangedRegistered, 'anchorsChanged should not be registered when bucketBar is null');
     });
 
     it('does not display the bucket bar if using an external container for the sidebar', () => {

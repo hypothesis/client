@@ -191,8 +191,7 @@ export class Sidebar implements Destroyable {
         if (!rpc) {
           return;
         }
-        const currentMode =
-          this.toolbar.keyboardModeState?.keyboardMode || 'rect';
+        const currentMode = this.toolbar.keyboardModeState?.keyboardMode || 'rect';
         let nextMode: 'move' | 'resize' | 'rect';
         if (currentMode === 'rect') {
           nextMode = 'move';
@@ -465,12 +464,12 @@ export class Sidebar implements Destroyable {
       this.toolbar.supportedAnnotationTools = tools;
     });
 
-    guestRPC.on(
-      'keyboardModeChanged',
-      (state: { keyboardActive: boolean; keyboardMode: KeyboardMode }) => {
-        this.toolbar.keyboardModeState = state;
-      },
-    );
+    guestRPC.on('keyboardModeChanged', (state: {
+      keyboardActive: boolean;
+      keyboardMode: KeyboardMode;
+    }) => {
+      this.toolbar.keyboardModeState = state;
+    });
 
     guestRPC.connect(port);
     this._guestRPC.push(guestRPC);
