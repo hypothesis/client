@@ -56,6 +56,7 @@ describe('Guest', () => {
   let fakeSetAllShortcuts;
   let fakeGetAllShortcuts;
   let FakeOutsideAssignmentNoticeController;
+  let fakeIsMacOS;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
