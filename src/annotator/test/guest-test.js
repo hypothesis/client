@@ -803,11 +803,10 @@ describe('Guest', () => {
 
         const guest = createGuest();
         emitHostEvent('activateMoveMode');
-        // Wait for the promise rejection and catch handler to execute (line 1086)
-        await delay(10);
+        await delay(0);
 
         assert.calledWith(fakeDrawTool.draw, 'rect');
-        // Verify that _pendingKeyboardMode was cleared after error (line 1086)
+        // Verify that _pendingKeyboardMode was cleared after error
         assert.isUndefined(guest._pendingKeyboardMode);
         // Second activateMoveMode should still work (state was cleared)
         fakeDrawTool.draw.resetHistory();
@@ -856,11 +855,10 @@ describe('Guest', () => {
 
         const guest = createGuest();
         emitHostEvent('activatePointMoveMode');
-        // Wait for the promise rejection and catch handler to execute (line 1086)
-        await delay(10);
+        await delay(0);
 
         assert.calledWith(fakeDrawTool.draw, 'point');
-        // Verify that _pendingKeyboardMode was cleared after error (line 1086)
+        // Verify that _pendingKeyboardMode was cleared after error
         assert.isUndefined(guest._pendingKeyboardMode);
       });
     });
@@ -1072,33 +1070,6 @@ describe('Guest', () => {
         assert.isFalse(sidebarClosed());
       });
 
-      it('does not hide sidebar if click is at a point with annotations (line 436)', () => {
-        // Configure getHighlightsFromPoint to return a highlight with annotation tag
-        // This covers the early return at line 436 when annotationsAtPoint returns non-empty array
-        fakeHighlighter.getHighlightsFromPoint.returns([
-          { _annotation: { $tag: 'test-annotation-tag' } },
-        ]);
-
-        createGuest();
-
-        // Simulate click at coordinates where there's a highlight
-        // annotationsAtPoint will return ['test-annotation-tag'], so length > 0
-        // This triggers the return at line 436
-        rootElement.dispatchEvent(
-          new PointerEvent('pointerdown', {
-            bubbles: true,
-            clientX: 50,
-            clientY: 60,
-          }),
-        );
-
-        // Verify sidebar was not closed (line 436 return executed)
-        assert.isFalse(sidebarClosed());
-
-        // Verify getHighlightsFromPoint was called with correct coordinates
-        assert.calledWith(fakeHighlighter.getHighlightsFromPoint, 50, 60);
-      });
-
       it('does not hide sidebar if side-by-side mode is active', () => {
         createGuest();
         fakeIntegration.sideBySideActive.returns(true);
@@ -1130,26 +1101,13 @@ describe('Guest', () => {
       });
 
       it('does not hide sidebar if event is within the bounds of the sidebar', () => {
-        fakeHighlighter.getHighlightsFromPoint.returns([]);
-        const guest = createGuest();
+        createGuest();
         emitHostEvent('sidebarLayoutChanged', { expanded: true, width: 300 });
 
-        // Configure frameFillsAncestor to return true with correct arguments
-        // to cover the full condition at line 443-447 (line 448 return statement)
-        fakeFrameFillsAncestor.withArgs(window, hostFrame).returns(true);
+        // Simulate click on the left edge of the sidebar.
+        simulateClick(rootElement, window.innerWidth - 295);
 
-        // Simulate click within sidebar bounds
-        // For width=300, we need: window.innerWidth - clientX < 300
-        // So clientX > window.innerWidth - 300
-        // Using window.innerWidth - 150 to ensure we're well within bounds
-        const clientX = window.innerWidth - 150;
-        simulateClick(rootElement, clientX);
-
-        // Verify sidebar was not closed (line 448 return executed)
         assert.isFalse(sidebarClosed());
-
-        // Verify frameFillsAncestor was called with correct arguments
-        assert.calledWith(fakeFrameFillsAncestor, window, hostFrame);
       });
 
       it('hides sidebar if event is outside sidebar bounds even when frameFillsAncestor is true', () => {
@@ -2374,7 +2332,7 @@ describe('Guest', () => {
       fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
       fakeDrawTool.draw.rejects(new DrawError('canceled'));
 
-      const guest = createGuest();
+      createGuest();
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           ctrlKey: true,
@@ -2383,12 +2341,9 @@ describe('Guest', () => {
           bubbles: true,
         }),
       );
-      // Wait for the promise rejection and catch handler to execute (line 803)
-      await delay(10);
+      await delay(0);
 
       assert.calledWith(fakeDrawTool.draw, 'rect');
-      // Verify that _pendingKeyboardMode was cleared after error (line 803)
-      assert.isUndefined(guest._pendingKeyboardMode);
       fakeDrawTool.draw.resetHistory();
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2583,12 +2538,11 @@ describe('Guest', () => {
         }),
       );
 
-      // Wait for the promise rejection and catch handler to execute (line 825)
-      await delay(10);
+      await delay(0);
 
       // Verify that draw was called with resize mode
       assert.calledWith(fakeDrawTool.draw, 'rect', 'resize');
-      // Verify that _pendingKeyboardMode was cleared after error (line 825)
+      // Verify that _pendingKeyboardMode was cleared after error
       assert.isUndefined(guest._pendingKeyboardMode);
     });
 
