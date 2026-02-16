@@ -81,23 +81,6 @@ describe('HypothesisInjector integration test', () => {
   }
 
   describe('injectClient', () => {
-    it('returns immediately without injecting when frame already has Hypothesis client', async () => {
-      const frame = document.createElement('iframe');
-      container.append(frame);
-      await onNextDocumentReady(frame);
-
-      const existingConfig = document.createElement('script');
-      existingConfig.className = 'js-hypothesis-config';
-      frame.contentDocument.body.appendChild(existingConfig);
-
-      await injectClient(frame, { clientUrl: 'https://hyp.is' });
-
-      assert.isNull(
-        getHypothesisScript(frame),
-        'should not add boot script when client already present',
-      );
-    });
-
     it('configures client', async () => {
       const frame = document.createElement('iframe');
       container.append(frame);

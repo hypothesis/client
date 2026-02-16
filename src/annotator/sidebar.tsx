@@ -9,10 +9,9 @@ import { PortRPC } from '../shared/messaging';
 import type {
   AnchorPosition,
   AnnotationTool,
+  SidebarLayout,
   Destroyable,
   Events,
-  KeyboardMode,
-  SidebarLayout,
 } from '../types/annotator';
 import type { Service } from '../types/config';
 import type {
@@ -184,40 +183,6 @@ export class Sidebar implements Destroyable {
       setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
 
-    // Set up callback for mode button click - cycles through modes
-    this.toolbar.modeButtonCallbacks = {
-      onModeClick: () => {
-        const rpc = this._getGuestRPC();
-        if (!rpc) {
-          return;
-        }
-        const currentMode = this.toolbar.keyboardModeState?.keyboardMode || 'rect';
-        let nextMode: 'move' | 'resize' | 'rect';
-        if (currentMode === 'rect') {
-          nextMode = 'move';
-        } else if (currentMode === 'move') {
-          nextMode = 'resize';
-        } else {
-          nextMode = 'rect';
-        }
-        rpc.call('setKeyboardMode', { mode: nextMode });
-      },
-      onActivateMoveMode: () => {
-        const rpc = this._getGuestRPC();
-        if (!rpc) {
-          return;
-        }
-        rpc.call('activateMoveMode');
-      },
-      onActivatePointMoveMode: () => {
-        const rpc = this._getGuestRPC();
-        if (!rpc) {
-          return;
-        }
-        rpc.call('activatePointMoveMode');
-      },
-    };
-
     if (config.externalContainerSelector) {
       this.externalFrame =
         document.querySelector(config.externalContainerSelector) ?? element;
@@ -375,11 +340,6 @@ export class Sidebar implements Destroyable {
     this._setupSidebarEvents();
   }
 
-  /** First connected guest RPC, or null if none. */
-  private _getGuestRPC(): PortRPC<GuestToHostCalls, HostToGuestCalls> | null {
-    return this._guestRPC[0] ?? null;
-  }
-
   destroy() {
     this._guestRPC.forEach(rpc => rpc.destroy());
     this._sidebarRPC.destroy();
@@ -462,13 +422,6 @@ export class Sidebar implements Destroyable {
 
     guestRPC.on('supportedToolsChanged', (tools: AnnotationTool[]) => {
       this.toolbar.supportedAnnotationTools = tools;
-    });
-
-    guestRPC.on('keyboardModeChanged', (state: {
-      keyboardActive: boolean;
-      keyboardMode: KeyboardMode;
-    }) => {
-      this.toolbar.keyboardModeState = state;
     });
 
     guestRPC.connect(port);

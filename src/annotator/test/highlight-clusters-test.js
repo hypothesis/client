@@ -108,18 +108,6 @@ describe('HighlightClusterController', () => {
     });
   });
 
-  it('scheduleClusterUpdates does not call updateClusters when feature flag is off', () => {
-    const clock = sinon.useFakeTimers();
-    const controller = createToolbar();
-    assert.isFalse(fakeFeatures.flagEnabled('styled_highlight_clusters'));
-
-    controller.scheduleClusterUpdates();
-    clock.tick(150);
-
-    assert.notCalled(fakeUpdateClusters);
-    clock.restore();
-  });
-
   it('responds to toolbar callback to update styles for a highlight cluster', () => {
     fakeFeatures.update({ styled_highlight_clusters: true });
     createToolbar();

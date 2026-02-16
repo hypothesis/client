@@ -69,40 +69,6 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
     store.clearAnnotationFocusRequest();
   }, [focusRequest, store, thread.id]);
 
-  useEffect(() => {
-    const cardElement = cardRef.current;
-    if (!cardElement) {
-      return () => {};
-    }
-
-    const handleFocusIn = () => {
-      setThreadHovered(thread.annotation ?? null);
-    };
-
-    const handleFocusOut = (e: FocusEvent) => {
-      // Only clear hover if focus is moving outside the card entirely
-      // (not just to another element within the card)
-      const relatedTarget = e.relatedTarget as Node | null;
-      
-      // If relatedTarget is null, focus is leaving the document/frame entirely
-      // If relatedTarget exists but is not contained in the card, focus is moving outside
-      if (!relatedTarget || !cardElement.contains(relatedTarget)) {
-        setThreadHovered(null);
-      }
-      // If relatedTarget exists and is contained in the card, focus is moving
-      // to another element within the card (e.g., from a button to a link),
-      // so we keep the highlight active
-    };
-
-    cardElement.addEventListener('focusin', handleFocusIn);
-    cardElement.addEventListener('focusout', handleFocusOut);
-
-    return () => {
-      cardElement.removeEventListener('focusin', handleFocusIn);
-      cardElement.removeEventListener('focusout', handleFocusOut);
-    };
-  }, [setThreadHovered, thread.annotation]);
-
   return (
     <Card
       active={isHovered}
