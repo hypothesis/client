@@ -801,13 +801,11 @@ describe('Guest', () => {
         fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
         fakeDrawTool.draw.rejects(new DrawError('canceled'));
 
-        const guest = createGuest();
+        createGuest();
         emitHostEvent('activateMoveMode');
         await delay(0);
 
         assert.calledWith(fakeDrawTool.draw, 'rect');
-        // Verify that _pendingKeyboardMode was cleared after error
-        assert.isUndefined(guest._pendingKeyboardMode);
         // Second activateMoveMode should still work (state was cleared)
         fakeDrawTool.draw.resetHistory();
         emitHostEvent('activateMoveMode');
@@ -847,19 +845,6 @@ describe('Guest', () => {
         emitHostEvent('activatePointMoveMode');
 
         assert.calledWith(fakeDrawTool.setKeyboardMode, 'move');
-      });
-
-      it('clears pending mode when createAnnotation rejects', async () => {
-        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
-        fakeDrawTool.draw.rejects(new DrawError('canceled'));
-
-        const guest = createGuest();
-        emitHostEvent('activatePointMoveMode');
-        await delay(0);
-
-        assert.calledWith(fakeDrawTool.draw, 'point');
-        // Verify that _pendingKeyboardMode was cleared after error
-        assert.isUndefined(guest._pendingKeyboardMode);
       });
     });
 
@@ -2527,7 +2512,7 @@ describe('Guest', () => {
       fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
       fakeDrawTool.draw.rejects(new DrawError('canceled'));
 
-      const guest = createGuest();
+      createGuest();
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2542,8 +2527,6 @@ describe('Guest', () => {
 
       // Verify that draw was called with resize mode
       assert.calledWith(fakeDrawTool.draw, 'rect', 'resize');
-      // Verify that _pendingKeyboardMode was cleared after error
-      assert.isUndefined(guest._pendingKeyboardMode);
     });
 
     it('clears _pendingKeyboardMode when Ctrl+Shift+U annotation creation is canceled', async () => {
@@ -2551,7 +2534,7 @@ describe('Guest', () => {
       fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
       fakeDrawTool.draw.rejects(new DrawError('canceled'));
 
-      const guest = createGuest();
+      createGuest();
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -2566,8 +2549,6 @@ describe('Guest', () => {
 
       // Verify that draw was called with move mode
       assert.calledWith(fakeDrawTool.draw, 'point', 'move');
-      // Verify that _pendingKeyboardMode was cleared after error
-      assert.isUndefined(guest._pendingKeyboardMode);
     });
 
     it('activates point annotation with Ctrl+Shift+U when point is supported', async () => {

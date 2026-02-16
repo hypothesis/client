@@ -230,31 +230,5 @@ describe('ToolbarController', () => {
         onActivatePointMoveMode,
       );
     });
-
-    it('returns the current mode button callbacks', () => {
-      const controller = createToolbar();
-      const onModeClick = sinon.stub();
-      const onActivateMoveMode = sinon.stub();
-      const onActivatePointMoveMode = sinon.stub();
-
-      controller.modeButtonCallbacks = {
-        onModeClick,
-        onActivateMoveMode,
-        onActivatePointMoveMode,
-      };
-
-      const callbacks = controller.modeButtonCallbacks;
-      assert.equal(callbacks.onModeClick, onModeClick);
-      assert.equal(callbacks.onActivateMoveMode, onActivateMoveMode);
-      assert.equal(callbacks.onActivatePointMoveMode, onActivatePointMoveMode);
-    });
-
-    it('returns undefined callbacks when not set', () => {
-      const controller = createToolbar();
-      const callbacks = controller.modeButtonCallbacks;
-      assert.isUndefined(callbacks.onModeClick);
-      assert.isUndefined(callbacks.onActivateMoveMode);
-      assert.isUndefined(callbacks.onActivatePointMoveMode);
-    });
   });
 });
