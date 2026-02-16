@@ -54,7 +54,6 @@ describe('Guest', () => {
   let fakePortRPCs;
   let fakeOutsideAssignmentNotice;
   let fakeSetAllShortcuts;
-  let fakeGetAllShortcuts;
   let FakeOutsideAssignmentNoticeController;
   let fakeIsMacOS;
 
@@ -218,20 +217,6 @@ describe('Guest', () => {
       setVisible: sinon.stub(),
     };
     fakeSetAllShortcuts = sinon.stub();
-    // Default shortcuts including the new keyboard annotation shortcuts
-    fakeGetAllShortcuts = sinon.stub().returns({
-      applyUpdates: 'l',
-      openKeyboardShortcuts: 'k',
-      openSearch: '/',
-      annotateSelection: 'a',
-      highlightSelection: 'h',
-      toggleHighlights: 'ctrl+shift+h',
-      showSelection: 's',
-      hideAdder: 'Escape',
-      activateRectMove: 'ctrl+shift+y',
-      activateRectResize: 'ctrl+shift+j',
-      activatePoint: 'ctrl+shift+u',
-    });
 
     FakeOutsideAssignmentNoticeController = sinon
       .stub()
@@ -244,13 +229,14 @@ describe('Guest', () => {
       }
     }
 
+    fakeIsMacOS = sinon.stub().returns(false);
+
     $imports.$mock({
       '../shared/messaging': {
         PortFinder: sinon.stub().returns(fakePortFinder),
         PortRPC: FakePortRPC,
       },
       '../shared/shortcut-config': {
-        getAllShortcuts: fakeGetAllShortcuts,
         setAllShortcuts: fakeSetAllShortcuts,
       },
       './adder': { Adder: FakeAdder },
@@ -282,6 +268,9 @@ describe('Guest', () => {
       },
       './util/frame': {
         frameFillsAncestor: fakeFrameFillsAncestor,
+      },
+      '../shared/user-agent': {
+        isMacOS: fakeIsMacOS,
       },
     });
   });
@@ -2631,20 +2620,8 @@ describe('Guest', () => {
       assert.calledWith(hostRPC().call, 'activeToolChanged', 'rect');
     });
 
-    it('uses Meta+Shift+J when shortcut is configured as meta+shift+j (e.g. on macOS)', async () => {
-      fakeGetAllShortcuts.returns({
-        applyUpdates: 'l',
-        openKeyboardShortcuts: 'k',
-        openSearch: '/',
-        annotateSelection: 'a',
-        highlightSelection: 'h',
-        toggleHighlights: 'ctrl+shift+h',
-        showSelection: 's',
-        hideAdder: 'Escape',
-        activateRectMove: 'ctrl+shift+y',
-        activateRectResize: 'meta+shift+j',
-        activatePoint: 'ctrl+shift+u',
-      });
+    it('uses Meta+Shift+J on macOS to activate resize mode when rect is supported', async () => {
+      fakeIsMacOS.returns(true);
       fakeIntegration.supportedTools.returns(['rect']);
       fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
       fakeDrawTool.draw.resolves({
@@ -2967,62 +2944,6 @@ describe('Guest', () => {
       );
 
       // Should not call draw when already in keyboard mode
-      assert.notCalled(fakeDrawTool.draw);
-    });
-
-    it('does not activate keyboard annotation modes when shortcuts are disabled', () => {
-      fakeIntegration.supportedTools.returns(['rect', 'point']);
-      fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
-
-      // Mock getAllShortcuts to return disabled shortcuts
-      fakeGetAllShortcuts.returns({
-        applyUpdates: 'l',
-        openKeyboardShortcuts: 'k',
-        openSearch: '/',
-        annotateSelection: 'a',
-        highlightSelection: 'h',
-        toggleHighlights: 'ctrl+shift+h',
-        showSelection: 's',
-        hideAdder: 'Escape',
-        activateRectMove: null, // Disabled
-        activateRectResize: null, // Disabled
-        activatePoint: null, // Disabled
-      });
-
-      createGuest();
-      emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
-
-      // Try Ctrl+Shift+Y (should not activate because shortcut is disabled)
-      document.body.dispatchEvent(
-        new KeyboardEvent('keydown', {
-          ctrlKey: true,
-          shiftKey: true,
-          key: 'y',
-          bubbles: true,
-        }),
-      );
-      assert.notCalled(fakeDrawTool.draw);
-
-      // Try Ctrl+Shift+J (should not activate because shortcut is disabled)
-      document.body.dispatchEvent(
-        new KeyboardEvent('keydown', {
-          ctrlKey: true,
-          shiftKey: true,
-          key: 'j',
-          bubbles: true,
-        }),
-      );
-      assert.notCalled(fakeDrawTool.draw);
-
-      // Try Ctrl+Shift+U (should not activate because shortcut is disabled)
-      document.body.dispatchEvent(
-        new KeyboardEvent('keydown', {
-          ctrlKey: true,
-          shiftKey: true,
-          key: 'u',
-          bubbles: true,
-        }),
-      );
       assert.notCalled(fakeDrawTool.draw);
     });
 

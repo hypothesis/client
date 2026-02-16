@@ -10,7 +10,6 @@ import { useMemo, useState } from 'preact/hooks';
 import ModalDialog from '../../annotator/components/ModalDialog';
 import {
   getAllShortcuts,
-  KEYBOARD_ANNOTATION_SHORTCUT_IDS,
   parseShortcutInputEvent,
   repeatableShortcutGroups,
   resetShortcuts,
@@ -53,7 +52,6 @@ type ShortcutBodyProps = {
   shortcutsKeyValue: ShortcutsConfig;
   duplicateShortcutsMessage: string | null;
   saveError: string | null;
-  shortcutDefinitionsToShow: ShortcutDefinition[];
 };
 
 function ShortcutBody({
@@ -61,10 +59,9 @@ function ShortcutBody({
   shortcutsKeyValue,
   duplicateShortcutsMessage,
   saveError,
-  shortcutDefinitionsToShow,
 }: ShortcutBodyProps) {
   // Group shortcuts for display
-  const groupShortcuts = shortcutDefinitionsToShow.reduce<ShortcutGroups>(
+  const groupShortcuts = shortcutDefinitions.reduce<ShortcutGroups>(
     (accumulator, definition) => {
       accumulator[definition.group] ??= [];
       accumulator[definition.group].push(definition);
@@ -224,19 +221,7 @@ function KeyboardShortcutsModal({
   const store = useSidebarStore();
   const hasFetchedProfile = store.hasFetchedProfile();
   const profile = store.profile();
-  const vpatKeyboardEnabled = store.isFeatureEnabled('vpat_keyboard');
   const [saveError, setSaveError] = useState<string | null>(null);
-
-  // Only show keyboard annotation shortcuts when the feature flag is enabled
-  const visibleShortcutDefinitions = useMemo(
-    () =>
-      shortcutDefinitions.filter(
-        def =>
-          !KEYBOARD_ANNOTATION_SHORTCUT_IDS.includes(def.id) ||
-          vpatKeyboardEnabled,
-      ),
-    [vpatKeyboardEnabled],
-  );
 
   const restoreProfileShortcuts = () => {
     if (!hasFetchedProfile) {
@@ -282,9 +267,9 @@ function KeyboardShortcutsModal({
 
   // Returns a list of duplicate shortcuts that are not allowed to be repeated
   const duplicateShortcuts = useMemo(() => {
-    // Group current shortcuts by key (only among visible shortcuts)
+    // Group current shortcuts by key
     const shortcutsByKey = new Map<string, ShortcutDefinition[]>();
-    visibleShortcutDefinitions.forEach(shortcutDefinition => {
+    shortcutDefinitions.forEach(shortcutDefinition => {
       const keyValue = shortcuts[shortcutDefinition.id]?.trim().toLowerCase();
       if (keyValue) {
         const shortcutsKeyValue = shortcutsByKey.get(keyValue) ?? [];
@@ -297,7 +282,7 @@ function KeyboardShortcutsModal({
       // Keep only duplicate groups that are not allowed to be repeated
       return isShortcutConflict(shortcuts.map(({ id }) => id));
     });
-  }, [shortcuts, visibleShortcutDefinitions]);
+  }, [shortcuts]);
 
   const duplicateShortcutsMessage =
     duplicateShortcuts.length > 0
@@ -324,7 +309,6 @@ function KeyboardShortcutsModal({
           <ShortcutBody
             duplicateShortcutsMessage={duplicateShortcutsMessage}
             handleShortcutInputKeyDown={handleShortcutInputKeyDown}
-            shortcutDefinitionsToShow={visibleShortcutDefinitions}
             shortcutsKeyValue={shortcuts}
             saveError={saveError}
           />

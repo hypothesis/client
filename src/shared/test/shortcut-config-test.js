@@ -44,39 +44,6 @@ describe('shared/shortcut-config', () => {
     });
   });
 
-  describe('keyboard annotation shortcuts', () => {
-    it('has default values for activateRectMove, activateRectResize, and activatePoint', () => {
-      const defaults = getDefaultShortcuts();
-      assert.equal(defaults.activateRectMove, 'ctrl+shift+y');
-      assert.equal(defaults.activateRectResize, 'ctrl+shift+j');
-      assert.equal(defaults.activatePoint, 'ctrl+shift+u');
-    });
-
-    it('allows setting and getting keyboard annotation shortcuts', () => {
-      setShortcut('activateRectMove', 'ctrl+shift+m');
-      setShortcut('activateRectResize', null);
-      setShortcut('activatePoint', 'ctrl+shift+p');
-
-      const shortcuts = getAllShortcuts();
-      assert.equal(shortcuts.activateRectMove, 'ctrl+shift+m');
-      assert.isNull(shortcuts.activateRectResize);
-      assert.equal(shortcuts.activatePoint, 'ctrl+shift+p');
-    });
-
-    it('resets keyboard annotation shortcuts to defaults', () => {
-      setShortcut('activateRectMove', 'ctrl+shift+m');
-      setShortcut('activateRectResize', null);
-      setShortcut('activatePoint', 'ctrl+shift+p');
-
-      resetShortcuts();
-
-      const shortcuts = getAllShortcuts();
-      assert.equal(shortcuts.activateRectMove, 'ctrl+shift+y');
-      assert.equal(shortcuts.activateRectResize, 'ctrl+shift+j');
-      assert.equal(shortcuts.activatePoint, 'ctrl+shift+u');
-    });
-  });
-
   describe('parseShortcutInputEvent', () => {
     it('returns null for modifier-only and tab keys', () => {
       assert.isNull(

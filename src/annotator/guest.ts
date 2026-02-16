@@ -5,6 +5,7 @@ import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
 import { matchShortcut } from '../shared/shortcut';
 import { getAllShortcuts, setAllShortcuts } from '../shared/shortcut-config';
+import { isMacOS } from '../shared/user-agent';
 import type {
   AbstractRange,
   AnnotationData,
@@ -785,26 +786,25 @@ export class Guest
         return;
       }
 
-      // Only process keyboard annotation shortcuts if the feature is enabled
-      if (!this._isKeyboardAnnotationModeEnabled()) {
-        return;
-      }
-
-      // Get current shortcuts configuration
-      const shortcuts = getAllShortcuts();
+      const isModifierPressed = isMacOS() ? e.metaKey : e.ctrlKey;
+      const isShiftPressed = e.shiftKey;
 
       // Check if rectangle annotation is supported before activating keyboard mode
       const supportedTools = this._integration.supportedTools();
       const isRectSupported = supportedTools.includes('rect');
       const isPointSupported = supportedTools.includes('point');
 
-      // Activate rectangle annotation in move mode
-      const activateRectMove = shortcuts.activateRectMove;
+      // Ctrl+Shift+Y: Activate annotation mode in move mode
       if (
-        activateRectMove &&
-        matchShortcut(e, activateRectMove) &&
-        isRectSupported
+        isModifierPressed &&
+        isShiftPressed &&
+        e.key.toLowerCase() === 'y' &&
+        this._isKeyboardAnnotationModeEnabled()
       ) {
+        // Only activate if rectangle annotation is supported
+        if (!isRectSupported) {
+          return;
+        }
         e.preventDefault();
         e.stopPropagation();
         // Check if we're already in annotation mode
@@ -823,38 +823,46 @@ export class Guest
         return;
       }
 
-      // Activate rectangle annotation in resize mode
-      const activateRectResize = shortcuts.activateRectResize;
+      // Ctrl+Shift+J: Activate annotation mode in resize mode
       if (
-        activateRectResize &&
-        matchShortcut(e, activateRectResize) &&
-        isRectSupported
+        isModifierPressed &&
+        isShiftPressed &&
+        e.key.toLowerCase() === 'j' &&
+        this._isKeyboardAnnotationModeEnabled()
       ) {
-        e.preventDefault();
-        e.stopPropagation();
-        // Check if we're already in annotation mode
-        const state = this._drawTool.getKeyboardModeState();
-        if (!state.keyboardActive) {
-          // Not in annotation mode - activate it
-          this._pendingKeyboardMode = 'resize';
-          this.createAnnotation('rect').catch(() => {
-            // Ignore errors (user might have canceled)
-            this._pendingKeyboardMode = undefined;
-          });
-        } else {
-          // Already in annotation mode - switch to resize mode
-          this._drawTool.setKeyboardMode('resize');
+        // Only activate if rectangle annotation is supported
+        if (isRectSupported) {
+          e.preventDefault();
+          e.stopPropagation();
+          // Check if we're already in annotation mode
+          const state = this._drawTool.getKeyboardModeState();
+          if (!state.keyboardActive) {
+            // Not in annotation mode - activate it
+            this._pendingKeyboardMode = 'resize';
+            this.createAnnotation('rect').catch(() => {
+              // Ignore errors (user might have canceled)
+              this._pendingKeyboardMode = undefined;
+            });
+          } else {
+            // Already in annotation mode - switch to resize mode
+            this._drawTool.setKeyboardMode('resize');
+          }
+          return;
         }
-        return;
+        // If rect is not supported, let the event propagate to highlights toggle handler
       }
 
-      // Activate point (pin) annotation mode
-      const activatePoint = shortcuts.activatePoint;
+      // Ctrl+Shift+U: Activate pin annotation mode
       if (
-        activatePoint &&
-        matchShortcut(e, activatePoint) &&
-        isPointSupported
+        isModifierPressed &&
+        isShiftPressed &&
+        e.key.toLowerCase() === 'u' &&
+        this._isKeyboardAnnotationModeEnabled()
       ) {
+        // Only activate if point annotation is supported
+        if (!isPointSupported) {
+          return;
+        }
         e.preventDefault();
         e.stopPropagation();
         // Check if we're already in annotation mode
