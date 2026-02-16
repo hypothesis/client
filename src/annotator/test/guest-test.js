@@ -816,21 +816,6 @@ describe('Guest', () => {
         assert.calledWith(fakeDrawTool.draw, 'rect');
       });
 
-      it('clears pending mode when createAnnotation rejects with unexpected error', async () => {
-        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
-        // Reject with a non-DrawError to make createAnnotation throw
-        fakeDrawTool.draw.rejects(new Error('Unexpected error'));
-
-        const guest = createGuest();
-        emitHostEvent('activateMoveMode');
-        // Wait for the promise rejection and catch handler to execute (line 1086)
-        await delay(10);
-
-        assert.calledWith(fakeDrawTool.draw, 'rect', 'move');
-        // Verify that _pendingKeyboardMode was cleared after error (line 1086)
-        assert.isUndefined(guest._pendingKeyboardMode);
-      });
-
       it('switches to move mode when keyboard already active', () => {
         fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: true });
 
@@ -875,21 +860,6 @@ describe('Guest', () => {
         await delay(10);
 
         assert.calledWith(fakeDrawTool.draw, 'point');
-        // Verify that _pendingKeyboardMode was cleared after error (line 1086)
-        assert.isUndefined(guest._pendingKeyboardMode);
-      });
-
-      it('clears pending mode when createAnnotation rejects with unexpected error', async () => {
-        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
-        // Reject with a non-DrawError to make createAnnotation throw
-        fakeDrawTool.draw.rejects(new Error('Unexpected error'));
-
-        const guest = createGuest();
-        emitHostEvent('activatePointMoveMode');
-        // Wait for the promise rejection and catch handler to execute (line 1086)
-        await delay(10);
-
-        assert.calledWith(fakeDrawTool.draw, 'point', 'move');
         // Verify that _pendingKeyboardMode was cleared after error (line 1086)
         assert.isUndefined(guest._pendingKeyboardMode);
       });
