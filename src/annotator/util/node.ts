@@ -9,7 +9,7 @@ export function nodeIsText(node: Node): node is Text {
 /**
  * Return true if the event target is in an editable context where we should
  * not intercept keyboard shortcuts (e.g. user is typing).
- * Covers INPUT, TEXTAREA, contenteditable, and role="textbox", "searchbox", "combobox" for WCAG 2.1.4.
+ * Covers INPUT, TEXTAREA, contenteditable, and role="textbox" for WCAG 2.1.4.
  */
 export function isEditableContext(target: EventTarget | null): boolean {
   if (!target || !(target instanceof HTMLElement)) {
@@ -23,10 +23,8 @@ export function isEditableContext(target: EventTarget | null): boolean {
     return true;
   }
   if (
-    ['textbox', 'searchbox', 'combobox'].includes(
-      el.getAttribute?.('role') || '',
-    ) ||
-    el.closest?.('[role="textbox"], [role="searchbox"], [role="combobox"]')
+    el.getAttribute?.('role') === 'textbox' ||
+    el.closest?.('[role="textbox"]')
   ) {
     return true;
   }

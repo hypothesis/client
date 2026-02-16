@@ -1,10 +1,20 @@
 import type {
   KeyboardMode,
   PinnedCorner,
+  Rect,
   Shape,
 } from '../../types/annotator';
 import { getActiveEdges } from '../util/rect-resize';
-import { normalizeRect } from '../util/draw-tool-position';
+
+function normalizeRect(r: Rect): Rect {
+  return {
+    type: 'rect',
+    left: Math.min(r.left, r.right),
+    top: Math.min(r.top, r.bottom),
+    right: Math.max(r.left, r.right),
+    bottom: Math.max(r.top, r.bottom),
+  };
+}
 
 export type DrawToolSurfaceProps = {
   shape: Shape | undefined;
