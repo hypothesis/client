@@ -1057,14 +1057,14 @@ describe('DrawTool', () => {
       assert.isNumber(shape.bottom);
     });
 
-    it('Arrow keys with Shift use large increment for point', async () => {
+    it('Arrow keys with Ctrl use large increment for point', async () => {
       const shapePromise = tool.draw('point', 'move');
       await delay(0);
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           key: 'ArrowRight',
-          shiftKey: true,
+          ctrlKey: true,
           bubbles: true,
         }),
       );
@@ -1079,15 +1079,15 @@ describe('DrawTool', () => {
       assert.isNumber(shape.y);
     });
 
-    it('Arrow keys with Shift use large increment', async () => {
+    it('Arrow keys with Ctrl use large increment', async () => {
       const shapePromise = tool.draw('rect', 'move');
       await delay(0);
 
-      // Move with Shift (large increment)
+      // Move with Ctrl (large increment; Cmd on Mac)
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           key: 'ArrowRight',
-          shiftKey: true,
+          ctrlKey: true,
           bubbles: true,
         }),
       );

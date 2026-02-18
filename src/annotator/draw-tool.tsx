@@ -105,7 +105,7 @@ export class DrawTool implements Destroyable {
   /** Increment for keyboard movement (pixels) */
   private readonly _keyboardMoveIncrement = 10;
 
-  /** Increment for keyboard movement with Shift (pixels) */
+  /** Increment for keyboard movement with Ctrl (Windows) or Cmd (Mac) (pixels) */
   private readonly _keyboardMoveIncrementLarge = 50;
 
   /** Default size for rectangle when initialized via keyboard (pixels) */
@@ -128,6 +128,9 @@ export class DrawTool implements Destroyable {
 
   /** Timeout ID for debouncing scroll events */
   private _scrollDebounceTimeout?: number;
+
+  /** True when the current rect was created by keyboard; first mouse move clears it so user can draw with mouse. */
+  private _rectInitiatedByKeyboard: boolean = false;
 
   /**
    * @param root - Container in which the user can draw a shape. The drawing
@@ -232,10 +235,13 @@ export class DrawTool implements Destroyable {
     this._waitingForSecondClick = false;
     this._firstClickPoint = undefined;
     this._hasMoved = false;
+    this._rectInitiatedByKeyboard = false;
 
     this._surface.addEventListener('pointerdown', e => {
       switch (this._tool) {
         case 'rect':
+          // User is interacting with mouse; rect is no longer "keyboard-initiated"
+          this._rectInitiatedByKeyboard = false;
           // If we're waiting for a second click, this is the second click
           if (this._waitingForSecondClick && this._firstClickPoint) {
             // Complete the rectangle with the second click
@@ -277,6 +283,16 @@ export class DrawTool implements Destroyable {
     });
 
     this._surface.addEventListener('pointermove', e => {
+      // If rect was created by keyboard, first mouse move clears it so user can draw selection with mouse
+      if (this._rectInitiatedByKeyboard && this._shape?.type === 'rect') {
+        this._shape = undefined;
+        this._rectInitiatedByKeyboard = false;
+        this._waitingForSecondClick = false;
+        this._firstClickPoint = undefined;
+        this._hasMoved = false;
+        this._renderSurface();
+        return;
+      }
       if (!this._shape) {
         return;
       }
@@ -442,15 +458,16 @@ export class DrawTool implements Destroyable {
           return;
         }
 
-        // Arrow keys: Move or resize
+        // Arrow keys: Move or resize. Fast movement: Ctrl (Windows) or Cmd (Mac)
         if (
           ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)
         ) {
           e.preventDefault();
           e.stopPropagation();
-          const increment = e.shiftKey
-            ? this._keyboardMoveIncrementLarge
-            : this._keyboardMoveIncrement;
+          const increment =
+            e.metaKey || e.ctrlKey
+              ? this._keyboardMoveIncrementLarge
+              : this._keyboardMoveIncrement;
           this._handleArrowKey(e.key, increment);
           return;
         }
@@ -471,6 +488,7 @@ export class DrawTool implements Destroyable {
       this._waitingForSecondClick = false;
       this._firstClickPoint = undefined;
       this._hasMoved = false;
+      this._rectInitiatedByKeyboard = false;
       this._deactivateKeyboardMode();
     };
 
@@ -565,6 +583,7 @@ export class DrawTool implements Destroyable {
     // Initialize shape at top-left corner of visible content area if it doesn't exist
     if (!this._shape) {
       this._updateRectanglePosition();
+      this._rectInitiatedByKeyboard = true;
     }
 
     // Set up scroll listener to update rectangle position when scrolling
