@@ -537,6 +537,12 @@ export class Guest
 
     this._hostRPC.on('createAnnotation', ({ tool }) => {
       if (tool) {
+        // When creating rect annotation via sidebar (mouse click), default to 'move'
+        // mode so the rectangle appears on canvas. Keyboard shortcuts set
+        // _pendingKeyboardMode themselves before calling createAnnotation.
+        if (tool === 'rect' && this._pendingKeyboardMode === undefined) {
+          this._pendingKeyboardMode = 'move';
+        }
         return this.createAnnotation(tool);
       } else {
         this._drawTool.cancel();
@@ -1045,12 +1051,8 @@ export class Guest
         this._hostRPC.call('activeToolChanged', tool);
 
         // Draw the shape for the new annotation's region.
-        // Pass pending keyboard mode if set (from hotkey). For rect, default to
-        // 'move' so the rectangle appears on canvas when started via mouse (sidebar icon).
-        const initialMode =
-          tool === 'rect'
-            ? (this._pendingKeyboardMode ?? 'move')
-            : this._pendingKeyboardMode;
+        // Pass pending keyboard mode if set (from hotkey or sidebar click).
+        const initialMode = this._pendingKeyboardMode;
         this._pendingKeyboardMode = undefined;
         const shape = await this._drawTool.draw(tool, initialMode);
 

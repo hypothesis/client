@@ -105,7 +105,7 @@ export class DrawTool implements Destroyable {
   /** Increment for keyboard movement (pixels) */
   private readonly _keyboardMoveIncrement = 10;
 
-  /** Increment for keyboard movement with Ctrl (Windows) or Cmd (Mac) (pixels) */
+  /** Increment for keyboard movement with Ctrl or Cmd (pixels) */
   private readonly _keyboardMoveIncrementLarge = 50;
 
   /** Default size for rectangle when initialized via keyboard (pixels) */
@@ -290,6 +290,8 @@ export class DrawTool implements Destroyable {
         this._waitingForSecondClick = false;
         this._firstClickPoint = undefined;
         this._hasMoved = false;
+        // Deactivate keyboard mode since user is switching to mouse interaction
+        this._deactivateKeyboardMode();
         this._renderSurface();
         return;
       }
@@ -458,7 +460,7 @@ export class DrawTool implements Destroyable {
           return;
         }
 
-        // Arrow keys: Move or resize. Fast movement: Ctrl (Windows) or Cmd (Mac)
+        // Arrow keys: Move or resize. Fast movement: Ctrl or Cmd
         if (
           ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)
         ) {

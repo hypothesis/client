@@ -1101,7 +1101,7 @@ describe('DrawTool', () => {
       assert.equal(shape.type, 'rect');
     });
 
-    it('clears keyboard-initiated rectangle on first mouse move', async () => {
+    it('clears keyboard-initiated rectangle on first mouse move and deactivates keyboard mode', async () => {
       const shapePromise = tool.draw('rect', 'move');
       await delay(0);
 
@@ -1109,6 +1109,9 @@ describe('DrawTool', () => {
       assert.ok(tool._shape);
       assert.equal(tool._shape.type, 'rect');
       assert.isTrue(tool._rectInitiatedByKeyboard);
+      // Verify keyboard mode is active
+      const initialState = tool.getKeyboardModeState();
+      assert.isTrue(initialState.keyboardActive);
 
       // Simulate mouse move - should clear the keyboard-initiated rectangle
       sendPointerEvent('pointermove', 50, 50);
@@ -1120,6 +1123,10 @@ describe('DrawTool', () => {
       assert.isFalse(tool._waitingForSecondClick);
       assert.isUndefined(tool._firstClickPoint);
       assert.isFalse(tool._hasMoved);
+      // Verify keyboard mode was deactivated
+      const stateAfterMove = tool.getKeyboardModeState();
+      assert.isFalse(stateAfterMove.keyboardActive);
+      assert.isNull(stateAfterMove.keyboardMode);
 
       // Now user can draw with mouse - simulate click to create new rectangle
       sendPointerEvent('pointerdown', 10, 10);
