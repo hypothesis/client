@@ -1045,8 +1045,12 @@ export class Guest
         this._hostRPC.call('activeToolChanged', tool);
 
         // Draw the shape for the new annotation's region.
-        // Pass pending keyboard mode if set (from hotkey activation)
-        const initialMode = this._pendingKeyboardMode;
+        // Pass pending keyboard mode if set (from hotkey). For rect, default to
+        // 'move' so the rectangle appears on canvas when started via mouse (sidebar icon).
+        const initialMode =
+          tool === 'rect'
+            ? (this._pendingKeyboardMode ?? 'move')
+            : this._pendingKeyboardMode;
         this._pendingKeyboardMode = undefined;
         const shape = await this._drawTool.draw(tool, initialMode);
 
