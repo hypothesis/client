@@ -1057,14 +1057,14 @@ describe('DrawTool', () => {
       assert.isNumber(shape.bottom);
     });
 
-    it('Arrow keys with Shift use large increment for point', async () => {
+    it('Arrow keys with Ctrl use large increment for point', async () => {
       const shapePromise = tool.draw('point', 'move');
       await delay(0);
 
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           key: 'ArrowRight',
-          shiftKey: true,
+          ctrlKey: true,
           bubbles: true,
         }),
       );
@@ -1079,15 +1079,15 @@ describe('DrawTool', () => {
       assert.isNumber(shape.y);
     });
 
-    it('Arrow keys with Shift use large increment', async () => {
+    it('Arrow keys with Ctrl use large increment', async () => {
       const shapePromise = tool.draw('rect', 'move');
       await delay(0);
 
-      // Move with Shift (large increment)
+      // Move with Ctrl (large increment; Cmd on Mac)
       document.body.dispatchEvent(
         new KeyboardEvent('keydown', {
           key: 'ArrowRight',
-          shiftKey: true,
+          ctrlKey: true,
           bubbles: true,
         }),
       );
@@ -1099,6 +1099,46 @@ describe('DrawTool', () => {
 
       const shape = await shapePromise;
       assert.equal(shape.type, 'rect');
+    });
+
+    it('clears keyboard-initiated rectangle on first mouse move and deactivates keyboard mode', async () => {
+      const shapePromise = tool.draw('rect', 'move');
+      await delay(0);
+
+      // Verify rectangle was created and marked as keyboard-initiated
+      assert.ok(tool._shape);
+      assert.equal(tool._shape.type, 'rect');
+      assert.isTrue(tool._rectInitiatedByKeyboard);
+      // Verify keyboard mode is active
+      const initialState = tool.getKeyboardModeState();
+      assert.isTrue(initialState.keyboardActive);
+
+      // Simulate mouse move - should clear the keyboard-initiated rectangle
+      sendPointerEvent('pointermove', 50, 50);
+      await delay(0);
+
+      // Verify rectangle was cleared and flag reset
+      assert.isUndefined(tool._shape);
+      assert.isFalse(tool._rectInitiatedByKeyboard);
+      assert.isFalse(tool._waitingForSecondClick);
+      assert.isUndefined(tool._firstClickPoint);
+      assert.isFalse(tool._hasMoved);
+      // Verify keyboard mode was deactivated
+      const stateAfterMove = tool.getKeyboardModeState();
+      assert.isFalse(stateAfterMove.keyboardActive);
+      assert.isNull(stateAfterMove.keyboardMode);
+
+      // Now user can draw with mouse - simulate click to create new rectangle
+      sendPointerEvent('pointerdown', 10, 10);
+      sendPointerEvent('pointermove', 30, 40);
+      sendPointerEvent('pointerup', 30, 40);
+
+      const shape = await shapePromise;
+      assert.equal(shape.type, 'rect');
+      assert.equal(shape.left, 10);
+      assert.equal(shape.top, 10);
+      assert.equal(shape.right, 30);
+      assert.equal(shape.bottom, 40);
     });
 
     it('updates rectangle position when container scrolls', async () => {
