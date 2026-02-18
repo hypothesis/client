@@ -1101,6 +1101,39 @@ describe('DrawTool', () => {
       assert.equal(shape.type, 'rect');
     });
 
+    it('clears keyboard-initiated rectangle on first mouse move', async () => {
+      const shapePromise = tool.draw('rect', 'move');
+      await delay(0);
+
+      // Verify rectangle was created and marked as keyboard-initiated
+      assert.ok(tool._shape);
+      assert.equal(tool._shape.type, 'rect');
+      assert.isTrue(tool._rectInitiatedByKeyboard);
+
+      // Simulate mouse move - should clear the keyboard-initiated rectangle
+      sendPointerEvent('pointermove', 50, 50);
+      await delay(0);
+
+      // Verify rectangle was cleared and flag reset
+      assert.isUndefined(tool._shape);
+      assert.isFalse(tool._rectInitiatedByKeyboard);
+      assert.isFalse(tool._waitingForSecondClick);
+      assert.isUndefined(tool._firstClickPoint);
+      assert.isFalse(tool._hasMoved);
+
+      // Now user can draw with mouse - simulate click to create new rectangle
+      sendPointerEvent('pointerdown', 10, 10);
+      sendPointerEvent('pointermove', 30, 40);
+      sendPointerEvent('pointerup', 30, 40);
+
+      const shape = await shapePromise;
+      assert.equal(shape.type, 'rect');
+      assert.equal(shape.left, 10);
+      assert.equal(shape.top, 10);
+      assert.equal(shape.right, 30);
+      assert.equal(shape.bottom, 40);
+    });
+
     it('updates rectangle position when container scrolls', async () => {
       // Make container scrollable
       Object.assign(container.style, {
