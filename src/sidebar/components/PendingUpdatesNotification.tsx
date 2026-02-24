@@ -98,6 +98,7 @@ function PendingUpdatesNotification({
   useShortcut(
     shortcuts.applyUpdates,
     () => hasPendingChanges && applyPendingUpdates(),
+    { ignoreWhenEditable: true },
   );
 
   useEffect(() => {
