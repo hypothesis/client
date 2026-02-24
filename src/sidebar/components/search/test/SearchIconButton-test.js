@@ -163,7 +163,7 @@ describe('SearchIconButton', () => {
       });
     });
 
-    it('opens search panel if user is in an input field and presses "Ctrl-k"', () => {
+    it('does not open search panel if user is in an input field and presses "Ctrl-k"', () => {
       fakeIsMacOS.returns(false);
       const input = document.createElement('input');
       document.body.append(input);
@@ -184,7 +184,7 @@ describe('SearchIconButton', () => {
           }),
         );
 
-        assert.calledWith(fakeStore.openSidebarPanel, 'searchAnnotations');
+        assert.notCalled(fakeStore.openSidebarPanel);
       } finally {
         input.remove();
       }
