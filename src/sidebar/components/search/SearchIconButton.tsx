@@ -44,8 +44,8 @@ function useSearchKeyboardShortcuts(store: SidebarStore) {
 
   const modifierKey = isMacOS() ? 'meta' : 'ctrl';
 
-  useShortcut(shortcuts.openSearch, openSearch);
-  useShortcut(`${modifierKey}+k`, openSearch);
+  useShortcut(shortcuts.openSearch, openSearch, { ignoreWhenEditable: true });
+  useShortcut(`${modifierKey}+k`, openSearch, { ignoreWhenEditable: true });
 }
 
 export default function SearchIconButton() {

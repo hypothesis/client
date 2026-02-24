@@ -61,12 +61,16 @@ export default function SearchField({
 
   // As long as this input is mounted, pressing the "open search" shortcut
   // should make it recover focus
-  useShortcut(shortcuts.openSearch, e => {
-    if (document.activeElement !== input.current) {
-      e.preventDefault();
-      input.current?.focus();
-    }
-  });
+  useShortcut(
+    shortcuts.openSearch,
+    e => {
+      if (document.activeElement !== input.current) {
+        e.preventDefault();
+        input.current?.focus();
+      }
+    },
+    { ignoreWhenEditable: true },
+  );
 
   const onSubmit = (e: Event) => {
     e.preventDefault();
