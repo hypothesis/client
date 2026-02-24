@@ -143,6 +143,49 @@ describe('shared/shortcut', () => {
 
       assert.notCalled(onPress);
     });
+
+    it('does not trigger when target is an input if ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const input = document.createElement('input');
+      document.body.appendChild(input);
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      input.dispatchEvent(event);
+      removeShortcut();
+      assert.notCalled(onPress);
+      document.body.removeChild(input);
+    });
+
+    it('does not trigger when target is contenteditable if ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const div = document.createElement('div');
+      div.contentEditable = 'true';
+      document.body.appendChild(div);
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      div.dispatchEvent(event);
+      removeShortcut();
+      assert.notCalled(onPress);
+      document.body.removeChild(div);
+    });
+
+    it('still triggers on non-editable targets when ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const span = document.createElement('span');
+      document.body.appendChild(span);
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      span.dispatchEvent(event);
+      removeShortcut();
+      assert.called(onPress);
+      document.body.removeChild(span);
+    });
   });
 
   describe('useShortcut', () => {
