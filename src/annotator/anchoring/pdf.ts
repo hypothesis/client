@@ -71,6 +71,10 @@ function quotePositionCacheKey(quote: string, pos?: number) {
   return `${quote}:${pos}`;
 }
 
+function normalizePDFText(str: string): string {
+  return str.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ');
+}
+
 /**
  * Return the text layer element of the PDF page containing `node`.
  */
@@ -795,7 +799,22 @@ export async function describe(range: Range): Promise<Selector[]> {
     end: pageOffset + endPos.offset,
   } as TextPositionSelector;
 
-  const quote = TextQuoteAnchor.fromRange(pageView.div, textRange).toSelector();
+  const quote = (() => {
+    const selector = TextQuoteAnchor.fromRange(
+      pageView.div,
+      textRange,
+    ).toSelector();
+    return {
+      ...selector,
+      exact: normalizePDFText(selector.exact),
+      prefix: selector.prefix
+        ? normalizePDFText(selector.prefix)
+        : selector.prefix,
+      suffix: selector.suffix
+        ? normalizePDFText(selector.suffix)
+        : selector.suffix,
+    } satisfies TextQuoteSelector;
+  })();
   const pageSelector = createPageSelector(pageView, startPageIndex);
 
   return [position, quote, pageSelector];
