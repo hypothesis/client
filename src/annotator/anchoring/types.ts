@@ -14,6 +14,7 @@ import type {
   TextQuoteSelector,
 } from '../../types/api';
 import { matchQuote } from './match-quote';
+import { renderedTextFromRange } from './rendered-text';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
@@ -173,27 +174,13 @@ export class TextQuoteAnchor {
    * Will throw if `range` does not contain any text nodes.
    */
   static fromRange(root: Element, range: Range): TextQuoteAnchor {
-    const text = root.textContent!;
-    const textRange = TextRange.fromRange(range).relativeTo(root);
+    const exact = renderedTextFromRange(range);
 
-    const start = textRange.start.offset;
-    const end = textRange.end.offset;
-
-    // Number of characters around the quote to capture as context. We currently
-    // always use a fixed amount, but it would be better if this code was aware
-    // of logical boundaries in the document (paragraph, article etc.) to avoid
-    // capturing text unrelated to the quote.
-    //
-    // In regular prose the ideal content would often be the surrounding sentence.
-    // This is a natural unit of meaning which enables displaying quotes in
-    // context even when the document is not available. We could use `Intl.Segmenter`
-    // for this when available.
-    const contextLen = 32;
-
-    return new TextQuoteAnchor(root, text.slice(start, end), {
-      prefix: text.slice(Math.max(0, start - contextLen), start),
-      suffix: text.slice(end, Math.min(text.length, end + contextLen)),
-    });
+    // Without a reliable mapping from rendered-text offsets back to DOM
+    // positions, we omit prefix/suffix. The primary TextPositionSelector still
+    // anchors ranges; this improves the stored/displayed quote to match
+    // rendered spacing (eg. at <br> boundaries).
+    return new TextQuoteAnchor(root, exact, {});
   }
 
   static fromSelector(
