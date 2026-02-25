@@ -81,12 +81,21 @@ function isEditableTarget(target: EventTarget | null): boolean {
   if (target.isContentEditable) {
     return true;
   }
-  const tag = target.tagName;
-  return tag === 'INPUT' || tag === 'TEXTAREA';
+  if (target instanceof HTMLTextAreaElement) {
+    return true;
+  }
+  if (target instanceof HTMLInputElement) {
+    try {
+      return target.selectionStart !== null;
+    } catch {
+      return false;
+    }
+  }
+  return false;
 }
 
 /**
- * Install a shortcut key listener on the document.
+ *Install a shortcut key listener on the document.
  *
  * This can be used directly outside of a component. To use within a Preact
  * component, you probably want {@link useShortcut}.
