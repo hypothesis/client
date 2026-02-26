@@ -14,7 +14,7 @@ import type {
   TextQuoteSelector,
 } from '../../types/api';
 import { matchQuote } from './match-quote';
-import { renderedTextWithOffsets } from './rendered-text';
+import { collapseWhitespace, renderedTextWithOffsets } from './rendered-text';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
@@ -181,10 +181,13 @@ export class TextQuoteAnchor {
 
     const contextLen = 32;
 
-    const prefix = normText.slice(Math.max(0, normStart - contextLen), normStart);
+    const prefix = collapseWhitespace(
+      normText.slice(Math.max(0, normStart - contextLen), normStart),
+    ).trim();
     const exact = normText.slice(normStart, normEnd);
-    const suffix =
-      normText.slice(normEnd, Math.min(normText.length, normEnd + contextLen));
+    const suffix = collapseWhitespace(
+      normText.slice(normEnd, Math.min(normText.length, normEnd + contextLen)),
+    ).trim();
 
     return new TextQuoteAnchor(root, exact, { prefix, suffix });
   }
