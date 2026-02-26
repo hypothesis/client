@@ -51,4 +51,14 @@ describe('annotator/anchoring/rendered-text', () => {
     assert.equal(toRaw(0), 0);
     assert.equal(toRaw(-10), 0);
   });
+
+  it('falls back to 0 when no raw-to-norm mapping exists', () => {
+    // Whitespace-only content collapses to empty; ensure toNorm returns 0.
+    const container = document.createElement('div');
+    container.textContent = '   ';
+
+    const { toNorm } = renderedTextWithOffsets(container);
+
+    assert.equal(toNorm(1), 0);
+  });
 });
