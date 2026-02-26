@@ -32,4 +32,23 @@ describe('annotator/anchoring/rendered-text', () => {
     assert.equal(toNorm(container.textContent.length), trimmed.length);
     assert.equal(toRaw(trimmed.length), container.textContent.length);
   });
+
+  it('maps out-of-range raw offsets to 0', () => {
+    const container = document.createElement('div');
+    container.textContent = 'abc';
+
+    const { toNorm } = renderedTextWithOffsets(container);
+
+    assert.equal(toNorm(-5), 0);
+  });
+
+  it('maps norm offsets <= 0 to raw start', () => {
+    const container = document.createElement('div');
+    container.textContent = 'abc';
+
+    const { toRaw } = renderedTextWithOffsets(container);
+
+    assert.equal(toRaw(0), 0);
+    assert.equal(toRaw(-10), 0);
+  });
 });
