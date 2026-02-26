@@ -367,7 +367,17 @@ describe('annotator/anchoring/types', () => {
         });
 
         quoteAnchor.toRange({ hint: 42 });
-        assert.isTrue(fakeMatchQuote.called);
+        const normalize = str => str.replace(/\s+/g, ' ').trim();
+
+        assert.isTrue(fakeMatchQuote.calledOnce);
+        const [textArg, quoteArg, contextArg] = fakeMatchQuote.firstCall.args;
+        assert.equal(normalize(textArg), normalize(container.textContent));
+        assert.equal(quoteArg, 'Liberty');
+        assert.deepEqual(contextArg, {
+          hint: 42,
+          prefix: 'expected-prefix',
+          suffix: 'expected-suffix',
+        });
       });
 
       it('returns `Range` representing match found by `matchQuote`', () => {
