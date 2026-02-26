@@ -35,7 +35,7 @@ const BLOCK_TAGS = new Set([
 const SPACE = ' ';
 
 /** Collapse any run of whitespace (including newlines) to a single space. */
-function collapseWhitespace(text: string): string {
+export function collapseWhitespace(text: string): string {
   return text.replace(/\s+/g, SPACE);
 }
 
@@ -43,24 +43,57 @@ function isBlock(node: Node): boolean {
   return node.nodeType === Node.ELEMENT_NODE && BLOCK_TAGS.has(node.nodeName);
 }
 
-/**
- * Produce rendered-like text for a DOM Range by inserting spaces where the
- * browser would visually break lines.
- */
-export function renderedTextFromRange(range: Range): string {
-  const fragment = range.cloneContents();
-  let output = '';
+type RenderedText = {
+  text: string;
+  rawToNorm: number[];
+  normToRaw: number[];
+};
 
-  const appendSpace = () => {
-    if (output.length === 0 || output.endsWith(SPACE)) {
+function appendNormalizedChar(
+  ch: string,
+  rawIndex: number,
+  state: {
+    output: string;
+    rawToNorm: number[];
+    normToRaw: number[];
+  },
+) {
+  const isWs = /\s/.test(ch);
+  if (isWs) {
+    if (state.output.length === 0 || state.output.endsWith(SPACE)) {
       return;
     }
-    output += SPACE;
+    ch = SPACE;
+  }
+
+  state.output += ch;
+  state.normToRaw.push(rawIndex);
+  if (state.rawToNorm[rawIndex] === undefined) {
+    state.rawToNorm[rawIndex] = state.normToRaw.length - 1;
+  }
+}
+
+function buildRenderedText(root: Element): RenderedText {
+  const rawText = root.textContent ?? '';
+  const state = {
+    output: '',
+    rawToNorm: Array(rawText.length + 1).fill(undefined) as number[],
+    normToRaw: [] as number[],
+  };
+
+  let rawPos = 0;
+
+  const appendSpace = () => {
+    appendNormalizedChar(SPACE, rawPos, state);
   };
 
   const walk = (node: Node) => {
     if (node.nodeType === Node.TEXT_NODE) {
-      output += node.textContent || '';
+      const text = node.textContent ?? '';
+      for (let i = 0; i < text.length; i++) {
+        appendNormalizedChar(text[i], rawPos, state);
+        rawPos += 1;
+      }
       return;
     }
 
@@ -83,9 +116,53 @@ export function renderedTextFromRange(range: Range): string {
     }
   };
 
-  for (const child of Array.from(fragment.childNodes)) {
-    walk(child);
-  }
+  walk(root);
 
-  return collapseWhitespace(output).trim();
+  // Map end-of-string raw offset.
+  if (state.rawToNorm[rawPos] === undefined) {
+    state.rawToNorm[rawPos] = state.normToRaw.length;
+  }
+  state.normToRaw.push(rawPos);
+
+  const text = state.output; // Already normalized/collapsed
+  return { text, rawToNorm: state.rawToNorm, normToRaw: state.normToRaw };
+}
+
+function translateRawToNorm(rawToNorm: number[], rawOffset: number): number {
+  if (rawOffset < 0) return 0;
+  const clamped = Math.min(rawOffset, rawToNorm.length - 1);
+  for (let i = clamped; i >= 0; i--) {
+    const val = rawToNorm[i];
+    if (val !== undefined) return val;
+  }
+  return 0;
+}
+
+function translateNormToRaw(normToRaw: number[], normOffset: number): number {
+  if (normOffset <= 0) return 0;
+  const clamped = Math.min(normOffset, normToRaw.length - 1);
+  return normToRaw[clamped];
+}
+
+export function renderedTextFromRange(range: Range): string {
+  const container = range.cloneContents();
+  const div = document.createElement('div');
+  div.appendChild(container);
+  const { text } = buildRenderedText(div);
+  return text;
+}
+
+export function renderedTextWithOffsets(root: Element): {
+  text: string;
+  rawToNorm: number[];
+  normToRaw: number[];
+  toNorm: (rawOffset: number) => number;
+  toRaw: (normOffset: number) => number;
+} {
+  const rendered = buildRenderedText(root);
+  return {
+    ...rendered,
+    toNorm: rawOffset => translateRawToNorm(rendered.rawToNorm, rawOffset),
+    toRaw: normOffset => translateNormToRaw(rendered.normToRaw, normOffset),
+  };
 }

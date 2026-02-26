@@ -426,49 +426,46 @@ async function anchorQuote(
     });
   }
 
-  // Search pages for the best match, ignoring whitespace differences.
-  const strippedPrefix =
+  // Normalize quote and context consistently with selector creation.
+  const normalizedPrefix =
     quoteSelector.prefix !== undefined
-      ? stripSpaces(quoteSelector.prefix)
+      ? normalizePDFText(quoteSelector.prefix)
       : undefined;
-  const strippedSuffix =
+  const normalizedSuffix =
     quoteSelector.suffix !== undefined
-      ? stripSpaces(quoteSelector.suffix)
+      ? normalizePDFText(quoteSelector.suffix)
       : undefined;
-  const strippedQuote = stripSpaces(quoteSelector.exact);
+  const normalizedQuote = normalizePDFText(quoteSelector.exact);
 
   let bestMatch;
   for (const page of pageIndexes) {
     const text = await getPageTextContent(page);
-    const strippedText = stripSpaces(text);
+    const normalizedText = normalizePDFText(text);
 
     // Determine expected offset of quote in current page based on position hint.
-    let strippedHint;
+    let normalizedHint;
     if (expectedPageIndex !== undefined && expectedOffsetInPage !== undefined) {
       if (page < expectedPageIndex) {
-        strippedHint = strippedText.length; // Prefer matches closer to end of page.
+        normalizedHint = normalizedText.length; // Prefer matches closer to end of page.
       } else if (page === expectedPageIndex) {
-        // Translate expected offset in whitespace-inclusive version of page
-        // text into offset in whitespace-stripped version of page text.
-        [strippedHint] = translateOffsets(
+        // Translate expected offset in original text into offset in normalized text.
+        [normalizedHint] = translateOffsets(
           text,
-          strippedText,
+          normalizedText,
           expectedOffsetInPage,
           expectedOffsetInPage,
-          isNotSpace,
-          // We don't need to normalize here since both input strings are
-          // derived from the same input.
-          { normalize: false },
+          char => char !== ' ',
+          { normalize: true },
         );
       } else {
-        strippedHint = 0; // Prefer matches closer to start of page.
+        normalizedHint = 0; // Prefer matches closer to start of page.
       }
     }
 
-    const match = matchQuote(strippedText, strippedQuote, {
-      prefix: strippedPrefix,
-      suffix: strippedSuffix,
-      hint: strippedHint,
+    const match = matchQuote(normalizedText, normalizedQuote, {
+      prefix: normalizedPrefix,
+      suffix: normalizedSuffix,
+      hint: normalizedHint,
     });
 
     if (!match) {
@@ -476,14 +473,14 @@ async function anchorQuote(
     }
 
     if (!bestMatch || match.score > bestMatch.match.score) {
-      // Translate match offset from whitespace-stripped version of page text
-      // back to original text.
+      // Translate match offset from normalized text back to original text.
       const [start, end] = translateOffsets(
-        strippedText,
+        normalizedText,
         text,
         match.start,
         match.end,
-        isNotSpace,
+        char => char !== ' ',
+        { normalize: true },
       );
       bestMatch = {
         page,
@@ -504,21 +501,21 @@ async function anchorQuote(
       // helps to avoid incorrectly stopping the search early if the quote is
       // a word or phrase that is common in the document.
       const exactQuoteMatch =
-        strippedText.slice(match.start, match.end) === strippedQuote;
+        normalizedText.slice(match.start, match.end) === normalizedQuote;
 
       const exactPrefixMatch =
-        strippedPrefix !== undefined &&
-        strippedText.slice(
-          Math.max(0, match.start - strippedPrefix.length),
+        normalizedPrefix !== undefined &&
+        normalizedText.slice(
+          Math.max(0, match.start - normalizedPrefix.length),
           match.start,
-        ) === strippedPrefix;
+        ) === normalizedPrefix;
 
       const exactSuffixMatch =
-        strippedSuffix !== undefined &&
-        strippedText.slice(match.end, strippedSuffix.length) === strippedSuffix;
+        normalizedSuffix !== undefined &&
+        normalizedText.slice(match.end, match.end + normalizedSuffix.length) === normalizedSuffix;
 
       const hasContext =
-        strippedPrefix !== undefined || strippedSuffix !== undefined;
+        normalizedPrefix !== undefined || normalizedSuffix !== undefined;
 
       if (
         exactQuoteMatch &&
@@ -799,22 +796,17 @@ export async function describe(range: Range): Promise<Selector[]> {
     end: pageOffset + endPos.offset,
   } as TextPositionSelector;
 
-  const quote = (() => {
-    const selector = TextQuoteAnchor.fromRange(
-      pageView.div,
-      textRange,
-    ).toSelector();
-    return {
-      ...selector,
-      exact: normalizePDFText(selector.exact),
-      prefix: selector.prefix
-        ? normalizePDFText(selector.prefix)
-        : selector.prefix,
-      suffix: selector.suffix
-        ? normalizePDFText(selector.suffix)
-        : selector.suffix,
-    } satisfies TextQuoteSelector;
-  })();
+  const rawQuote = TextQuoteAnchor.fromRange(pageView.div, textRange).toSelector();
+  const quote: TextQuoteSelector = {
+    ...rawQuote,
+    exact: normalizePDFText(rawQuote.exact).trim(),
+    prefix: rawQuote.prefix
+      ? normalizePDFText(rawQuote.prefix).trim()
+      : rawQuote.prefix,
+    suffix: rawQuote.suffix
+      ? normalizePDFText(rawQuote.suffix).trim()
+      : rawQuote.suffix,
+  };
   const pageSelector = createPageSelector(pageView, startPageIndex);
 
   return [position, quote, pageSelector];
