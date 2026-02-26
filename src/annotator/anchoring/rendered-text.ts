@@ -23,7 +23,6 @@ const BLOCK_TAGS = new Set([
   'NAV',
   'OL',
   'P',
-  'PRE',
   'SECTION',
   'TABLE',
   'TD',
