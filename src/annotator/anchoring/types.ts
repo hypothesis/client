@@ -14,7 +14,7 @@ import type {
   TextQuoteSelector,
 } from '../../types/api';
 import { matchQuote } from './match-quote';
-import { renderedTextFromRange } from './rendered-text';
+import { renderedTextWithOffsets } from './rendered-text';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
@@ -174,13 +174,19 @@ export class TextQuoteAnchor {
    * Will throw if `range` does not contain any text nodes.
    */
   static fromRange(root: Element, range: Range): TextQuoteAnchor {
-    const exact = renderedTextFromRange(range);
+    const { text: normText, toNorm } = renderedTextWithOffsets(root);
+    const textRange = TextRange.fromRange(range).relativeTo(root);
+    const normStart = toNorm(textRange.start.offset);
+    const normEnd = toNorm(textRange.end.offset);
 
-    // Without a reliable mapping from rendered-text offsets back to DOM
-    // positions, we omit prefix/suffix. The primary TextPositionSelector still
-    // anchors ranges; this improves the stored/displayed quote to match
-    // rendered spacing (eg. at <br> boundaries).
-    return new TextQuoteAnchor(root, exact, {});
+    const contextLen = 32;
+
+    const prefix = normText.slice(Math.max(0, normStart - contextLen), normStart);
+    const exact = normText.slice(normStart, normEnd);
+    const suffix =
+      normText.slice(normEnd, Math.min(normText.length, normEnd + contextLen));
+
+    return new TextQuoteAnchor(root, exact, { prefix, suffix });
   }
 
   static fromSelector(
@@ -205,7 +211,7 @@ export class TextQuoteAnchor {
   }
 
   toPositionAnchor(options: QuoteMatchOptions = {}): TextPositionAnchor {
-    const text = this.root.textContent!;
+    const { text, toRaw } = renderedTextWithOffsets(this.root);
     const match = matchQuote(text, this.exact, {
       ...this.context,
       hint: options.hint,
@@ -213,7 +219,9 @@ export class TextQuoteAnchor {
     if (!match) {
       throw new Error('Quote not found');
     }
-    return new TextPositionAnchor(this.root, match.start, match.end);
+    const rawStart = toRaw(match.start);
+    const rawEnd = toRaw(match.end);
+    return new TextPositionAnchor(this.root, rawStart, rawEnd);
   }
 }
 
