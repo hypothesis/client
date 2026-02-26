@@ -512,7 +512,8 @@ async function anchorQuote(
 
       const exactSuffixMatch =
         normalizedSuffix !== undefined &&
-        normalizedText.slice(match.end, match.end + normalizedSuffix.length) === normalizedSuffix;
+        normalizedText.slice(match.end, match.end + normalizedSuffix.length) ===
+          normalizedSuffix;
 
       const hasContext =
         normalizedPrefix !== undefined || normalizedSuffix !== undefined;
@@ -796,7 +797,10 @@ export async function describe(range: Range): Promise<Selector[]> {
     end: pageOffset + endPos.offset,
   } as TextPositionSelector;
 
-  const rawQuote = TextQuoteAnchor.fromRange(pageView.div, textRange).toSelector();
+  const rawQuote = TextQuoteAnchor.fromRange(
+    pageView.div,
+    textRange,
+  ).toSelector();
   const quote: TextQuoteSelector = {
     ...rawQuote,
     exact: normalizePDFText(rawQuote.exact).trim(),

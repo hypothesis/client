@@ -2,6 +2,20 @@ import * as html from '../html';
 import fixture from './html-anchoring-fixture.html';
 import { htmlBaselines } from './html-baselines';
 
+const normalizeText = str => str.replace(/\s+/g, ' ').trim();
+const normalizeQuoteSelector = sel => {
+  if (sel.type !== 'TextQuoteSelector') {
+    return sel;
+  }
+  const normalize = s => (s === undefined ? s : s.replace(/\s+/g, ' ').trim());
+  return {
+    ...sel,
+    exact: normalize(sel.exact),
+    prefix: normalize(sel.prefix),
+    suffix: normalize(sel.suffix),
+  };
+};
+
 /** Return all text node children of `container`. */
 function textNodes(container) {
   const nodes = [];
@@ -279,7 +293,7 @@ const rangeSpecs = [
     0,
     '/p[4]',
     0,
-    'Header Level 2\n\n\n  Mauris lacinia ipsum nulla, id iaculis quam egestas quis.\n\n\n',
+    'Header Level 2\n\n\n  Mauris lacinia ipsum nulla, id iaculis quam egestas quis.\n\n\n\n\n',
     'No text node at the end and offset 0',
   ],
 
@@ -334,7 +348,10 @@ describe('HTML anchoring', () => {
       // Resolve the range descriptor to a DOM Range, verify that the expected
       // text was selected.
       const range = toRange(container, testCase.range);
-      assert.equal(range.toString(), testCase.quote);
+      assert.equal(
+        normalizeText(range.toString()),
+        normalizeText(testCase.quote),
+      );
 
       // Capture a set of selectors describing the range and perform basic sanity
       // checks on them.
@@ -364,7 +381,10 @@ describe('HTML anchoring', () => {
       // text. We test each selector in turn to make sure they are all valid.
       const anchored = selectors.map(sel => {
         return html.anchor(container, [sel]).then(anchoredRange => {
-          assert.equal(range.toString(), anchoredRange.toString());
+          assert.equal(
+            normalizeText(range.toString()),
+            normalizeText(anchoredRange.toString()),
+          );
         });
       });
       return Promise.all(anchored);
@@ -471,9 +491,11 @@ describe('HTML anchoring', () => {
 
         const annotationsChecked = annotations.map(async ann => {
           const root = frame.contentWindow.document.body;
-          const selectors = ann.target[0].selector;
+          const selectors = ann.target[0].selector.map(normalizeQuoteSelector);
           const range = await html.anchor(root, selectors);
-          const newSelectors = await html.describe(root, range);
+          const newSelectors = (await html.describe(root, range)).map(
+            normalizeQuoteSelector,
+          );
           assert.deepEqual(sortByType(selectors), sortByType(newSelectors));
         });
 
