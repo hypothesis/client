@@ -149,19 +149,46 @@ describe('annotator/anchoring/pdf', () => {
       assert.equal(position.end, expectedPos + quote.length);
     });
 
-    it('returns a quote selector with the correct quote', () => {
+    it('returns a quote selector with the correct quote', async () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
-      return pdfAnchoring.describe(range).then(selectors => {
-        const quote = selectors.find(s => s.type === 'TextQuoteSelector');
+      const selectors = await pdfAnchoring.describe(range);
+      const quote = selectors.find(s => s.type === 'TextQuoteSelector');
 
-        assert.deepEqual(quote, {
-          type: 'TextQuoteSelector',
-          exact: 'Netherfield Park',
-          prefix: 'im one day, "have you heard that',
-          suffix: 'is occupied again?"',
-        });
+      assert.deepEqual(quote, {
+        type: 'TextQuoteSelector',
+        exact: 'Netherfield Park',
+        prefix: 'im one day, "have you heard that',
+        suffix: 'is occupied again?"',
       });
+    });
+
+    it('handles quotes without prefix/suffix when describing', async () => {
+      viewer.pdfViewer.setCurrentPage(2);
+      const range = findText(container, 'Netherfield Park');
+
+      const fakeSelector = {
+        type: 'TextQuoteSelector',
+        exact: 'Netherfield Park',
+      };
+
+      pdfAnchoring.$imports.$mock({
+        './types': {
+          TextQuoteAnchor: {
+            fromRange: sinon.stub().returns({
+              toSelector: () => fakeSelector,
+            }),
+          },
+        },
+      });
+
+      const selectors = await pdfAnchoring.describe(range);
+      pdfAnchoring.$imports.$restore();
+
+      const quote = selectors.find(s => s.type === 'TextQuoteSelector');
+      assert.equal(quote.exact, 'Netherfield Park');
+      assert.isUndefined(quote.prefix);
+      assert.isUndefined(quote.suffix);
     });
 
     it('returns a page selector with the page number as the label', async () => {
