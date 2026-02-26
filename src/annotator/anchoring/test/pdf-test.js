@@ -506,6 +506,8 @@ describe('annotator/anchoring/pdf', () => {
 
       // nb. The new lines in fixtures don't appear in the extracted PDF text.
       const getPageText = page => fixtures.pdfPages[page].replaceAll('\n', '');
+      const normalize = str =>
+        str.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ');
 
       const quote = {
         type: 'TextQuoteSelector',
@@ -528,7 +530,21 @@ describe('annotator/anchoring/pdf', () => {
 
       await pdfAnchoring.anchor([position, quote]);
 
-      assert.ok(matchQuoteSpy.called);
+      const expectedText = normalize(getPageText(2));
+      const expectedQuote = normalize(quote.exact);
+      const expectedPrefix = normalize(quote.prefix);
+      const expectedSuffix = normalize(quote.suffix);
+      const expectedHint = expectedText.indexOf(expectedQuote);
+
+      assert.isTrue(matchQuoteSpy.calledOnce);
+      const [textArg, quoteArg, contextArg] = matchQuoteSpy.firstCall.args;
+      assert.equal(textArg, expectedText);
+      assert.equal(quoteArg, expectedQuote);
+      assert.deepEqual(contextArg, {
+        prefix: expectedPrefix,
+        suffix: expectedSuffix,
+        hint: expectedHint,
+      });
     });
 
     // See https://github.com/hypothesis/client/issues/1329
