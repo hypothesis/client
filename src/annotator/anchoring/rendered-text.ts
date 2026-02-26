@@ -106,13 +106,17 @@ function buildRenderedText(root: Element): RenderedText {
       }
 
       const block = isBlock(el);
-      if (block) appendSpace();
+      if (block) {
+        appendSpace();
+      }
 
       for (const child of Array.from(node.childNodes)) {
         walk(child);
       }
 
-      if (block) appendSpace();
+      if (block) {
+        appendSpace();
+      }
     }
   };
 
@@ -129,17 +133,23 @@ function buildRenderedText(root: Element): RenderedText {
 }
 
 function translateRawToNorm(rawToNorm: number[], rawOffset: number): number {
-  if (rawOffset < 0) return 0;
+  if (rawOffset < 0) {
+    return 0;
+  }
   const clamped = Math.min(rawOffset, rawToNorm.length - 1);
   for (let i = clamped; i >= 0; i--) {
     const val = rawToNorm[i];
-    if (val !== undefined) return val;
+    if (val !== undefined) {
+      return val;
+    }
   }
   return 0;
 }
 
 function translateNormToRaw(normToRaw: number[], normOffset: number): number {
-  if (normOffset <= 0) return 0;
+  if (normOffset <= 0) {
+    return 0;
+  }
   const clamped = Math.min(normOffset, normToRaw.length - 1);
   return normToRaw[clamped];
 }

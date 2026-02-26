@@ -501,11 +501,6 @@ describe('annotator/anchoring/pdf', () => {
 
       await pdfAnchoring.anchor([position, quote]);
 
-      const normalize = str =>
-        str.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ');
-      const normalizedText = normalize(fixtures.pdfPages[2]);
-      const normalizedQuote = normalize(quote.exact);
-
       assert.ok(matchQuoteSpy.called);
     });
 
