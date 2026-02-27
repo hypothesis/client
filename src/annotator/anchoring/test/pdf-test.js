@@ -149,19 +149,46 @@ describe('annotator/anchoring/pdf', () => {
       assert.equal(position.end, expectedPos + quote.length);
     });
 
-    it('returns a quote selector with the correct quote', () => {
+    it('returns a quote selector with the correct quote', async () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
-      return pdfAnchoring.describe(range).then(selectors => {
-        const quote = selectors.find(s => s.type === 'TextQuoteSelector');
+      const selectors = await pdfAnchoring.describe(range);
+      const quote = selectors.find(s => s.type === 'TextQuoteSelector');
 
-        assert.deepEqual(quote, {
-          type: 'TextQuoteSelector',
-          exact: 'Netherfield Park',
-          prefix: 'im one day, "have you heard that',
-          suffix: ' is occupied again?" ',
-        });
+      assert.deepEqual(quote, {
+        type: 'TextQuoteSelector',
+        exact: 'Netherfield Park',
+        prefix: 'im one day, "have you heard that',
+        suffix: 'is occupied again?"',
       });
+    });
+
+    it('handles quotes without prefix/suffix when describing', async () => {
+      viewer.pdfViewer.setCurrentPage(2);
+      const range = findText(container, 'Netherfield Park');
+
+      const fakeSelector = {
+        type: 'TextQuoteSelector',
+        exact: 'Netherfield Park',
+      };
+
+      pdfAnchoring.$imports.$mock({
+        './types': {
+          TextQuoteAnchor: {
+            fromRange: sinon.stub().returns({
+              toSelector: () => fakeSelector,
+            }),
+          },
+        },
+      });
+
+      const selectors = await pdfAnchoring.describe(range);
+      pdfAnchoring.$imports.$restore();
+
+      const quote = selectors.find(s => s.type === 'TextQuoteSelector');
+      assert.equal(quote.exact, 'Netherfield Park');
+      assert.isUndefined(quote.prefix);
+      assert.isUndefined(quote.suffix);
     });
 
     it('returns a page selector with the page number as the label', async () => {
@@ -479,6 +506,8 @@ describe('annotator/anchoring/pdf', () => {
 
       // nb. The new lines in fixtures don't appear in the extracted PDF text.
       const getPageText = page => fixtures.pdfPages[page].replaceAll('\n', '');
+      const normalize = str =>
+        str.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ');
 
       const quote = {
         type: 'TextQuoteSelector',
@@ -501,19 +530,20 @@ describe('annotator/anchoring/pdf', () => {
 
       await pdfAnchoring.anchor([position, quote]);
 
-      const stripSpaces = str => str.replace(/\s+/g, '');
-      const strippedText = stripSpaces(fixtures.pdfPages[2]);
-      const strippedQuote = stripSpaces(quote.exact);
+      const expectedText = normalize(getPageText(2));
+      const expectedQuote = normalize(quote.exact);
+      const expectedPrefix = normalize(quote.prefix);
+      const expectedSuffix = normalize(quote.suffix);
+      const expectedHint = expectedText.indexOf(expectedQuote);
 
-      const call = matchQuoteSpy
-        .getCalls()
-        .find(call => call.args[0] === strippedText);
-      assert.ok(call);
-      assert.equal(call.args[1], strippedQuote);
-      assert.match(call.args[2], {
-        prefix: stripSpaces(quote.prefix),
-        suffix: stripSpaces(quote.suffix),
-        hint: strippedText.indexOf(strippedQuote),
+      assert.isTrue(matchQuoteSpy.calledOnce);
+      const [textArg, quoteArg, contextArg] = matchQuoteSpy.firstCall.args;
+      assert.equal(textArg, expectedText);
+      assert.equal(quoteArg, expectedQuote);
+      assert.deepEqual(contextArg, {
+        prefix: expectedPrefix,
+        suffix: expectedSuffix,
+        hint: expectedHint,
       });
     });
 

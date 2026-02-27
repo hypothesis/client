@@ -15,8 +15,8 @@
         "end": 7
       },{
         "type": "TextQuoteSelector",
-        "prefix": "One ",
-        "suffix": " Three\n",
+        "prefix": "One",
+        "suffix": "Three",
         "exact": "Two"
       }]
     }]
