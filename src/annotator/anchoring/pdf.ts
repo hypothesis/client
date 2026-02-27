@@ -429,13 +429,13 @@ async function anchorQuote(
   // Normalize quote and context consistently with selector creation.
   const normalizedPrefix =
     quoteSelector.prefix !== undefined
-      ? normalizePDFText(quoteSelector.prefix)
+      ? normalizePDFText(quoteSelector.prefix).trim()
       : undefined;
   const normalizedSuffix =
     quoteSelector.suffix !== undefined
-      ? normalizePDFText(quoteSelector.suffix)
+      ? normalizePDFText(quoteSelector.suffix).trim()
       : undefined;
-  const normalizedQuote = normalizePDFText(quoteSelector.exact);
+  const normalizedQuote = normalizePDFText(quoteSelector.exact).trim();
 
   let bestMatch;
   for (const page of pageIndexes) {
