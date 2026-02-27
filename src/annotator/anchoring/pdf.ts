@@ -454,7 +454,7 @@ async function anchorQuote(
           normalizedText,
           expectedOffsetInPage,
           expectedOffsetInPage,
-          char => char !== ' ',
+          isNotSpace,
           { normalize: true },
         );
       } else {
@@ -479,7 +479,7 @@ async function anchorQuote(
         text,
         match.start,
         match.end,
-        char => char !== ' ',
+        isNotSpace,
         { normalize: true },
       );
       bestMatch = {
