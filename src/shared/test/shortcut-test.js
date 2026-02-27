@@ -186,6 +186,43 @@ describe('shared/shortcut', () => {
       assert.called(onPress);
       document.body.removeChild(span);
     });
+
+    it('fires shortcut when target is not an HTMLElement even with ignoreWhenEditable', () => {
+      const onPress = sinon.stub();
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      const textNode = document.createTextNode('x');
+      Object.defineProperty(event, 'target', { value: textNode });
+
+      document.documentElement.dispatchEvent(event);
+      removeShortcut();
+
+      assert.called(onPress);
+    });
+
+    it('fires shortcut when input selectionStart cannot be read', () => {
+      const onPress = sinon.stub();
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+
+      const input = document.createElement('input');
+      Object.defineProperty(input, 'selectionStart', {
+        get() {
+          throw new Error('no selectionStart');
+        },
+      });
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      Object.defineProperty(event, 'target', { value: input });
+
+      document.documentElement.dispatchEvent(event);
+      removeShortcut();
+
+      assert.called(onPress);
+    });
   });
 
   describe('useShortcut', () => {
