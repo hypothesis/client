@@ -44,7 +44,7 @@ function isBlock(node: Node): boolean {
 
 type RenderedText = {
   text: string;
-  rawToNorm: number[];
+  rawToNorm: (number | undefined)[];
   normToRaw: number[];
 };
 
@@ -53,7 +53,7 @@ function appendNormalizedChar(
   rawIndex: number,
   state: {
     output: string;
-    rawToNorm: number[];
+    rawToNorm: (number | undefined)[];
     normToRaw: number[];
   },
 ) {
@@ -76,7 +76,10 @@ function buildRenderedText(root: Element): RenderedText {
   const rawText = root.textContent ?? '';
   const state = {
     output: '',
-    rawToNorm: Array(rawText.length + 1).fill(undefined) as number[],
+    rawToNorm: Array(rawText.length + 1).fill(undefined) as (
+      | number
+      | undefined
+    )[],
     normToRaw: [] as number[],
   };
 
@@ -131,7 +134,10 @@ function buildRenderedText(root: Element): RenderedText {
   return { text, rawToNorm: state.rawToNorm, normToRaw: state.normToRaw };
 }
 
-function translateRawToNorm(rawToNorm: number[], rawOffset: number): number {
+function translateRawToNorm(
+  rawToNorm: (number | undefined)[],
+  rawOffset: number,
+): number {
   if (rawOffset < 0) {
     return 0;
   }
@@ -163,7 +169,7 @@ export function renderedTextFromRange(range: Range): string {
 
 export function renderedTextWithOffsets(root: Element): {
   text: string;
-  rawToNorm: number[];
+  rawToNorm: (number | undefined)[];
   normToRaw: number[];
   toNorm: (rawOffset: number) => number;
   toRaw: (normOffset: number) => number;
