@@ -81,6 +81,12 @@ function isEditableTarget(target: EventTarget | null): boolean {
   if (target.isContentEditable) {
     return true;
   }
+  if (
+    target.closest('[role="textbox"], [role="searchbox"]') instanceof
+    HTMLElement
+  ) {
+    return true;
+  }
   if (target instanceof HTMLTextAreaElement) {
     return true;
   }

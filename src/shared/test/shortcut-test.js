@@ -223,6 +223,46 @@ describe('shared/shortcut', () => {
 
       assert.called(onPress);
     });
+
+    it('does not trigger when target has role="textbox" if ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const textbox = document.createElement('div');
+      textbox.setAttribute('role', 'textbox');
+      document.body.appendChild(textbox);
+
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      Object.defineProperty(event, 'target', { value: textbox });
+      document.documentElement.dispatchEvent(event);
+
+      removeShortcut();
+      document.body.removeChild(textbox);
+
+      assert.notCalled(onPress);
+    });
+
+    it('still triggers when target has a non-editable ARIA role if ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const nonEditable = document.createElement('div');
+      nonEditable.setAttribute('role', 'button');
+      document.body.appendChild(nonEditable);
+
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      Object.defineProperty(event, 'target', { value: nonEditable });
+      document.documentElement.dispatchEvent(event);
+
+      removeShortcut();
+      document.body.removeChild(nonEditable);
+
+      assert.called(onPress);
+    });
   });
 
   describe('useShortcut', () => {
