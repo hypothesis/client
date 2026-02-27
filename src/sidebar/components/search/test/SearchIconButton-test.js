@@ -119,6 +119,76 @@ describe('SearchIconButton', () => {
       assert.calledWith(fakeStore.openSidebarPanel, 'searchAnnotations');
     });
 
+    it('does nothing if search panel is already open when "ctrl-K" is pressed', () => {
+      fakeIsMacOS.returns(false);
+      fakeStore.isSidebarPanelOpen.returns(true);
+
+      createSearchIconButton();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          key: 'k',
+          ctrlKey: true,
+        }),
+      );
+
+      assert.notCalled(fakeStore.openSidebarPanel);
+    });
+
+    it('does nothing if search panel is already open when "Cmd-K" is pressed', () => {
+      fakeIsMacOS.returns(true);
+      fakeStore.isSidebarPanelOpen.returns(true);
+
+      createSearchIconButton();
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          key: 'k',
+          metaKey: true,
+        }),
+      );
+
+      assert.notCalled(fakeStore.openSidebarPanel);
+    });
+
+    it('returns early when "/" shortcut handler is invoked while focus is in an input', () => {
+      const handlers = [];
+
+      $imports.$mock({
+        '../../../shared/shortcut': {
+          useShortcut: (shortcut, handler) =>
+            handlers.push({ shortcut, handler }),
+        },
+      });
+
+      const input = document.createElement('input');
+      document.body.append(input);
+
+      try {
+        createSearchIconButton();
+
+        const openSearchHandler = handlers.find(
+          h => h.shortcut === '/',
+        )?.handler;
+        assert.ok(openSearchHandler, 'handler for "/" should be registered');
+
+        openSearchHandler({
+          key: '/',
+          metaKey: false,
+          ctrlKey: false,
+          target: input,
+        });
+
+        assert.notCalled(fakeStore.openSidebarPanel);
+      } finally {
+        input.remove();
+      }
+    });
+
     it('opens search panel for macOS when "Cmd-K" is pressed outside of the component element', () => {
       fakeIsMacOS.returns(true);
       createSearchIconButton();
@@ -163,7 +233,7 @@ describe('SearchIconButton', () => {
       });
     });
 
-    it('opens search panel if user is in an input field and presses "Ctrl-k"', () => {
+    it('does not open search panel if user is in an input field and presses "Ctrl-k"', () => {
       fakeIsMacOS.returns(false);
       const input = document.createElement('input');
       document.body.append(input);
@@ -184,7 +254,7 @@ describe('SearchIconButton', () => {
           }),
         );
 
-        assert.calledWith(fakeStore.openSidebarPanel, 'searchAnnotations');
+        assert.notCalled(fakeStore.openSidebarPanel);
       } finally {
         input.remove();
       }

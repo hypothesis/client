@@ -70,10 +70,38 @@ export type ShortcutOptions = {
    * `document.body`.
    */
   rootElement?: HTMLElement;
+  /** Skip firing the shortcut when the target is an editable element. */
+  ignoreWhenEditable?: boolean;
 };
 
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+  if (target.isContentEditable) {
+    return true;
+  }
+  if (
+    target.closest('[role="textbox"], [role="searchbox"]') instanceof
+    HTMLElement
+  ) {
+    return true;
+  }
+  if (target instanceof HTMLTextAreaElement) {
+    return true;
+  }
+  if (target instanceof HTMLInputElement) {
+    try {
+      return target.selectionStart !== null;
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
+
 /**
- * Install a shortcut key listener on the document.
+ *Install a shortcut key listener on the document.
  *
  * This can be used directly outside of a component. To use within a Preact
  * component, you probably want {@link useShortcut}.
@@ -96,9 +124,13 @@ export function installShortcut(
     // but it has been observed on some ChromeOS devices. See
     // https://hypothesis.sentry.io/issues/3987992034.
     rootElement = (document.documentElement as HTMLElement | null) ?? undefined,
+    ignoreWhenEditable = false,
   }: ShortcutOptions = {},
 ) {
   const onKeydown = (event: KeyboardEvent) => {
+    if (ignoreWhenEditable && isEditableTarget(event.target)) {
+      return;
+    }
     if (matchShortcut(event, shortcut)) {
       onPress(event);
     }
@@ -128,12 +160,15 @@ export function installShortcut(
 export function useShortcut(
   shortcut: string | null,
   onPress: (e: KeyboardEvent) => void,
-  { rootElement }: ShortcutOptions = {},
+  { rootElement, ignoreWhenEditable }: ShortcutOptions = {},
 ) {
   useEffect(() => {
     if (!shortcut) {
       return undefined;
     }
-    return installShortcut(shortcut, onPress, { rootElement });
-  }, [shortcut, onPress, rootElement]);
+    return installShortcut(shortcut, onPress, {
+      rootElement,
+      ignoreWhenEditable,
+    });
+  }, [shortcut, onPress, rootElement, ignoreWhenEditable]);
 }

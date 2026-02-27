@@ -143,6 +143,126 @@ describe('shared/shortcut', () => {
 
       assert.notCalled(onPress);
     });
+
+    it('does not trigger when target is an input if ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const input = document.createElement('input');
+      document.body.appendChild(input);
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      input.dispatchEvent(event);
+      removeShortcut();
+      assert.notCalled(onPress);
+      document.body.removeChild(input);
+    });
+
+    it('does not trigger when target is contenteditable if ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const div = document.createElement('div');
+      div.contentEditable = 'true';
+      document.body.appendChild(div);
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      div.dispatchEvent(event);
+      removeShortcut();
+      assert.notCalled(onPress);
+      document.body.removeChild(div);
+    });
+
+    it('still triggers on non-editable targets when ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const span = document.createElement('span');
+      document.body.appendChild(span);
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      span.dispatchEvent(event);
+      removeShortcut();
+      assert.called(onPress);
+      document.body.removeChild(span);
+    });
+
+    it('fires shortcut when target is not an HTMLElement even with ignoreWhenEditable', () => {
+      const onPress = sinon.stub();
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      const textNode = document.createTextNode('x');
+      Object.defineProperty(event, 'target', { value: textNode });
+
+      document.documentElement.dispatchEvent(event);
+      removeShortcut();
+
+      assert.called(onPress);
+    });
+
+    it('fires shortcut when input selectionStart cannot be read', () => {
+      const onPress = sinon.stub();
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+
+      const input = document.createElement('input');
+      Object.defineProperty(input, 'selectionStart', {
+        get() {
+          throw new Error('no selectionStart');
+        },
+      });
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      Object.defineProperty(event, 'target', { value: input });
+
+      document.documentElement.dispatchEvent(event);
+      removeShortcut();
+
+      assert.called(onPress);
+    });
+
+    it('does not trigger when target has role="textbox" if ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const textbox = document.createElement('div');
+      textbox.setAttribute('role', 'textbox');
+      document.body.appendChild(textbox);
+
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      Object.defineProperty(event, 'target', { value: textbox });
+      document.documentElement.dispatchEvent(event);
+
+      removeShortcut();
+      document.body.removeChild(textbox);
+
+      assert.notCalled(onPress);
+    });
+
+    it('still triggers when target has a non-editable ARIA role if ignoreWhenEditable is set', () => {
+      const onPress = sinon.stub();
+      const nonEditable = document.createElement('div');
+      nonEditable.setAttribute('role', 'button');
+      document.body.appendChild(nonEditable);
+
+      const removeShortcut = installShortcut('a', onPress, {
+        ignoreWhenEditable: true,
+      });
+
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true });
+      Object.defineProperty(event, 'target', { value: nonEditable });
+      document.documentElement.dispatchEvent(event);
+
+      removeShortcut();
+      document.body.removeChild(nonEditable);
+
+      assert.called(onPress);
+    });
   });
 
   describe('useShortcut', () => {
