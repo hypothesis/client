@@ -101,7 +101,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
 }
 
 /**
- *Install a shortcut key listener on the document.
+ * Install a shortcut key listener on the document.
  *
  * This can be used directly outside of a component. To use within a Preact
  * component, you probably want {@link useShortcut}.
