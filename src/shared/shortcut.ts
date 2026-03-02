@@ -67,7 +67,7 @@ export function matchShortcut(event: KeyboardEvent, shortcut: string): boolean {
 export type ShortcutOptions = {
   /**
    * Element on which the key event listener should be installed. Defaults to
-   * `document.body`.
+   * `document.documentElement`.
    */
   rootElement?: HTMLElement;
   /** Skip firing the shortcut when the target is an editable element. */
