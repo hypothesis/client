@@ -75,29 +75,10 @@ export type ShortcutOptions = {
 };
 
 function isEditableTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-  if (target.isContentEditable) {
-    return true;
-  }
-  if (
-    target.closest('[role="textbox"], [role="searchbox"]') instanceof
-    HTMLElement
-  ) {
-    return true;
-  }
-  if (target instanceof HTMLTextAreaElement) {
-    return true;
-  }
-  if (target instanceof HTMLInputElement) {
-    try {
-      return target.selectionStart !== null;
-    } catch {
-      return false;
-    }
-  }
-  return false;
+  return (
+    target instanceof HTMLElement &&
+    (target.isContentEditable || ['INPUT', 'TEXTAREA'].includes(target.tagName))
+  );
 }
 
 /**

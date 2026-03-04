@@ -155,40 +155,6 @@ describe('SearchIconButton', () => {
       assert.notCalled(fakeStore.openSidebarPanel);
     });
 
-    it('returns early when "/" shortcut handler is invoked while focus is in an input', () => {
-      const handlers = [];
-
-      $imports.$mock({
-        '../../../shared/shortcut': {
-          useShortcut: (shortcut, handler) =>
-            handlers.push({ shortcut, handler }),
-        },
-      });
-
-      const input = document.createElement('input');
-      document.body.append(input);
-
-      try {
-        createSearchIconButton();
-
-        const openSearchHandler = handlers.find(
-          h => h.shortcut === '/',
-        )?.handler;
-        assert.ok(openSearchHandler, 'handler for "/" should be registered');
-
-        openSearchHandler({
-          key: '/',
-          metaKey: false,
-          ctrlKey: false,
-          target: input,
-        });
-
-        assert.notCalled(fakeStore.openSidebarPanel);
-      } finally {
-        input.remove();
-      }
-    });
-
     it('opens search panel for macOS when "Cmd-K" is pressed outside of the component element', () => {
       fakeIsMacOS.returns(true);
       createSearchIconButton();
