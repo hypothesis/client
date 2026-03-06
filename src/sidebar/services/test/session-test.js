@@ -289,6 +289,37 @@ describe('SessionService', () => {
     });
   });
 
+  describe('#dismissYoutubeDisclaimer', () => {
+    beforeEach(() => {
+      fakeApi.profile.update.returns(
+        Promise.resolve({
+          preferences: {},
+        }),
+      );
+    });
+
+    it('calls H backend with show_youtube_gdpr_banner: false to persist dismiss', () => {
+      const session = createService();
+      session.dismissYoutubeDisclaimer();
+      assert.calledWith(
+        fakeApi.profile.update,
+        {},
+        {
+          preferences: { show_youtube_gdpr_banner: false },
+        },
+      );
+    });
+
+    it('updates the session with the response from the API', () => {
+      const session = createService();
+      const updatedProfile = { preferences: {} };
+      fakeApi.profile.update.resolves(updatedProfile);
+      return session.dismissYoutubeDisclaimer().then(() => {
+        assert.calledWith(fakeStore.updateProfile, updatedProfile);
+      });
+    });
+  });
+
   describe('#reload', () => {
     beforeEach(() => {
       // Load the initial profile data, as the client will do on startup.

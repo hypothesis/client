@@ -368,6 +368,8 @@ export type Profile = {
   preferences: {
     show_sidebar_tutorial?: boolean;
     shortcuts_preferences?: ShortcutsPreferences;
+    /** When true, user has not dismissed the YouTube GDPR banner (from H backend). */
+    show_youtube_gdpr_banner?: boolean;
   };
   features: Record<string, boolean>;
   user_info?: UserInfo;

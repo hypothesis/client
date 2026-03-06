@@ -81,4 +81,50 @@ describe('sidebar/helpers/session', () => {
       });
     });
   });
+
+  describe('shouldShowYoutubeDisclaimer', () => {
+    [
+      {
+        description:
+          'youtubeAssignment is true and H sends show_youtube_gdpr_banner true',
+        settings: { youtubeAssignment: true },
+        profile: { preferences: { show_youtube_gdpr_banner: true } },
+        expected: true,
+      },
+      {
+        description:
+          'youtubeAssignment is true and preference is undefined (no banner)',
+        settings: { youtubeAssignment: true },
+        profile: {},
+        expected: false,
+      },
+      {
+        description:
+          'youtubeAssignment is true but user has dismissed (H omits key)',
+        settings: { youtubeAssignment: true },
+        profile: { preferences: {} },
+        expected: false,
+      },
+      {
+        description: 'youtubeAssignment is false',
+        settings: { youtubeAssignment: false },
+        profile: { preferences: { show_youtube_gdpr_banner: true } },
+        expected: false,
+      },
+      {
+        description: 'youtubeAssignment is undefined',
+        settings: {},
+        profile: { preferences: { show_youtube_gdpr_banner: true } },
+        expected: false,
+      },
+    ].forEach(fixture => {
+      it(`returns ${fixture.expected} when ${fixture.description}`, () => {
+        const result = sessionUtil.shouldShowYoutubeDisclaimer(
+          fixture.settings,
+          fixture.profile,
+        );
+        assert.equal(result, fixture.expected);
+      });
+    });
+  });
 });
