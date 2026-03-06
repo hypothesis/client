@@ -42,3 +42,22 @@ export function shouldAutoDisplayTutorial(
 
   return true;
 }
+
+/**
+ * Return true if the YouTube disclaimer banner should be shown.
+ * Show when the assignment is a YouTube assignment (from LMS config) and the
+ * user has not yet dismissed the disclaimer (H backend sends show_youtube_gdpr_banner: true).
+ *
+ * @param settings - Sidebar settings (includes youtubeAssignment from embedder)
+ * @param profile - User profile from the API
+ * @return Whether to show the YouTube disclaimer banner
+ */
+export function shouldShowYoutubeDisclaimer(
+  settings: SidebarSettings,
+  profile: Profile,
+): boolean {
+  if (settings.youtubeAssignment !== true) {
+    return false;
+  }
+  return profile.preferences?.show_youtube_gdpr_banner === true;
+}
