@@ -101,11 +101,18 @@ export class SessionService {
    * Uses show_youtube_gdpr_banner: false (H backend contract).
    */
   async dismissYoutubeDisclaimer() {
-    const updatedProfile = await this._api.profile.update(
-      {},
-      { preferences: { show_youtube_gdpr_banner: false } },
-    );
-    this.update(updatedProfile);
+    try {
+      const updatedProfile = await this._api.profile.update(
+        {},
+        { preferences: { show_youtube_gdpr_banner: false } },
+      );
+      this.update(updatedProfile);
+    } catch (err) {
+      this._toastMessenger.error(
+        'Unable to dismiss YouTube disclaimer. Please try again.',
+      );
+      throw err;
+    }
   }
 
   /**

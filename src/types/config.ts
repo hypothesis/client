@@ -335,8 +335,10 @@ export type ConfigFromEmbedder = ConfigFromHost & {
   dashboard?: DashboardConfig;
 
   /**
-   * When true, indicates the assignment content is a YouTube video.
-   * Set by the LMS when the document URL is a YouTube URL and YouTube is enabled.
+   * When true, indicates the assignment content includes YouTube video(s)
+   * (for example, one or more embedded YouTube players in the assignment).
+   * Set by the LMS when the assignment includes YouTube content and YouTube
+   * features should be enabled for this assignment.
    */
   youtubeAssignment?: boolean;
 };
