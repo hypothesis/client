@@ -12,6 +12,7 @@ describe('HypothesisApp', () => {
   let fakeServiceConfig = null;
   let fakeSession = null;
   let fakeShouldAutoDisplayTutorial = null;
+  let fakeShouldShowYoutubeDisclaimer = null;
   let fakeSettings = null;
   let fakeToastMessenger = null;
   let fakeIsThirdPartyService;
@@ -33,6 +34,7 @@ describe('HypothesisApp', () => {
     fakeApplyTheme = sinon.stub().returns({});
     fakeServiceConfig = sinon.stub();
     fakeShouldAutoDisplayTutorial = sinon.stub().returns(false);
+    fakeShouldShowYoutubeDisclaimer = sinon.stub().returns(false);
 
     fakeStore = {
       clearGroups: sinon.stub(),
@@ -88,6 +90,7 @@ describe('HypothesisApp', () => {
       '../store': { useSidebarStore: () => fakeStore },
       '../helpers/session': {
         shouldAutoDisplayTutorial: fakeShouldAutoDisplayTutorial,
+        shouldShowYoutubeDisclaimer: fakeShouldShowYoutubeDisclaimer,
       },
       '../helpers/theme': { applyTheme: fakeApplyTheme },
       '../helpers/is-third-party-service': {
@@ -154,6 +157,34 @@ describe('HypothesisApp', () => {
       fakeShouldAutoDisplayTutorial.returns(false);
       createComponent();
       assert.notCalled(fakeStore.openSidebarPanel);
+    });
+  });
+
+  describe('YouTube disclaimer banner', () => {
+    it('renders YouTubeDisclaimerBanner when not on modal route and shouldShowYoutubeDisclaimer returns true', () => {
+      fakeStore.route.returns('sidebar');
+      fakeShouldShowYoutubeDisclaimer.returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('YouTubeDisclaimerBanner').exists());
+    });
+
+    it('does not render YouTubeDisclaimerBanner when shouldShowYoutubeDisclaimer returns false', () => {
+      fakeShouldShowYoutubeDisclaimer.returns(false);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('YouTubeDisclaimerBanner').exists());
+    });
+
+    it('does not render YouTubeDisclaimerBanner on modal routes', () => {
+      fakeShouldShowYoutubeDisclaimer.returns(true);
+      fakeStore.route.returns('profile');
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('YouTubeDisclaimerBanner').exists());
     });
   });
 
