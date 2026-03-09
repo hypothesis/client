@@ -318,6 +318,18 @@ describe('SessionService', () => {
         assert.calledWith(fakeStore.updateProfile, updatedProfile);
       });
     });
+
+    it('shows toast and rethrows when profile update fails', async () => {
+      const apiError = new Error('API error');
+      fakeApi.profile.update.rejects(apiError);
+      const session = createService();
+
+      await assert.rejects(session.dismissYoutubeDisclaimer(), 'API error');
+      assert.calledWith(
+        fakeToastMessenger.error,
+        'Unable to dismiss YouTube disclaimer. Please try again.',
+      );
+    });
   });
 
   describe('#reload', () => {
