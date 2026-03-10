@@ -34,8 +34,10 @@ function useSearchKeyboardShortcuts(store: SidebarStore) {
 
   const modifierKey = isMacOS() ? 'meta' : 'ctrl';
 
+  // When user is in an input field, respond to CMD-/CTRL-K keypresses,
+  // but ignore '/' keypresses
   useShortcut(shortcuts.openSearch, openSearch, { ignoreWhenEditable: true });
-  useShortcut(`${modifierKey}+k`, openSearch, { ignoreWhenEditable: true });
+  useShortcut(`${modifierKey}+k`, openSearch, { ignoreWhenEditable: false });
 }
 
 export default function SearchIconButton() {
