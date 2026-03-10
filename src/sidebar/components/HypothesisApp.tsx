@@ -5,7 +5,10 @@ import { useEffect, useMemo } from 'preact/hooks';
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import { isThirdPartyService } from '../helpers/is-third-party-service';
-import { shouldAutoDisplayTutorial } from '../helpers/session';
+import {
+  shouldAutoDisplayTutorial,
+  shouldShowYoutubeDisclaimer,
+} from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import type { AuthService } from '../services/auth';
@@ -22,6 +25,7 @@ import SidebarView from './SidebarView';
 import StreamView from './StreamView';
 import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
+import YouTubeDisclaimerBanner from './YouTubeDisclaimerBanner';
 import SearchPanel from './search/SearchPanel';
 
 export type HypothesisAppProps = {
@@ -163,6 +167,9 @@ function HypothesisApp({
           onLogout={logout}
           isSidebar={isSidebar}
         />
+      )}
+      {!isModalRoute && shouldShowYoutubeDisclaimer(settings, profile) && (
+        <YouTubeDisclaimerBanner />
       )}
       <div className="container">
         <ToastMessages />

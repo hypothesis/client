@@ -289,6 +289,49 @@ describe('SessionService', () => {
     });
   });
 
+  describe('#dismissYoutubeDisclaimer', () => {
+    beforeEach(() => {
+      fakeApi.profile.update.returns(
+        Promise.resolve({
+          preferences: {},
+        }),
+      );
+    });
+
+    it('calls H backend with show_youtube_gdpr_banner: false to persist dismiss', () => {
+      const session = createService();
+      session.dismissYoutubeDisclaimer();
+      assert.calledWith(
+        fakeApi.profile.update,
+        {},
+        {
+          preferences: { show_youtube_gdpr_banner: false },
+        },
+      );
+    });
+
+    it('updates the session with the response from the API', () => {
+      const session = createService();
+      const updatedProfile = { preferences: {} };
+      fakeApi.profile.update.resolves(updatedProfile);
+      return session.dismissYoutubeDisclaimer().then(() => {
+        assert.calledWith(fakeStore.updateProfile, updatedProfile);
+      });
+    });
+
+    it('shows toast and rethrows when profile update fails', async () => {
+      const apiError = new Error('API error');
+      fakeApi.profile.update.rejects(apiError);
+      const session = createService();
+
+      await assert.rejects(session.dismissYoutubeDisclaimer(), 'API error');
+      assert.calledWith(
+        fakeToastMessenger.error,
+        'Unable to dismiss YouTube disclaimer. Please try again.',
+      );
+    });
+  });
+
   describe('#reload', () => {
     beforeEach(() => {
       // Load the initial profile data, as the client will do on startup.

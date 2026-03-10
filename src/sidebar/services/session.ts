@@ -96,6 +96,26 @@ export class SessionService {
   }
 
   /**
+   * Store the preference server-side that the user dismissed the YouTube
+   * disclaimer banner and then update the local profile data.
+   * Uses show_youtube_gdpr_banner: false (H backend contract).
+   */
+  async dismissYoutubeDisclaimer() {
+    try {
+      const updatedProfile = await this._api.profile.update(
+        {},
+        { preferences: { show_youtube_gdpr_banner: false } },
+      );
+      this.update(updatedProfile);
+    } catch (err) {
+      this._toastMessenger.error(
+        'Unable to dismiss YouTube disclaimer. Please try again.',
+      );
+      throw err;
+    }
+  }
+
+  /**
    * Persist the user's keyboard shortcut overrides server-side.
    */
   async updateShortcutPreferences(preferences: ShortcutsPreferences) {
