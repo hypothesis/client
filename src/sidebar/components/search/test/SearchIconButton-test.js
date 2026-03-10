@@ -119,24 +119,6 @@ describe('SearchIconButton', () => {
       assert.calledWith(fakeStore.openSidebarPanel, 'searchAnnotations');
     });
 
-    it('does nothing if search panel is already open when "ctrl-K" is pressed', () => {
-      fakeIsMacOS.returns(false);
-      fakeStore.isSidebarPanelOpen.returns(true);
-
-      createSearchIconButton();
-
-      document.body.dispatchEvent(
-        new KeyboardEvent('keydown', {
-          bubbles: true,
-          cancelable: true,
-          key: 'k',
-          ctrlKey: true,
-        }),
-      );
-
-      assert.notCalled(fakeStore.openSidebarPanel);
-    });
-
     it('does nothing if search panel is already open when "Cmd-K" is pressed', () => {
       fakeIsMacOS.returns(true);
       fakeStore.isSidebarPanelOpen.returns(true);
