@@ -316,8 +316,8 @@ describe('annotator/anchoring/types', () => {
         assert.instanceOf(anchor, TextQuoteAnchor);
         assert.equal(anchor.exact, quote);
         assert.deepEqual(anchor.context, {
-          prefix: text.slice(Math.max(0, pos - 32), pos),
-          suffix: text.slice(pos + quote.length, pos + quote.length + 32),
+          prefix: 'Four score and seven years ago',
+          suffix: 'brought forth on this continent',
         });
       });
     });
@@ -367,8 +367,13 @@ describe('annotator/anchoring/types', () => {
         });
 
         quoteAnchor.toRange({ hint: 42 });
+        const normalize = str => str.replace(/\s+/g, ' ').trim();
 
-        assert.calledWith(fakeMatchQuote, container.textContent, 'Liberty', {
+        assert.isTrue(fakeMatchQuote.calledOnce);
+        const [textArg, quoteArg, contextArg] = fakeMatchQuote.firstCall.args;
+        assert.equal(normalize(textArg), normalize(container.textContent));
+        assert.equal(quoteArg, 'Liberty');
+        assert.deepEqual(contextArg, {
           hint: 42,
           prefix: 'expected-prefix',
           suffix: 'expected-suffix',
@@ -443,7 +448,7 @@ describe('annotator/anchoring/types', () => {
         assert.deepEqual(anchor.toSelector(), {
           type: 'TextQuoteSelector',
           prefix: '',
-          suffix: ' score and seven years ago our f',
+          suffix: 'score and seven years ago our f',
           exact: 'Four',
         });
 

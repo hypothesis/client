@@ -14,6 +14,7 @@ import type {
   TextQuoteSelector,
 } from '../../types/api';
 import { matchQuote } from './match-quote';
+import { collapseWhitespace, renderedTextWithOffsets } from './rendered-text';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
@@ -173,27 +174,22 @@ export class TextQuoteAnchor {
    * Will throw if `range` does not contain any text nodes.
    */
   static fromRange(root: Element, range: Range): TextQuoteAnchor {
-    const text = root.textContent!;
+    const { text: normText, toNorm } = renderedTextWithOffsets(root);
     const textRange = TextRange.fromRange(range).relativeTo(root);
+    const normStart = toNorm(textRange.start.offset);
+    const normEnd = toNorm(textRange.end.offset);
 
-    const start = textRange.start.offset;
-    const end = textRange.end.offset;
-
-    // Number of characters around the quote to capture as context. We currently
-    // always use a fixed amount, but it would be better if this code was aware
-    // of logical boundaries in the document (paragraph, article etc.) to avoid
-    // capturing text unrelated to the quote.
-    //
-    // In regular prose the ideal content would often be the surrounding sentence.
-    // This is a natural unit of meaning which enables displaying quotes in
-    // context even when the document is not available. We could use `Intl.Segmenter`
-    // for this when available.
     const contextLen = 32;
 
-    return new TextQuoteAnchor(root, text.slice(start, end), {
-      prefix: text.slice(Math.max(0, start - contextLen), start),
-      suffix: text.slice(end, Math.min(text.length, end + contextLen)),
-    });
+    const prefix = collapseWhitespace(
+      normText.slice(Math.max(0, normStart - contextLen), normStart),
+    ).trim();
+    const exact = normText.slice(normStart, normEnd);
+    const suffix = collapseWhitespace(
+      normText.slice(normEnd, Math.min(normText.length, normEnd + contextLen)),
+    ).trim();
+
+    return new TextQuoteAnchor(root, exact, { prefix, suffix });
   }
 
   static fromSelector(
@@ -218,7 +214,7 @@ export class TextQuoteAnchor {
   }
 
   toPositionAnchor(options: QuoteMatchOptions = {}): TextPositionAnchor {
-    const text = this.root.textContent!;
+    const { text, toRaw } = renderedTextWithOffsets(this.root);
     const match = matchQuote(text, this.exact, {
       ...this.context,
       hint: options.hint,
@@ -226,7 +222,9 @@ export class TextQuoteAnchor {
     if (!match) {
       throw new Error('Quote not found');
     }
-    return new TextPositionAnchor(this.root, match.start, match.end);
+    const rawStart = toRaw(match.start);
+    const rawEnd = toRaw(match.end);
+    return new TextPositionAnchor(this.root, rawStart, rawEnd);
   }
 }
 
