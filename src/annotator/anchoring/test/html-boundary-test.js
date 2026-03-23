@@ -1,0 +1,43 @@
+import { assert } from 'chai';
+
+import * as html from '../html';
+
+describe('annotator/anchoring/html boundary handling', () => {
+  let container;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    container.innerHTML = '<p>foo<br>bar</p>';
+    document.body.appendChild(container);
+  });
+
+  afterEach(() => {
+    container.remove();
+  });
+
+  it('describes selection after <br> without leading space in exact', () => {
+    const range = document.createRange();
+    const textNode = container.querySelector('p').lastChild; // text node "bar"
+    range.setStart(textNode, 0);
+    range.setEnd(textNode, 3);
+
+    const selectors = html.describe(container, range);
+    const quoteSel = selectors.find(s => s.type === 'TextQuoteSelector');
+
+    assert.equal(quoteSel.exact, 'bar');
+    assert.isFalse(quoteSel.exact.startsWith(' '));
+    assert.isFalse(quoteSel.exact.endsWith(' '));
+  });
+
+  it('anchors selection after <br> back to the same text', async () => {
+    const range = document.createRange();
+    const textNode = container.querySelector('p').lastChild; // text node "bar"
+    range.setStart(textNode, 0);
+    range.setEnd(textNode, 3);
+
+    const selectors = html.describe(container, range);
+    const anchoredRange = await html.anchor(container, selectors);
+
+    assert.equal(anchoredRange.toString(), 'bar');
+  });
+});

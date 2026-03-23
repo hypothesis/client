@@ -184,7 +184,7 @@ export class TextQuoteAnchor {
     const prefix = collapseWhitespace(
       normText.slice(Math.max(0, normStart - contextLen), normStart),
     ).trim();
-    const exact = normText.slice(normStart, normEnd);
+    const exact = normText.slice(normStart, normEnd).trim();
     const suffix = collapseWhitespace(
       normText.slice(normEnd, Math.min(normText.length, normEnd + contextLen)),
     ).trim();
