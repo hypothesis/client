@@ -47,6 +47,9 @@ export type DocumentMetadata = {
 
   // HTML + PDF
   documentFingerprint?: string;
+
+  // Document version extracted from metadata (highwire id, public_url, canonical)
+  version?: number;
 };
 
 /**
