@@ -22,16 +22,6 @@ function useSearchKeyboardShortcuts(store: SidebarStore) {
 
   const openSearch = useCallback(
     (event: KeyboardEvent) => {
-      // When user is in an input field, respond to CMD-/CTRL-K keypresses,
-      // but ignore '/' keypresses
-      if (
-        !event.metaKey &&
-        !event.ctrlKey &&
-        event.target instanceof HTMLElement &&
-        ['INPUT', 'TEXTAREA'].includes(event.target.tagName)
-      ) {
-        return;
-      }
       prevFocusRef.current = document.activeElement as HTMLOrSVGElement | null;
       if (!store.isSidebarPanelOpen('searchAnnotations')) {
         store.openSidebarPanel('searchAnnotations');
@@ -44,8 +34,10 @@ function useSearchKeyboardShortcuts(store: SidebarStore) {
 
   const modifierKey = isMacOS() ? 'meta' : 'ctrl';
 
-  useShortcut(shortcuts.openSearch, openSearch);
-  useShortcut(`${modifierKey}+k`, openSearch);
+  // When user is in an input field, respond to CMD-/CTRL-K keypresses,
+  // but ignore '/' keypresses
+  useShortcut(shortcuts.openSearch, openSearch, { ignoreWhenEditable: true });
+  useShortcut(`${modifierKey}+k`, openSearch, { ignoreWhenEditable: false });
 }
 
 export default function SearchIconButton() {

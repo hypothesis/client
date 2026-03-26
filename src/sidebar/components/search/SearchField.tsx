@@ -59,14 +59,18 @@ export default function SearchField({
   // The query that the user is currently typing, but may not yet have applied.
   const [pendingQuery, setPendingQuery] = useState(query);
 
-  // As long as this input is mounted, pressing the "open search" shortcut
-  // should make it recover focus
-  useShortcut(shortcuts.openSearch, e => {
-    if (document.activeElement !== input.current) {
-      e.preventDefault();
-      input.current?.focus();
-    }
-  });
+  // While this input is mounted, pressing the "open search" shortcut from a
+  // non-editable context should make it recover focus
+  useShortcut(
+    shortcuts.openSearch,
+    e => {
+      if (document.activeElement !== input.current) {
+        e.preventDefault();
+        input.current?.focus();
+      }
+    },
+    { ignoreWhenEditable: true },
+  );
 
   const onSubmit = (e: Event) => {
     e.preventDefault();
