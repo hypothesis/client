@@ -289,6 +289,132 @@ describe('HTMLMetadata', () => {
     });
   });
 
+  describe('#_getVersion', () => {
+    function setVersionMeta(id, publicUrl, canonicalHref) {
+      let html = '';
+      if (id) {
+        html += `<meta name="citation_id" content="${id}">`;
+      }
+      if (publicUrl) {
+        html += `<meta name="citation_public_url" content="${publicUrl}">`;
+      }
+      if (canonicalHref) {
+        html += `<link rel="canonical" href="${canonicalHref}">`;
+      }
+      tempDocumentHead.innerHTML = html;
+    }
+
+    it('returns version when all three sources agree', () => {
+      setVersionMeta(
+        'doc-v3',
+        'https://example.com/doc-v3',
+        'https://example.com/doc-v3',
+      );
+      const metadata = testDocument.getDocumentMetadata();
+      assert.equal(metadata.version, 3);
+    });
+
+    it('returns null when sources have different versions', () => {
+      setVersionMeta(
+        'doc-v3',
+        'https://example.com/doc-v5',
+        'https://example.com/doc-v3',
+      );
+      const metadata = testDocument.getDocumentMetadata();
+      assert.isUndefined(metadata.version);
+    });
+
+    it('returns null when one source is missing a version', () => {
+      setVersionMeta(
+        'doc-v3',
+        'https://example.com/doc',
+        'https://example.com/doc-v3',
+      );
+      const metadata = testDocument.getDocumentMetadata();
+      assert.isUndefined(metadata.version);
+    });
+
+    it('returns null when no sources have a version', () => {
+      setVersionMeta(
+        'doc-abc',
+        'https://example.com/doc',
+        'https://example.com/doc',
+      );
+      const metadata = testDocument.getDocumentMetadata();
+      assert.isUndefined(metadata.version);
+    });
+
+    it('returns null when canonical link is missing', () => {
+      tempDocumentHead.innerHTML = `
+        <meta name="citation_id" content="doc-v3">
+        <meta name="citation_public_url" content="https://example.com/doc-v3">
+      `;
+      const metadata = testDocument.getDocumentMetadata();
+      assert.isUndefined(metadata.version);
+    });
+
+    it('returns null when citation_id is missing', () => {
+      tempDocumentHead.innerHTML = `
+        <meta name="citation_public_url" content="https://example.com/doc-v3">
+        <link rel="canonical" href="https://example.com/doc-v3">
+      `;
+      const metadata = testDocument.getDocumentMetadata();
+      assert.isUndefined(metadata.version);
+    });
+
+    it('accepts versions from v1 to v25', () => {
+      setVersionMeta(
+        'doc-v1',
+        'https://example.com/doc-v1',
+        'https://example.com/doc-v1',
+      );
+      assert.equal(testDocument.getDocumentMetadata().version, 1);
+
+      setVersionMeta(
+        'doc-v25',
+        'https://example.com/doc-v25',
+        'https://example.com/doc-v25',
+      );
+      assert.equal(testDocument.getDocumentMetadata().version, 25);
+    });
+
+    it('rejects versions above 25', () => {
+      setVersionMeta(
+        'doc-v26',
+        'https://example.com/doc-v26',
+        'https://example.com/doc-v26',
+      );
+      assert.isUndefined(testDocument.getDocumentMetadata().version);
+    });
+
+    it('rejects version 0', () => {
+      setVersionMeta(
+        'doc-v0',
+        'https://example.com/doc-v0',
+        'https://example.com/doc-v0',
+      );
+      assert.isUndefined(testDocument.getDocumentMetadata().version);
+    });
+
+    it('is case insensitive for version suffix', () => {
+      setVersionMeta(
+        'doc-V3',
+        'https://example.com/doc-V3',
+        'https://example.com/doc-V3',
+      );
+      assert.equal(testDocument.getDocumentMetadata().version, 3);
+    });
+
+    it('does not match version embedded in a word', () => {
+      setVersionMeta(
+        'docrev3',
+        'https://example.com/docrev3',
+        'https://example.com/docrev3',
+      );
+      assert.isUndefined(testDocument.getDocumentMetadata().version);
+    });
+  });
+
   describe('#_absoluteUrl', () => {
     it('should add the protocol when the url starts with two slashes', () => {
       const result = testDocument._absoluteUrl('//example.com/');
