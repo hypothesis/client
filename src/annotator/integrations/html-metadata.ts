@@ -117,7 +117,7 @@ export class HTMLMetadata {
       metadata.highwire.public_url ?? [],
       [metadata.link.find(link => link.rel === 'canonical')?.href],
     ];
-
+    // Empty comment
     let version: number | null = null;
 
     for (const candidate of candidates) {
