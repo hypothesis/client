@@ -121,16 +121,16 @@ export class HTMLMetadata {
     let version: number | null = null;
 
     for (const candidate of candidates) {
-      const potentialVersion = this._findVersion(candidate);
-      if (!potentialVersion) {
+      const potential_version = this._findVersion(candidate);
+      if (!potential_version) {
         return null;
       }
 
       // If the version is not set, set it to the potential version.
       // If the version is set and the potential version is different, return null.
       if (version === null) {
-        version = potentialVersion;
-      } else if (version !== potentialVersion) {
+        version = potential_version;
+      } else if (version !== potential_version) {
         return null;
       }
     }
