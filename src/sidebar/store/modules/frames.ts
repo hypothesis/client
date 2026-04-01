@@ -188,10 +188,16 @@ function searchUrisForFrame(frame: Frame): string[] {
     });
   }
 
-  // If the document has a version, append :v0:v{version} to each URI
+  // If the document has a version, append a version suffix to each URI.
+  // v0 is the base version and should not be appended.
+  // Only v1 includes v0 annotations (`:v0:v1`), other versions only search their own (`:v{version}`).
   const version = frame.metadata?.version;
-  if (version) {
-    uris = uris.map(uri => `${uri}:v0:v${version}`);
+  if (version && version > 0) {
+    if (version === 1) {
+      uris = uris.map(uri => `${uri}:v0:v1`);
+    } else {
+      uris = uris.map(uri => `${uri}:v${version}`);
+    }
   }
 
   return uris;
