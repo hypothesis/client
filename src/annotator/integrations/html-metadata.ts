@@ -31,6 +31,7 @@ type HTMLDocumentMetadata = {
   twitter: Record<string, string[]>;
   favicon?: string;
   documentFingerprint?: string;
+  version?: number;
 };
 
 /**
@@ -96,7 +97,78 @@ export class HTMLMetadata {
       metadata.documentFingerprint = dcLink.href;
     }
 
+    const version = this._getVersion(metadata);
+
+    if (version !== null) {
+      metadata.version = version;
+    }
+
     return metadata;
+  }
+
+  /**
+   * Get document version from citation_id, citation_public_url and rel=canonical
+   * when they end with v1, v2, ... v25. Returns the version if consistent
+   * across all three sources, else null. All three must provide a version.
+   */
+  private _getVersion(metadata: HTMLDocumentMetadata): number | null {
+    const candidates = [
+      metadata.highwire.id ?? [],
+      metadata.highwire.public_url ?? [],
+      [metadata.link.find(link => link.rel === 'canonical')?.href],
+    ];
+
+    let version: number | null = null;
+
+    for (const candidate of candidates) {
+      const potential_version = this._findVersion(candidate);
+      if (!potential_version) {
+        return null;
+      }
+
+      // If the version is not set, set it to the potential version.
+      // If the version is set and the potential version is different, return null.
+      if (version === null) {
+        version = potential_version;
+      } else if (version !== potential_version) {
+        return null;
+      }
+    }
+
+    return version;
+  }
+
+  /**
+   * Find the first valid version in an array of uri strings.
+   * If the array has multiple versions, it will return the first one.
+   * If the array has no versions, it will return null.
+   */
+  private _findVersion(uris: (string | undefined)[]): number | null {
+    for (const uri of uris) {
+      const version = this._extractVersionFromUri(uri);
+      if (version !== null) {
+        return version;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Extract version number from a uri ending with v1, v2, ...
+   */
+  private _extractVersionFromUri(uri: string | undefined): number | null {
+    if (uri === undefined) {
+      return null;
+    }
+
+    const match = uri.trim().match(/(?<![a-zA-Z])v(\d+)$/i);
+    if (!match) {
+      return null;
+    }
+    // match[1] contains all digits captured by (\d+); parseInt radix 10 ensures decimal parsing
+    const version = parseInt(match[1], 10);
+    // Only return a version if it is between 1 and 25
+    return version >= 1 && version <= 25 ? version : null;
   }
 
   /**
