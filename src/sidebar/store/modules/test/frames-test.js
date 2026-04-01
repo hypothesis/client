@@ -213,6 +213,81 @@ describe('sidebar/store/modules/frames', () => {
         ],
         searchUris: ['https://publisher.org/article.html', 'doi:10.1.1/1234'],
       },
+      {
+        when: 'version 1 includes v0 annotations',
+        frames: [
+          {
+            uri: 'https://publisher.org/article.html',
+            metadata: {
+              version: 1,
+              link: [],
+            },
+          },
+        ],
+        searchUris: ['https://publisher.org/article.html:v0:v1'],
+      },
+      {
+        when: 'version > 1 only searches its own version',
+        frames: [
+          {
+            uri: 'https://publisher.org/article.html',
+            metadata: {
+              version: 3,
+              link: [],
+            },
+          },
+        ],
+        searchUris: ['https://publisher.org/article.html:v3'],
+      },
+      {
+        when: 'a PDF frame with version > 1 only searches its own version',
+        frames: [
+          {
+            uri: 'https://publisher.org/article.pdf',
+            metadata: {
+              documentFingerprint: '1234',
+              version: 5,
+              link: [
+                {
+                  href: 'urn:x-pdf:1234',
+                },
+                {
+                  href: 'https://publisher.org/article.pdf?from_meta_link=1',
+                },
+              ],
+            },
+          },
+        ],
+        searchUris: [
+          'urn:x-pdf:1234:v5',
+          'https://publisher.org/article.pdf?from_meta_link=1:v5',
+        ],
+      },
+      {
+        when: 'the document metadata has no version',
+        frames: [
+          {
+            uri: 'https://publisher.org/article.html',
+            metadata: {
+              link: [],
+            },
+          },
+        ],
+        searchUris: ['https://publisher.org/article.html'],
+      },
+      {
+        when: 'the document metadata has version 0 (base version)',
+        frames: [
+          {
+            uri: 'https://publisher.org/article.html',
+            metadata: {
+              version: 0,
+              link: [],
+            },
+          },
+        ],
+        searchUris: ['https://publisher.org/article.html'],
+      },
     ].forEach(testCase => {
       it(testCase.when, () => {
         testCase.frames.forEach(frame => {
