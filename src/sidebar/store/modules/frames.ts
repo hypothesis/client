@@ -188,12 +188,6 @@ function searchUrisForFrame(frame: Frame): string[] {
     });
   }
 
-  // If the document has a version, append :v0:v{version} to each URI
-  const version = frame.metadata?.version;
-  if (version) {
-    uris = uris.map(uri => `${uri}:v0:v${version}`);
-  }
-
   return uris;
 }
 
