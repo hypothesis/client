@@ -25,10 +25,10 @@
                      "end" : 11897
                   },
                   {
-                     "suffix" : ", at 05:56.\n\t\t\t\t\t\t\t\t\t\t\tText is a",
+                     "suffix" : ", at 05:56. Text is available un",
                      "exact" : "11 November 2016",
                      "type" : "TextQuoteSelector",
-                     "prefix" : " This page was last modified on "
+                     "prefix" : "This page was last modified on"
                   }
                ]
             }
@@ -164,7 +164,7 @@
                      "end" : 7667
                   },
                   {
-                     "prefix" : " execute the test suite cases.\n\n",
+                     "prefix" : "d execute the test suite cases.\n\n",
                      "suffix" : ". Theoretically, after each fix ",
                      "exact" : "Also as a consequence of the introduction of new bugs, program maintenance requires far more system testing per statement written than any other programming",
                      "type" : "TextQuoteSelector"
@@ -254,7 +254,7 @@
                   {
                      "prefix" : "\t\n\t\t\n\t\t\n\t\t\t\n\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\n\n\t\t\t",
                      "exact" : "Regression testing",
-                     "suffix" : "\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\tFrom Wikiped",
+                     "suffix" : "\n\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\tFrom Wikipedia, the free encycl",
                      "type" : "TextQuoteSelector"
                   }
                ],
