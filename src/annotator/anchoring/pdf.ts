@@ -14,7 +14,7 @@ import type {
   PDFViewer,
   TextLayer,
 } from '../../types/pdfjs';
-import { translateOffsets } from '../util/normalize';
+import { isNotSpace, isSpace, translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
 import { textInDOMRect } from './text-in-rect';
@@ -72,7 +72,7 @@ function quotePositionCacheKey(quote: string, pos?: number) {
 }
 
 function normalizePDFText(str: string): string {
-  return str.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ');
+  return str.replace(/\s+/g, ' ');
 }
 
 /**
@@ -241,29 +241,6 @@ async function findPageByOffset(offset: number): Promise<PageOffset> {
   // the last page.
   return { index: viewer.pagesCount - 1, offset: pageStartOffset, text };
 }
-
-/**
- * Return true if `char` is an ASCII space.
- *
- * This is more efficient than `/\s/.test(char)` but does not handle Unicode
- * spaces.
- */
-function isSpace(char: string) {
-  switch (char) {
-    case ' ':
-    case '\f':
-    case '\n':
-    case '\r':
-    case '\t':
-    case '\v':
-    case '\u00a0': // nbsp
-      return true;
-    default:
-      return false;
-  }
-}
-
-const isNotSpace = (char: string) => !isSpace(char);
 
 /**
  * Determines if provided text layer is done rendering.
