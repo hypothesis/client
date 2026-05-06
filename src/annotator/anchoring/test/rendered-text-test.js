@@ -2,63 +2,85 @@ import { assert } from 'chai';
 
 import {
   renderedTextFromRange,
-  renderedTextWithOffsets,
+  renderedTextOf,
 } from '../rendered-text';
 
 describe('annotator/anchoring/rendered-text', () => {
-  it('normalizes rendered text with line breaks and block boundaries', () => {
-    const container = document.createElement('div');
-    container.innerHTML = '<p>foo<br>bar</p><div>baz</div>';
-    const range = document.createRange();
-    range.selectNodeContents(container);
-
-    const text = renderedTextFromRange(range);
-    assert.equal(text.trim(), 'foo bar baz');
-  });
-
-  it('provides raw/normalized offset mappings', () => {
+  it('inserts a space at <br> boundaries', () => {
     const container = document.createElement('div');
     container.innerHTML = '<p>foo<br>bar</p>';
 
-    const { text, toNorm, toRaw } = renderedTextWithOffsets(container);
-
-    const trimmed = text.trim();
-    assert.equal(trimmed, 'foo bar');
-    // Raw textContent is "foobar". The inserted space should map to the
-    // boundary between raw offsets 3 and 3.
-    assert.equal(toNorm(3), 3);
-    assert.equal(toRaw(3), 3);
-    // End of raw text maps to end of normalized text (ignoring trailing space).
-    assert.equal(toNorm(container.textContent.length), trimmed.length);
-    assert.equal(toRaw(trimmed.length), container.textContent.length);
+    assert.equal(renderedTextOf(container).text.trim(), 'foo bar');
   });
 
-  it('maps out-of-range raw offsets to 0', () => {
+  it('inserts a space at block-tag boundaries', () => {
     const container = document.createElement('div');
-    container.textContent = 'abc';
+    container.innerHTML = '<p>foo</p><p>bar</p><div>baz</div>';
 
-    const { toNorm } = renderedTextWithOffsets(container);
-
-    assert.equal(toNorm(-5), 0);
+    assert.equal(renderedTextOf(container).text.trim(), 'foo bar baz');
   });
 
-  it('maps norm offsets <= 0 to raw start', () => {
+  it('collapses runs of whitespace and suppresses leading whitespace', () => {
     const container = document.createElement('div');
-    container.textContent = 'abc';
+    container.innerHTML = '<p>  foo \n\n bar  </p>';
 
-    const { toRaw } = renderedTextWithOffsets(container);
-
-    assert.equal(toRaw(0), 0);
-    assert.equal(toRaw(-10), 0);
+    assert.equal(renderedTextOf(container).text.trim(), 'foo bar');
   });
 
-  it('falls back to 0 when no raw-to-norm mapping exists', () => {
-    // Whitespace-only content collapses to empty; ensure toNorm returns 0.
+  it('returns the rendered text of a Range', () => {
     const container = document.createElement('div');
-    container.textContent = '   ';
+    container.innerHTML = '<p>foo<br>bar</p>';
+    document.body.appendChild(container);
 
-    const { toNorm } = renderedTextWithOffsets(container);
+    const range = document.createRange();
+    range.selectNodeContents(container);
+    assert.equal(renderedTextFromRange(range).trim(), 'foo bar');
 
-    assert.equal(toNorm(1), 0);
+    container.remove();
+  });
+
+  describe('offset translation', () => {
+    it('round-trips raw <-> norm offsets across a <br> boundary', () => {
+      const container = document.createElement('div');
+      container.innerHTML = '<p>foo<br>bar</p>';
+
+      const { text, toNorm, toRaw } = renderedTextOf(container);
+      assert.equal(text.trim(), 'foo bar');
+
+      // Raw textContent is "foobar". The 'b' at raw offset 3 maps into the
+      // rendered text past the synthesized space inserted at the <br>.
+      assert.equal(toNorm(3), 3);
+      assert.equal(toRaw(toNorm(3)), 3);
+      // End-of-string round-trips to end-of-string.
+      assert.equal(toRaw(text.length), container.textContent.length);
+    });
+
+    it('clamps out-of-range raw offsets to the start', () => {
+      const container = document.createElement('div');
+      container.textContent = 'abc';
+
+      const { toNorm } = renderedTextOf(container);
+      assert.equal(toNorm(-5), 0);
+    });
+
+    it('clamps non-positive norm offsets to raw start', () => {
+      const container = document.createElement('div');
+      container.textContent = 'abc';
+
+      const { toRaw } = renderedTextOf(container);
+      assert.equal(toRaw(0), 0);
+      assert.equal(toRaw(-10), 0);
+    });
+
+    it('handles whitespace-only content', () => {
+      const container = document.createElement('div');
+      container.textContent = '   ';
+
+      const { text, toNorm } = renderedTextOf(container);
+      // Whitespace collapses; container is a block, so we get just the
+      // closing-block synthesized space (or empty after trim).
+      assert.equal(text.trim(), '');
+      assert.equal(toNorm(1), 0);
+    });
   });
 });

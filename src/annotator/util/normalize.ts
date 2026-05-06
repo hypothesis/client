@@ -1,4 +1,27 @@
 /**
+ * Return true if `char` is an ASCII space.
+ *
+ * This is more efficient than `/\s/.test(char)` but does not handle Unicode
+ * spaces.
+ */
+export function isSpace(char: string): boolean {
+  switch (char) {
+    case ' ':
+    case '\f':
+    case '\n':
+    case '\r':
+    case '\t':
+    case '\v':
+    case ' ': // nbsp
+      return true;
+    default:
+      return false;
+  }
+}
+
+export const isNotSpace = (char: string): boolean => !isSpace(char);
+
+/**
  * Find the smallest offset in `str` which contains at least `count` chars
  * that match `filter` before it.
  */

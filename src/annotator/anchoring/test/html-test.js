@@ -293,7 +293,7 @@ const rangeSpecs = [
     0,
     '/p[4]',
     0,
-    'Header Level 2\n\n\n  Mauris lacinia ipsum nulla, id iaculis quam egestas quis.\n\n\n\n\n',
+    'Header Level 2\n\n\n  Mauris lacinia ipsum nulla, id iaculis quam egestas quis.\n\n\n',
     'No text node at the end and offset 0',
   ],
 
@@ -348,10 +348,7 @@ describe('HTML anchoring', () => {
       // Resolve the range descriptor to a DOM Range, verify that the expected
       // text was selected.
       const range = toRange(container, testCase.range);
-      assert.equal(
-        normalizeText(range.toString()),
-        normalizeText(testCase.quote),
-      );
+      assert.equal(range.toString(), testCase.quote);
 
       // Capture a set of selectors describing the range and perform basic sanity
       // checks on them.
