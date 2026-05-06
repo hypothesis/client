@@ -1,9 +1,6 @@
 import { assert } from 'chai';
 
-import {
-  renderedTextFromRange,
-  renderedTextOf,
-} from '../rendered-text';
+import { renderedTextFromRange, renderedTextOf } from '../rendered-text';
 
 describe('annotator/anchoring/rendered-text', () => {
   it('inserts a space at <br> boundaries', () => {

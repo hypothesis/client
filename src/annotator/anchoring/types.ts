@@ -221,7 +221,11 @@ export class TextQuoteAnchor {
     if (!match) {
       throw new Error('Quote not found');
     }
-    return new TextPositionAnchor(this.root, toRaw(match.start), toRaw(match.end));
+    return new TextPositionAnchor(
+      this.root,
+      toRaw(match.start),
+      toRaw(match.end),
+    );
   }
 }
 
