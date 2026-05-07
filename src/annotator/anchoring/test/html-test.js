@@ -1,5 +1,4 @@
 import * as html from '../html';
-import { renderedTextOf } from '../rendered-text';
 import fixture from './html-anchoring-fixture.html';
 import { htmlBaselines } from './html-baselines';
 
@@ -64,6 +63,15 @@ function toRange(root, descriptor) {
 function findByType(selectors, type) {
   return selectors.find(s => {
     return s.type === type;
+  });
+}
+
+/**
+ * Return a copy of a list of selectors sorted by type.
+ */
+function sortByType(selectors) {
+  return selectors.slice().sort((a, b) => {
+    return a.type.localeCompare(b.type);
   });
 }
 
@@ -468,15 +476,8 @@ describe('HTML anchoring', () => {
           const root = frame.contentWindow.document.body;
           const selectors = ann.target[0].selector;
           const range = await html.anchor(root, selectors);
-
-          // Verify that anchoring lands on the saved quote: the rendered
-          // text of the anchored range should contain the selector's `exact`.
-          // This is what production cares about — that re-anchoring an old
-          // annotation finds the originally-highlighted text.
-          const quote = selectors.find(s => s.type === 'TextQuoteSelector');
-          const div = document.createElement('div');
-          div.appendChild(range.cloneContents());
-          assert.include(renderedTextOf(div).text, quote.exact);
+          const newSelectors = await html.describe(root, range);
+          assert.deepEqual(sortByType(selectors), sortByType(newSelectors));
         });
 
         return Promise.all(annotationsChecked);

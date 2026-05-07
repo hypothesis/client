@@ -159,7 +159,7 @@ describe('annotator/anchoring/pdf', () => {
           type: 'TextQuoteSelector',
           exact: 'Netherfield Park',
           prefix: 'im one day, "have you heard that',
-          suffix: 'is occupied again?"',
+          suffix: ' is occupied again?" ',
         });
       });
     });

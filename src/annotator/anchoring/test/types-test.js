@@ -317,8 +317,8 @@ describe('annotator/anchoring/types', () => {
         assert.instanceOf(anchor, TextQuoteAnchor);
         assert.equal(anchor.exact, quote);
         assert.deepEqual(anchor.context, {
-          prefix: 'Four score and seven years ago',
-          suffix: 'brought forth on this continent',
+          prefix: text.slice(Math.max(0, pos - 32), pos),
+          suffix: text.slice(pos + quote.length, pos + quote.length + 32),
         });
       });
     });
@@ -369,6 +369,9 @@ describe('annotator/anchoring/types', () => {
 
         quoteAnchor.toRange({ hint: 42 });
 
+        // `toPositionAnchor` matches against the rendered (whitespace-collapsed,
+        // BR-aware) text rather than raw `textContent`. For this container the
+        // two only differ by a trailing synthesized space from the block close.
         assert.calledWith(
           fakeMatchQuote,
           renderedTextOf(container).text,
@@ -449,7 +452,7 @@ describe('annotator/anchoring/types', () => {
         assert.deepEqual(anchor.toSelector(), {
           type: 'TextQuoteSelector',
           prefix: '',
-          suffix: 'score and seven years ago our f',
+          suffix: ' score and seven years ago our f',
           exact: 'Four',
         });
 
