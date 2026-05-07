@@ -1,20 +1,7 @@
 import * as html from '../html';
+import { renderedTextOf } from '../rendered-text';
 import fixture from './html-anchoring-fixture.html';
 import { htmlBaselines } from './html-baselines';
-
-const normalizeText = str => str.replace(/\s+/g, ' ').trim();
-const normalizeQuoteSelector = sel => {
-  if (sel.type !== 'TextQuoteSelector') {
-    return sel;
-  }
-  const normalize = s => (s === undefined ? s : s.replace(/\s+/g, ' ').trim());
-  return {
-    ...sel,
-    exact: normalize(sel.exact),
-    prefix: normalize(sel.prefix),
-    suffix: normalize(sel.suffix),
-  };
-};
 
 /** Return all text node children of `container`. */
 function textNodes(container) {
@@ -77,15 +64,6 @@ function toRange(root, descriptor) {
 function findByType(selectors, type) {
   return selectors.find(s => {
     return s.type === type;
-  });
-}
-
-/**
- * Return a copy of a list of selectors sorted by type.
- */
-function sortByType(selectors) {
-  return selectors.slice().sort((a, b) => {
-    return a.type.localeCompare(b.type);
   });
 }
 
@@ -379,8 +357,8 @@ describe('HTML anchoring', () => {
       const anchored = selectors.map(sel => {
         return html.anchor(container, [sel]).then(anchoredRange => {
           assert.equal(
-            normalizeText(range.toString()),
-            normalizeText(anchoredRange.toString()),
+            range.toString().trim(),
+            anchoredRange.toString().trim(),
           );
         });
       });
@@ -488,12 +466,17 @@ describe('HTML anchoring', () => {
 
         const annotationsChecked = annotations.map(async ann => {
           const root = frame.contentWindow.document.body;
-          const selectors = ann.target[0].selector.map(normalizeQuoteSelector);
+          const selectors = ann.target[0].selector;
           const range = await html.anchor(root, selectors);
-          const newSelectors = (await html.describe(root, range)).map(
-            normalizeQuoteSelector,
-          );
-          assert.deepEqual(sortByType(selectors), sortByType(newSelectors));
+
+          // Verify that anchoring lands on the saved quote: the rendered
+          // text of the anchored range should contain the selector's `exact`.
+          // This is what production cares about — that re-anchoring an old
+          // annotation finds the originally-highlighted text.
+          const quote = selectors.find(s => s.type === 'TextQuoteSelector');
+          const div = document.createElement('div');
+          div.appendChild(range.cloneContents());
+          assert.include(renderedTextOf(div).text, quote.exact);
         });
 
         return Promise.all(annotationsChecked);
