@@ -1,8 +1,9 @@
 /**
- * Return true if `char` is an ASCII space.
+ * Return true if `char` is an ASCII whitespace character or a non-breaking
+ * space (U+00A0).
  *
- * This is more efficient than `/\s/.test(char)` but does not handle Unicode
- * spaces.
+ * This is more efficient than `/\s/.test(char)` but does not handle the
+ * full set of Unicode whitespace characters.
  */
 export function isSpace(char: string): boolean {
   switch (char) {
@@ -12,7 +13,7 @@ export function isSpace(char: string): boolean {
     case '\r':
     case '\t':
     case '\v':
-    case ' ': // nbsp
+    case '\u00a0': // nbsp
       return true;
     default:
       return false;

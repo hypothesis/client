@@ -22,10 +22,7 @@ function AnnotationQuote({
   isOrphan,
   settings,
 }: AnnotationQuoteProps) {
-  const displayQuote = quote
-    .replace(/[\r\n]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const displayQuote = quote.replace(/\s+/g, ' ').trim();
 
   return (
     <InlineControlExcerpt collapsedHeight={35} overflowThreshold={20}>

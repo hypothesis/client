@@ -553,7 +553,11 @@ async function anchorRange(selectors: Selector[]): Promise<Range> {
       const start = position.start - offset;
       const end = position.end - offset;
 
-      const matchedText = text.substring(start, end);
+      // Compare normalized forms — `quote.exact` is stored normalized (see
+      // `describe`), but `text` is the raw page text, so any difference in
+      // whitespace would otherwise cause this fast path to always fall
+      // through to the slow quote search.
+      const matchedText = normalizePDFText(text.substring(start, end)).trim();
       if (quote.exact !== matchedText) {
         throw new Error('quote mismatch');
       }

@@ -14,7 +14,7 @@ import type {
   TextQuoteSelector,
 } from '../../types/api';
 import { matchQuote } from './match-quote';
-import { renderedTextOf } from './rendered-text';
+import { renderedTextOf, toNormalized, toRaw } from './rendered-text';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
@@ -174,18 +174,21 @@ export class TextQuoteAnchor {
    * Will throw if `range` does not contain any text nodes.
    */
   static fromRange(root: Element, range: Range): TextQuoteAnchor {
-    const { text, toNorm } = renderedTextOf(root);
+    const { text, rawToNormalized } = renderedTextOf(root);
     const textRange = TextRange.fromRange(range).relativeTo(root);
-    const normStart = toNorm(textRange.start.offset);
-    const normEnd = toNorm(textRange.end.offset);
+    const normalizedStart = toNormalized(
+      rawToNormalized,
+      textRange.start.offset,
+    );
+    const normalizedEnd = toNormalized(rawToNormalized, textRange.end.offset);
 
     const contextLen = 32;
-    const exact = text.slice(normStart, normEnd).trim();
+    const exact = text.slice(normalizedStart, normalizedEnd).trim();
     const prefix = text
-      .slice(Math.max(0, normStart - contextLen), normStart)
+      .slice(Math.max(0, normalizedStart - contextLen), normalizedStart)
       .trim();
     const suffix = text
-      .slice(normEnd, Math.min(text.length, normEnd + contextLen))
+      .slice(normalizedEnd, Math.min(text.length, normalizedEnd + contextLen))
       .trim();
 
     return new TextQuoteAnchor(root, exact, { prefix, suffix });
@@ -213,7 +216,7 @@ export class TextQuoteAnchor {
   }
 
   toPositionAnchor(options: QuoteMatchOptions = {}): TextPositionAnchor {
-    const { text, toRaw } = renderedTextOf(this.root);
+    const { text, normalizedToRaw } = renderedTextOf(this.root);
     const match = matchQuote(text, this.exact, {
       ...this.context,
       hint: options.hint,
@@ -223,8 +226,8 @@ export class TextQuoteAnchor {
     }
     return new TextPositionAnchor(
       this.root,
-      toRaw(match.start),
-      toRaw(match.end),
+      toRaw(normalizedToRaw, match.start),
+      toRaw(normalizedToRaw, match.end),
     );
   }
 }
