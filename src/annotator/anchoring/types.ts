@@ -174,22 +174,25 @@ export class TextQuoteAnchor {
    * Will throw if `range` does not contain any text nodes.
    */
   static fromRange(root: Element, range: Range): TextQuoteAnchor {
+    const rawText = root.textContent ?? '';
     const { text, rawToNormalized } = renderedTextOf(root);
     const textRange = TextRange.fromRange(range).relativeTo(root);
-    const normalizedStart = toNormalized(
-      rawToNormalized,
-      textRange.start.offset,
-    );
-    const normalizedEnd = toNormalized(rawToNormalized, textRange.end.offset);
+    const rawStart = textRange.start.offset;
+    const rawEnd = textRange.end.offset;
+    const normalizedStart = toNormalized(rawToNormalized, rawStart);
+    const normalizedEnd = toNormalized(rawToNormalized, rawEnd);
 
     const contextLen = 32;
     const exact = text.slice(normalizedStart, normalizedEnd).trim();
-    const prefix = text
-      .slice(Math.max(0, normalizedStart - contextLen), normalizedStart)
-      .trim();
-    const suffix = text
-      .slice(normalizedEnd, Math.min(text.length, normalizedEnd + contextLen))
-      .trim();
+    // Prefix/suffix come from raw textContent: matchQuote tolerates
+    // whitespace differences when matching, and keeping them raw preserves
+    // backward compatibility with selectors stored before the rendered-text
+    // normalization landed.
+    const prefix = rawText.slice(Math.max(0, rawStart - contextLen), rawStart);
+    const suffix = rawText.slice(
+      rawEnd,
+      Math.min(rawText.length, rawEnd + contextLen),
+    );
 
     return new TextQuoteAnchor(root, exact, { prefix, suffix });
   }
