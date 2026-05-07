@@ -14,7 +14,7 @@ import type {
   PDFViewer,
   TextLayer,
 } from '../../types/pdfjs';
-import { isNotSpace, isSpace, translateOffsets } from '../util/normalize';
+import { translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
 import { textInDOMRect } from './text-in-rect';
@@ -69,10 +69,6 @@ const quotePositionCache = new Map<string, PDFTextRange>();
  */
 function quotePositionCacheKey(quote: string, pos?: number) {
   return `${quote}:${pos}`;
-}
-
-function normalizePDFText(str: string): string {
-  return str.replace(/\s+/g, ' ');
 }
 
 /**
@@ -243,6 +239,29 @@ async function findPageByOffset(offset: number): Promise<PageOffset> {
 }
 
 /**
+ * Return true if `char` is an ASCII space.
+ *
+ * This is more efficient than `/\s/.test(char)` but does not handle Unicode
+ * spaces.
+ */
+function isSpace(char: string) {
+  switch (char) {
+    case ' ':
+    case '\f':
+    case '\n':
+    case '\r':
+    case '\t':
+    case '\v':
+    case '\u00a0': // nbsp
+      return true;
+    default:
+      return false;
+  }
+}
+
+const isNotSpace = (char: string) => !isSpace(char);
+
+/**
  * Determines if provided text layer is done rendering.
  * It works on older PDF.js versions which expose a public `renderingDone` prop,
  * and newer versions as well
@@ -403,46 +422,49 @@ async function anchorQuote(
     });
   }
 
-  // Normalize quote and context consistently with selector creation.
-  const normalizedPrefix =
+  // Search pages for the best match, ignoring whitespace differences.
+  const strippedPrefix =
     quoteSelector.prefix !== undefined
-      ? normalizePDFText(quoteSelector.prefix).trim()
+      ? stripSpaces(quoteSelector.prefix)
       : undefined;
-  const normalizedSuffix =
+  const strippedSuffix =
     quoteSelector.suffix !== undefined
-      ? normalizePDFText(quoteSelector.suffix).trim()
+      ? stripSpaces(quoteSelector.suffix)
       : undefined;
-  const normalizedQuote = normalizePDFText(quoteSelector.exact).trim();
+  const strippedQuote = stripSpaces(quoteSelector.exact);
 
   let bestMatch;
   for (const page of pageIndexes) {
     const text = await getPageTextContent(page);
-    const normalizedText = normalizePDFText(text);
+    const strippedText = stripSpaces(text);
 
     // Determine expected offset of quote in current page based on position hint.
-    let normalizedHint;
+    let strippedHint;
     if (expectedPageIndex !== undefined && expectedOffsetInPage !== undefined) {
       if (page < expectedPageIndex) {
-        normalizedHint = normalizedText.length; // Prefer matches closer to end of page.
+        strippedHint = strippedText.length; // Prefer matches closer to end of page.
       } else if (page === expectedPageIndex) {
-        // Translate expected offset in original text into offset in normalized text.
-        [normalizedHint] = translateOffsets(
+        // Translate expected offset in whitespace-inclusive version of page
+        // text into offset in whitespace-stripped version of page text.
+        [strippedHint] = translateOffsets(
           text,
-          normalizedText,
+          strippedText,
           expectedOffsetInPage,
           expectedOffsetInPage,
           isNotSpace,
-          { normalize: true },
+          // We don't need to normalize here since both input strings are
+          // derived from the same input.
+          { normalize: false },
         );
       } else {
-        normalizedHint = 0; // Prefer matches closer to start of page.
+        strippedHint = 0; // Prefer matches closer to start of page.
       }
     }
 
-    const match = matchQuote(normalizedText, normalizedQuote, {
-      prefix: normalizedPrefix,
-      suffix: normalizedSuffix,
-      hint: normalizedHint,
+    const match = matchQuote(strippedText, strippedQuote, {
+      prefix: strippedPrefix,
+      suffix: strippedSuffix,
+      hint: strippedHint,
     });
 
     if (!match) {
@@ -450,14 +472,14 @@ async function anchorQuote(
     }
 
     if (!bestMatch || match.score > bestMatch.match.score) {
-      // Translate match offset from normalized text back to original text.
+      // Translate match offset from whitespace-stripped version of page text
+      // back to original text.
       const [start, end] = translateOffsets(
-        normalizedText,
+        strippedText,
         text,
         match.start,
         match.end,
         isNotSpace,
-        { normalize: true },
       );
       bestMatch = {
         page,
@@ -478,22 +500,21 @@ async function anchorQuote(
       // helps to avoid incorrectly stopping the search early if the quote is
       // a word or phrase that is common in the document.
       const exactQuoteMatch =
-        normalizedText.slice(match.start, match.end) === normalizedQuote;
+        strippedText.slice(match.start, match.end) === strippedQuote;
 
       const exactPrefixMatch =
-        normalizedPrefix !== undefined &&
-        normalizedText.slice(
-          Math.max(0, match.start - normalizedPrefix.length),
+        strippedPrefix !== undefined &&
+        strippedText.slice(
+          Math.max(0, match.start - strippedPrefix.length),
           match.start,
-        ) === normalizedPrefix;
+        ) === strippedPrefix;
 
       const exactSuffixMatch =
-        normalizedSuffix !== undefined &&
-        normalizedText.slice(match.end, match.end + normalizedSuffix.length) ===
-          normalizedSuffix;
+        strippedSuffix !== undefined &&
+        strippedText.slice(match.end, strippedSuffix.length) === strippedSuffix;
 
       const hasContext =
-        normalizedPrefix !== undefined || normalizedSuffix !== undefined;
+        strippedPrefix !== undefined || strippedSuffix !== undefined;
 
       if (
         exactQuoteMatch &&
@@ -553,11 +574,7 @@ async function anchorRange(selectors: Selector[]): Promise<Range> {
       const start = position.start - offset;
       const end = position.end - offset;
 
-      // Compare normalized forms — `quote.exact` is stored normalized (see
-      // `describe`), but `text` is the raw page text, so any difference in
-      // whitespace would otherwise cause this fast path to always fall
-      // through to the slow quote search.
-      const matchedText = normalizePDFText(text.substring(start, end)).trim();
+      const matchedText = text.substring(start, end);
       if (quote.exact !== matchedText) {
         throw new Error('quote mismatch');
       }
@@ -778,20 +795,7 @@ export async function describe(range: Range): Promise<Selector[]> {
     end: pageOffset + endPos.offset,
   } as TextPositionSelector;
 
-  const rawQuote = TextQuoteAnchor.fromRange(
-    pageView.div,
-    textRange,
-  ).toSelector();
-  const quote: TextQuoteSelector = {
-    ...rawQuote,
-    exact: normalizePDFText(rawQuote.exact).trim(),
-    prefix: rawQuote.prefix
-      ? normalizePDFText(rawQuote.prefix).trim()
-      : rawQuote.prefix,
-    suffix: rawQuote.suffix
-      ? normalizePDFText(rawQuote.suffix).trim()
-      : rawQuote.suffix,
-  };
+  const quote = TextQuoteAnchor.fromRange(pageView.div, textRange).toSelector();
   const pageSelector = createPageSelector(pageView, startPageIndex);
 
   return [position, quote, pageSelector];
