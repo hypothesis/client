@@ -22,8 +22,6 @@ function AnnotationQuote({
   isOrphan,
   settings,
 }: AnnotationQuoteProps) {
-  const displayQuote = quote.replace(/\s+/g, ' ').trim();
-
   return (
     <InlineControlExcerpt collapsedHeight={35} overflowThreshold={20}>
       <StyledText classes={classnames({ 'p-redacted-text': isOrphan })}>
@@ -33,7 +31,7 @@ function AnnotationQuote({
           })}
           style={applyTheme(['selectionFontFamily'], settings)}
         >
-          {displayQuote}
+          {quote}
         </blockquote>
       </StyledText>
     </InlineControlExcerpt>
