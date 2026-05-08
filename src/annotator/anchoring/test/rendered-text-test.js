@@ -1,75 +1,47 @@
 import { assert } from 'chai';
 
-import { renderedTextOf, toNormalized, toRaw } from '../rendered-text';
+import { renderedTextFromRange, renderedTextOf } from '../rendered-text';
 
 describe('annotator/anchoring/rendered-text', () => {
-  it('inserts a space at <br> boundaries', () => {
-    const container = document.createElement('div');
-    container.innerHTML = '<p>foo<br>bar</p>';
-
-    assert.equal(renderedTextOf(container).text.trim(), 'foo bar');
-  });
-
-  it('inserts a space at block-tag boundaries', () => {
-    const container = document.createElement('div');
-    container.innerHTML = '<p>foo</p><p>bar</p><div>baz</div>';
-
-    assert.equal(renderedTextOf(container).text.trim(), 'foo bar baz');
-  });
-
-  it('collapses runs of whitespace and suppresses leading whitespace', () => {
-    const container = document.createElement('div');
-    container.innerHTML = '<p>  foo \n\n bar  </p>';
-
-    assert.equal(renderedTextOf(container).text.trim(), 'foo bar');
-  });
-
-  describe('offset translation', () => {
-    it('round-trips raw <-> normalized offsets across a <br> boundary', () => {
+  describe('renderedTextOf', () => {
+    it('replaces <br> with a space', () => {
       const container = document.createElement('div');
       container.innerHTML = '<p>foo<br>bar</p>';
 
-      const { text, rawToNormalized, normalizedToRaw } =
-        renderedTextOf(container);
-      assert.equal(text.trim(), 'foo bar');
-
-      // Raw textContent is "foobar". The 'b' at raw offset 3 maps into the
-      // rendered text past the synthesized space inserted at the <br>.
-      assert.equal(toNormalized(rawToNormalized, 3), 3);
-      assert.equal(toRaw(normalizedToRaw, toNormalized(rawToNormalized, 3)), 3);
-      // End-of-string round-trips to end-of-string.
-      assert.equal(
-        toRaw(normalizedToRaw, text.length),
-        container.textContent.length,
-      );
+      assert.equal(renderedTextOf(container), 'foo bar');
     });
 
-    it('clamps out-of-range raw offsets to the start', () => {
+    it('preserves whitespace and block-tag boundaries (no collapse)', () => {
       const container = document.createElement('div');
-      container.textContent = 'abc';
+      container.innerHTML = '<p>foo  bar</p><p>baz</p>';
 
-      const { rawToNormalized } = renderedTextOf(container);
-      assert.equal(toNormalized(rawToNormalized, -5), 0);
+      // Same as textContent: no collapsing of consecutive spaces, no
+      // synthesized space at the </p><p> boundary.
+      assert.equal(renderedTextOf(container), 'foo  barbaz');
     });
 
-    it('clamps non-positive normalized offsets to raw start', () => {
+    it('does not modify the original element', () => {
       const container = document.createElement('div');
-      container.textContent = 'abc';
+      container.innerHTML = '<p>foo<br>bar</p>';
 
-      const { normalizedToRaw } = renderedTextOf(container);
-      assert.equal(toRaw(normalizedToRaw, 0), 0);
-      assert.equal(toRaw(normalizedToRaw, -10), 0);
+      renderedTextOf(container);
+
+      assert.ok(container.querySelector('br'));
     });
+  });
 
-    it('handles whitespace-only content', () => {
+  describe('renderedTextFromRange', () => {
+    it('returns the range contents with <br> replaced by a space', () => {
       const container = document.createElement('div');
-      container.textContent = '   ';
+      container.innerHTML = '<p>foo<br>bar</p>';
+      document.body.appendChild(container);
 
-      const { text, rawToNormalized } = renderedTextOf(container);
-      // Whitespace collapses; container is a block, so we get just the
-      // closing-block synthesized space (or empty after trim).
-      assert.equal(text.trim(), '');
-      assert.equal(toNormalized(rawToNormalized, 1), 0);
+      const range = document.createRange();
+      range.selectNodeContents(container.querySelector('p'));
+
+      assert.equal(renderedTextFromRange(range), 'foo bar');
+
+      container.remove();
     });
   });
 });

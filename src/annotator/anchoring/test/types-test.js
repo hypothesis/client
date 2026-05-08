@@ -1,6 +1,5 @@
 import { render } from 'preact';
 
-import { renderedTextOf } from '../rendered-text';
 import { TextRange } from '../text-range';
 import {
   MediaTimeAnchor,
@@ -369,19 +368,11 @@ describe('annotator/anchoring/types', () => {
 
         quoteAnchor.toRange({ hint: 42 });
 
-        // `toPositionAnchor` matches against the rendered (whitespace-collapsed,
-        // BR-aware) text rather than raw `textContent`. For this container the
-        // two only differ by a trailing synthesized space from the block close.
-        assert.calledWith(
-          fakeMatchQuote,
-          renderedTextOf(container).text,
-          'Liberty',
-          {
-            hint: 42,
-            prefix: 'expected-prefix',
-            suffix: 'expected-suffix',
-          },
-        );
+        assert.calledWith(fakeMatchQuote, container.textContent, 'Liberty', {
+          hint: 42,
+          prefix: 'expected-prefix',
+          suffix: 'expected-suffix',
+        });
       });
 
       it('returns `Range` representing match found by `matchQuote`', () => {

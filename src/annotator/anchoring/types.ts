@@ -14,7 +14,7 @@ import type {
   TextQuoteSelector,
 } from '../../types/api';
 import { matchQuote } from './match-quote';
-import { renderedTextOf, toNormalized, toRaw } from './rendered-text';
+import { renderedTextFromRange } from './rendered-text';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
@@ -175,24 +175,41 @@ export class TextQuoteAnchor {
    */
   static fromRange(root: Element, range: Range): TextQuoteAnchor {
     const rawText = root.textContent ?? '';
-    const { text, rawToNormalized } = renderedTextOf(root);
     const textRange = TextRange.fromRange(range).relativeTo(root);
     const rawStart = textRange.start.offset;
     const rawEnd = textRange.end.offset;
-    const normalizedStart = toNormalized(rawToNormalized, rawStart);
-    const normalizedEnd = toNormalized(rawToNormalized, rawEnd);
 
+    // Number of characters around the quote to capture as context. We currently
+    // always use a fixed amount, but it would be better if this code was aware
+    // of logical boundaries in the document (paragraph, article etc.) to avoid
+    // capturing text unrelated to the quote.
+    //
+    // In regular prose the ideal content would often be the surrounding sentence.
+    // This is a natural unit of meaning which enables displaying quotes in
+    // context even when the document is not available. We could use `Intl.Segmenter`
+    // for this when available.
     const contextLen = 32;
-    const exact = text.slice(normalizedStart, normalizedEnd).trim();
-    // Prefix/suffix come from raw textContent: matchQuote tolerates
-    // whitespace differences when matching, and keeping them raw preserves
-    // backward compatibility with selectors stored before the rendered-text
-    // normalization landed.
-    const prefix = rawText.slice(Math.max(0, rawStart - contextLen), rawStart);
-    const suffix = rawText.slice(
+
+    // The exact text uses `<br>` → space substitution so that selections
+    // spanning a line break aren't stored as run-together words. We trim
+    // the result to drop the synthesized space when the range starts or
+    // ends right at a `<br>` — otherwise that leading/trailing space
+    // throws off `matchQuote` when re-anchoring. Prefix and suffix get
+    // the same `<br>` substitution but aren't trimmed: they're context,
+    // not the matched text.
+    const exact = renderedTextFromRange(range).trim();
+    const prefixRange = TextRange.fromOffsets(
+      root,
+      Math.max(0, rawStart - contextLen),
+      rawStart,
+    ).toRange();
+    const prefix = renderedTextFromRange(prefixRange);
+    const suffixRange = TextRange.fromOffsets(
+      root,
       rawEnd,
       Math.min(rawText.length, rawEnd + contextLen),
-    );
+    ).toRange();
+    const suffix = renderedTextFromRange(suffixRange);
 
     return new TextQuoteAnchor(root, exact, { prefix, suffix });
   }
@@ -219,7 +236,7 @@ export class TextQuoteAnchor {
   }
 
   toPositionAnchor(options: QuoteMatchOptions = {}): TextPositionAnchor {
-    const { text, normalizedToRaw } = renderedTextOf(this.root);
+    const text = this.root.textContent!;
     const match = matchQuote(text, this.exact, {
       ...this.context,
       hint: options.hint,
@@ -227,11 +244,7 @@ export class TextQuoteAnchor {
     if (!match) {
       throw new Error('Quote not found');
     }
-    return new TextPositionAnchor(
-      this.root,
-      toRaw(normalizedToRaw, match.start),
-      toRaw(normalizedToRaw, match.end),
-    );
+    return new TextPositionAnchor(this.root, match.start, match.end);
   }
 }
 
