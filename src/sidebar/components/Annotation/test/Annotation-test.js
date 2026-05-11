@@ -150,10 +150,7 @@ describe('Annotation', () => {
 
       const wrapper = createComponent({ annotation });
 
-      assert.equal(
-        wrapper.find('AnnotationQuote').props().quote,
-        'foo bar',
-      );
+      assert.equal(wrapper.find('AnnotationQuote').props().quote, 'foo bar');
     });
 
     it('falls back to stored quote when $displayQuote is absent', () => {
@@ -161,10 +158,7 @@ describe('Annotation', () => {
 
       const wrapper = createComponent();
 
-      assert.equal(
-        wrapper.find('AnnotationQuote').props().quote,
-        'foobar',
-      );
+      assert.equal(wrapper.find('AnnotationQuote').props().quote, 'foobar');
     });
   });
 
