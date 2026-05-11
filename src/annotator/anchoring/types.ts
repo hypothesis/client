@@ -14,7 +14,6 @@ import type {
   TextQuoteSelector,
 } from '../../types/api';
 import { matchQuote } from './match-quote';
-import { renderedTextFromRange } from './rendered-text';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
@@ -174,10 +173,11 @@ export class TextQuoteAnchor {
    * Will throw if `range` does not contain any text nodes.
    */
   static fromRange(root: Element, range: Range): TextQuoteAnchor {
-    const rawText = root.textContent ?? '';
+    const text = root.textContent!;
     const textRange = TextRange.fromRange(range).relativeTo(root);
-    const rawStart = textRange.start.offset;
-    const rawEnd = textRange.end.offset;
+
+    const start = textRange.start.offset;
+    const end = textRange.end.offset;
 
     // Number of characters around the quote to capture as context. We currently
     // always use a fixed amount, but it would be better if this code was aware
@@ -190,28 +190,10 @@ export class TextQuoteAnchor {
     // for this when available.
     const contextLen = 32;
 
-    // The exact text uses `<br>` → space substitution so that selections
-    // spanning a line break aren't stored as run-together words. We trim
-    // the result to drop the synthesized space when the range starts or
-    // ends right at a `<br>` — otherwise that leading/trailing space
-    // throws off `matchQuote` when re-anchoring. Prefix and suffix get
-    // the same `<br>` substitution but aren't trimmed: they're context,
-    // not the matched text.
-    const exact = renderedTextFromRange(range).trim();
-    const prefixRange = TextRange.fromOffsets(
-      root,
-      Math.max(0, rawStart - contextLen),
-      rawStart,
-    ).toRange();
-    const prefix = renderedTextFromRange(prefixRange);
-    const suffixRange = TextRange.fromOffsets(
-      root,
-      rawEnd,
-      Math.min(rawText.length, rawEnd + contextLen),
-    ).toRange();
-    const suffix = renderedTextFromRange(suffixRange);
-
-    return new TextQuoteAnchor(root, exact, { prefix, suffix });
+    return new TextQuoteAnchor(root, text.slice(start, end), {
+      prefix: text.slice(Math.max(0, start - contextLen), start),
+      suffix: text.slice(end, Math.min(text.length, end + contextLen)),
+    });
   }
 
   static fromSelector(
