@@ -13,17 +13,11 @@ function substituteBrs(root: Element): string {
 }
 
 /**
- * Don't collapse whitespace or block-level tags. Preserve the same behavior
- * as `root.textContent`, but add a space for `<br>` elements.
- */
-export function renderedTextOf(root: Element): string {
-  return substituteBrs(root.cloneNode(true) as Element);
-}
-
-/**
- * Same as {@link renderedTextOf} but operates on a `Range` rather than a
- * root element. Returns the text within the range with each `<br>` replaced
- * by a space.
+ * Return the text within `range` with each `<br>` replaced by a space.
+ *
+ * Same as `range.toString()` otherwise — no whitespace collapsing, no
+ * block-tag handling. The `<br>` → space substitution exists so that
+ * selections spanning a line break aren't reported as run-together words.
  */
 export function renderedTextFromRange(range: Range): string {
   const container = document.createElement('div');
