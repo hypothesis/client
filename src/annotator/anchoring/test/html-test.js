@@ -364,10 +364,7 @@ describe('HTML anchoring', () => {
       // text. We test each selector in turn to make sure they are all valid.
       const anchored = selectors.map(sel => {
         return html.anchor(container, [sel]).then(anchoredRange => {
-          assert.equal(
-            range.toString().trim(),
-            anchoredRange.toString().trim(),
-          );
+          assert.equal(range.toString(), anchoredRange.toString());
         });
       });
       return Promise.all(anchored);
