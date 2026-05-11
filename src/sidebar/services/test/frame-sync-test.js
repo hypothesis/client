@@ -179,6 +179,7 @@ describe('FrameSyncService', () => {
         setSidebarOpened: sinon.stub(),
         toggleSelectedAnnotations: sinon.stub(),
         updateAnchorStatus: sinon.stub(),
+        updateDisplayQuotes: sinon.stub(),
       },
     );
 
@@ -769,6 +770,22 @@ describe('FrameSyncService', () => {
         t1: 'anchored',
         t2: 'orphan',
       });
+    });
+
+    it('forwards $displayQuote to the store when present', () => {
+      emitGuestEvent('syncAnchoringStatus', {
+        $tag: 't1',
+        $orphan: false,
+        $displayQuote: 'foo bar',
+      });
+
+      assert.calledWith(fakeStore.updateDisplayQuotes, { t1: 'foo bar' });
+    });
+
+    it('does not call updateDisplayQuotes if $displayQuote is absent', () => {
+      emitGuestEvent('syncAnchoringStatus', { $tag: 't1', $orphan: false });
+
+      assert.notCalled(fakeStore.updateDisplayQuotes);
     });
   });
 

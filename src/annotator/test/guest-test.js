@@ -1770,6 +1770,28 @@ describe('Guest', () => {
         .then(() => assert.isFalse(annotation.$orphan));
     });
 
+    it('computes $displayQuote with <br> substituted by a space', async () => {
+      const container = document.createElement('div');
+      container.innerHTML = '<p>foo<br>bar</p>';
+      document.body.appendChild(container);
+      const brRange = document.createRange();
+      brRange.selectNodeContents(container.querySelector('p'));
+
+      const guest = createGuest();
+      const annotation = {
+        target: [
+          { selector: [{ type: 'TextQuoteSelector', exact: 'foobar' }] },
+        ],
+      };
+      fakeIntegration.anchor.returns(Promise.resolve(brRange));
+
+      await guest.anchor(annotation);
+
+      assert.equal(annotation.$displayQuote, 'foo bar');
+
+      container.remove();
+    });
+
     it("doesn't mark an annotation in which at least one target anchors as an orphan", () => {
       const guest = createGuest();
       const annotation = {

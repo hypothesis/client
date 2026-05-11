@@ -140,6 +140,32 @@ describe('Annotation', () => {
       const quote = wrapper.find('AnnotationQuote');
       assert.isFalse(quote.exists());
     });
+
+    it('prefers $displayQuote over the stored quote when present', () => {
+      fakeMetadata.quote.returns('foobar');
+      const annotation = {
+        ...fixtures.defaultAnnotation(),
+        $displayQuote: 'foo bar',
+      };
+
+      const wrapper = createComponent({ annotation });
+
+      assert.equal(
+        wrapper.find('AnnotationQuote').props().quote,
+        'foo bar',
+      );
+    });
+
+    it('falls back to stored quote when $displayQuote is absent', () => {
+      fakeMetadata.quote.returns('foobar');
+
+      const wrapper = createComponent();
+
+      assert.equal(
+        wrapper.find('AnnotationQuote').props().quote,
+        'foobar',
+      );
+    });
   });
 
   describe('annotation thumbnail', () => {
