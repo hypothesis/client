@@ -37,4 +37,15 @@ export type ClientAnnotationData = {
    * `true` if anchoring failed or `false` if it succeeded.
    */
   $orphan?: boolean;
+
+  /**
+   * Quote text computed from the anchored DOM range, with `<br>` elements
+   * substituted by spaces. Used by the sidebar to display selections that
+   * span line breaks as "foo bar" instead of "foobar" (which is what
+   * `textContent` produces because `<br>` contributes no characters).
+   *
+   * Storage and matching always use the raw `TextQuoteSelector.exact`;
+   * `$displayQuote` only affects what the sidebar renders.
+   */
+  $displayQuote?: string;
 };

@@ -27,6 +27,7 @@ import type {
   SidebarToGuestCalls,
 } from '../types/port-rpc-calls';
 import { Adder } from './adder';
+import { renderedTextFromRange } from './anchoring/rendered-text';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
 import { DrawTool, DrawError } from './draw-tool';
@@ -932,6 +933,13 @@ export class Guest
           // this anchor.
           const textRange = TextRange.fromRange(region);
           anchor = { annotation, target, region: textRange };
+
+          // Compute a display-friendly version of the quote from the anchored
+          // DOM range. This substitutes `<br>` with a space so that selections
+          // spanning a line break show as "foo bar" in the sidebar instead of
+          // "foobar". The stored selector remains unchanged — this only
+          // affects what the sidebar renders.
+          annotation.$displayQuote = renderedTextFromRange(region);
         } else {
           anchor = { annotation, target, region };
         }

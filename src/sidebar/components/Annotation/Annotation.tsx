@@ -86,7 +86,9 @@ function Annotation({
 }: AnnotationProps) {
   const store = useSidebarStore();
 
-  const annotationQuote = quote(annotation);
+  // Prefer the display-friendly quote computed at anchor time (which
+  // substitutes `<br>` with a space) over the raw stored selector text.
+  const annotationQuote = annotation.$displayQuote ?? quote(annotation);
   const targetDescription = description(annotation);
 
   const draft = store.getDraft(annotation);
