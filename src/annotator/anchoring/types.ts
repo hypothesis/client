@@ -14,6 +14,11 @@ import type {
   TextQuoteSelector,
 } from '../../types/api';
 import { matchQuote } from './match-quote';
+import {
+  renderedOffsetToRaw,
+  renderedTextFromRange,
+  renderedTextOf,
+} from './rendered-text';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
@@ -173,11 +178,14 @@ export class TextQuoteAnchor {
    * Will throw if `range` does not contain any text nodes.
    */
   static fromRange(root: Element, range: Range): TextQuoteAnchor {
-    const text = root.textContent!;
+    // Store the quote with each `<br>` substituted by a space, so that
+    // selections spanning a line break aren't run-together as "foobar"
+    // for `<p>foo<br>bar</p>`. Prefix and suffix go through the same
+    // substitution so the three fields are consistent.
+    const rawText = root.textContent ?? '';
     const textRange = TextRange.fromRange(range).relativeTo(root);
-
-    const start = textRange.start.offset;
-    const end = textRange.end.offset;
+    const rawStart = textRange.start.offset;
+    const rawEnd = textRange.end.offset;
 
     // Number of characters around the quote to capture as context. We currently
     // always use a fixed amount, but it would be better if this code was aware
@@ -190,10 +198,21 @@ export class TextQuoteAnchor {
     // for this when available.
     const contextLen = 32;
 
-    return new TextQuoteAnchor(root, text.slice(start, end), {
-      prefix: text.slice(Math.max(0, start - contextLen), start),
-      suffix: text.slice(end, Math.min(text.length, end + contextLen)),
-    });
+    const exact = renderedTextFromRange(range);
+    const prefixRange = TextRange.fromOffsets(
+      root,
+      Math.max(0, rawStart - contextLen),
+      rawStart,
+    ).toRange();
+    const prefix = renderedTextFromRange(prefixRange);
+    const suffixRange = TextRange.fromOffsets(
+      root,
+      rawEnd,
+      Math.min(rawText.length, rawEnd + contextLen),
+    ).toRange();
+    const suffix = renderedTextFromRange(suffixRange);
+
+    return new TextQuoteAnchor(root, exact, { prefix, suffix });
   }
 
   static fromSelector(
@@ -218,7 +237,11 @@ export class TextQuoteAnchor {
   }
 
   toPositionAnchor(options: QuoteMatchOptions = {}): TextPositionAnchor {
-    const text = this.root.textContent!;
+    // Match against rendered text (with `<br>` substituted by a space), the
+    // same representation used when the selector was created. Then
+    // translate the match offsets back to raw `textContent` positions for
+    // `TextPositionAnchor`.
+    const { text, brPositionsInText } = renderedTextOf(this.root);
     const match = matchQuote(text, this.exact, {
       ...this.context,
       hint: options.hint,
@@ -226,7 +249,11 @@ export class TextQuoteAnchor {
     if (!match) {
       throw new Error('Quote not found');
     }
-    return new TextPositionAnchor(this.root, match.start, match.end);
+    return new TextPositionAnchor(
+      this.root,
+      renderedOffsetToRaw(brPositionsInText, match.start),
+      renderedOffsetToRaw(brPositionsInText, match.end),
+    );
   }
 }
 

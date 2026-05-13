@@ -452,28 +452,21 @@ export class FrameSyncService {
     });
 
     // Anchoring an annotation in the frame completed
-    guestRPC.on(
-      'syncAnchoringStatus',
-      ({ $tag, $orphan, $displayQuote }: AnnotationData) => {
-        this._inFrame.add($tag);
-        this._updateAnchorStatus($tag, $orphan ? 'orphan' : 'anchored');
+    guestRPC.on('syncAnchoringStatus', ({ $tag, $orphan }: AnnotationData) => {
+      this._inFrame.add($tag);
+      this._updateAnchorStatus($tag, $orphan ? 'orphan' : 'anchored');
 
-        if (typeof $displayQuote === 'string') {
-          this._store.updateDisplayQuotes({ [$tag]: $displayQuote });
+      if ($tag === this._pendingHoverTag) {
+        this._pendingHoverTag = null;
+        guestRPC.call('hoverAnnotations', [$tag]);
+      }
+      if (this._pendingScrollToTag) {
+        if ($tag === this._pendingScrollToTag) {
+          this._pendingScrollToTag = null;
+          guestRPC.call('scrollToAnnotation', $tag);
         }
-
-        if ($tag === this._pendingHoverTag) {
-          this._pendingHoverTag = null;
-          guestRPC.call('hoverAnnotations', [$tag]);
-        }
-        if (this._pendingScrollToTag) {
-          if ($tag === this._pendingScrollToTag) {
-            this._pendingScrollToTag = null;
-            guestRPC.call('scrollToAnnotation', $tag);
-          }
-        }
-      },
-    );
+      }
+    });
 
     guestRPC.on(
       'showAnnotations',
