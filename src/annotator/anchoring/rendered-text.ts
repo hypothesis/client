@@ -32,7 +32,7 @@ export function renderedTextFromRange(range: Range): string {
  * rendered text and need to translate match offsets back to offsets in the
  * raw `textContent` (where `<br>` contributes no characters).
  */
-export type RenderedTextWithBrPositions = {
+type RenderedTextWithBrPositions = {
   /** Rendered text — raw textContent with each `<br>` replaced by a space. */
   text: string;
   /**
