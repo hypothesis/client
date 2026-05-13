@@ -251,31 +251,6 @@ describe('sidebar/store/modules/annotations', () => {
     });
   });
 
-  describe('#updateDisplayQuotes', () => {
-    it('sets $displayQuote on annotations matched by $tag', () => {
-      const store = createTestStore();
-      const annot = fixtures.defaultAnnotation();
-      store.addAnnotations([annot]);
-      const tag = store.getState().annotations.annotations[0].$tag;
-
-      store.updateDisplayQuotes({ [tag]: 'foo bar' });
-
-      const updated = store.getState().annotations.annotations[0];
-      assert.equal(updated.$displayQuote, 'foo bar');
-    });
-
-    it('leaves annotations with unmatched $tags unchanged', () => {
-      const store = createTestStore();
-      const annot = fixtures.defaultAnnotation();
-      store.addAnnotations([annot]);
-
-      store.updateDisplayQuotes({ 'unknown-tag': 'foo bar' });
-
-      const updated = store.getState().annotations.annotations[0];
-      assert.isUndefined(updated.$displayQuote);
-    });
-  });
-
   describe('#isWaitingToAnchorAnnotations', () => {
     it('returns true if there are unanchored annotations', () => {
       const unanchored = Object.assign(fixtures.oldAnnotation(), {

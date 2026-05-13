@@ -240,21 +240,6 @@ const reducers = {
     return { annotations };
   },
 
-  UPDATE_DISPLAY_QUOTES(
-    state: State,
-    action: { displayQuotes: Record<string, string> },
-  ): Partial<State> {
-    const annotations = state.annotations.map(annot => {
-      if (!hasOwn(action.displayQuotes, annot.$tag)) {
-        return annot;
-      }
-      return Object.assign({}, annot, {
-        $displayQuote: action.displayQuotes[annot.$tag],
-      });
-    });
-    return { annotations };
-  },
-
   UPDATE_FLAG_STATUS(
     state: State,
     action: { id: string; isFlagged: boolean },
@@ -408,15 +393,6 @@ export function removeAnnotations(annotations: AnnotationStub[]) {
  */
 function updateAnchorStatus(statusUpdates: AnchorStatusUpdates) {
   return makeAction(reducers, 'UPDATE_ANCHOR_STATUS', { statusUpdates });
-}
-
-/**
- * Update the display-only quote text for annotations. Keyed by `$tag`.
- * The display quote is derived from the anchored DOM range (with `<br>`
- * substituted to a space) — it doesn't change the stored selector.
- */
-function updateDisplayQuotes(displayQuotes: Record<string, string>) {
-  return makeAction(reducers, 'UPDATE_DISPLAY_QUOTES', { displayQuotes });
 }
 
 /**
@@ -620,7 +596,6 @@ export const annotationsModule = createStoreModule(initialState, {
     highlightAnnotations,
     removeAnnotations,
     updateAnchorStatus,
-    updateDisplayQuotes,
     updateFlagStatus,
   },
   selectors: {
