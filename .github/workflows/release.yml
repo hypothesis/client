@@ -68,10 +68,10 @@ jobs:
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
       run: |
-        SENTRY_CMD="yarn run sentry-cli --org hypothesis --project client"
-        $SENTRY_CMD releases new $STAGING_VERSION
-        $SENTRY_CMD sourcemaps upload --release $STAGING_VERSION --url-prefix $CDN_URL/$STAGING_VERSION/build/scripts/ build/scripts
-        $SENTRY_CMD releases finalize $STAGING_VERSION
+        SENTRY_CMD="yarn run sentry-cli releases --org hypothesis --project client"
+        $SENTRY_CMD new $STAGING_VERSION
+        yarn run sentry-cli sourcemaps upload --org hypothesis --project client --release $STAGING_VERSION --url-prefix $CDN_URL/$STAGING_VERSION/build/scripts/ build/scripts
+        $SENTRY_CMD finalize $STAGING_VERSION
     - name: Deploy to S3
       run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }} --tag staging --no-cache-entry
 
@@ -119,10 +119,10 @@ jobs:
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
       run: |
-        SENTRY_CMD="yarn run sentry-cli --org hypothesis --project client"
-        $SENTRY_CMD releases new $NEW_VERSION
-        $SENTRY_CMD sourcemaps upload --release $NEW_VERSION --url-prefix $CDN_URL/$NEW_VERSION/build/scripts/ build/scripts
-        $SENTRY_CMD releases finalize $NEW_VERSION
+        SENTRY_CMD="yarn run sentry-cli releases --org hypothesis --project client"
+        $SENTRY_CMD new $NEW_VERSION
+        yarn run sentry-cli sourcemaps upload --org hypothesis --project client --release $NEW_VERSION --url-prefix $CDN_URL/$NEW_VERSION/build/scripts/ build/scripts
+        $SENTRY_CMD finalize $NEW_VERSION
     - name: Create GitHub release
       run: scripts/create-github-release.js v$NEW_VERSION
       env:
