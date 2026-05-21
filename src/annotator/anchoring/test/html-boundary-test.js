@@ -42,10 +42,9 @@ describe('annotator/anchoring/html boundary handling', () => {
   });
 
   it('describes selection spanning <br> with a space in exact', () => {
-    // This is the bug the PR fixes: a selection that crosses a `<br>` used
-    // to produce `exact: "foobar"` because `textContent` doesn't include a
-    // character for the `<br>`. With the substitution, the stored quote
-    // reflects what the user actually sees in the rendered page.
+    // A selection crossing a `<br>` should produce `exact: "foo bar"` (with
+    // a space), not `"foobar"`, so the stored quote reflects what the user
+    // sees on the rendered page.
     const range = document.createRange();
     range.selectNodeContents(container.querySelector('p'));
 
