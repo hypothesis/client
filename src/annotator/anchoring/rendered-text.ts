@@ -15,9 +15,10 @@ function substituteBrs(root: Element): string {
 /**
  * Return the text within `range` with each `<br>` replaced by a space.
  *
- * Same as `range.toString()` otherwise — no whitespace collapsing, no
- * block-tag handling. The `<br>` → space substitution exists so that
- * selections spanning a line break aren't reported as run-together words.
+ * Unlike block tags (which almost always have whitespace between them in
+ * the HTML source), `<br>` elements are written inline with no surrounding
+ * whitespace, so `textContent` produces no separation. Each `<br>` is
+ * replaced by a space so the quote reflects what the user sees on screen.
  */
 export function renderedTextFromRange(range: Range): string {
   const container = document.createElement('div');
