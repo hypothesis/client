@@ -7,6 +7,7 @@ import {
 } from '@hypothesis/frontend-build';
 import gulp from 'gulp';
 import changed from 'gulp-changed';
+import { writeFileSync } from 'node:fs';
 
 import { serveDev } from './dev-server/serve-dev.js';
 import { servePackage } from './dev-server/serve-package.js';
@@ -89,7 +90,21 @@ const manifestSourceFiles = 'build/{scripts,styles}/*.{css,js,map}';
 
 gulp.task('build-boot-script', async () => {
   // Generate the manifest containing cache-busted asset URLs
-  await generateManifest({ pattern: manifestSourceFiles });
+  const manifest = await generateManifest({ pattern: manifestSourceFiles });
+  // Rewrite the manifest with sorted keys. `generateManifest` inserts entries
+  // in file-read-completion order, which varies between runs, and the boot
+  // bundle inlines this JSON — key order must be stable for the boot script's
+  // bytes (and any CSP hash derived from them) to be reproducible.
+  writeFileSync(
+    'build/manifest.json',
+    JSON.stringify(
+      Object.fromEntries(
+        Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b)),
+      ),
+      null,
+      2,
+    ),
+  );
   // Generate the boot script template
   await buildJS('./rollup-boot.config.js');
   // Replace variables in the template with real URLs

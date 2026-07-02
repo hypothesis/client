@@ -33,3 +33,75 @@ jobs:
       with:
         files: ./coverage/coverage-final.json
         token: ${{ secrets.CODECOV_TOKEN }}
+
+  # Guard against changes that only break after merge (see the 2026-07-01
+  # incident): the production build - whose boot script bytes are gated by a
+  # CSP `script-src` sha256 where the client is embedded - and the deploy
+  # script's dependency chain both run for the first time in the post-merge
+  # Release workflow, so a PR that alters either is green here and fails (or
+  # silently breaks the shipped client) in production.
+  prod-build-guard:
+    name: Prod build & boot hash guard
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout PR branch
+      uses: actions/checkout@v4
+      with:
+        path: pr
+    - name: Checkout base branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.pull_request.base.sha }}
+        path: base
+    - name: Cache the PR node_modules dir
+      uses: actions/cache@v4
+      with:
+        path: pr/node_modules
+        key: ${{ runner.os }}-node_modules-guard-pr-${{ hashFiles('pr/yarn.lock') }}
+    - name: Cache the base node_modules dir
+      uses: actions/cache@v4
+      with:
+        path: base/node_modules
+        key: ${{ runner.os }}-node_modules-guard-base-${{ hashFiles('base/yarn.lock') }}
+    - name: Build production bundles (PR)
+      run: cd pr && yarn install --immutable && yarn build
+    - name: Build production bundles (base)
+      run: cd base && yarn install --immutable && yarn build
+    - name: Smoke-check deploy-time dependencies
+      run: |
+        cd pr
+        node scripts/check-deploy-deps.js
+        node scripts/deploy-to-s3.js --help > /dev/null
+    - name: Check boot script for byte drift
+      env:
+        DRIFT_APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'boot-bytes-approved') }}
+      run: |
+        # Cache-buster fingerprints (`?abc123`) in the inlined asset manifest
+        # legitimately change whenever any asset's content changes, so they are
+        # stripped before comparing: only drift in the boot script's *code*
+        # (the 2026-07-01 incident class) should fail the check.
+        normalized_hash() { sed -E 's/\?[0-9a-f]{6}//g' "$1" | sha256sum | awk '{print $1}'; }
+        drift=""
+        for f in boot-template.js boot.js; do
+          base_hash=$(normalized_hash "base/build/$f")
+          pr_hash=$(normalized_hash "pr/build/$f")
+          echo "$f (fingerprints stripped): base=$base_hash pr=$pr_hash"
+          echo "$f (raw): base=$(sha256sum "base/build/$f" | awk '{print $1}') pr=$(sha256sum "pr/build/$f" | awk '{print $1}')"
+          if [ "$base_hash" != "$pr_hash" ]; then
+            drift="$drift $f"
+          fi
+        done
+        if [ -n "$drift" ]; then
+          msg="Boot script bytes changed vs the base branch:$drift. Where the client \
+        is embedded via an inline script gated by a CSP script-src sha256, this change \
+        invalidates that hash and the browser will block the client (2026-07-01 outage). \
+        If the change is intentional, coordinate refreshing the CSP hash allowlist with \
+        the deploy, then add the 'boot-bytes-approved' label to this PR and re-run."
+          if [ "$DRIFT_APPROVED" = "true" ]; then
+            echo "::warning::$msg (approved via 'boot-bytes-approved' label)"
+          else
+            echo "::error::$msg"
+            exit 1
+          fi
+        fi
