@@ -55,6 +55,7 @@ const fixtures = {
 describe('FrameSyncService', () => {
   let FakePortRPC;
 
+  let fakeAnnotationActivity;
   let fakeAnnotationsService;
   let fakeToastMessenger;
   let fakePortRPCs;
@@ -76,6 +77,7 @@ describe('FrameSyncService', () => {
   let setupPortRPC;
 
   beforeEach(() => {
+    fakeAnnotationActivity = { reportDocumentInfo: sinon.stub() };
     fakeAnnotationsService = { create: sinon.stub() };
     fakeToastMessenger = new EventEmitter();
     fakePortRPCs = [];
@@ -198,6 +200,7 @@ describe('FrameSyncService', () => {
 
     frameSync = new Injector()
       .register('$window', { value: fakeWindow })
+      .register('annotationActivity', { value: fakeAnnotationActivity })
       .register('annotationsService', { value: fakeAnnotationsService })
       .register('store', { value: fakeStore })
       .register('toastMessenger', { value: fakeToastMessenger })
