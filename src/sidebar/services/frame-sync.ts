@@ -37,6 +37,7 @@ import { isPrivate } from '../helpers/permissions';
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
 import { watch } from '../util/watch';
+import type { AnnotationActivityService } from './annotation-activity';
 import type { AnnotationsService } from './annotations';
 import type { ToastMessengerService } from './toast-messenger';
 
@@ -111,6 +112,7 @@ function frameForAnnotation(frames: Frame[], ann: Annotation): Frame | null {
  * @inject
  */
 export class FrameSyncService {
+  private _annotationActivity: AnnotationActivityService;
   private _annotationsService: AnnotationsService;
 
   /**
@@ -183,11 +185,13 @@ export class FrameSyncService {
 
   constructor(
     $window: Window,
+    annotationActivity: AnnotationActivityService,
     annotationsService: AnnotationsService,
     store: SidebarStore,
     toastMessenger: ToastMessengerService,
   ) {
     this._window = $window;
+    this._annotationActivity = annotationActivity;
     this._annotationsService = annotationsService;
     this._store = store;
     this._toastMessenger = toastMessenger;
@@ -395,6 +399,12 @@ export class FrameSyncService {
         segment: info.segmentInfo,
         persistent: info.persistent,
       });
+
+      if (sourceId === null) {
+        const fingerprint = info.metadata.documentFingerprint;
+        const documentUri = fingerprint ? `urn:x-pdf:${fingerprint}` : info.uri;
+        this._annotationActivity.reportDocumentInfo(documentUri);
+      }
     });
 
     // TODO - Close connection if we don't receive a "connect" message within

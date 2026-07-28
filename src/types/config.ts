@@ -331,6 +331,12 @@ export type ConfigFromEmbedder = ConfigFromHost & {
    */
   reportActivity?: ReportAnnotationActivityConfig;
 
+  /**
+   * Request that the loaded document's identity — be reported to the embedder frame via a
+   * `reportDocumentInfo` RPC call when the document loads.
+   */
+  reportDocumentInfo?: boolean;
+
   /** Configuration for menu items etc. related to LMS instructor dashboard */
   dashboard?: DashboardConfig;
 

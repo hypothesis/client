@@ -14,10 +14,12 @@ import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 export class AnnotationActivityService {
   private _rpc: SidebarSettings['rpc'];
   private _reportConfig: SidebarSettings['reportActivity'];
+  private _reportDocumentInfo: boolean;
 
   constructor(settings: SidebarSettings) {
     this._rpc = settings.rpc;
     this._reportConfig = settings.reportActivity;
+    this._reportDocumentInfo = settings.reportDocumentInfo ?? false;
   }
 
   reportActivity(eventType: AnnotationEventType, annotation: Annotation) {
@@ -49,6 +51,18 @@ export class AnnotationActivityService {
     if (this._reportConfig.events.includes(eventType)) {
       this.notify(this._reportConfig.method, [eventType, data]);
     }
+  }
+
+  /**
+   * Notify the embedder frame of the loaded document's identity.
+   *
+   * Only sent when the embedder opts in via the `reportDocumentInfo` setting.
+   */
+  reportDocumentInfo(uri: string) {
+    if (!this._reportDocumentInfo) {
+      return;
+    }
+    this.notify('reportDocumentInfo', [{ uri }]);
   }
 
   /**
