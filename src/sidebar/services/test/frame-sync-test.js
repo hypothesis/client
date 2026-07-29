@@ -37,6 +37,19 @@ const fixtures = {
     persistent: false,
   },
 
+  // Argument to the `documentInfoChanged` call made by a guest displaying a PDF.
+  pdfDocumentInfo: {
+    uri: 'https://example.com/test.pdf',
+    metadata: {
+      documentFingerprint: 'FINGERPRINT',
+      link: [
+        { href: 'urn:x-pdf:FINGERPRINT' },
+        { href: 'https://example.com/test.pdf' },
+      ],
+    },
+    persistent: false,
+  },
+
   // Argument to the `documentInfoChanged` call made by a guest displaying an EPUB
   // document.
   epubDocumentInfo: {
@@ -818,6 +831,35 @@ describe('FrameSyncService', () => {
       emitHostEvent('setHighlightsVisible', false);
       await connectGuest();
       assert.calledWith(channel.call, 'setHighlightsVisible', false);
+    });
+
+    describe("reporting the document's identity to the embedder", () => {
+      it('reports the main URI for an HTML document', async () => {
+        await connectGuest();
+        emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
+
+        assert.calledWith(
+          fakeAnnotationActivity.reportDocumentInfo,
+          fixtures.htmlDocumentInfo.uri,
+        );
+      });
+
+      it('reports the fingerprint URN for a PDF', async () => {
+        await connectGuest();
+        emitGuestEvent('documentInfoChanged', fixtures.pdfDocumentInfo);
+
+        assert.calledWith(
+          fakeAnnotationActivity.reportDocumentInfo,
+          'urn:x-pdf:FINGERPRINT',
+        );
+      });
+
+      it('does not report the identity of a non-main frame', async () => {
+        await connectGuest('test-frame');
+        emitGuestEvent('documentInfoChanged', fixtures.pdfDocumentInfo);
+
+        assert.notCalled(fakeAnnotationActivity.reportDocumentInfo);
+      });
     });
 
     [true, false].forEach(contentInfoAvailable => {

@@ -401,9 +401,13 @@ export class FrameSyncService {
       });
 
       if (sourceId === null) {
-        const fingerprint = info.metadata.documentFingerprint;
-        const documentUri = fingerprint ? `urn:x-pdf:${fingerprint}` : info.uri;
-        this._annotationActivity.reportDocumentInfo(documentUri);
+        // For a PDF the main URI is the (possibly temporary) URL it was served
+        // from, so prefer the fingerprint URN that `PDFMetadata` puts in
+        // `link` — that is the stable identity annotations resolve onto.
+        const fingerprintURN = info.metadata?.link?.find(link =>
+          link.href.startsWith('urn:x-pdf:'),
+        )?.href;
+        this._annotationActivity.reportDocumentInfo(fingerprintURN ?? info.uri);
       }
     });
 
