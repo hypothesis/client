@@ -157,6 +157,34 @@ describe('AnnotationActivityService', () => {
     });
   });
 
+  describe('#reportDocumentInfo', () => {
+    it('sends reportDocumentInfo notification if the embedder opted in', () => {
+      const svc = new AnnotationActivityService({
+        ...fakeSettings,
+        reportDocumentInfo: true,
+      });
+
+      svc.reportDocumentInfo('urn:x-pdf:FINGERPRINT');
+
+      assert.calledOnce(fakePostMessageJsonRpc.notify);
+      assert.calledWith(
+        fakePostMessageJsonRpc.notify,
+        window,
+        'https://www.example.com',
+        'reportDocumentInfo',
+        [{ uri: 'urn:x-pdf:FINGERPRINT' }],
+      );
+    });
+
+    it('does not send notification if the embedder did not opt in', () => {
+      const svc = new AnnotationActivityService(fakeSettings);
+
+      svc.reportDocumentInfo('urn:x-pdf:FINGERPRINT');
+
+      assert.notCalled(fakePostMessageJsonRpc.notify);
+    });
+  });
+
   describe('#notifyUnsavedChanges', () => {
     [true, false].forEach(unsaved => {
       it('sends reportUnsavedChanges notification with unsaved state', () => {
