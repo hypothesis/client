@@ -54,6 +54,7 @@ describe('HypothesisApp', () => {
         },
       }),
       route: sinon.stub().returns('sidebar'),
+      isInstructorSurveyPending: sinon.stub().returns(false),
 
       getLink: sinon.stub(),
     };
@@ -185,6 +186,36 @@ describe('HypothesisApp', () => {
       const wrapper = createComponent();
 
       assert.isFalse(wrapper.find('YouTubeDisclaimerBanner').exists());
+    });
+  });
+
+  describe('instructor survey panel', () => {
+    it('renders InstructorSurveyPanel when the survey is pending', () => {
+      fakeStore.route.returns('sidebar');
+      fakeStore.isInstructorSurveyPending.returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('InstructorSurveyPanel').exists());
+    });
+
+    it('does not render InstructorSurveyPanel when the survey is not pending', () => {
+      fakeStore.isInstructorSurveyPending.returns(false);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('InstructorSurveyPanel').exists());
+    });
+
+    ['annotation', 'notebook', 'profile', 'stream'].forEach(route => {
+      it(`does not render InstructorSurveyPanel outside the sidebar (${route})`, () => {
+        fakeStore.isInstructorSurveyPending.returns(true);
+        fakeStore.route.returns(route);
+
+        const wrapper = createComponent();
+
+        assert.isFalse(wrapper.find('InstructorSurveyPanel').exists());
+      });
     });
   });
 
