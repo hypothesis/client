@@ -61,3 +61,29 @@ export function shouldShowYoutubeDisclaimer(
   }
   return profile.preferences?.show_youtube_gdpr_banner === true;
 }
+
+/**
+ * Return true if the EDU role survey should be shown.
+ *
+ * Both of these come from H: `instructor_survey` is the feature flag, which
+ * doubles as the kill switch, and `show_instructor_survey` is true only while
+ * the user is in the survey's audience and hasn't answered it. The client
+ * deliberately doesn't know what the audience is — first-party users at
+ * educational institutions — so that changing it needs no client release,
+ * which would have to propagate through the CDN and the browser extension.
+ *
+ * No `isLoggedIn` check is needed: H only emits the preference when there is a
+ * user, and the dummy profile the store starts with has no preferences.
+ *
+ * Takes `features` rather than `settings` so that FrameSyncService can call it
+ * too, without a change to its constructor.
+ */
+export function shouldShowInstructorSurvey(
+  profile: Profile,
+  features: Record<string, boolean>,
+): boolean {
+  return (
+    features.instructor_survey === true &&
+    profile.preferences?.show_instructor_survey === true
+  );
+}

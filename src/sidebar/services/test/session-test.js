@@ -332,6 +332,56 @@ describe('SessionService', () => {
     });
   });
 
+  describe('#submitInstructorSurveyResponse', () => {
+    beforeEach(() => {
+      fakeApi.profile.update.returns(
+        Promise.resolve({
+          preferences: {},
+        }),
+      );
+    });
+
+    ['instructor', 'not_instructor', 'dismissed'].forEach(response => {
+      it(`sends "${response}" to the backend on its own`, () => {
+        const session = createService();
+        session.submitInstructorSurveyResponse(response);
+        // Only the answer: H emits `show_instructor_survey` but does not
+        // accept it back, so echoing the whole preferences object would fail.
+        assert.calledWith(
+          fakeApi.profile.update,
+          {},
+          {
+            preferences: { instructor_survey_response: response },
+          },
+        );
+      });
+    });
+
+    it('updates the session with the response from the API', () => {
+      const session = createService();
+      const updatedProfile = { preferences: {} };
+      fakeApi.profile.update.resolves(updatedProfile);
+      return session.submitInstructorSurveyResponse('instructor').then(() => {
+        assert.calledWith(fakeStore.updateProfile, updatedProfile);
+      });
+    });
+
+    it('shows toast and rethrows when profile update fails', async () => {
+      const apiError = new Error('API error');
+      fakeApi.profile.update.rejects(apiError);
+      const session = createService();
+
+      await assert.rejects(
+        session.submitInstructorSurveyResponse('instructor'),
+        'API error',
+      );
+      assert.calledWith(
+        fakeToastMessenger.error,
+        'Unable to save your answer. Please try again.',
+      );
+    });
+  });
+
   describe('#reload', () => {
     beforeEach(() => {
       // Load the initial profile data, as the client will do on startup.

@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 
 import type { Profile } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
+import { shouldShowInstructorSurvey } from '../../helpers/session';
 import { createStoreModule, makeAction } from '../create-store';
 
 export type State = {
@@ -107,6 +108,17 @@ function isFeatureEnabled(state: State, feature: string) {
 }
 
 /**
+ * Return true if the EDU role survey is being asked of this user.
+ *
+ * The single source of truth for the survey's visibility, shared by the panel
+ * and (in the sidebar-blocking work) by FrameSyncService, so that the two can't
+ * disagree about whether the survey is up.
+ */
+function isInstructorSurveyPending(state: State) {
+  return shouldShowInstructorSurvey(state.profile, features(state));
+}
+
+/**
  * Return true if the user's profile has been fetched. This can be used to
  * distinguish the dummy profile returned by `profile()` on startup from a
  * logged-out user profile returned by the server.
@@ -143,6 +155,7 @@ export const sessionModule = createStoreModule(initialState, {
     features,
     hasFetchedProfile,
     isFeatureEnabled,
+    isInstructorSurveyPending,
     isLoggedIn,
     profile,
   },

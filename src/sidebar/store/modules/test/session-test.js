@@ -116,4 +116,37 @@ describe('sidebar/store/modules/session', () => {
       });
     });
   });
+
+  describe('#isInstructorSurveyPending', () => {
+    it('returns true when the flag is on and H is asking this user', () => {
+      store.updateProfile({
+        userid: 'john',
+        features: { instructor_survey: true },
+        preferences: { show_instructor_survey: true },
+      });
+      assert.isTrue(store.isInstructorSurveyPending());
+    });
+
+    it('returns false when the flag is off', () => {
+      store.updateProfile({
+        userid: 'john',
+        features: {},
+        preferences: { show_instructor_survey: true },
+      });
+      assert.isFalse(store.isInstructorSurveyPending());
+    });
+
+    it('returns false when H is not asking this user', () => {
+      store.updateProfile({
+        userid: 'john',
+        features: { instructor_survey: true },
+        preferences: {},
+      });
+      assert.isFalse(store.isInstructorSurveyPending());
+    });
+
+    it('returns false before a profile has been fetched', () => {
+      assert.isFalse(store.isInstructorSurveyPending());
+    });
+  });
 });
