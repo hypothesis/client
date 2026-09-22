@@ -18,6 +18,7 @@ import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import AnnotationView from './AnnotationView';
 import HelpPanel from './HelpPanel';
+import InstructorSurveyPanel from './InstructorSurveyPanel';
 import NotebookView from './NotebookView';
 import ProfileView from './ProfileView';
 import SharePanel from './SharePanel';
@@ -61,6 +62,7 @@ function HypothesisApp({
   const isThemeClean = settings.theme === 'clean';
 
   const isSidebar = route === 'sidebar';
+  const surveyPending = store.isInstructorSurveyPending();
 
   useEffect(() => {
     if (shouldAutoDisplayTutorial(isSidebar, profile, settings)) {
@@ -168,6 +170,7 @@ function HypothesisApp({
           isSidebar={isSidebar}
         />
       )}
+      {isSidebar && surveyPending && <InstructorSurveyPanel />}
       {!isModalRoute && shouldShowYoutubeDisclaimer(settings, profile) && (
         <YouTubeDisclaimerBanner />
       )}
