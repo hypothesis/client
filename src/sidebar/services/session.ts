@@ -1,5 +1,9 @@
 import { setAllShortcuts } from '../../shared/shortcut-config';
-import type { Profile, ShortcutsPreferences } from '../../types/api';
+import type {
+  InstructorSurveyResponse,
+  Profile,
+  ShortcutsPreferences,
+} from '../../types/api';
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import type { SidebarStore } from '../store';
@@ -110,6 +114,32 @@ export class SessionService {
     } catch (err) {
       this._toastMessenger.error(
         'Unable to dismiss YouTube disclaimer. Please try again.',
+      );
+      throw err;
+    }
+  }
+
+  /**
+   * Record the user's answer to the EDU role survey server-side and then
+   * update the local profile data.
+   *
+   * One method for all three answers, dismissal included: H treats a dismissal
+   * as an answer like the others, and any of them stops the survey being shown.
+   *
+   * Sends the one key on its own. H emits `show_instructor_survey` but does not
+   * accept it back, so a PATCH that echoed the whole preferences object would
+   * be rejected, taking the answer with it.
+   */
+  async submitInstructorSurveyResponse(response: InstructorSurveyResponse) {
+    try {
+      const updatedProfile = await this._api.profile.update(
+        {},
+        { preferences: { instructor_survey_response: response } },
+      );
+      this.update(updatedProfile);
+    } catch (err) {
+      this._toastMessenger.error(
+        'Unable to save your answer. Please try again.',
       );
       throw err;
     }

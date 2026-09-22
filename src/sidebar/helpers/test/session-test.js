@@ -127,4 +127,49 @@ describe('sidebar/helpers/session', () => {
       });
     });
   });
+
+  describe('shouldShowInstructorSurvey', () => {
+    [
+      {
+        description: 'the flag is on and H says the survey is pending',
+        features: { instructor_survey: true },
+        profile: { preferences: { show_instructor_survey: true } },
+        expected: true,
+      },
+      {
+        description: 'the feature flag is off',
+        features: { instructor_survey: false },
+        profile: { preferences: { show_instructor_survey: true } },
+        expected: false,
+      },
+      {
+        description: 'the feature flag is absent',
+        features: {},
+        profile: { preferences: { show_instructor_survey: true } },
+        expected: false,
+      },
+      {
+        description: 'H is not asking this user',
+        features: { instructor_survey: true },
+        profile: { preferences: {} },
+        expected: false,
+      },
+      {
+        // The dummy profile the store starts with, which is also what a
+        // logged-out user looks like.
+        description: 'there are no preferences at all',
+        features: { instructor_survey: true },
+        profile: {},
+        expected: false,
+      },
+    ].forEach(fixture => {
+      it(`returns ${fixture.expected} when ${fixture.description}`, () => {
+        const result = sessionUtil.shouldShowInstructorSurvey(
+          fixture.profile,
+          fixture.features,
+        );
+        assert.equal(result, fixture.expected);
+      });
+    });
+  });
 });
