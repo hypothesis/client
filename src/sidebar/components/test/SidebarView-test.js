@@ -53,6 +53,7 @@ describe('SidebarView', () => {
       hasFetchedProfile: sinon.stub().returns(true),
       hasSelectedAnnotations: sinon.stub(),
       hasSidebarOpened: sinon.stub(),
+      isInstructorSurveyPending: sinon.stub().returns(false),
       isLoading: sinon.stub().returns(false),
       isLoggedIn: sinon.stub(),
       isSidebarPanelOpen: sinon.stub().returns(false),
@@ -282,4 +283,23 @@ describe('SidebarView', () => {
       content: () => createComponent(),
     }),
   );
+
+  describe('the EDU role survey', () => {
+    it('hides the pending updates notification while the survey is up', () => {
+      // It is `fixed top-12`, so it would float over the survey panel.
+      fakeStore.isInstructorSurveyPending.returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('PendingUpdatesNotification').exists());
+    });
+
+    it('shows the pending updates notification otherwise', () => {
+      fakeStore.isInstructorSurveyPending.returns(false);
+
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('PendingUpdatesNotification').exists());
+    });
+  });
 });

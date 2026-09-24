@@ -62,7 +62,9 @@ function HypothesisApp({
   const isThemeClean = settings.theme === 'clean';
 
   const isSidebar = route === 'sidebar';
-  const surveyPending = store.isInstructorSurveyPending();
+  // One state drives the survey panel, the blocking of the content below it and
+  // the scroll lock that keeps the panel in place.
+  const surveyShown = isSidebar && store.isInstructorSurveyPending();
 
   useEffect(() => {
     if (shouldAutoDisplayTutorial(isSidebar, profile, settings)) {
@@ -146,12 +148,17 @@ function HypothesisApp({
   return (
     <div
       className={classnames(
-        'h-full min-h-full overflow-auto',
+        'h-full min-h-full',
         // Precise padding to align with annotation cards in content
         // Larger padding on bottom for wide screens
         'lg:pb-16 bg-grey-2',
         'js-thread-list-scroll-root',
         {
+          // Pin the survey panel by taking the scroll away from the root.
+          // Help, Search and Share open below it and can be clipped on a short
+          // sidebar, but each has its own close button, so nobody is stuck.
+          'overflow-auto': !surveyShown,
+          'overflow-hidden': surveyShown,
           'theme-clean': isThemeClean,
           // Make room at top for the TopBar (40px) plus custom padding (9px)
           // but not in the Notebook or Profile, which don't use the TopBar
@@ -175,13 +182,23 @@ function HypothesisApp({
       )}
       <div className="container">
         <ToastMessages />
-        {isSidebar && surveyPending && <InstructorSurveyPanel />}
+        {surveyShown && <InstructorSurveyPanel />}
         <HelpPanel />
         <SearchPanel />
         <SharePanel shareTab={!isThirdParty} />
 
         {route && (
-          <main>
+          // `inert` rather than `pointer-events-none` plus `aria-hidden`: it is
+          // the only one of the three that also stops Tab reaching the content,
+          // and it takes the subtree out of the accessibility tree by itself.
+          // Wrapping `<main>` and nothing else keeps Help, Search and Share --
+          // siblings inside `.container` -- usable from the top bar, and keeps
+          // ToastMessages outside, so the error toast from a failed answer can
+          // still be read and dismissed.
+          <main
+            className={classnames({ 'opacity-50': surveyShown })}
+            inert={surveyShown}
+          >
             {route === 'annotation' && <AnnotationView onLogin={login} />}
             {route === 'notebook' && <NotebookView />}
             {route === 'profile' && <ProfileView />}
