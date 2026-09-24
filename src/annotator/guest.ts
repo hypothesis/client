@@ -273,6 +273,17 @@ export class Guest
   private _outsideAssignmentNotice: OutsideAssignmentNoticeController | null;
   private _commentsMode: boolean;
 
+  /**
+   * Whether new annotations can be created in this frame.
+   *
+   * Pushed from the sidebar, which turns it off while it is blocked behind the
+   * EDU role survey. The adder and the toolbar keep working; what changes is
+   * that creating an annotation asks the sidebar to show what is blocking it
+   * instead. Defaults to true so that a guest that connects before the sidebar
+   * has told it anything behaves as it always has.
+   */
+  private _annotatingEnabled: boolean;
+
   /** Pending keyboard mode to activate when annotation mode starts */
   private _pendingKeyboardMode?: 'move' | 'resize';
 
@@ -295,6 +306,7 @@ export class Guest
     this.element = element;
     this._contentReady = config.contentReady;
     this._commentsMode = config.commentsMode ?? false;
+    this._annotatingEnabled = true;
     this._hostFrame = hostFrame;
     this._highlightsVisible = false;
     this._isAdderVisible = false;
@@ -679,6 +691,13 @@ export class Guest
       this.setHighlightsVisible(showHighlights, false /* notifyHost */);
     });
 
+    this._sidebarRPC.on('setAnnotatingEnabled', (enabled: boolean) => {
+      // Nothing else to do: the selection and the adder are left alone either
+      // way, so text still selected when the survey is answered can be
+      // annotated straight away.
+      this._annotatingEnabled = enabled;
+    });
+
     this._sidebarRPC.on('deleteAnnotation', (tag: string) => this.detach(tag));
 
     // Expose document info to the sidebar on demand, so that annotation
@@ -1041,6 +1060,14 @@ export class Guest
    *   creation.
    */
   async createAnnotation(tool: AnnotationTool): Promise<AnnotationData | null> {
+    if (!this._annotatingEnabled) {
+      // Callers that start a keyboard draw set the mode before calling this,
+      // and only clear it on rejection. Drop it here, or it would carry into
+      // the next annotation once annotating is back on.
+      this._pendingKeyboardMode = undefined;
+      this._reportAnnotatingBlocked();
+      return null;
+    }
     if (tool === 'selection') {
       return this.createAnnotationFromSelection();
     } else if (['rect', 'point'].includes(tool)) {
@@ -1120,11 +1147,17 @@ export class Guest
    *   @param [options.highlight] - If true, the new annotation has
    *     the `$highlight` flag set, causing it to be saved immediately without
    *     prompting for a comment.
-   * @return The new annotation
+   * @return The new annotation, or `null` if annotating is turned off
    */
   async createAnnotationFromSelection({
     highlight = false,
-  } = {}): Promise<AnnotationData> {
+  } = {}): Promise<AnnotationData | null> {
+    // The adder's buttons call this directly, not through `createAnnotation`.
+    if (!this._annotatingEnabled) {
+      this._reportAnnotatingBlocked();
+      return null;
+    }
+
     const ranges = this.selectedRanges;
     this.selectedRanges = [];
 
@@ -1208,6 +1241,17 @@ export class Guest
     this._adder.annotationsForSelection = annotationsForSelection();
     this._isAdderVisible = true;
     this._adder.show(focusRect, isBackwards);
+  }
+
+  /**
+   * Tell the sidebar that an annotation was refused because annotating is off,
+   * so that it can open and show why. The selection is dropped as it would be
+   * after a successful annotation, which also hides the adder.
+   */
+  private _reportAnnotatingBlocked() {
+    this.selectedRanges = [];
+    removeTextSelection();
+    this._sidebarRPC.call('annotatingBlocked');
   }
 
   _onClearSelection() {

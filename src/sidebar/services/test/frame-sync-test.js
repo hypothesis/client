@@ -171,7 +171,9 @@ describe('FrameSyncService', () => {
         focusedGroup: sinon.stub().returns({ id: 'foobar' }),
         getFocusFilters: sinon.stub().returns({}),
         hoverAnnotations: sinon.stub(),
+        isInstructorSurveyPending: sinon.stub().returns(false),
         isLoggedIn: sinon.stub().returns(false),
+        nudgeInstructorSurvey: sinon.stub(),
         openSidebarPanel: sinon.stub(),
         selectAnnotations: sinon.stub(),
         selectTab: sinon.stub(),
@@ -1190,6 +1192,81 @@ describe('FrameSyncService', () => {
 
       assert.calledWith(hostRPC().call, 'featureFlagsUpdated', currentFlags());
       assert.calledWith(guestRPC().call, 'featureFlagsUpdated', currentFlags());
+    });
+  });
+
+  describe('turning annotating off behind the EDU role survey', () => {
+    const setSurveyPending = pending => {
+      fakeStore.isInstructorSurveyPending.returns(pending);
+      // Any state change makes the watcher re-read the selector.
+      fakeStore.setState({});
+    };
+
+    beforeEach(async () => {
+      await frameSync.connect();
+    });
+
+    it('tells a guest frame when it connects', async () => {
+      // Guests that connect later -- iframes, VitalSource chapter navigation --
+      // need the current value, not just the changes.
+      setSurveyPending(true);
+
+      await connectGuest();
+
+      assert.calledWith(guestRPC().call, 'setAnnotatingEnabled', false);
+    });
+
+    it('turns annotating off in guests while the survey is pending', async () => {
+      await connectGuest();
+      guestRPC().call.resetHistory();
+
+      setSurveyPending(true);
+
+      assert.calledWith(guestRPC().call, 'setAnnotatingEnabled', false);
+    });
+
+    it('turns annotating back on once the survey is answered', async () => {
+      await connectGuest();
+      setSurveyPending(true);
+      guestRPC().call.resetHistory();
+
+      setSurveyPending(false);
+
+      assert.calledWith(guestRPC().call, 'setAnnotatingEnabled', true);
+    });
+
+    it('leaves the host frame alone', async () => {
+      // The toolbar keeps its buttons; the guest turns their use into
+      // `annotatingBlocked`.
+      await connectGuest();
+      setSurveyPending(true);
+
+      assert.neverCalledWith(hostRPC().call, 'setAnnotatingEnabled');
+    });
+
+    it('opens the sidebar on the survey when a guest reports a blocked annotation', async () => {
+      await connectGuest();
+
+      emitGuestEvent('annotatingBlocked');
+
+      assert.calledWith(hostRPC().call, 'openSidebar');
+      assert.calledOnce(fakeStore.nudgeInstructorSurvey);
+    });
+
+    it('refuses an annotation that reaches the sidebar anyway', async () => {
+      // Belt and braces: the guest should not have got this far. No draft is
+      // opened inside the inert sidebar, the annotation is removed from the
+      // frame it came from, and the user is pointed at the survey.
+      await connectGuest();
+      fakeStore.isLoggedIn.returns(true);
+      setSurveyPending(true);
+
+      emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
+
+      assert.notCalled(fakeAnnotationsService.create);
+      assert.calledWith(guestRPC().call, 'deleteAnnotation', 't1');
+      assert.calledOnce(fakeStore.nudgeInstructorSurvey);
+      assert.notCalled(fakeStore.openSidebarPanel);
     });
   });
 

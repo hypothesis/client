@@ -8,6 +8,9 @@ import type { AnalyticsService } from '../services/analytics';
 import type { SessionService } from '../services/session';
 import { useSidebarStore } from '../store';
 
+/** Matches the length of the `survey-nudge` animation in sidebar.css. */
+const NUDGE_DURATION_MS = 800;
+
 export type InstructorSurveyPanelProps = {
   // Injected
   analytics: AnalyticsService;
@@ -62,6 +65,24 @@ function InstructorSurveyPanel({
     }
   }, [sidebarHasOpened]);
 
+  // Draw attention to the panel when the user tries to annotate while it
+  // blocks the sidebar: focus it and play a short pulse, so the click visibly
+  // leads here -- the sidebar may already have been open, in which case nothing
+  // else on screen would change. Only changes count, not the value it mounts
+  // with.
+  const nudges = store.instructorSurveyNudges();
+  const initialNudges = useRef(nudges);
+  const [nudging, setNudging] = useState(false);
+  useEffect(() => {
+    if (nudges === initialNudges.current) {
+      return () => {};
+    }
+    container.current?.focus();
+    setNudging(true);
+    const timeout = setTimeout(() => setNudging(false), NUDGE_DURATION_MS);
+    return () => clearTimeout(timeout);
+  }, [nudges]);
+
   const submit = useCallback(
     async (response: InstructorSurveyResponse) => {
       setSubmitting(true);
@@ -98,8 +119,12 @@ function InstructorSurveyPanel({
           // put its own buttons out of reach. Cheap insurance; the copy is
           // short.
           'max-h-[calc(100dvh-49px)] overflow-y-auto',
+          { 'animate-survey-nudge': nudging },
         )}
         data-testid="instructor-survey-card"
+        // A new card per attempt, so that a click while the pulse is still
+        // playing starts it again instead of leaving the class in place.
+        key={nudges}
       >
         <CloseButton
           classes={classnames(

@@ -26,6 +26,21 @@
     }
   }
 
+  /* Points the user at the EDU role survey. Keep in step with
+     NUDGE_DURATION_MS in InstructorSurveyPanel. */
+  --animate-survey-nudge: survey-nudge 0.8s ease-in-out;
+  @keyframes survey-nudge {
+    0%,
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 transparent;
+    }
+    30% {
+      transform: scale(1.03);
+      box-shadow: 0 0 0 3px var(--color-brand);
+    }
+  }
+
   --animate-updates-notification-slide-in: updates-notification-slide-in 0.3s
     ease-in;
   @keyframes updates-notification-slide-in {

@@ -1,4 +1,5 @@
 import { checkAccessibility, mount } from '@hypothesis/frontend-testing';
+import { act } from 'preact/test-utils';
 
 import { ServiceContext } from '../../service-context';
 import InstructorSurveyPanel, { $imports } from '../InstructorSurveyPanel';
@@ -29,7 +30,10 @@ describe('InstructorSurveyPanel', () => {
     };
     // The panel only counts as seen once the sidebar has been opened; most
     // tests want it already open.
-    fakeStore = { hasSidebarOpened: sinon.stub().returns(true) };
+    fakeStore = {
+      hasSidebarOpened: sinon.stub().returns(true),
+      instructorSurveyNudges: sinon.stub().returns(0),
+    };
 
     $imports.$mock({
       '../store': { useSidebarStore: () => fakeStore },
@@ -66,6 +70,92 @@ describe('InstructorSurveyPanel', () => {
         .find('section[data-testid="instructor-survey-panel"]')
         .getDOMNode(),
     );
+  });
+
+  describe('when the user tries to annotate', () => {
+    let clock;
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
+    const card = wrapper => wrapper.find('Card');
+    const nudge = (wrapper, count) => {
+      fakeStore.instructorSurveyNudges.returns(count);
+      // The store is a fake, so re-render by hand -- with a fresh element, since
+      // an unchanged one would be skipped -- and use `act` so the effect that
+      // reacts to the new count runs before asserting.
+      act(() => {
+        wrapper.setProps({
+          children: <InstructorSurveyPanel rerender={count} />,
+        });
+      });
+      wrapper.update();
+    };
+
+    it('pulses and takes focus', () => {
+      const wrapper = createComponent();
+      document.activeElement.blur();
+
+      nudge(wrapper, 1);
+
+      assert.include(card(wrapper).prop('classes'), 'animate-survey-nudge');
+      assert.equal(
+        document.activeElement,
+        wrapper
+          .find('section[data-testid="instructor-survey-panel"]')
+          .getDOMNode(),
+      );
+    });
+
+    it('stops pulsing once the animation is over', () => {
+      const wrapper = createComponent();
+      nudge(wrapper, 1);
+
+      act(() => {
+        clock.tick(800);
+      });
+      wrapper.update();
+
+      assert.notInclude(card(wrapper).prop('classes'), 'animate-survey-nudge');
+    });
+
+    it('pulses again on the next attempt', () => {
+      const wrapper = createComponent();
+      nudge(wrapper, 1);
+      act(() => {
+        clock.tick(800);
+      });
+      wrapper.update();
+
+      nudge(wrapper, 2);
+
+      assert.include(card(wrapper).prop('classes'), 'animate-survey-nudge');
+    });
+
+    it('restarts the pulse on an attempt made while it is playing', () => {
+      const wrapper = createComponent();
+      nudge(wrapper, 1);
+      const first = card(wrapper).getDOMNode();
+
+      nudge(wrapper, 2);
+
+      // A fresh element is what makes the browser play the animation again.
+      assert.notEqual(card(wrapper).getDOMNode(), first);
+      assert.include(card(wrapper).prop('classes'), 'animate-survey-nudge');
+    });
+
+    it('does not pulse for attempts made before it mounted', () => {
+      fakeStore.instructorSurveyNudges.returns(3);
+
+      const wrapper = createComponent();
+
+      assert.notInclude(card(wrapper).prop('classes'), 'animate-survey-nudge');
+    });
   });
 
   it('does not track an impression while the sidebar is closed', () => {
