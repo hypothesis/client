@@ -1,4 +1,4 @@
-import { Button, CloseButton } from '@hypothesis/frontend-shared';
+import { Button, Card, CloseButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useEffect, useId, useRef, useState } from 'preact/hooks';
 
@@ -74,7 +74,7 @@ function InstructorSurveyPanel({
       // Re-enable either way. On success the updated profile unmounts this
       // panel, so this is normally a no-op -- but if a response ever came back
       // still reporting the survey as pending, leaving `submitting` set would
-      // strand the user with a banner whose dismiss button is disabled too.
+      // strand the user with a panel whose dismiss button is disabled too.
       setSubmitting(false);
     },
     [session],
@@ -83,42 +83,56 @@ function InstructorSurveyPanel({
   return (
     <section
       aria-labelledby={headingId}
-      className={classnames(
-        'relative flex flex-col gap-3 p-4 bg-grey-1 border-b border-grey-3',
-        'text-color-text text-sm',
-      )}
+      // Same outer shape as the Help, Search and Share panels (SidebarPanel),
+      // so it lines up with whichever of them is open below it.
+      className="mb-4 focus-visible-ring rounded-lg"
       data-testid="instructor-survey-panel"
       ref={container}
       tabIndex={-1}
     >
-      <CloseButton
-        classes="absolute top-1 right-1 text-grey-6 hover:text-grey-7"
-        data-testid="instructor-survey-dismiss"
-        disabled={submitting}
-        onClick={() => submit('dismissed')}
-        title="Dismiss survey"
-      />
-      <h2 className="m-0 text-base font-medium" id={headingId}>
-        Are you a course instructor?
-      </h2>
-      <div className="flex flex-row gap-2">
-        <Button
-          data-testid="instructor-survey-yes"
+      <Card
+        classes={classnames(
+          'relative flex flex-col gap-3 p-3 text-color-text text-sm',
+        )}
+        data-testid="instructor-survey-card"
+      >
+        <CloseButton
+          classes={classnames(
+            'absolute top-1 right-1',
+            // Same size and colours as the close button in TabHeader, which the
+            // Help and Share panels use.
+            'text-[16px] text-grey-6 hover:text-grey-7 hover:bg-grey-3/50',
+            'touch:!min-h-0',
+          )}
+          data-testid="instructor-survey-dismiss"
           disabled={submitting}
-          onClick={() => submit('instructor')}
-          variant="primary"
-        >
-          Yes
-        </Button>
-        <Button
-          data-testid="instructor-survey-no"
-          disabled={submitting}
-          onClick={() => submit('not_instructor')}
-          variant="primary"
-        >
-          No
-        </Button>
-      </div>
+          onClick={() => submit('dismissed')}
+          size="sm"
+          title="Dismiss survey"
+          variant="custom"
+        />
+        <h2 className="m-0 text-base font-medium" id={headingId}>
+          Are you a course instructor?
+        </h2>
+        <div className="flex flex-row gap-2">
+          <Button
+            data-testid="instructor-survey-yes"
+            disabled={submitting}
+            onClick={() => submit('instructor')}
+            variant="primary"
+          >
+            Yes
+          </Button>
+          <Button
+            data-testid="instructor-survey-no"
+            disabled={submitting}
+            onClick={() => submit('not_instructor')}
+            variant="primary"
+          >
+            No
+          </Button>
+        </div>
+      </Card>
     </section>
   );
 }

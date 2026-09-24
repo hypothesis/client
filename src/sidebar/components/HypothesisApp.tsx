@@ -170,12 +170,12 @@ function HypothesisApp({
           isSidebar={isSidebar}
         />
       )}
-      {isSidebar && surveyPending && <InstructorSurveyPanel />}
       {!isModalRoute && shouldShowYoutubeDisclaimer(settings, profile) && (
         <YouTubeDisclaimerBanner />
       )}
       <div className="container">
         <ToastMessages />
+        {isSidebar && surveyPending && <InstructorSurveyPanel />}
         <HelpPanel />
         <SearchPanel />
         <SharePanel shareTab={!isThirdParty} />
