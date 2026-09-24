@@ -219,6 +219,74 @@ describe('HypothesisApp', () => {
     });
   });
 
+  describe('blocking the sidebar behind the survey', () => {
+    it('makes the content inert and greys it out while the survey is pending', () => {
+      fakeStore.isInstructorSurveyPending.returns(true);
+
+      const wrapper = createComponent();
+      const main = wrapper.find('main');
+
+      assert.isTrue(main.prop('inert'));
+      assert.isTrue(main.hasClass('opacity-50'));
+    });
+
+    it('leaves the content alone when the survey is not pending', () => {
+      fakeStore.isInstructorSurveyPending.returns(false);
+
+      const wrapper = createComponent();
+      const main = wrapper.find('main');
+
+      assert.isFalse(main.prop('inert'));
+      assert.isFalse(main.hasClass('opacity-50'));
+    });
+
+    it('takes the scroll away from the root while the survey is pending', () => {
+      // How the panel is kept in place: the content below it is inert anyway.
+      fakeStore.isInstructorSurveyPending.returns(true);
+
+      const wrapper = createComponent();
+      const root = wrapper.find('[data-testid="hypothesis-app"]');
+
+      assert.isTrue(root.hasClass('overflow-hidden'));
+      assert.isFalse(root.hasClass('overflow-auto'));
+    });
+
+    it('gives the root its scroll back once the survey is answered', () => {
+      fakeStore.isInstructorSurveyPending.returns(false);
+
+      const wrapper = createComponent();
+      const root = wrapper.find('[data-testid="hypothesis-app"]');
+
+      assert.isTrue(root.hasClass('overflow-auto'));
+      assert.isFalse(root.hasClass('overflow-hidden'));
+    });
+
+    it('leaves existing drafts alone', () => {
+      // Deliberately not discardAllDrafts(), which is what logout does:
+      // destroying someone's unsaved work to collect a survey answer would be
+      // a bad trade. Drafts stay frozen inside the inert content and come back
+      // when the question is answered.
+      fakeStore.isInstructorSurveyPending.returns(true);
+      fakeStore.countDrafts.returns(2);
+
+      createComponent();
+
+      assert.notCalled(fakeStore.discardAllDrafts);
+      assert.equal(fakeStore.countDrafts(), 2);
+    });
+
+    ['annotation', 'notebook', 'profile', 'stream'].forEach(route => {
+      it(`does not block anything outside the sidebar (${route})`, () => {
+        fakeStore.isInstructorSurveyPending.returns(true);
+        fakeStore.route.returns(route);
+
+        const wrapper = createComponent();
+
+        assert.isFalse(wrapper.find('main').prop('inert'));
+      });
+    });
+  });
+
   // Add tests for common behaviors shared between "Log in" and "Sign up" actions.
   function addCommonLoginTests(action) {
     const clickButton = wrapper =>

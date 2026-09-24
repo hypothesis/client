@@ -93,6 +93,11 @@ function InstructorSurveyPanel({
       <Card
         classes={classnames(
           'relative flex flex-col gap-3 p-3 text-color-text text-sm',
+          // The root's scroll is taken away while this is up, so a panel
+          // taller than the viewport -- large fonts, a narrow sidebar -- would
+          // put its own buttons out of reach. Cheap insurance; the copy is
+          // short.
+          'max-h-[calc(100dvh-49px)] overflow-y-auto',
         )}
         data-testid="instructor-survey-card"
       >
