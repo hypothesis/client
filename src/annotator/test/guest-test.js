@@ -1448,6 +1448,116 @@ describe('Guest', () => {
       assert.calledWith(hostRPC().call, 'textSelected');
     });
 
+    context('when annotating is disabled', () => {
+      it('still shows the adder on a selection', () => {
+        // So that using it can lead the user to what is blocking it.
+        createGuest();
+        emitSidebarEvent('setAnnotatingEnabled', false);
+
+        simulateSelectionWithText();
+
+        assert.called(FakeAdder.instance.show);
+      });
+
+      it('leaves an existing selection alone when it is turned off', () => {
+        createGuest();
+        simulateSelectionWithText();
+        FakeAdder.instance.hide.resetHistory();
+        hostRPC().call.resetHistory();
+
+        emitSidebarEvent('setAnnotatingEnabled', false);
+
+        assert.notCalled(FakeAdder.instance.hide);
+        assert.neverCalledWith(hostRPC().call, 'textUnselected');
+      });
+
+      it('reports the attempt instead of annotating from the adder', async () => {
+        const guest = createGuest();
+        emitSidebarEvent('setAnnotatingEnabled', false);
+        simulateSelectionWithText();
+        sidebarRPC().call.resetHistory();
+
+        const annotation = await guest.createAnnotationFromSelection();
+
+        assert.isNull(annotation);
+        assert.calledWith(sidebarRPC().call, 'annotatingBlocked');
+        assert.neverCalledWith(sidebarRPC().call, 'createAnnotation');
+        assert.equal(guest.selectedRanges.length, 0);
+      });
+
+      it('reports the attempt instead of creating a shape annotation', async () => {
+        const guest = createGuest();
+        emitSidebarEvent('setAnnotatingEnabled', false);
+
+        assert.isNull(await guest.createAnnotation('rect'));
+        assert.calledWith(sidebarRPC().call, 'annotatingBlocked');
+      });
+
+      it('reports the attempt when the toolbar asks for an annotation', () => {
+        createGuest();
+        emitSidebarEvent('setAnnotatingEnabled', false);
+
+        emitHostEvent('createAnnotation', { tool: 'rect' });
+
+        assert.calledWith(sidebarRPC().call, 'annotatingBlocked');
+      });
+
+      it('does not carry a keyboard mode into the next annotation', async () => {
+        const guest = createGuest();
+        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+        emitSidebarEvent('setAnnotatingEnabled', false);
+
+        emitHostEvent('activateMoveMode');
+        await delay(0);
+
+        assert.isUndefined(guest._pendingKeyboardMode);
+        assert.notCalled(fakeDrawTool.draw);
+        assert.calledWith(sidebarRPC().call, 'annotatingBlocked');
+      });
+
+      it('reports the attempt when a keyboard shortcut asks for an annotation', async () => {
+        fakeIntegration.supportedTools.returns(['rect']);
+        fakeDrawTool.getKeyboardModeState.returns({ keyboardActive: false });
+        createGuest();
+        emitSidebarEvent('featureFlagsUpdated', { vpat_keyboard: true });
+        emitSidebarEvent('setAnnotatingEnabled', false);
+
+        document.body.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            ctrlKey: true,
+            shiftKey: true,
+            key: 'y',
+            bubbles: true,
+          }),
+        );
+        await delay(0);
+
+        assert.notCalled(fakeDrawTool.draw);
+        assert.calledWith(sidebarRPC().call, 'annotatingBlocked');
+      });
+
+      it('does not report cancelling a drawing tool', () => {
+        createGuest();
+        emitSidebarEvent('setAnnotatingEnabled', false);
+
+        emitHostEvent('createAnnotation', { tool: null });
+
+        assert.neverCalledWith(sidebarRPC().call, 'annotatingBlocked');
+      });
+
+      it('annotates again once it is turned back on', async () => {
+        const guest = createGuest();
+        emitSidebarEvent('setAnnotatingEnabled', false);
+        emitSidebarEvent('setAnnotatingEnabled', true);
+        simulateSelectionWithText();
+
+        const annotation = await guest.createAnnotationFromSelection();
+
+        assert.isNotNull(annotation);
+        assert.calledWith(sidebarRPC().call, 'createAnnotation', annotation);
+      });
+    });
+
     it('calls "textUnselected" RPC method when clearing text selection', () => {
       createGuest();
 

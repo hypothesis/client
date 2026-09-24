@@ -220,6 +220,7 @@ export class FrameSyncService {
     this._setupSyncToGuests();
     this._setupHostEvents();
     this._setupFeatureFlagSync();
+    this._setupAnnotatingEnabledSync();
     this._setupShortcutsSync();
     this._setupToastMessengerEvents();
   }
@@ -425,10 +426,17 @@ export class FrameSyncService {
       const isLoggedIn = this._store.isLoggedIn();
       const hasGroup = this._store.focusedGroup() !== null;
 
-      if (!isLoggedIn || !hasGroup) {
+      // The survey check is belt and braces: the guest should not have got
+      // this far with annotating off. Reusing this branch means a draft is
+      // never opened inside the inert sidebar, and the annotation is deleted
+      // in the frame it came from.
+      const surveyPending = this._store.isInstructorSurveyPending();
+      if (!isLoggedIn || !hasGroup || surveyPending) {
         this._hostRPC.call('openSidebar');
         if (!isLoggedIn) {
           this._store.openSidebarPanel('loginPrompt');
+        } else if (surveyPending) {
+          this._store.nudgeInstructorSurvey();
         }
         this._guestRPC.forEach(rpc => rpc.call('deleteAnnotation', annot.$tag));
         return;
@@ -504,6 +512,14 @@ export class FrameSyncService {
       this._hostRPC.call('openSidebar');
     });
 
+    // The user tried to annotate while the survey blocks the sidebar. Open it,
+    // if it isn't already, and point them at the survey: with the sidebar
+    // already open, opening it alone would look like the click did nothing.
+    guestRPC.on('annotatingBlocked', () => {
+      this._hostRPC.call('openSidebar');
+      this._store.nudgeInstructorSurvey();
+    });
+
     guestRPC.on('closeSidebar', () => {
       this._hostRPC.call('closeSidebar');
     });
@@ -512,6 +528,10 @@ export class FrameSyncService {
 
     // Synchronize highlight visibility in this guest with the sidebar's controls.
     guestRPC.call('setHighlightsVisible', this._highlightsVisible);
+    guestRPC.call(
+      'setAnnotatingEnabled',
+      !this._store.isInstructorSurveyPending(),
+    );
     guestRPC.call('featureFlagsUpdated', this._store.features());
     guestRPC.call('shortcutsUpdated', getAllShortcuts());
 
@@ -566,6 +586,29 @@ export class FrameSyncService {
 
     // Watch for future flag changes.
     watch(this._store.subscribe, getFlags, sendFlags);
+  }
+
+  /**
+   * Turn annotating off in the guest frames while the sidebar is blocked behind
+   * the EDU role survey, and back on once it is answered.
+   *
+   * Without this the guest would create the annotation and the survey check in
+   * the `createAnnotation` handler would delete it again, so its highlight
+   * would flash on the page and vanish. With it the guest creates nothing and
+   * reports `annotatingBlocked` instead.
+   *
+   * The initial value goes out as each guest connects (see `_connectGuest`).
+   */
+  private _setupAnnotatingEnabledSync() {
+    const getEnabled = () => !this._store.isInstructorSurveyPending();
+
+    const sendEnabled = (enabled: boolean) => {
+      for (const guest of this._guestRPC.values()) {
+        guest.call('setAnnotatingEnabled', enabled);
+      }
+    };
+
+    watch(this._store.subscribe, getEnabled, sendEnabled);
   }
 
   /**

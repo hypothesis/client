@@ -149,4 +149,23 @@ describe('sidebar/store/modules/session', () => {
       assert.isFalse(store.isInstructorSurveyPending());
     });
   });
+
+  describe('#nudgeInstructorSurvey', () => {
+    it('counts each attempt to get past the survey', () => {
+      assert.equal(store.instructorSurveyNudges(), 0);
+
+      store.nudgeInstructorSurvey();
+      store.nudgeInstructorSurvey();
+
+      assert.equal(store.instructorSurveyNudges(), 2);
+    });
+
+    it('leaves the profile alone', () => {
+      store.updateProfile({ userid: 'john', features: {}, preferences: {} });
+
+      store.nudgeInstructorSurvey();
+
+      assert.equal(store.profile().userid, 'john');
+    });
+  });
 });
