@@ -30,6 +30,13 @@ export type State = {
    * Profile object fetched from the `/api/profile` endpoint.
    */
   profile: Profile;
+
+  /**
+   * How many times the user has been pointed at the EDU role survey because
+   * they tried to annotate while it blocks the sidebar. Only changes matter:
+   * the survey panel draws attention to itself on each one.
+   */
+  instructorSurveyNudges: number;
 };
 
 /**
@@ -52,6 +59,7 @@ function initialState(settings: SidebarSettings): State {
     defaultAuthority: settings?.authDomain ?? '',
     features: settings.features ?? [],
     profile: initialProfile,
+    instructorSurveyNudges: 0,
   };
 }
 
@@ -61,6 +69,10 @@ const reducers = {
       profile: { ...action.profile },
     };
   },
+
+  NUDGE_INSTRUCTOR_SURVEY(state: State) {
+    return { instructorSurveyNudges: state.instructorSurveyNudges + 1 };
+  },
 };
 
 /**
@@ -68,6 +80,13 @@ const reducers = {
  */
 function updateProfile(profile: Profile) {
   return makeAction(reducers, 'UPDATE_PROFILE', { profile });
+}
+
+/**
+ * Point the user at the EDU role survey: they tried to do something it blocks.
+ */
+function nudgeInstructorSurvey() {
+  return makeAction(reducers, 'NUDGE_INSTRUCTOR_SURVEY', undefined);
 }
 
 function defaultAuthority(state: State) {
@@ -111,11 +130,15 @@ function isFeatureEnabled(state: State, feature: string) {
  * Return true if the EDU role survey is being asked of this user.
  *
  * The single source of truth for the survey's visibility, shared by the panel
- * and (in the sidebar-blocking work) by FrameSyncService, so that the two can't
- * disagree about whether the survey is up.
+ * and by FrameSyncService, so that the two can't disagree about whether the
+ * survey is up.
  */
 function isInstructorSurveyPending(state: State) {
   return shouldShowInstructorSurvey(state.profile, features(state));
+}
+
+function instructorSurveyNudges(state: State) {
+  return state.instructorSurveyNudges;
 }
 
 /**
@@ -147,6 +170,7 @@ export const sessionModule = createStoreModule(initialState, {
   reducers,
 
   actionCreators: {
+    nudgeInstructorSurvey,
     updateProfile,
   },
 
@@ -155,6 +179,7 @@ export const sessionModule = createStoreModule(initialState, {
     features,
     hasFetchedProfile,
     isFeatureEnabled,
+    instructorSurveyNudges,
     isInstructorSurveyPending,
     isLoggedIn,
     profile,

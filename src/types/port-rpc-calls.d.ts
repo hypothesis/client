@@ -115,6 +115,13 @@ export type GuestToSidebarCalls = CommonCalls & {
   /** Request to open the sidebar. */
   openSidebar(): void;
 
+  /**
+   * The user tried to create an annotation while annotating is turned off
+   * (see `setAnnotatingEnabled`). Nothing was created; the sidebar opens and
+   * points the user at what is blocking it.
+   */
+  annotatingBlocked(): void;
+
   /** The URIs or metadata of the document in the guest frame changed. */
   documentInfoChanged(info: DocumentInfo): void;
 
@@ -230,6 +237,19 @@ export type SidebarToGuestCalls = {
 
   /** Scroll an annotation into view. */
   scrollToAnnotation(tag: string): void;
+
+  /**
+   * Turn annotating in the guest frames on or off.
+   *
+   * Pushed from the sidebar rather than derived from a feature flag on the
+   * annotator side, because what it reflects -- the EDU role survey blocking
+   * the sidebar -- is sidebar state that the annotator has no other way to
+   * know about.
+   *
+   * While it is off the adder and the toolbar's buttons still show, but using
+   * them reports `annotatingBlocked` instead of creating an annotation.
+   */
+  setAnnotatingEnabled(enabled: boolean): void;
 
   setHighlightsVisible(visible: boolean): void;
 

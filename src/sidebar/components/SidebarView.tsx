@@ -50,6 +50,7 @@ function SidebarView({
 
   const searchUris = store.searchUris();
   const sidebarHasOpened = store.hasSidebarOpened();
+  const surveyShown = store.isInstructorSurveyPending();
   const userId = store.profile().userid;
 
   // If, after loading completes, no `linkedAnnotation` object is present when
@@ -130,19 +131,27 @@ function SidebarView({
   return (
     <div className="relative">
       <h2 className="sr-only">Annotations</h2>
-      <div
-        className={classnames(
-          // z-10 ensures this appears over sidebar panels, which use the same
-          // z-index but render lower in the DOM
-          'fixed z-10',
-          // Setting 9px to the right instead of some standard tailwind size,
-          // so that it matches the padding of the sidebar's container.
-          // DEFAULT `.container` padding is defined in tailwind.conf.js
-          'right-[9px] top-12',
-        )}
-      >
-        <PendingUpdatesNotification />
-      </div>
+      {/*
+        Hidden while the EDU role survey is up: this is `fixed top-12`, so it
+        would float over the survey panel -- greyed out and inert with the rest
+        of the content, but still on top of the question. Applying real-time
+        updates to a list nobody can reach has nothing to offer either.
+      */}
+      {!surveyShown && (
+        <div
+          className={classnames(
+            // z-10 ensures this appears over sidebar panels, which use the same
+            // z-index but render lower in the DOM
+            'fixed z-10',
+            // Setting 9px to the right instead of some standard tailwind size,
+            // so that it matches the padding of the sidebar's container.
+            // DEFAULT `.container` padding is defined in tailwind.conf.js
+            'right-[9px] top-12',
+          )}
+        >
+          <PendingUpdatesNotification />
+        </div>
+      )}
       {showFilterControls && <FilterControls withCardContainer />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
