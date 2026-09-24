@@ -173,7 +173,9 @@ type ListGroupParams = {
   expand?: string[];
 };
 
-export type AnalyticsEventName = 'client.realtime.apply_updates';
+export type AnalyticsEventName =
+  | 'client.realtime.apply_updates'
+  | 'client.survey.instructor_role.shown';
 
 export type AnalyticsEvent = {
   event: AnalyticsEventName;

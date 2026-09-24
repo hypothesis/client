@@ -370,10 +370,30 @@ export type Profile = {
     shortcuts_preferences?: ShortcutsPreferences;
     /** When true, user has not dismissed the YouTube GDPR banner (from H backend). */
     show_youtube_gdpr_banner?: boolean;
+    /**
+     * When true, the EDU role survey is being asked of this user: they are in
+     * its audience and haven't answered it yet. The client is not told why —
+     * all of the eligibility lives in H, so changing who is asked needs no
+     * client release.
+     */
+    show_instructor_survey?: boolean;
+    /** The user's answer to the EDU role survey. */
+    instructor_survey_response?: InstructorSurveyResponse;
   };
   features: Record<string, boolean>;
   user_info?: UserInfo;
 };
+
+/**
+ * A user's answer to the EDU role survey.
+ *
+ * 'dismissed' is an answer like the other two, not the absence of one: the
+ * survey has to be dismissable, and a dismissal stops it being shown again.
+ */
+export type InstructorSurveyResponse =
+  | 'instructor'
+  | 'not_instructor'
+  | 'dismissed';
 
 export type GroupType = 'private' | 'restricted' | 'open';
 
