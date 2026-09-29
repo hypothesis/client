@@ -32,6 +32,7 @@ function InstructorSurveyPanel({
 }: InstructorSurveyPanelProps) {
   const store = useSidebarStore();
   const headingId = useId();
+  const introId = useId();
   const container = useRef<HTMLElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -103,6 +104,7 @@ function InstructorSurveyPanel({
 
   return (
     <section
+      aria-describedby={introId}
       aria-labelledby={headingId}
       // Same outer shape as the Help, Search and Share panels (SidebarPanel),
       // so it lines up with whichever of them is open below it.
@@ -141,9 +143,14 @@ function InstructorSurveyPanel({
           title="Dismiss survey"
           variant="custom"
         />
-        <h2 className="m-0 text-base font-medium" id={headingId}>
-          Are you a course instructor?
-        </h2>
+        <div className="flex flex-col gap-1 pr-6">
+          <p className="m-0" id={introId}>
+            Hello! We have a quick question before your next annotation.
+          </p>
+          <h2 className="m-0 text-base font-medium" id={headingId}>
+            Are you a course instructor using Hypothesis?
+          </h2>
+        </div>
         <div className="flex flex-row gap-2">
           <Button
             data-testid="instructor-survey-yes"

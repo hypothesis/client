@@ -46,7 +46,26 @@ describe('InstructorSurveyPanel', () => {
 
   it('asks the question', () => {
     const wrapper = createComponent();
-    assert.include(wrapper.text(), 'Are you a course instructor?');
+    assert.include(
+      wrapper.text(),
+      'Are you a course instructor using Hypothesis?',
+    );
+  });
+
+  it('is named by the question and described by the greeting', () => {
+    // So that a screen reader landing on the panel hears both, question first.
+    const wrapper = createComponent();
+    const section = wrapper
+      .find('section[data-testid="instructor-survey-panel"]')
+      .getDOMNode();
+
+    const byId = attr =>
+      document.getElementById(section.getAttribute(attr)).textContent;
+    assert.equal(
+      byId('aria-labelledby').trim(),
+      'Are you a course instructor using Hypothesis?',
+    );
+    assert.include(byId('aria-describedby'), 'quick question');
   });
 
   it('tracks an impression once the sidebar has been opened', () => {
