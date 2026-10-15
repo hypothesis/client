@@ -12,7 +12,9 @@
 # <version> defaults to the "version" field from package.json.
 
 package_name=hypothesis
-timeout=60
+# npm now processes a new version after "npm publish" returns, which can take
+# a few minutes.
+timeout=600
 start_time=$(date +%s)
 end_time=$((start_time + timeout))
 
