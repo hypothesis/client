@@ -24,9 +24,10 @@ Not all configuration settings can be set in this way, some must be
 
 .. note::
 
-   The body of the ``.js-hypothesis-config`` tag must be
-   `valid JSON <http://jsonlint.com/>`_, invalid JSON will cause the entire
-   config object to be ignored.
+   The body of the ``.js-hypothesis-config`` tag must be valid JSON. You can
+   check this with `JSONLint <http://jsonlint.com/>`_ or the
+   `JSONViewerTool JSON Validator <https://jsonviewertool.com/json-validator>`_.
+   Invalid JSON will cause the entire config object to be ignored.
 
 .. _configuring-with-js:
 
