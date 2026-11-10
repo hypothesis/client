@@ -30,7 +30,9 @@ jobs:
 
   release-staging:
     needs: continuous-integration
-    runs-on: ubuntu-latest
+    # Pinned to match the `ci` job. This also keeps the build on the image's
+    # default Node 22; ubuntu-latest (Ubuntu 26.04) defaults to Node 24.
+    runs-on: ubuntu-24.04
     # This presently uses the AWS / Sentry auth from the old "QA" environment.
     # We should eventually rename that environment or create a new one.
     environment: qa
@@ -78,7 +80,9 @@ jobs:
   release-prod:
     if: github.ref_name == 'main'
     needs: release-staging
-    runs-on: ubuntu-latest
+    # Pinned to match the `ci` job. This also keeps the build on the image's
+    # default Node 22; ubuntu-latest (Ubuntu 26.04) defaults to Node 24.
+    runs-on: ubuntu-24.04
     environment: production
     env:
       NOTEBOOK_APP_URL: https://hypothes.is/notebook
