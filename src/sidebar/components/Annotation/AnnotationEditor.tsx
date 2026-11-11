@@ -79,6 +79,11 @@ function AnnotationEditor({
   // which link to external websites.
   const showHelpLink = serviceConfig(settings)?.enableHelpPanel ?? true;
 
+  // The "About the Annotation editor" link also goes to an external website,
+  // so it follows the same rule, on top of its feature flag.
+  const showEditorInfoLink =
+    showHelpLink && store.isFeatureEnabled('annotation_editor_info');
+
   const tags = draft.tags;
   const text = draft.text;
   const description = draft.description;
@@ -300,6 +305,7 @@ function AnnotationEditor({
         mentionsEnabled={mentionsEnabled}
         usersForMentions={usersForMentions}
         showHelpLink={showHelpLink}
+        showEditorInfoLink={showEditorInfoLink}
         mentions={annotation.mentions}
         mentionMode={mentionMode}
         onInsertMentionSuggestion={onInsertMentionSuggestion}

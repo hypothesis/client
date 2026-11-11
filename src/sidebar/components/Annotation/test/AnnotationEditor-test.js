@@ -464,6 +464,70 @@ describe('AnnotationEditor', () => {
     });
   });
 
+  describe('editor info link', () => {
+    const showsEditorInfoLink = wrapper =>
+      wrapper.find('MarkdownEditor').prop('showEditorInfoLink');
+
+    const enableEditorInfo = () =>
+      fakeStore.isFeatureEnabled
+        .withArgs('annotation_editor_info')
+        .returns(true);
+
+    it('is hidden by default', () => {
+      const wrapper = createComponent();
+      assert.isFalse(showsEditorInfoLink(wrapper));
+    });
+
+    it('is hidden if only other features are enabled', () => {
+      fakeStore.isFeatureEnabled.withArgs('at_mentions').returns(true);
+      fakeStore.isFeatureEnabled.withArgs('image_descriptions').returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(showsEditorInfoLink(wrapper));
+    });
+
+    it('is shown if the `annotation_editor_info` feature is enabled', () => {
+      enableEditorInfo();
+      const wrapper = createComponent();
+      assert.isTrue(showsEditorInfoLink(wrapper));
+    });
+
+    [
+      { enableHelpPanel: true, expected: true },
+      { enableHelpPanel: false, expected: false },
+    ].forEach(({ enableHelpPanel, expected }) => {
+      it('is hidden if the Help panel is disabled', () => {
+        enableEditorInfo();
+        fakeSettings = { services: [{ enableHelpPanel }] };
+
+        const wrapper = createComponent();
+
+        assert.equal(showsEditorInfoLink(wrapper), expected);
+      });
+    });
+
+    it('is rendered before the toolbar when the editor is shown', () => {
+      enableEditorInfo();
+      // Render the real editor, rather than a mock.
+      $imports.$restore({ '../MarkdownEditor': true });
+
+      const wrapper = createComponent();
+
+      const editor = wrapper.find(editorSelector).getDOMNode();
+      const link = editor.querySelector('[data-testid="editor-info-link"]');
+      const toolbar = editor.querySelector('[data-testid="markdown-toolbar"]');
+      assert.ok(link);
+      assert.ok(toolbar);
+      assert.isTrue(
+        Boolean(
+          link.compareDocumentPosition(toolbar) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+        ),
+      );
+    });
+  });
+
   describe('loading focused group members', () => {
     [
       {
@@ -679,6 +743,18 @@ describe('AnnotationEditor', () => {
         // AnnotationEditor is primarily a container and state-managing component;
         // a11y should be more deeply checked on the leaf components
         content: () => createComponent(),
+      },
+      {
+        name: 'Editor info link',
+        content: () => {
+          fakeStore.isFeatureEnabled
+            .withArgs('annotation_editor_info')
+            .returns(true);
+          // Render the real editor, as that is what renders the link.
+          $imports.$restore({ '../MarkdownEditor': true });
+
+          return createComponent();
+        },
       },
     ]),
   );
