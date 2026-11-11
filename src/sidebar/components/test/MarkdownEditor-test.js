@@ -464,6 +464,178 @@ describe('MarkdownEditor', () => {
     });
   });
 
+  describe('editor info link', () => {
+    const linkSelector = 'a[data-testid="editor-info-link"]';
+    const toolbarSelector = '[data-testid="markdown-toolbar"]';
+
+    const isBefore = (a, b) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+
+    /** Return the elements inside `root` that the Tab key stops at, in order. */
+    function tabStops(root) {
+      const focusable = [
+        ...root.querySelectorAll('a[href], button, textarea, [tabindex]'),
+      ].filter(el => !el.disabled);
+
+      // Tab order is only the same as DOM order if no element has a positive
+      // `tabindex`.
+      assert.isEmpty(focusable.filter(el => el.tabIndex > 0));
+
+      return focusable.filter(el => el.tabIndex === 0);
+    }
+
+    function clickPreview(wrapper) {
+      wrapper
+        .find('button')
+        .filterWhere(el => el.text() === 'Preview')
+        .simulate('click');
+    }
+
+    it('is not rendered by default', () => {
+      const wrapper = createComponent();
+      const editor = wrapper.getDOMNode();
+
+      assert.isFalse(wrapper.exists(linkSelector));
+      // The toolbar is the first thing in the editor, as it was before this
+      // link was added.
+      assert.equal(
+        editor.firstElementChild,
+        editor.querySelector(toolbarSelector),
+      );
+
+      // Turning the link off explicitly renders the same thing.
+      const explicitlyOff = createComponent({ showEditorInfoLink: false });
+      assert.equal(explicitlyOff.getDOMNode().outerHTML, editor.outerHTML);
+    });
+
+    it('links to the Help Center article, in a new tab', () => {
+      const wrapper = createComponent({ showEditorInfoLink: true });
+      const link = wrapper.find(linkSelector).getDOMNode();
+
+      assert.equal(
+        link.getAttribute('href'),
+        'https://web.hypothes.is/help/using-the-annotation-editor/',
+      );
+      assert.equal(link.getAttribute('target'), '_blank');
+      assert.equal(link.getAttribute('rel'), 'noopener noreferrer');
+    });
+
+    it('has a tooltip and an accessible name', () => {
+      const wrapper = createComponent({ showEditorInfoLink: true });
+      const link = wrapper.find(linkSelector).getDOMNode();
+
+      assert.equal(link.getAttribute('title'), 'About the Annotation editor');
+      assert.equal(
+        link.getAttribute('aria-label'),
+        'About the Annotation editor. Learn what this text field is for. Opens Help Center article in a new tab.',
+      );
+      // The icon is the only content, and it is hidden from assistive
+      // technology, so the name comes from `aria-label` alone.
+      assert.equal(link.textContent, '');
+      assert.equal(link.children.length, 1);
+      assert.equal(link.children[0].getAttribute('aria-hidden'), 'true');
+    });
+
+    it('shows a grey info icon', () => {
+      const wrapper = createComponent(
+        { showEditorInfoLink: true },
+        { connected: true },
+      );
+      const link = wrapper.find(linkSelector).getDOMNode();
+      const icon = link.querySelector('svg[data-component="InfoIcon"]');
+      assert.ok(icon);
+
+      const { width, height } = icon.getBoundingClientRect();
+      assert.equal(width, 16);
+      assert.equal(height, 16);
+
+      // Links are red by default in the sidebar. This one must be a grey.
+      const [red, green, blue] = getComputedStyle(icon)
+        .color.match(/\d+/g)
+        .map(Number);
+      assert.equal(red, green);
+      assert.equal(green, blue);
+    });
+
+    it('comes before the toolbar in DOM and tab order', () => {
+      const wrapper = createComponent(
+        { showEditorInfoLink: true },
+        { connected: true },
+      );
+      const editor = wrapper.getDOMNode();
+      const link = editor.querySelector(linkSelector);
+      const toolbar = editor.querySelector(toolbarSelector);
+      const textarea = editor.querySelector('textarea');
+
+      // The link is outside the toolbar, in a row above it.
+      assert.equal(editor.firstElementChild.firstElementChild, link);
+      assert.isFalse(toolbar.contains(link));
+      assert.isTrue(isBefore(link, toolbar));
+      assert.isTrue(isBefore(toolbar, textarea));
+
+      // The toolbar is a single tab stop. See `useArrowKeyNavigation`.
+      const [first, second, third, ...rest] = tabStops(editor);
+      assert.equal(first, link);
+      assert.isTrue(toolbar.contains(second));
+      assert.equal(third, textarea);
+      assert.isEmpty(rest);
+
+      link.focus();
+      assert.equal(document.activeElement, link);
+    });
+
+    it('is not reached by arrow key navigation in the toolbar', () => {
+      const wrapper = createComponent(
+        { showEditorInfoLink: true },
+        { connected: true },
+      );
+      const link = wrapper.find(linkSelector).getDOMNode();
+      const toolbar = wrapper.find(toolbarSelector);
+
+      // Go past both ends of the toolbar.
+      for (const key of ['Home', 'ArrowLeft', 'End', 'ArrowRight']) {
+        toolbar.simulate('keydown', { key });
+        assert.notEqual(document.activeElement, link);
+        assert.isTrue(toolbar.getDOMNode().contains(document.activeElement));
+      }
+    });
+
+    it('is still rendered in preview mode', () => {
+      const wrapper = createComponent({ showEditorInfoLink: true });
+
+      clickPreview(wrapper);
+
+      assert.isFalse(wrapper.exists('textarea'));
+      assert.isTrue(wrapper.exists(linkSelector));
+    });
+
+    [true, false].forEach(showHelpLink => {
+      it('does not affect the "Formatting help" link', () => {
+        const wrapper = createComponent({
+          showEditorInfoLink: true,
+          showHelpLink,
+        });
+
+        assert.isTrue(wrapper.exists(linkSelector));
+
+        const helpLink = wrapper.find('Link[aria-label="Formatting help"]');
+        assert.equal(helpLink.exists(), showHelpLink);
+        if (showHelpLink) {
+          assert.equal(
+            helpLink.prop('href'),
+            'https://web.hypothes.is/help/formatting-annotations-with-markdown/',
+          );
+          assert.isTrue(
+            wrapper
+              .find(toolbarSelector)
+              .getDOMNode()
+              .contains(helpLink.getDOMNode()),
+          );
+        }
+      });
+    });
+  });
+
   context('when @mentions are enabled', () => {
     function keyDownInTextarea(wrapper, key) {
       const textarea = wrapper.find('textarea');
@@ -691,6 +863,10 @@ describe('MarkdownEditor', () => {
 
           return wrapper;
         },
+      },
+      {
+        name: 'Editor info link',
+        content: () => createComponent({ showEditorInfoLink: true }),
       },
       {
         name: 'Suggestions popover',

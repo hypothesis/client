@@ -13,6 +13,7 @@ import {
   EditorTextItalicIcon,
   HelpIcon,
   ImageIcon,
+  InfoIcon,
   LinkIcon,
   ListOrderedIcon,
   ListUnorderedIcon,
@@ -545,6 +546,44 @@ function Toolbar({
   );
 }
 
+/**
+ * Link to a Help Center article which explains what the annotation editor is
+ * for. This gives the text field a cue that is always visible, rather than one
+ * that only appears on hover or focus (WCAG 3.3.2).
+ *
+ * It is rendered in a row of its own above the toolbar, rather than inside it,
+ * so that it is a separate tab stop which comes before the formatting buttons.
+ * The article opens in a new tab, so the draft is not lost.
+ */
+function EditorInfoLink() {
+  return (
+    // `flex` keeps the link from stretching to the full width of the row.
+    <div className="flex mb-1">
+      <Link
+        classes={classnames(
+          // A 24px target around the 16px icon. The negative margin lines the
+          // icon up with the left edge of the toolbar below.
+          'flex justify-center items-center w-6 h-6 -ml-1',
+          'touch:h-touch-minimum touch:w-touch-minimum',
+          'text-grey-7 hover:text-grey-9',
+        )}
+        data-testid="editor-info-link"
+        href="https://web.hypothes.is/help/using-the-annotation-editor/"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="About the Annotation editor"
+        aria-label="About the Annotation editor. Learn what this text field is for. Opens Help Center article in a new tab."
+        underline="none"
+        variant="custom"
+      >
+        {/* The "i" is a hole in the icon, so it has the color of whatever is
+            behind it, which is the white background of the annotation card. */}
+        <InfoIcon className="w-4 h-4" />
+      </Link>
+    </div>
+  );
+}
+
 export type MarkdownEditorProps = {
   /**
    * Whether the at-mentions feature ir enabled or not.
@@ -565,6 +604,12 @@ export type MarkdownEditorProps = {
 
   /** Whether to display the formatting help link in the toolbar. */
   showHelpLink?: boolean;
+
+  /**
+   * Whether to display the "About the Annotation editor" link above the
+   * toolbar. Defaults to false.
+   */
+  showEditorInfoLink?: boolean;
 
   /**
    * Base list of users used to populate the @mentions suggestions, when
@@ -593,6 +638,7 @@ export default function MarkdownEditor({
   text,
   textStyle = {},
   showHelpLink = true,
+  showEditorInfoLink = false,
   usersForMentions,
   mentions,
   mentionMode,
@@ -640,6 +686,7 @@ export default function MarkdownEditor({
 
   return (
     <div className="leading-none">
+      {showEditorInfoLink && <EditorInfoLink />}
       <Toolbar
         onCommand={handleCommand}
         isPreviewing={preview}
