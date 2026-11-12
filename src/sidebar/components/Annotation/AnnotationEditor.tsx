@@ -79,7 +79,7 @@ function AnnotationEditor({
   // which link to external websites.
   const showHelpLink = serviceConfig(settings)?.enableHelpPanel ?? true;
 
-  // The "Annotation Editor Help" link also goes to an external website,
+  // The "Annotation editor help" link also goes to an external website,
   // so it follows the same rule, on top of its feature flag.
   const showEditorInfoLink =
     showHelpLink && store.isFeatureEnabled('annotation_editor_info');

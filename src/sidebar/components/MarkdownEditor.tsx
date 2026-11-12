@@ -554,8 +554,14 @@ function Toolbar({
  * It is rendered in a row of its own above the toolbar, rather than inside it,
  * so that it is a separate tab stop which comes before the formatting buttons.
  * The article opens in a new tab, so the draft is not lost.
+ *
+ * The tooltip and the accessible name are the same text, so what is shown on
+ * hover is what a screen reader says and what voice control listens for. What
+ * the link is for, and that it opens a new tab, is its accessible description.
  */
 function EditorInfoLink() {
+  const descriptionId = useId();
+
   return (
     // `flex` keeps the link from stretching to the full width of the row.
     <div className="flex mb-1">
@@ -571,8 +577,9 @@ function EditorInfoLink() {
         href="https://web.hypothes.is/help/using-the-annotation-editor/"
         target="_blank"
         rel="noopener noreferrer"
-        title="Annotation Editor Help"
-        aria-label="About the Annotation editor. Learn what this text field is for. Opens Help Center article in a new tab."
+        title="Annotation editor help"
+        aria-label="Annotation editor help"
+        aria-describedby={descriptionId}
         underline="none"
         variant="custom"
       >
@@ -580,6 +587,12 @@ function EditorInfoLink() {
             behind it, which is the white background of the annotation card. */}
         <InfoIcon className="w-4 h-4" />
       </Link>
+      {/* `hidden`, so that it is read only as the link's description and not
+          a second time as text after it. */}
+      <span id={descriptionId} hidden>
+        Learn what the annotation text field is for. Opens Help Center article
+        in a new tab.
+      </span>
     </div>
   );
 }
@@ -606,7 +619,7 @@ export type MarkdownEditorProps = {
   showHelpLink?: boolean;
 
   /**
-   * Whether to display the "Annotation Editor Help" link above the toolbar.
+   * Whether to display the "Annotation editor help" link above the toolbar.
    * Defaults to false.
    */
   showEditorInfoLink?: boolean;
