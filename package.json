@@ -29,7 +29,7 @@
     "@rollup/plugin-replace": "^6.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "@rollup/plugin-virtual": "^3.0.0",
-    "@sentry/browser": "^10.5.0",
+    "@sentry/browser": "^11.8.0",
     "@sentry/cli": "^3.4.1",
     "@tailwindcss/postcss": "^4.1.13",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
