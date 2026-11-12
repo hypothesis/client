@@ -520,20 +520,77 @@ describe('MarkdownEditor', () => {
       assert.equal(link.getAttribute('rel'), 'noopener noreferrer');
     });
 
-    it('has a tooltip and an accessible name', () => {
+    it('has a tooltip and the same text as its accessible name', () => {
       const wrapper = createComponent({ showEditorInfoLink: true });
       const link = wrapper.find(linkSelector).getDOMNode();
 
-      assert.equal(link.getAttribute('title'), 'About the Annotation editor');
-      assert.equal(
-        link.getAttribute('aria-label'),
-        'About the Annotation editor. Learn what this text field is for. Opens Help Center article in a new tab.',
-      );
+      assert.equal(link.getAttribute('title'), 'Annotation Editor Help');
+      // What is shown on hover is what a screen reader says and what voice
+      // control listens for.
+      assert.equal(link.getAttribute('aria-label'), link.getAttribute('title'));
       // The icon is the only content, and it is hidden from assistive
       // technology, so the name comes from `aria-label` alone.
       assert.equal(link.textContent, '');
       assert.equal(link.children.length, 1);
       assert.equal(link.children[0].getAttribute('aria-hidden'), 'true');
+    });
+
+    it('is described by text that says what it is for and that it opens a new tab', () => {
+      const wrapper = createComponent(
+        { showEditorInfoLink: true },
+        { connected: true },
+      );
+      const link = wrapper.find(linkSelector).getDOMNode();
+
+      // `aria-describedby` takes one or more IDs. There is exactly one here,
+      // and it is of an element in the same document.
+      const ids = link.getAttribute('aria-describedby').split(/\s+/);
+      assert.lengthOf(ids, 1);
+      const description = document.getElementById(ids[0]);
+      assert.ok(description);
+
+      assert.equal(
+        description.textContent.replace(/\s+/g, ' ').trim(),
+        'Learn what this text field is for. Opens Help Center article in a new tab.',
+      );
+      // The description does not repeat the name, which is read before it.
+      assert.notInclude(description.textContent, link.getAttribute('title'));
+
+      // It is only the description of the link: not shown, not read a second
+      // time as text of its own, and not something the Tab key stops at.
+      assert.isTrue(description.hidden);
+      assert.equal(getComputedStyle(description).display, 'none');
+      assert.isFalse(link.contains(description));
+      assert.notInclude(tabStops(wrapper.getDOMNode()), description);
+    });
+
+    it('gives each editor a description of its own', () => {
+      // Several annotations can be open for editing at once, in one tree. An
+      // ID used twice would make both links point at the first description.
+      const editors = [1, 2].map(key => (
+        <MarkdownEditor
+          key={key}
+          label="Test editor"
+          text="test"
+          mentionsEnabled={false}
+          usersForMentions={{ status: 'loaded', users: [] }}
+          mentionMode="username"
+          showEditorInfoLink={true}
+        />
+      ));
+      const wrapper = mount(<div>{editors}</div>, { connected: true });
+
+      const links = [...wrapper.getDOMNode().querySelectorAll(linkSelector)];
+      assert.lengthOf(links, 2);
+      const ids = links.map(link => link.getAttribute('aria-describedby'));
+      assert.notEqual(ids[0], ids[1]);
+
+      links.forEach((link, index) => {
+        const described = document.querySelectorAll(`[id="${ids[index]}"]`);
+        assert.lengthOf(described, 1);
+        // Each link is described by the element next to it.
+        assert.equal(described[0], link.nextElementSibling);
+      });
     });
 
     it('shows a grey info icon', () => {
