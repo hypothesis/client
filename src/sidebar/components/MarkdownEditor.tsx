@@ -554,16 +554,8 @@ function Toolbar({
  * It is rendered in a row of its own above the toolbar, rather than inside it,
  * so that it is a separate tab stop which comes before the formatting buttons.
  * The article opens in a new tab, so the draft is not lost.
- *
- * The link's accessible name is the same text as its tooltip, so what is shown
- * on hover is what a screen reader says and what voice control listens for.
- * The rest of what a screen reader user needs to know is the link's
- * description. Giving it one also stops browsers from using `title` as the
- * description, which would read the tooltip out a second time.
  */
 function EditorInfoLink() {
-  const descriptionId = useId();
-
   return (
     // `flex` keeps the link from stretching to the full width of the row.
     <div className="flex mb-1">
@@ -580,8 +572,7 @@ function EditorInfoLink() {
         target="_blank"
         rel="noopener noreferrer"
         title="Annotation Editor Help"
-        aria-label="Annotation Editor Help"
-        aria-describedby={descriptionId}
+        aria-label="About the Annotation editor. Learn what this text field is for. Opens Help Center article in a new tab."
         underline="none"
         variant="custom"
       >
@@ -589,12 +580,6 @@ function EditorInfoLink() {
             behind it, which is the white background of the annotation card. */}
         <InfoIcon className="w-4 h-4" />
       </Link>
-      {/* `hidden`, so that it is only read as the description of the link and
-          not a second time as text after it. */}
-      <span id={descriptionId} hidden>
-        Learn what this text field is for. Opens Help Center article in a new
-        tab.
-      </span>
     </div>
   );
 }
